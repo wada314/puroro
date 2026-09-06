@@ -20,6 +20,7 @@ pub(crate) mod slot_init;
 pub(crate) mod value_layout;
 pub(crate) mod value_slot;
 
+pub use crate::fields::wire::wire_or_sso::WireOrSso;
 pub use crate::unknown_fields::{DiscardUnknowns, UnknownFields, UnknownStore};
 pub use ::unmanaged::DefaultIn;
 pub use field_deallocate::FieldDeallocate;
@@ -331,6 +332,20 @@ pub trait MessageBinding<A: Allocator>: MessageCommonAlloc<Alloc = A> + MessageC
 pub trait MessageBindingMut<A: Allocator>: MessageBinding<A> {
     /// Mutable unknown-field store for this binding.
     fn unknown_fields_mut(&mut self) -> &mut Self::Unknown;
+}
+
+/// Bit writes through `&self` (lazy LEN promotion).
+pub trait MessageCommonSharedBits: MessageCommonBits {
+    fn set_bit_shared(&self, bit: usize, value: bool);
+}
+
+impl<const N: usize, A: Allocator, U: UnknownStore<A>> MessageCommonSharedBits
+    for MessageCommon<InteriorBitArray<N>, A, U>
+{
+    #[inline]
+    fn set_bit_shared(&self, bit: usize, value: bool) {
+        self.bits.set_shared(bit, value);
+    }
 }
 
 impl<B, A: Allocator, U: UnknownStore<A>> MessageBinding<A> for MessageCommon<B, A, U>

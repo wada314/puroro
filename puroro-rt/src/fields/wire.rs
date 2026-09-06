@@ -33,4 +33,4 @@ pub use repeated_element::RepeatedElement;
 pub use singular_type::{PayloadAccess, SingularType};
 pub use sso_bytes::{SsoBytes, SsoBytesMut};
 pub use sso_string::{INLINE_CAP, SsoString, SsoStringMut};
-pub use wire_or_sso::{LazyBytesSlot, LazyStringSlot, WireOrSsoArm, WireOrSsoSlot};
+pub use wire_or_sso::{LazyBytesSlot, LazyStringSlot, WireOrSsoKind, WireOrSsoSlot};

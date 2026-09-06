@@ -18,8 +18,8 @@ pub const BIT_CITY: usize = 2; // city (EXPLICIT presence)
 pub const BIT_CITY_SSO: usize = 3; // city (SSO: 1 = heap)
 pub const BIT_POSTAL_CODE: usize = 4; // postal_code (EXPLICIT fixed32)
 pub const BIT_LATITUDE: usize = 5; // latitude (EXPLICIT double)
-pub const BIT_STREET_ARM1: usize = 6; // street WireOrSso high arm bit
-pub const BIT_CITY_ARM1: usize = 7; // city WireOrSso high arm bit
+pub const BIT_STREET_LAZY_KIND: usize = 8; // lazy-only 2-bit WireOrSso kind (this bit and the next)
+pub const BIT_CITY_LAZY_KIND: usize = 10; // lazy-only 2-bit WireOrSso kind (this bit and the next)
 
 // ---------------------------------------------------------------------------
 // Proto field numbers

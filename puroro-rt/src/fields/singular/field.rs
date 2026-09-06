@@ -25,21 +25,26 @@ use ::bytes::BufMut;
 use crate::defaults::ProtoDefault;
 use ::puroro::{DecodeBuf, DecodeError, HasDefault, Optional, WireType};
 
+use crate::decode::WireSpan;
 use crate::encode::field_number_const;
 use crate::fields::shared::FieldDeallocate;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{
-    DefaultIn, MessageBindingMut, MessageCommon, MessageCommonAlloc,
+    DefaultIn, MessageBindingMut, MessageCommon, MessageCommonAlloc, MessageCommonSharedBits,
     field_presence::{
         Explicit, FieldPresence, Implicit, LegacyRequired, Message, Oneof, RequiredFieldPresence,
     },
     slot_init::{AlwaysInitialized, SlotInitView},
     value_layout::{Inline, ValueLayout, ValueLayoutClone, ValueLayoutMerge},
-    value_slot::{AddressableSlot, ValueSlot, ValueSlotNew, ValueSlotRefAccess},
+    value_slot::{
+        AddressableSlot, ValueSlot, ValueSlotMutAccess, ValueSlotNew, ValueSlotRefAccess,
+    },
 };
 use crate::fields::wire::encode_type::{encode_field, encoded_len_field};
+use crate::fields::wire::len::{ProtoBytes, ProtoString};
 use crate::fields::wire::proto_ref_ops::{ProtoRefDebug, ProtoRefEq};
 use crate::fields::wire::singular_type::SingularType;
+use crate::fields::wire::wire_or_sso::{WireOrSso, WireOrSsoKind, WireOrSsoStore};
 use crate::message_encode::EncodeCtx;
 
 /// Type-level projection of a [`SingularField`]'s `_mut` payload.
@@ -552,6 +557,113 @@ where
         L::Slot: DefaultIn<A>,
     {
         L::clear(&mut *self.field.value, P::slot_init_mut(), self.common);
+    }
+}
+
+impl<T, P, const FIELD: u32, A, const KIND: usize, D>
+    SingularField<T, P, FIELD, A, WireOrSso<KIND>, D>
+where
+    T: SingularType,
+    P: FieldPresence,
+    A: Allocator + Clone,
+    WireOrSso<KIND>: ValueLayout<T, A>,
+    <WireOrSso<KIND> as ValueLayout<T, A>>::Slot:
+        AddressableSlot + DefaultIn<A> + WireOrSsoStore<A>,
+    P::ValueSlot<<WireOrSso<KIND> as ValueLayout<T, A>>::Slot>:
+        ValueSlot<<WireOrSso<KIND> as ValueLayout<T, A>>::Slot, A>,
+{
+    /// Record a LEN payload that already lives in the island buffer.
+    pub fn store_len_span<Cx: MessageBindingMut<A>>(&mut self, span: WireSpan, common: &mut Cx) {
+        let init = P::slot_init_mut();
+        let old = WireOrSso::<KIND>::kind(common);
+        let alloc = common.clone_alloc();
+        {
+            let slot = ValueSlot::with_mut(&mut *self.value, init, common).get_mut();
+            slot.store_wire(span, old, &alloc);
+        }
+        WireOrSso::<KIND>::set_kind(common, WireOrSsoKind::Wire);
+    }
+}
+
+impl<P, const FIELD: u32, A, const KIND: usize, D>
+    SingularField<ProtoString, P, FIELD, A, WireOrSso<KIND>, D>
+where
+    P: FieldPresence,
+    A: Allocator + Clone,
+    <WireOrSso<KIND> as ValueLayout<ProtoString, A>>::Slot: AddressableSlot,
+    P::ValueSlot<<WireOrSso<KIND> as ValueLayout<ProtoString, A>>::Slot>:
+        ValueSlot<<WireOrSso<KIND> as ValueLayout<ProtoString, A>>::Slot, A>,
+{
+    /// Decode / promote a UTF-8 string. Failed is sticky.
+    pub fn try_str<'a, Cx>(
+        &'a self,
+        common: &'a Cx,
+        wire: &'a [u8],
+    ) -> Result<Optional<&'a str, D>, DecodeError>
+    where
+        Cx: MessageBindingMut<A> + MessageCommonSharedBits,
+        D: HasDefault<&'a str>,
+    {
+        if !P::is_set(common, || {
+            match (*self.value).with(P::slot_init_view(), common).get() {
+                Some(slot) => {
+                    <WireOrSso<KIND> as ValueLayout<ProtoString, A>>::is_proto_empty(slot, common)
+                }
+                None => true,
+            }
+        }) {
+            return Ok(Optional::new(None));
+        }
+        let slot = (*self.value)
+            .with(P::slot_init_view(), common)
+            .get()
+            .expect("is_set implies initialized slot");
+        let arm = WireOrSso::<KIND>::kind(common);
+        let s = slot.get_str(arm, wire, common.clone_alloc(), |new| {
+            WireOrSso::<KIND>::set_kind_shared(common, new);
+        })?;
+        Ok(Optional::new(Some(s)))
+    }
+}
+
+impl<P, const FIELD: u32, A, const KIND: usize, D>
+    SingularField<ProtoBytes, P, FIELD, A, WireOrSso<KIND>, D>
+where
+    P: FieldPresence,
+    A: Allocator + Clone,
+    <WireOrSso<KIND> as ValueLayout<ProtoBytes, A>>::Slot: AddressableSlot,
+    P::ValueSlot<<WireOrSso<KIND> as ValueLayout<ProtoBytes, A>>::Slot>:
+        ValueSlot<<WireOrSso<KIND> as ValueLayout<ProtoBytes, A>>::Slot, A>,
+{
+    /// Copy a bytes payload into Inline / Heap.
+    pub fn try_bytes<'a, Cx>(
+        &'a self,
+        common: &'a Cx,
+        wire: &'a [u8],
+    ) -> Result<Optional<&'a [u8], D>, DecodeError>
+    where
+        Cx: MessageBindingMut<A> + MessageCommonSharedBits,
+        D: HasDefault<&'a [u8]>,
+    {
+        if !P::is_set(common, || {
+            match (*self.value).with(P::slot_init_view(), common).get() {
+                Some(slot) => {
+                    <WireOrSso<KIND> as ValueLayout<ProtoBytes, A>>::is_proto_empty(slot, common)
+                }
+                None => true,
+            }
+        }) {
+            return Ok(Optional::new(None));
+        }
+        let slot = (*self.value)
+            .with(P::slot_init_view(), common)
+            .get()
+            .expect("is_set implies initialized slot");
+        let arm = WireOrSso::<KIND>::kind(common);
+        let bytes = slot.get_bytes(arm, wire, common.clone_alloc(), |new| {
+            WireOrSso::<KIND>::set_kind_shared(common, new);
+        })?;
+        Ok(Optional::new(Some(bytes)))
     }
 }
 

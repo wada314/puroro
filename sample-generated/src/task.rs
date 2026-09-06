@@ -33,9 +33,9 @@ pub const BIT_FLAG: usize = 11; // flag (EXPLICIT presence)
 pub const BIT_FLAG_VALUE: usize = 12; // flag (EXPLICIT bool value)
 pub const BIT_URGENT_VALUE: usize = 13; // notification.urgent (oneof bool value)
 pub const BIT_ORIGIN: usize = 14; // origin (inlined nested Point, EXPLICIT presence)
-pub const BIT_TITLE_ARM1: usize = 15; // title WireOrSso high arm bit
-pub const BIT_OWNER_ID_ARM1: usize = 16; // owner_id WireOrSso high arm bit
-pub const BIT_PAYLOAD_ARM1: usize = 17; // payload WireOrSso high arm bit
+pub const BIT_TITLE_LAZY_KIND: usize = 15; // lazy-only 2-bit WireOrSso kind (this bit and the next)
+pub const BIT_OWNER_ID_LAZY_KIND: usize = 17; // lazy-only 2-bit WireOrSso kind (this bit and the next)
+pub const BIT_PAYLOAD_LAZY_KIND: usize = 19; // lazy-only 2-bit WireOrSso kind (this bit and the next)
 
 // ---------------------------------------------------------------------------
 // Proto field numbers

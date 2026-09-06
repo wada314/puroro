@@ -1,6 +1,6 @@
 //! Read-oriented `Task` that applies numericals during a resumable scan.
 //!
-//! Singular string / bytes use [`LazyStringSlot`] / [`LazyBytesSlot`]: Wire
+//! Singular string / bytes use [`SingularField`] + [`WireOrSso`]: Wire
 //! spans promote to Inline / Heap on first get. Failed UTF-8 is sticky.
 //! Nested `assignee` / `origin` merge each complete LEN into a child that
 //! shares the island-root buffer. Repeated `watchers` appends one child per
@@ -17,9 +17,8 @@ use ::puroro::{DecodeError, HasDefault, MapRef, Message, Optional};
 use ::puroro_rt::decode::{LazyScan, ScannedRecord, merge_scanned_field, scanned_len_span};
 use ::puroro_rt::{
     BitPacked, Closed, Expanded, Explicit, FieldDeallocVisitor, FieldVisitorMut, Implicit, Inline,
-    InteriorBitArray, LazyBytesSlot, LazyMapField, LazyStringSlot, MessageCommon, Open, Packed,
-    ProtoBool, ProtoDefault, ProtoEnum, ProtoInt32, ProtoString, RepeatedField, SingularField,
-    WireOrSsoArm,
+    InteriorBitArray, LazyMapField, LegacyRequired, MessageCommon, Open, Packed, ProtoBool,
+    ProtoBytes, ProtoEnum, ProtoInt32, ProtoString, RepeatedField, SingularField, WireOrSso,
 };
 
 use crate::Task;
@@ -28,9 +27,9 @@ use crate::enums::{Priority, Status};
 use crate::point::PointLazy;
 use crate::task::defaults::MaxRetriesDefault;
 use crate::task::{
-    BIT_DONE_VALUE, BIT_FLAG, BIT_FLAG_VALUE, BIT_MAX_RETRIES, BIT_OWNER_ID, BIT_OWNER_ID_ARM1,
-    BIT_OWNER_ID_SSO, BIT_PAYLOAD, BIT_PAYLOAD_ARM1, BIT_PAYLOAD_SSO, BIT_PRIORITY, BIT_TITLE,
-    BIT_TITLE_ARM1, BIT_TITLE_SSO, FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_DONE, FIELD_FLAG,
+    BIT_DONE_VALUE, BIT_FLAG, BIT_FLAG_VALUE, BIT_MAX_RETRIES, BIT_OWNER_ID,
+    BIT_OWNER_ID_LAZY_KIND, BIT_PAYLOAD, BIT_PAYLOAD_LAZY_KIND, BIT_PRIORITY, BIT_TITLE,
+    BIT_TITLE_LAZY_KIND, FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_DONE, FIELD_FLAG,
     FIELD_MAX_RETRIES, FIELD_ORIGIN, FIELD_OWNER_ID, FIELD_PAYLOAD, FIELD_PRIORITY, FIELD_SCORE,
     FIELD_SCORES, FIELD_STATUS, FIELD_TAG_IDS, FIELD_TITLE, FIELD_VOTES, FIELD_WATCHERS,
 };
@@ -39,9 +38,27 @@ use crate::task::{
 pub struct TaskLazy<A: Allocator = Global> {
     scan: LazyScan<A>,
     _common: MessageCommon<InteriorBitArray<3>, A>,
-    title: LazyStringSlot<A>,
-    owner_id: LazyStringSlot<A>,
-    payload: LazyBytesSlot<A>,
+    title: SingularField<
+        ProtoString,
+        Explicit<{ BIT_TITLE }>,
+        { FIELD_TITLE },
+        A,
+        WireOrSso<{ BIT_TITLE_LAZY_KIND }>,
+    >,
+    owner_id: SingularField<
+        ProtoString,
+        LegacyRequired<{ BIT_OWNER_ID }>,
+        { FIELD_OWNER_ID },
+        A,
+        WireOrSso<{ BIT_OWNER_ID_LAZY_KIND }>,
+    >,
+    payload: SingularField<
+        ProtoBytes,
+        Explicit<{ BIT_PAYLOAD }>,
+        { FIELD_PAYLOAD },
+        A,
+        WireOrSso<{ BIT_PAYLOAD_LAZY_KIND }>,
+    >,
     assignee: Option<AddressLazy<A>>,
     origin: Option<PointLazy<A>>,
     watchers: AllocVec<AddressLazy<A>, A>,
@@ -99,16 +116,7 @@ impl<A: Allocator> TaskLazy<A> {
         A: Clone,
     {
         self.require_finished()?;
-        if !self._common.is_bit_set(BIT_TITLE) {
-            return Ok(Optional::<&str, ProtoDefault>::new(None));
-        }
-        let s = self.title.get_str(
-            self.arm(BIT_TITLE_SSO, BIT_TITLE_ARM1),
-            self.scan.wire(),
-            self._common.alloc.clone(),
-            |arm| self.set_arm(BIT_TITLE_SSO, BIT_TITLE_ARM1, arm),
-        )?;
-        Ok(Optional::new(Some(s)))
+        self.title.try_str(&self._common, self.scan.wire())
     }
 
     /// Wire presence only; does not UTF-8-check the payload.
@@ -122,16 +130,7 @@ impl<A: Allocator> TaskLazy<A> {
         A: Clone,
     {
         self.require_finished()?;
-        if !self._common.is_bit_set(BIT_OWNER_ID) {
-            return Ok(Optional::<&str, ProtoDefault>::new(None));
-        }
-        let s = self.owner_id.get_str(
-            self.arm(BIT_OWNER_ID_SSO, BIT_OWNER_ID_ARM1),
-            self.scan.wire(),
-            self._common.alloc.clone(),
-            |arm| self.set_arm(BIT_OWNER_ID_SSO, BIT_OWNER_ID_ARM1, arm),
-        )?;
-        Ok(Optional::new(Some(s)))
+        self.owner_id.try_str(&self._common, self.scan.wire())
     }
 
     /// Wire presence only; does not UTF-8-check the payload.
@@ -145,16 +144,7 @@ impl<A: Allocator> TaskLazy<A> {
         A: Clone,
     {
         self.require_finished()?;
-        if !self._common.is_bit_set(BIT_PAYLOAD) {
-            return Ok(Optional::<&[u8], ProtoDefault>::new(None));
-        }
-        let bytes = self.payload.get_bytes(
-            self.arm(BIT_PAYLOAD_SSO, BIT_PAYLOAD_ARM1),
-            self.scan.wire(),
-            self._common.alloc.clone(),
-            |arm| self.set_arm(BIT_PAYLOAD_SSO, BIT_PAYLOAD_ARM1, arm),
-        )?;
-        Ok(Optional::new(Some(bytes)))
+        self.payload.try_bytes(&self._common, self.scan.wire())
     }
 
     pub fn has_payload(&self) -> Result<bool, DecodeError> {
@@ -264,23 +254,13 @@ impl<A: Allocator> TaskLazy<A> {
         self.scan.require_finished()
     }
 
-    fn arm(&self, arm0: usize, arm1: usize) -> WireOrSsoArm {
-        WireOrSsoArm::from_bits(
-            self._common.bits.is_set(arm0),
-            self._common.bits.is_set(arm1),
-        )
-    }
-
-    fn set_arm(&self, arm0: usize, arm1: usize, arm: WireOrSsoArm) {
-        let (b0, b1) = arm.bits();
-        self._common.bits.set_shared(arm0, b0);
-        self._common.bits.set_shared(arm1, b1);
-    }
-
     fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<InteriorBitArray<3>, A>>>(
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
+        v.visit("title", &mut self.title)?;
+        v.visit("owner_id", &mut self.owner_id)?;
+        v.visit("payload", &mut self.payload)?;
         v.visit("score", &mut self.score)?;
         v.visit("max_retries", &mut self.max_retries)?;
         v.visit("tag_ids", &mut self.tag_ids)?;
@@ -299,9 +279,9 @@ impl<A: Allocator + Clone> TaskLazy<A> {
         Self {
             scan: LazyScan::new_in(alloc.clone()),
             _common: MessageCommon::new_in(InteriorBitArray::zero(), alloc.clone()),
-            title: LazyStringSlot::empty(),
-            owner_id: LazyStringSlot::empty(),
-            payload: LazyBytesSlot::empty(),
+            title: SingularField::new_in(alloc.clone()),
+            owner_id: SingularField::new_in(alloc.clone()),
+            payload: SingularField::new_in(alloc.clone()),
             assignee: None,
             origin: None,
             watchers: AllocVec::new_in(alloc.clone()),
@@ -370,26 +350,17 @@ impl<A: Allocator + Clone> TaskLazy<A> {
         match rec.field_number.as_u32() {
             FIELD_TITLE => {
                 let span = scanned_len_span(origin, rec)?;
-                let old = self.arm(BIT_TITLE_SSO, BIT_TITLE_ARM1);
-                self.title.store_wire(span, old, &self._common.alloc);
-                self._common.set_bit(BIT_TITLE, true);
-                self.set_arm(BIT_TITLE_SSO, BIT_TITLE_ARM1, WireOrSsoArm::Wire);
+                self.title.store_len_span(span, &mut self._common);
                 Ok(())
             }
             FIELD_OWNER_ID => {
                 let span = scanned_len_span(origin, rec)?;
-                let old = self.arm(BIT_OWNER_ID_SSO, BIT_OWNER_ID_ARM1);
-                self.owner_id.store_wire(span, old, &self._common.alloc);
-                self._common.set_bit(BIT_OWNER_ID, true);
-                self.set_arm(BIT_OWNER_ID_SSO, BIT_OWNER_ID_ARM1, WireOrSsoArm::Wire);
+                self.owner_id.store_len_span(span, &mut self._common);
                 Ok(())
             }
             FIELD_PAYLOAD => {
                 let span = scanned_len_span(origin, rec)?;
-                let old = self.arm(BIT_PAYLOAD_SSO, BIT_PAYLOAD_ARM1);
-                self.payload.store_wire(span, old, &self._common.alloc);
-                self._common.set_bit(BIT_PAYLOAD, true);
-                self.set_arm(BIT_PAYLOAD_SSO, BIT_PAYLOAD_ARM1, WireOrSsoArm::Wire);
+                self.payload.store_len_span(span, &mut self._common);
                 Ok(())
             }
             FIELD_ASSIGNEE => {
@@ -470,16 +441,6 @@ impl<A: Allocator + Clone> TaskLazy<A> {
 
 impl<A: Allocator> Drop for TaskLazy<A> {
     fn drop(&mut self) {
-        self.title
-            .deallocate(self.arm(BIT_TITLE_SSO, BIT_TITLE_ARM1), &self._common.alloc);
-        self.owner_id.deallocate(
-            self.arm(BIT_OWNER_ID_SSO, BIT_OWNER_ID_ARM1),
-            &self._common.alloc,
-        );
-        self.payload.deallocate(
-            self.arm(BIT_PAYLOAD_SSO, BIT_PAYLOAD_ARM1),
-            &self._common.alloc,
-        );
         self.attributes.deallocate(&self._common);
         let mut v = FieldDeallocVisitor::new(&self._common);
         let _ = self.visit_fields_mut(&mut v);
