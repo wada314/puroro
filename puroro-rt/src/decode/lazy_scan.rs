@@ -49,7 +49,7 @@ impl<A: Allocator> LazyScan<A> {
         self.write_bodies(buf)
     }
 
-    fn body_len(&self) -> usize {
+    pub fn body_len(&self) -> usize {
         if self.regions.is_empty() {
             self.wire.len()
         } else {
@@ -57,7 +57,7 @@ impl<A: Allocator> LazyScan<A> {
         }
     }
 
-    fn write_bodies<B: BufMut>(&self, buf: &mut B) -> Result<(), DecodeError> {
+    pub fn write_bodies<B: BufMut>(&self, buf: &mut B) -> Result<(), DecodeError> {
         if self.regions.is_empty() {
             buf.put_slice(self.wire.as_bytes());
             return Ok(());
@@ -135,5 +135,14 @@ impl<A: Allocator + Clone> LazyScan<A> {
         self.scanner.finish()?;
         self.finished = true;
         Ok(records)
+    }
+
+    pub fn clone_in(&self, alloc: A) -> Self {
+        Self {
+            scanner: self.scanner.clone(),
+            finished: self.finished,
+            wire: self.wire.clone_in(alloc.clone()),
+            regions: self.regions.clone(),
+        }
     }
 }

@@ -174,10 +174,10 @@ fn task_fields_roundtrip() {
         Some(Notification::EmailAddress(s)) if s == "a@example.com"
     ));
     let a = decoded.assignee().unwrap();
-    assert_eq!(a.street().get(), "1 Main St");
-    assert_eq!(a.city().get(), "Tokyo");
-    assert_eq!(a.postal_code().get(), 1000001);
-    assert!((a.latitude().get() - 35.6812).abs() < 1e-9);
+    assert_eq!(a.street().unwrap().get(), "1 Main St");
+    assert_eq!(a.city().unwrap().get(), "Tokyo");
+    assert_eq!(a.postal_code().unwrap().get(), 1000001);
+    assert!((a.latitude().unwrap().get() - 35.6812).abs() < 1e-9);
     assert_eq!(decoded.watchers().len(), 1);
     assert_eq!(
         decoded.watchers().first().unwrap().street().get(),
@@ -889,17 +889,41 @@ fn owned_and_inlined_point_share_the_same_type() {
 }
 
 #[test]
-fn owned_boxed_and_inlined_address_share_the_same_type() {
+fn owned_and_inlined_address_share_the_same_type() {
     let mut owned = Address::new();
     owned.street_mut().set("A");
     assert_eq!(street_of(&owned), "A");
 
     let mut task = Task::new();
-    task.assignee_mut().street_mut().set("B");
-    assert_eq!(street_of(task.assignee().unwrap()), "B");
-
     task.postal_mut().street_mut().set("C");
     assert_eq!(street_of(task.postal().unwrap()), "C");
+}
+
+#[test]
+fn eager_parent_lazy_assignee_roundtrip() {
+    let mut task = Task::new();
+    task.owner_id_mut().set("u");
+    let mut addr = Address::new();
+    addr.street_mut().set("1 Island");
+    addr.city_mut().set("Kyoto");
+    task.set_assignee(addr);
+
+    let bytes = task.encode_to_vec();
+    let decoded: Task = Task::decode(&bytes[..]).unwrap();
+    let child = decoded.assignee().unwrap();
+    assert_eq!(child.street().unwrap().get(), "1 Island");
+    assert_eq!(child.city().unwrap().get(), "Kyoto");
+
+    let again: Task = Task::decode(&decoded.encode_to_vec()[..]).unwrap();
+    assert_eq!(
+        again.assignee().unwrap().street().unwrap().get(),
+        "1 Island"
+    );
+
+    let body = child.encode_to_vec().unwrap();
+    let eager: Address = Address::decode(&body[..]).unwrap();
+    assert_eq!(eager.street().get(), "1 Island");
+    assert_eq!(eager.city().get(), "Kyoto");
 }
 
 /// Decodes a base-128 varint at `bytes[i..]`. Returns `(value, bytes_consumed)`.

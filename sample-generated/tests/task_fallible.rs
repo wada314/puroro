@@ -6,7 +6,10 @@ use ::puroro_sample_generated::{Address, Point, Priority, Status, Task, TaskMess
 
 /// Touches every `TaskMessageFallible` getter. Must not call inherent `Task`
 /// accessors (except through the trait impl).
-fn read_via_trait<M: TaskMessageFallible>(m: &M) -> Result<usize, M::Error> {
+fn read_via_trait<M: TaskMessageFallible>(m: &M) -> Result<usize, M::Error>
+where
+    M::Alloc: Clone,
+{
     let mut n = 0usize;
     n = n.wrapping_add(m.title()?.get().len());
     n = n.wrapping_add(m.score()? as usize);
@@ -19,7 +22,7 @@ fn read_via_trait<M: TaskMessageFallible>(m: &M) -> Result<usize, M::Error> {
     n = n.wrapping_add(m.status()?.is_set() as usize);
     n = n.wrapping_add(m.priority()?.is_set() as usize);
     if let Some(addr) = m.assignee()? {
-        n = n.wrapping_add(addr.street().get().len());
+        n = n.wrapping_add(addr.street().unwrap().get().len());
     }
     n = n.wrapping_add(m.done()? as usize);
     n = n.wrapping_add(m.flag()?.is_set() as usize);

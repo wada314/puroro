@@ -31,6 +31,7 @@ use puroro_rt::{
 };
 
 use crate::Address;
+use crate::AddressLazy;
 use crate::Point;
 use crate::enums::{Priority, Status};
 use crate::task::defaults::MaxRetriesDefault;
@@ -93,7 +94,7 @@ pub struct Task<A: Allocator = Global> {
         A,
     >, // proto: Priority priority = 10;
     assignee:
-        SingularField<ProtoMessage<Address<A>>, MessagePresence, { FIELD_ASSIGNEE }, A, Boxed>, // proto: Address assignee = 11
+        SingularField<ProtoMessage<AddressLazy<A>>, MessagePresence, { FIELD_ASSIGNEE }, A, Boxed>, // proto: Address assignee = 11 (lazy child)
     // proto: oneof notification { string email_address=12; string phone_number=13;
     //                             int32 webhook_id=14 [default=-1]; Address postal=15;
     //                             bool urgent=18; }
@@ -171,7 +172,7 @@ impl<A: Allocator> Task<A> {
         self.priority.bind(&self._common).optional()
     }
 
-    pub fn assignee(&self) -> Option<&Address<A>> {
+    pub fn assignee(&self) -> Option<&AddressLazy<A>> {
         self.assignee.bind(&self._common).get()
     }
 
@@ -505,11 +506,15 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- assignee (nested message, proto field 11) --------------------------
 
-    pub fn assignee_mut(&mut self) -> &mut Address<A> {
+    pub fn assignee_mut(&mut self) -> &mut AddressLazy<A> {
         self.assignee.bind_mut(&mut self._common).get_mut()
     }
 
     pub fn set_assignee(&mut self, src: Address<A>) {
+        *self.assignee_mut() = src.into_lazy();
+    }
+
+    pub fn set_assignee_lazy(&mut self, src: AddressLazy<A>) {
         *self.assignee_mut() = src;
     }
 

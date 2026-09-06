@@ -21,8 +21,8 @@ use puroro_rt::{
 };
 
 use crate::address::{
-    BIT_CITY, BIT_CITY_SSO, BIT_LATITUDE, BIT_POSTAL_CODE, BIT_STREET, BIT_STREET_SSO, FIELD_CITY,
-    FIELD_LATITUDE, FIELD_POSTAL_CODE, FIELD_STREET,
+    AddressLazy, BIT_CITY, BIT_CITY_SSO, BIT_LATITUDE, BIT_POSTAL_CODE, BIT_STREET, BIT_STREET_SSO,
+    FIELD_CITY, FIELD_LATITUDE, FIELD_POSTAL_CODE, FIELD_STREET,
 };
 
 // ---------------------------------------------------------------------------
@@ -188,6 +188,16 @@ impl<A: Allocator + Clone> Address<A> {
     /// Replaces `self` with a clone of `src` (same allocator family).
     pub fn copy_from(&mut self, src: &Self) {
         *self = src.clone();
+    }
+
+    /// Encodes `self` and rebuilds it as an island-root [`AddressLazy`].
+    pub fn into_lazy(self) -> AddressLazy<A> {
+        let alloc = self._common.alloc.clone();
+        let bytes = Message::encode_to_vec(&self);
+        let mut lazy = AddressLazy::new_in(alloc);
+        lazy.merge_from(&mut bytes.as_slice())
+            .expect("self-encoded Address is a valid Address body");
+        lazy
     }
 }
 

@@ -60,6 +60,14 @@ impl<A: Allocator + Clone> SharedWire<A> {
         self.clone()
     }
 
+    /// Same bytes, destination allocator stored on the handle.
+    pub fn clone_in(&self, alloc: A) -> Self {
+        Self {
+            data: self.data.clone(),
+            alloc,
+        }
+    }
+
     /// Sub-handle of `span`. Offsets in the result are 0-based in the slice.
     pub fn slice(&self, span: WireSpan) -> Result<Self, ::puroro::DecodeError> {
         let _ = span.slice(self.as_bytes())?;

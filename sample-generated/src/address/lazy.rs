@@ -2,15 +2,19 @@
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bytes::{Buf, BufMut};
+use ::core::fmt::{self, Debug, Formatter};
+use ::core::iter;
 use ::core::ops::ControlFlow;
-use ::puroro::{DecodeError, HasDefault, Message, Optional};
+use ::puroro::{DecodeBuf, DecodeError, HasDefault, Message, Optional, RECURSION_LIMIT};
 use ::puroro_rt::decode::{
     LazyScan, ScannedRecord, SharedWire, WireSpan, merge_scanned_field, scanned_len_span,
 };
 use ::puroro_rt::{
-    Explicit, FieldDeallocVisitor, FieldVisitorMut, InteriorBitArray, LazyStringSlot,
-    MessageCommon, ProtoDefault, ProtoDouble, ProtoFixed32, SingularField, WireOrSsoArm,
+    CloneIn, DeallocateIn, DefaultIn, EncodeCtx, Explicit, FieldCloneIn, FieldDeallocVisitor,
+    FieldVisitorMut, InteriorBitArray, LazyStringSlot, MessageCommon, MessageEncode, MessageMerge,
+    ProtoDefault, ProtoDouble, ProtoFixed32, SingularField, WireOrSsoArm,
 };
+use ::std::vec::Vec;
 
 use crate::Address;
 use crate::address::{
@@ -164,6 +168,10 @@ impl<A: Allocator + Clone> AddressLazy<A> {
     }
 
     pub fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+        self.ingest_buf(buf)
+    }
+
+    fn ingest_buf<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
         while buf.has_remaining() {
             let n = buf.chunk().len();
             if n == 0 {
@@ -234,6 +242,120 @@ impl<A: Allocator + Clone> AddressLazy<A> {
             }),
             _ => Ok(()),
         }
+    }
+}
+
+impl<A: Allocator + Clone> CloneIn<A> for AddressLazy<A> {
+    fn clone_in(&self, alloc: A) -> Self {
+        let street_arm = self.arm(BIT_STREET_SSO, BIT_STREET_ARM1);
+        let city_arm = self.arm(BIT_CITY_SSO, BIT_CITY_ARM1);
+        Self {
+            scan: self.scan.clone_in(alloc.clone()),
+            _common: self._common.clone_in(alloc.clone()),
+            street: self.street.clone_in(street_arm, alloc.clone()),
+            city: self.city.clone_in(city_arm, alloc.clone()),
+            postal_code: self.postal_code.clone_field(&self._common, alloc.clone()),
+            latitude: self.latitude.clone_field(&self._common, alloc),
+        }
+    }
+}
+
+impl<A: Allocator + Clone> Clone for AddressLazy<A> {
+    fn clone(&self) -> Self {
+        self.clone_in(self._common.alloc.clone())
+    }
+}
+
+impl<A: Allocator> PartialEq for AddressLazy<A> {
+    fn eq(&self, other: &Self) -> bool {
+        let mut left = Vec::new();
+        let mut right = Vec::new();
+        if self.scan.write_bodies(&mut left).is_err() {
+            return false;
+        }
+        if other.scan.write_bodies(&mut right).is_err() {
+            return false;
+        }
+        left == right
+    }
+}
+
+impl<A: Allocator> Debug for AddressLazy<A> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_struct("AddressLazy").finish_non_exhaustive()
+    }
+}
+
+impl<A: Allocator> DeallocateIn<A> for AddressLazy<A> {
+    #[inline]
+    unsafe fn deallocate_in(self, _alloc: &A) {
+        drop(self);
+    }
+}
+
+::puroro_rt::impl_owned_slot_bounds!(AddressLazy);
+
+impl<A: Allocator> MessageEncode for AddressLazy<A> {
+    fn encoded_len(&self, _ctx: &mut EncodeCtx) -> usize {
+        self.scan.body_len()
+    }
+
+    fn encode_raw<B: BufMut>(&self, _ctx: &mut EncodeCtx, buf: &mut B) {
+        let _ = self.scan.write_bodies(buf);
+    }
+}
+
+impl<A: Allocator + Clone> MessageMerge for AddressLazy<A> {
+    fn merge_from_with_depth<B: DecodeBuf>(
+        &mut self,
+        buf: &mut B,
+        depth: usize,
+    ) -> Result<(), DecodeError> {
+        if depth >= RECURSION_LIMIT {
+            return Err(DecodeError::RecursionLimitExceeded);
+        }
+        self.ingest_buf(buf)
+    }
+}
+
+impl<A: Allocator + Clone> DefaultIn<A> for AddressLazy<A> {
+    #[inline]
+    fn default_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+}
+
+impl<A: Allocator> Message for AddressLazy<A> {
+    type Alloc = A;
+
+    fn new_in(alloc: A) -> Self
+    where
+        A: Clone,
+    {
+        Self::new_in(alloc)
+    }
+
+    fn encode<B: BufMut>(&self, buf: &mut B) {
+        ::puroro_rt::encode_message(self, buf)
+    }
+
+    fn encode_to_vec(&self) -> Vec<u8> {
+        ::puroro_rt::encode_message_to_vec(self)
+    }
+
+    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError>
+    where
+        A: Clone,
+    {
+        self.ingest_buf(buf)
+    }
+
+    fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
+        iter::empty()
+    }
+
+    fn validate(&self) -> Result<(), DecodeError> {
+        Ok(())
     }
 }
 

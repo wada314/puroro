@@ -93,6 +93,14 @@ impl RecordScanner<Global> {
     }
 }
 
+impl<A: Allocator + Clone> Clone for RecordScanner<A> {
+    fn clone(&self) -> Self {
+        Self {
+            leftover: self.leftover.clone(),
+        }
+    }
+}
+
 impl<A: Allocator> RecordScanner<A> {
     pub fn new_in(alloc: A) -> Self {
         Self {

@@ -4,6 +4,7 @@
 //! uses [`Infallible`](::core::convert::Infallible).
 
 use crate::Address;
+use crate::AddressLazy;
 use crate::Point;
 use crate::Task;
 use crate::enums::{Priority, Status};
@@ -35,7 +36,7 @@ pub trait TaskMessageFallible {
     fn labels(&self) -> Result<&[impl Deref<Target = str>], Self::Error>;
     fn status(&self) -> Result<Optional<Status, impl HasDefault<Status>>, Self::Error>;
     fn priority(&self) -> Result<Optional<Priority, impl HasDefault<Priority>>, Self::Error>;
-    fn assignee(&self) -> Result<Option<&Address<Self::Alloc>>, Self::Error>;
+    fn assignee(&self) -> Result<Option<&AddressLazy<Self::Alloc>>, Self::Error>;
     fn done(&self) -> Result<bool, Self::Error>;
     fn flag(&self) -> Result<Optional<bool, impl HasDefault<bool>>, Self::Error>;
     fn watchers(&self) -> Result<&[Address<Self::Alloc>], Self::Error>;
@@ -99,7 +100,7 @@ impl<A: Allocator> TaskMessageFallible for Task<A> {
         Ok(Task::priority(self))
     }
 
-    fn assignee(&self) -> Result<Option<&Address<Self::Alloc>>, Self::Error> {
+    fn assignee(&self) -> Result<Option<&AddressLazy<Self::Alloc>>, Self::Error> {
         Ok(Task::assignee(self))
     }
 
