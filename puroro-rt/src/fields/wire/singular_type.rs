@@ -67,7 +67,7 @@ pub trait SingularType: EncodeType {}
 /// Public because [`Inline`](crate::fields::shared::value_layout::Inline) aliases
 /// these associated types on the public [`ValueLayout`](crate::ValueLayout)
 /// impl. Not intended for generated code — prefer `ValueLayout::Slot` /
-/// `ValueLayout::Mut`. [`ProtoBool`](super::numerical::ProtoBool) implements
+/// `ValueLayoutMut::Mut`. [`ProtoBool`](super::numerical::ProtoBool) implements
 /// this for [`Inline`](crate::fields::shared::value_layout::Inline) (`Slot = bool`);
 /// packed singular / oneof bool uses
 /// [`BitPacked`](crate::fields::shared::value_layout::BitPacked) instead.

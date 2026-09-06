@@ -138,7 +138,7 @@ pub trait RepeatedVecMut: RepeatedElement {}
 /// How to obtain a mutable element handle for
 /// [`RepeatedContainerMut`](::puroro::RepeatedContainerMut).
 ///
-/// Usually matches singular [`ValueLayout::Mut`](crate::fields::shared::value_layout::ValueLayout::Mut).
+/// Usually matches singular [`ValueLayoutMut::Mut`](crate::fields::shared::value_layout::ValueLayoutMut::Mut).
 /// Packed singular [`ProtoBool`](super::numerical::ProtoBool) uses a bit handle;
 /// repeated (and inline singular) store plain `bool`.
 pub trait RepeatedElementMut: RepeatedElement {

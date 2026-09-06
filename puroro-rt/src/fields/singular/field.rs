@@ -35,7 +35,7 @@ use crate::fields::shared::{
         Explicit, FieldPresence, Implicit, LegacyRequired, Message, Oneof, RequiredFieldPresence,
     },
     slot_init::{AlwaysInitialized, SlotInitView},
-    value_layout::{Inline, ValueLayout, ValueLayoutClone, ValueLayoutMerge},
+    value_layout::{Inline, ValueLayout, ValueLayoutClone, ValueLayoutMerge, ValueLayoutMut},
     value_slot::{
         AddressableSlot, ValueSlot, ValueSlotMutAccess, ValueSlotNew, ValueSlotRefAccess,
     },
@@ -82,7 +82,7 @@ where
     T: SingularType,
     P: FieldPresence,
     A: Allocator,
-    L: ValueLayout<T, A>,
+    L: ValueLayoutMut<T, A>,
     L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
@@ -267,6 +267,7 @@ where
     pub fn value_mut<'a, Cx: MessageBindingMut<A>>(&'a mut self, common: &'a mut Cx) -> L::Mut<'a>
     where
         A: Clone,
+        L: ValueLayoutMut<T, A>,
         L::Slot: DefaultIn<A>,
     {
         L::with_mut(&mut *self.value, AlwaysInitialized, common)
@@ -512,6 +513,7 @@ where
     where
         'c: 'f,
         A: Clone,
+        L: ValueLayoutMut<T, A>,
         L::Slot: DefaultIn<A>,
     {
         L::with_mut(&mut *self.field.value, P::slot_init_mut(), self.common)
@@ -523,6 +525,7 @@ where
     where
         'c: 'f,
         A: Clone,
+        L: ValueLayoutMut<T, A>,
         L::Slot: DefaultIn<A>,
     {
         self.value_mut()

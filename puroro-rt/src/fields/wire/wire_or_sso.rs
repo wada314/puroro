@@ -7,7 +7,6 @@
 use ::allocator_api2::alloc::Allocator;
 use ::core::cell::UnsafeCell;
 use ::core::mem::{self, ManuallyDrop};
-use ::core::ops::Deref;
 use ::core::str;
 use ::puroro::DecodeError;
 use ::unmanaged::{DefaultIn, String as AllocString, UnmanagedString, UnmanagedVec};
@@ -284,17 +283,6 @@ impl<A: Allocator> WireOrSsoStore<A> for WireOrSsoSlot<UnmanagedVec<u8, A>> {
     }
 }
 
-/// Placeholder: this layout has no `_mut` accessor.
-pub struct WireOrSsoNoMut;
-
-impl Deref for WireOrSsoNoMut {
-    type Target = ();
-
-    fn deref(&self) -> &() {
-        &()
-    }
-}
-
 /// Singular `string` / `bytes` layout: [`WireOrSsoSlot`] + a 2-bit kind at `KIND`.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct WireOrSso<const KIND: usize>;
@@ -319,10 +307,6 @@ impl<const KIND: usize> WireOrSso<KIND> {
 
 impl<A: Allocator, const KIND: usize> ValueLayout<ProtoString, A> for WireOrSso<KIND> {
     type Slot = WireOrSsoSlot<UnmanagedString<A>>;
-    type Mut<'a>
-        = WireOrSsoNoMut
-    where
-        A: 'a;
 
     fn is_proto_empty<Cx>(slot: &Self::Slot, common: &Cx) -> bool
     where
@@ -340,18 +324,6 @@ impl<A: Allocator, const KIND: usize> ValueLayout<ProtoString, A> for WireOrSso<
             WireOrSsoKind::Heap => unsafe { heap_str(&*slot.inner.get()) },
             WireOrSsoKind::Wire | WireOrSsoKind::Failed => "",
         }
-    }
-
-    fn with_mut<'a, VS, I, Cx>(_slot: &'a mut VS, _init: I, _common: &'a mut Cx) -> Self::Mut<'a>
-    where
-        VS: ValueSlot<Self::Slot, A>,
-        I: SlotInitMut,
-        Cx: MessageBindingMut<A>,
-        ProtoString: 'a,
-        A: 'a + Clone,
-        Self::Slot: DefaultIn<A>,
-    {
-        panic!("WireOrSso layout does not support mutable accessors")
     }
 
     fn clear<VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
@@ -402,11 +374,6 @@ impl<A: Allocator, const KIND: usize, C: BytesLikeLenCodec> ValueLayout<LenScala
     for WireOrSso<KIND>
 {
     type Slot = WireOrSsoSlot<UnmanagedVec<u8, A>>;
-    type Mut<'a>
-        = WireOrSsoNoMut
-    where
-        C: 'a,
-        A: 'a;
 
     fn is_proto_empty<Cx>(slot: &Self::Slot, common: &Cx) -> bool
     where
@@ -424,18 +391,6 @@ impl<A: Allocator, const KIND: usize, C: BytesLikeLenCodec> ValueLayout<LenScala
             WireOrSsoKind::Heap => unsafe { (*(*slot.inner.get()).heap).as_slice() },
             WireOrSsoKind::Wire | WireOrSsoKind::Failed => &[],
         }
-    }
-
-    fn with_mut<'a, VS, I, Cx>(_slot: &'a mut VS, _init: I, _common: &'a mut Cx) -> Self::Mut<'a>
-    where
-        VS: ValueSlot<Self::Slot, A>,
-        I: SlotInitMut,
-        Cx: MessageBindingMut<A>,
-        LenScalar<C>: 'a,
-        A: 'a + Clone,
-        Self::Slot: DefaultIn<A>,
-    {
-        panic!("WireOrSso layout does not support mutable accessors")
     }
 
     fn clear<VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)

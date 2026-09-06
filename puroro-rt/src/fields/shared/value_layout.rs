@@ -39,24 +39,12 @@ use crate::message_merge::MessageMerge;
 
 /// Where a singular field's logical value is stored.
 ///
-/// Associated [`Slot`](Self::Slot) / [`Mut`](Self::Mut) are the physical storage
-/// and `_mut` handle for this `(T, L)` pair — not properties of `T` alone.
+/// Associated [`Slot`](Self::Slot) is the physical storage for this `(T, L)`
+/// pair. Mutable `_mut` handles live on [`ValueLayoutMut`].
 pub trait ValueLayout<T: SingularType, A: Allocator>: Copy {
     /// Physical value stored in the singular field slot (excluding
     /// [`MessageCommon`] bits).
     type Slot: AddressableSlot;
-
-    /// Mutable handle returned by `_mut` accessors (`&mut i32`, SSO mutator,
-    /// bit handle, …).
-    ///
-    /// Bound is [`Deref`] only so SSO string mutators need not expose
-    /// `DerefMut` (edits go through inherent / trait methods). Concrete handles
-    /// such as `&mut T` / `BitRef` still implement `DerefMut`.
-    type Mut<'a>: Deref
-    where
-        T: 'a,
-        A: 'a,
-        Self: 'a;
 
     fn is_proto_empty<Cx>(slot: &Self::Slot, common: &Cx) -> bool
     where
@@ -65,15 +53,6 @@ pub trait ValueLayout<T: SingularType, A: Allocator>: Copy {
     fn get<'a, Cx>(slot: &'a Self::Slot, common: &'a Cx) -> T::View<'a, A>
     where
         Cx: MessageBindingMut<A>;
-
-    fn with_mut<'a, VS, I, Cx>(slot: &'a mut VS, init: I, common: &'a mut Cx) -> Self::Mut<'a>
-    where
-        VS: ValueSlot<Self::Slot, A>,
-        I: SlotInitMut,
-        Cx: MessageBindingMut<A>,
-        T: 'a,
-        A: 'a + Clone,
-        Self::Slot: DefaultIn<A>;
 
     /// Clears the logical value and slot presence / payload.
     ///
@@ -137,6 +116,31 @@ pub trait ValueLayoutClone<T: SingularType, A: Allocator + Clone>: ValueLayout<T
         Cx: MessageBindingMut<A>;
 }
 
+/// `_mut` handle for a layout. Kept off [`ValueLayout`] so read-only layouts
+/// ([`WireOrSso`](crate::WireOrSso)) do not provide a placeholder mutator.
+pub trait ValueLayoutMut<T: SingularType, A: Allocator>: ValueLayout<T, A> {
+    /// Mutable handle returned by `_mut` accessors (`&mut i32`, SSO mutator,
+    /// bit handle, …).
+    ///
+    /// Bound is [`Deref`] only so SSO string mutators need not expose
+    /// `DerefMut` (edits go through inherent / trait methods). Concrete handles
+    /// such as `&mut T` / `BitRef` still implement `DerefMut`.
+    type Mut<'a>: Deref
+    where
+        T: 'a,
+        A: 'a,
+        Self: 'a;
+
+    fn with_mut<'a, VS, I, Cx>(slot: &'a mut VS, init: I, common: &'a mut Cx) -> Self::Mut<'a>
+    where
+        VS: ValueSlot<Self::Slot, A>,
+        I: SlotInitMut,
+        Cx: MessageBindingMut<A>,
+        T: 'a,
+        A: 'a + Clone,
+        Self::Slot: DefaultIn<A>;
+}
+
 /// Value lives in the field slot payload ([`PayloadAccess::Slot`]).
 ///
 /// For [`ProtoMessage`](crate::ProtoMessage) this is the nested message `M`
@@ -158,11 +162,6 @@ where
     T::Slot<A>: AddressableSlot + DeallocateBound<A>,
 {
     type Slot = T::Slot<A>;
-    type Mut<'a>
-        = T::Mut<'a, A>
-    where
-        T: 'a,
-        A: 'a;
 
     #[inline]
     fn is_proto_empty<Cx>(slot: &T::Slot<A>, common: &Cx) -> bool
@@ -178,19 +177,6 @@ where
         Cx: MessageBindingMut<A>,
     {
         T::get(slot, common)
-    }
-
-    #[inline]
-    fn with_mut<'a, VS, I, Cx>(slot: &'a mut VS, init: I, common: &'a mut Cx) -> T::Mut<'a, A>
-    where
-        VS: ValueSlot<T::Slot<A>, A>,
-        I: SlotInitMut,
-        Cx: MessageBindingMut<A>,
-        T: 'a,
-        A: 'a + Clone,
-        T::Slot<A>: DefaultIn<A>,
-    {
-        T::with_mut(slot, init, common)
     }
 
     #[inline]
@@ -214,6 +200,30 @@ where
         if let Some(v) = slot.take_value(initialized) {
             T::deallocate_payload(v, common);
         }
+    }
+}
+
+impl<T: PayloadAccess, A: Allocator> ValueLayoutMut<T, A> for Inline
+where
+    T::Slot<A>: AddressableSlot + DeallocateBound<A>,
+{
+    type Mut<'a>
+        = T::Mut<'a, A>
+    where
+        T: 'a,
+        A: 'a;
+
+    #[inline]
+    fn with_mut<'a, VS, I, Cx>(slot: &'a mut VS, init: I, common: &'a mut Cx) -> T::Mut<'a, A>
+    where
+        VS: ValueSlot<T::Slot<A>, A>,
+        I: SlotInitMut,
+        Cx: MessageBindingMut<A>,
+        T: 'a,
+        A: 'a + Clone,
+        T::Slot<A>: DefaultIn<A>,
+    {
+        T::with_mut(slot, init, common)
     }
 }
 
@@ -265,11 +275,6 @@ where
     M: MessageEncode + DeallocateIn<A>,
 {
     type Slot = UnmanagedBox<M, A>;
-    type Mut<'a>
-        = &'a mut M
-    where
-        M: 'a,
-        A: 'a;
 
     #[inline]
     fn is_proto_empty<Cx>(_slot: &UnmanagedBox<M, A>, _common: &Cx) -> bool
@@ -285,19 +290,6 @@ where
         Cx: MessageBindingMut<A>,
     {
         Deref::deref(slot)
-    }
-
-    #[inline]
-    fn with_mut<'a, VS, I, Cx>(slot: &'a mut VS, init: I, common: &'a mut Cx) -> &'a mut M
-    where
-        VS: ValueSlot<UnmanagedBox<M, A>, A>,
-        I: SlotInitMut,
-        Cx: MessageBindingMut<A>,
-        M: 'a,
-        A: 'a + Clone,
-        UnmanagedBox<M, A>: DefaultIn<A>,
-    {
-        DerefMut::deref_mut(ValueSlot::with_mut(slot, init, common).get_mut())
     }
 
     #[inline]
@@ -326,6 +318,30 @@ where
             // SAFETY: `deallocate_slot` contract — `common` is this field's parent.
             unsafe { DeallocateIn::deallocate_in(v, common.alloc()) };
         }
+    }
+}
+
+impl<M, A: Allocator> ValueLayoutMut<ProtoMessage<M>, A> for Boxed
+where
+    M: MessageEncode + DeallocateIn<A>,
+{
+    type Mut<'a>
+        = &'a mut M
+    where
+        M: 'a,
+        A: 'a;
+
+    #[inline]
+    fn with_mut<'a, VS, I, Cx>(slot: &'a mut VS, init: I, common: &'a mut Cx) -> &'a mut M
+    where
+        VS: ValueSlot<UnmanagedBox<M, A>, A>,
+        I: SlotInitMut,
+        Cx: MessageBindingMut<A>,
+        M: 'a,
+        A: 'a + Clone,
+        UnmanagedBox<M, A>: DefaultIn<A>,
+    {
+        DerefMut::deref_mut(ValueSlot::with_mut(slot, init, common).get_mut())
     }
 }
 
@@ -388,10 +404,6 @@ pub struct BitPacked<const VALUE_BIT: usize>;
 
 impl<A: Allocator, const VALUE_BIT: usize> ValueLayout<ProtoBool, A> for BitPacked<VALUE_BIT> {
     type Slot = ();
-    type Mut<'a>
-        = BitRef<'a, Mut, u8, Lsb0>
-    where
-        A: 'a;
 
     #[inline]
     fn is_proto_empty<Cx>(_slot: &(), common: &Cx) -> bool
@@ -407,24 +419,6 @@ impl<A: Allocator, const VALUE_BIT: usize> ValueLayout<ProtoBool, A> for BitPack
         Cx: MessageBindingMut<A>,
     {
         common.is_bit_set(VALUE_BIT)
-    }
-
-    #[inline]
-    fn with_mut<'a, VS, I, Cx>(
-        slot: &'a mut VS,
-        init: I,
-        common: &'a mut Cx,
-    ) -> BitRef<'a, Mut, u8, Lsb0>
-    where
-        VS: ValueSlot<(), A>,
-        I: SlotInitMut,
-        Cx: MessageBindingMut<A>,
-        ProtoBool: 'a,
-        A: 'a + Clone,
-        Self::Slot: DefaultIn<A>,
-    {
-        let _ = ValueSlot::with_mut(slot, init, common).get_mut();
-        common.bit_mut(VALUE_BIT)
     }
 
     #[inline]
@@ -447,6 +441,31 @@ impl<A: Allocator, const VALUE_BIT: usize> ValueLayout<ProtoBool, A> for BitPack
         Cx: MessageBindingMut<A>,
     {
         let _ = slot.take_value(initialized);
+    }
+}
+
+impl<A: Allocator, const VALUE_BIT: usize> ValueLayoutMut<ProtoBool, A> for BitPacked<VALUE_BIT> {
+    type Mut<'a>
+        = BitRef<'a, Mut, u8, Lsb0>
+    where
+        A: 'a;
+
+    #[inline]
+    fn with_mut<'a, VS, I, Cx>(
+        slot: &'a mut VS,
+        init: I,
+        common: &'a mut Cx,
+    ) -> BitRef<'a, Mut, u8, Lsb0>
+    where
+        VS: ValueSlot<(), A>,
+        I: SlotInitMut,
+        Cx: MessageBindingMut<A>,
+        ProtoBool: 'a,
+        A: 'a + Clone,
+        Self::Slot: DefaultIn<A>,
+    {
+        let _ = ValueSlot::with_mut(slot, init, common).get_mut();
+        common.bit_mut(VALUE_BIT)
     }
 }
 
@@ -537,10 +556,6 @@ impl<const HEAP_BIT: usize> InlineOrHeap<HEAP_BIT> {
 
 impl<A: Allocator, const HEAP_BIT: usize> ValueLayout<ProtoString, A> for InlineOrHeap<HEAP_BIT> {
     type Slot = SsoString<A>;
-    type Mut<'a>
-        = SsoStringMut<'a, A>
-    where
-        A: 'a;
 
     #[inline]
     fn is_proto_empty<Cx>(slot: &SsoString<A>, common: &Cx) -> bool
@@ -556,26 +571,6 @@ impl<A: Allocator, const HEAP_BIT: usize> ValueLayout<ProtoString, A> for Inline
         Cx: MessageBindingMut<A>,
     {
         slot.as_str(Self::is_heap(common))
-    }
-
-    #[inline]
-    fn with_mut<'a, VS, I, Cx>(slot: &'a mut VS, init: I, common: &'a mut Cx) -> SsoStringMut<'a, A>
-    where
-        VS: ValueSlot<SsoString<A>, A>,
-        I: SlotInitMut,
-        Cx: MessageBindingMut<A>,
-        ProtoString: 'a,
-        A: 'a + Clone,
-        Self::Slot: DefaultIn<A>,
-    {
-        let alloc = common.clone_alloc();
-        // Ensure presence/init, then split the slot pointer from `common` so we
-        // can hand out both `&mut SsoString` and a heap-bit `BitRef`.
-        let slot_ptr: *mut SsoString<A> = ValueSlot::with_mut(slot, init, common).get_mut();
-        let tag = common.bit_mut(HEAP_BIT);
-        // SAFETY: `tag` borrows only the bitfield in `common`; `slot_ptr` is the
-        // distinct field payload and remains valid for `'a`.
-        SsoStringMut::new(unsafe { &mut *slot_ptr }, tag, alloc)
     }
 
     #[inline]
@@ -616,6 +611,35 @@ impl<A: Allocator, const HEAP_BIT: usize> ValueLayout<ProtoString, A> for Inline
             // SAFETY: HEAP_BIT / `alloc` come from this field's parent `common`.
             unsafe { s.deallocate(is_heap, common.alloc()) };
         }
+    }
+}
+
+impl<A: Allocator, const HEAP_BIT: usize> ValueLayoutMut<ProtoString, A>
+    for InlineOrHeap<HEAP_BIT>
+{
+    type Mut<'a>
+        = SsoStringMut<'a, A>
+    where
+        A: 'a;
+
+    #[inline]
+    fn with_mut<'a, VS, I, Cx>(slot: &'a mut VS, init: I, common: &'a mut Cx) -> SsoStringMut<'a, A>
+    where
+        VS: ValueSlot<SsoString<A>, A>,
+        I: SlotInitMut,
+        Cx: MessageBindingMut<A>,
+        ProtoString: 'a,
+        A: 'a + Clone,
+        Self::Slot: DefaultIn<A>,
+    {
+        let alloc = common.clone_alloc();
+        // Ensure presence/init, then split the slot pointer from `common` so we
+        // can hand out both `&mut SsoString` and a heap-bit `BitRef`.
+        let slot_ptr: *mut SsoString<A> = ValueSlot::with_mut(slot, init, common).get_mut();
+        let tag = common.bit_mut(HEAP_BIT);
+        // SAFETY: `tag` borrows only the bitfield in `common`; `slot_ptr` is the
+        // distinct field payload and remains valid for `'a`.
+        SsoStringMut::new(unsafe { &mut *slot_ptr }, tag, alloc)
     }
 }
 
@@ -677,11 +701,6 @@ impl<A: Allocator, const HEAP_BIT: usize, C: BytesLikeLenCodec> ValueLayout<LenS
     for InlineOrHeap<HEAP_BIT>
 {
     type Slot = SsoBytes<A>;
-    type Mut<'a>
-        = SsoBytesMut<'a, A>
-    where
-        A: 'a,
-        C: 'a;
 
     #[inline]
     fn is_proto_empty<Cx>(slot: &SsoBytes<A>, common: &Cx) -> bool
@@ -697,24 +716,6 @@ impl<A: Allocator, const HEAP_BIT: usize, C: BytesLikeLenCodec> ValueLayout<LenS
         Cx: MessageBindingMut<A>,
     {
         slot.as_bytes(Self::is_heap(common))
-    }
-
-    #[inline]
-    fn with_mut<'a, VS, I, Cx>(slot: &'a mut VS, init: I, common: &'a mut Cx) -> SsoBytesMut<'a, A>
-    where
-        VS: ValueSlot<SsoBytes<A>, A>,
-        I: SlotInitMut,
-        Cx: MessageBindingMut<A>,
-        LenScalar<C>: 'a,
-        A: 'a + Clone,
-        Self::Slot: DefaultIn<A>,
-    {
-        let alloc = common.clone_alloc();
-        let slot_ptr: *mut SsoBytes<A> = ValueSlot::with_mut(slot, init, common).get_mut();
-        let tag = common.bit_mut(HEAP_BIT);
-        // SAFETY: `tag` borrows only the bitfield in `common`; `slot_ptr` is the
-        // distinct field payload and remains valid for `'a`.
-        SsoBytesMut::new(unsafe { &mut *slot_ptr }, tag, alloc)
     }
 
     #[inline]
@@ -754,6 +755,34 @@ impl<A: Allocator, const HEAP_BIT: usize, C: BytesLikeLenCodec> ValueLayout<LenS
             // SAFETY: HEAP_BIT / `alloc` come from this field's parent `common`.
             unsafe { s.deallocate(is_heap, common.alloc()) };
         }
+    }
+}
+
+impl<A: Allocator, const HEAP_BIT: usize, C: BytesLikeLenCodec> ValueLayoutMut<LenScalar<C>, A>
+    for InlineOrHeap<HEAP_BIT>
+{
+    type Mut<'a>
+        = SsoBytesMut<'a, A>
+    where
+        A: 'a,
+        C: 'a;
+
+    #[inline]
+    fn with_mut<'a, VS, I, Cx>(slot: &'a mut VS, init: I, common: &'a mut Cx) -> SsoBytesMut<'a, A>
+    where
+        VS: ValueSlot<SsoBytes<A>, A>,
+        I: SlotInitMut,
+        Cx: MessageBindingMut<A>,
+        LenScalar<C>: 'a,
+        A: 'a + Clone,
+        Self::Slot: DefaultIn<A>,
+    {
+        let alloc = common.clone_alloc();
+        let slot_ptr: *mut SsoBytes<A> = ValueSlot::with_mut(slot, init, common).get_mut();
+        let tag = common.bit_mut(HEAP_BIT);
+        // SAFETY: `tag` borrows only the bitfield in `common`; `slot_ptr` is the
+        // distinct field payload and remains valid for `'a`.
+        SsoBytesMut::new(unsafe { &mut *slot_ptr }, tag, alloc)
     }
 }
 
