@@ -2,10 +2,11 @@
 //!
 //! Singular string / bytes use [`SingularField`] + [`WireOrSso`]: Wire
 //! spans promote to Inline / Heap on first get. Failed UTF-8 is sticky.
-//! Nested `assignee` / `origin` / `watchers` store each complete LEN as an
-//! unparsed child on the island-root buffer; the child's first field getter
-//! walks that body. Repeated `watchers` appends one child per occurrence. `attributes` stores map-entry spans and materialises on first
-//! get. Repeated `labels` stores element spans and materialises on first get.
+//! Nested `assignee` / `origin` use catalog [`SingularField`] + [`ProtoMessage`]
+//! and [`SingularField::merge_shared`] (unparsed child on the island-root
+//! buffer). Repeated `watchers` appends one child per occurrence. `attributes`
+//! stores map-entry spans and materialises on first get. Repeated `labels`
+//! stores element spans and materialises on first get.
 //! Oneof is still skipped. Getters require a finished
 //! input stream so last-wins is final. `into_eager` re-merges `_wire` into
 //! [`Task`]; encode writes `_wire` as-is.
@@ -17,10 +18,10 @@ use ::core::ops::{ControlFlow, Deref};
 use ::puroro::{DecodeError, HasDefault, MapRef, Message, Optional};
 use ::puroro_rt::decode::{LazyMessage, ScannedRecord, merge_scanned_field, scanned_len_span};
 use ::puroro_rt::{
-    BitPacked, Closed, Expanded, Explicit, FieldDeallocVisitor, FieldVisitorMut, Implicit, Inline,
-    InteriorBitArray, LazyMapField, LazyMessageCommon, LazyRepeatedField, LegacyRequired, Open,
-    Packed, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32, ProtoString, RepeatedField,
-    SingularField, WireOrSso,
+    BitPacked, Boxed, Closed, Expanded, Explicit, FieldDeallocVisitor, FieldVisitorMut, Implicit,
+    Inline, InteriorBitArray, LazyMapField, LazyMessageCommon, LazyRepeatedField, LegacyRequired,
+    Message as MessagePresence, Open, Packed, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32,
+    ProtoMessage, ProtoString, RepeatedField, SingularField, WireOrSso,
 };
 
 use crate::Task;
@@ -29,7 +30,7 @@ use crate::enums::{Priority, Status};
 use crate::point::PointLazy;
 use crate::task::defaults::MaxRetriesDefault;
 use crate::task::{
-    BIT_DONE_VALUE, BIT_FLAG, BIT_FLAG_VALUE, BIT_MAX_RETRIES, BIT_OWNER_ID,
+    BIT_DONE_VALUE, BIT_FLAG, BIT_FLAG_VALUE, BIT_MAX_RETRIES, BIT_ORIGIN, BIT_OWNER_ID,
     BIT_OWNER_ID_LAZY_KIND, BIT_PAYLOAD, BIT_PAYLOAD_LAZY_KIND, BIT_PRIORITY, BIT_TITLE,
     BIT_TITLE_LAZY_KIND, FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_DONE, FIELD_FLAG, FIELD_LABELS,
     FIELD_MAX_RETRIES, FIELD_ORIGIN, FIELD_OWNER_ID, FIELD_PAYLOAD, FIELD_PRIORITY, FIELD_SCORE,
@@ -60,8 +61,10 @@ pub struct TaskLazy<A: Allocator = Global> {
         A,
         WireOrSso<{ BIT_PAYLOAD_LAZY_KIND }>,
     >,
-    assignee: Option<AddressLazy<A>>,
-    origin: Option<PointLazy<A>>,
+    assignee:
+        SingularField<ProtoMessage<AddressLazy<A>>, MessagePresence, { FIELD_ASSIGNEE }, A, Boxed>,
+    origin:
+        SingularField<ProtoMessage<PointLazy<A>>, Explicit<{ BIT_ORIGIN }>, { FIELD_ORIGIN }, A>,
     watchers: AllocVec<AddressLazy<A>, A>,
     labels: LazyRepeatedField<ProtoString, Expanded, { FIELD_LABELS }, A>,
     attributes: LazyMapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>,
@@ -229,12 +232,12 @@ impl<A: Allocator> TaskLazy<A> {
 
     pub fn assignee(&self) -> Result<Option<&AddressLazy<A>>, DecodeError> {
         self.require_finished()?;
-        Ok(self.assignee.as_ref())
+        Ok(self.assignee.bind(&self._common).get())
     }
 
     pub fn origin(&self) -> Result<Option<&PointLazy<A>>, DecodeError> {
         self.require_finished()?;
-        Ok(self.origin.as_ref())
+        Ok(self.origin.bind(&self._common).get())
     }
 
     pub fn watchers(&self) -> Result<&[AddressLazy<A>], DecodeError> {
@@ -287,6 +290,8 @@ impl<A: Allocator> TaskLazy<A> {
         v.visit("done", &mut self.done)?;
         v.visit("flag", &mut self.flag)?;
         v.visit("votes", &mut self.votes)?;
+        v.visit("assignee", &mut self.assignee)?;
+        v.visit("origin", &mut self.origin)?;
         ControlFlow::Continue(())
     }
 }
@@ -298,8 +303,8 @@ impl<A: Allocator + Clone> TaskLazy<A> {
             title: SingularField::new_in(alloc.clone()),
             owner_id: SingularField::new_in(alloc.clone()),
             payload: SingularField::new_in(alloc.clone()),
-            assignee: None,
-            origin: None,
+            assignee: SingularField::new_in(alloc.clone()),
+            origin: SingularField::new_in(alloc.clone()),
             watchers: AllocVec::new_in(alloc.clone()),
             labels: LazyRepeatedField::new_in(alloc.clone()),
             attributes: LazyMapField::new_in(alloc.clone()),
@@ -382,17 +387,13 @@ impl<A: Allocator + Clone> TaskLazy<A> {
             }
             FIELD_ASSIGNEE => {
                 let span = scanned_len_span(origin, rec)?;
-                let child = self
-                    .assignee
-                    .get_or_insert_with(|| AddressLazy::new_in(self._common.alloc.clone()));
-                child.merge_shared(self._common.lazy.scan.shared(), span)
+                let root = self._common.lazy.scan.shared().clone_handle();
+                self.assignee.merge_shared(&root, span, &mut self._common)
             }
             FIELD_ORIGIN => {
                 let span = scanned_len_span(origin, rec)?;
-                let child = self
-                    .origin
-                    .get_or_insert_with(|| PointLazy::new_in(self._common.alloc.clone()));
-                child.merge_shared(self._common.lazy.scan.shared(), span)
+                let root = self._common.lazy.scan.shared().clone_handle();
+                self.origin.merge_shared(&root, span, &mut self._common)
             }
             FIELD_WATCHERS => {
                 let span = scanned_len_span(origin, rec)?;

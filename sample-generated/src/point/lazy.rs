@@ -8,7 +8,8 @@ use ::core::ops::ControlFlow;
 use ::puroro::{DecodeError, Message};
 use ::puroro_rt::decode::{LazyMessage, LazyScan, ScannedRecord, merge_scanned_field};
 use ::puroro_rt::{
-    FieldDeallocVisitor, FieldVisitorMut, Implicit, LazyMessageCommon, ProtoInt32, SingularField,
+    CloneIn, DeallocateIn, DefaultIn, EncodeCtx, FieldCloneIn, FieldDeallocVisitor,
+    FieldVisitorMut, Implicit, LazyMessageCommon, MessageEncode, ProtoInt32, SingularField,
 };
 use ::std::vec::Vec;
 
@@ -147,6 +148,42 @@ impl<A: Allocator + Clone> LazyMessage<A> for PointLazy<A> {
             }),
             _ => Ok(()),
         }
+    }
+}
+
+impl<A: Allocator + Clone> CloneIn<A> for PointLazy<A> {
+    fn clone_in(&self, alloc: A) -> Self {
+        Self {
+            _common: self._common.clone_in(alloc.clone()),
+            x: self.x.clone_field(&self._common, alloc.clone()),
+            y: self.y.clone_field(&self._common, alloc),
+        }
+    }
+}
+
+impl<A: Allocator> DeallocateIn<A> for PointLazy<A> {
+    #[inline]
+    unsafe fn deallocate_in(self, _alloc: &A) {
+        drop(self);
+    }
+}
+
+::puroro_rt::impl_owned_slot_bounds!(PointLazy);
+
+impl<A: Allocator> MessageEncode for PointLazy<A> {
+    fn encoded_len(&self, _ctx: &mut EncodeCtx) -> usize {
+        self._common.lazy.scan.body_len()
+    }
+
+    fn encode_raw<B: BufMut>(&self, _ctx: &mut EncodeCtx, buf: &mut B) {
+        let _ = self._common.lazy.scan.write_bodies(buf);
+    }
+}
+
+impl<A: Allocator + Clone> DefaultIn<A> for PointLazy<A> {
+    #[inline]
+    fn default_in(alloc: A) -> Self {
+        Self::new_in(alloc)
     }
 }
 
