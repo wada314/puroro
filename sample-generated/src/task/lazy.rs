@@ -2,9 +2,9 @@
 //!
 //! Singular string / bytes use [`SingularField`] + [`WireOrSso`]: Wire
 //! spans promote to Inline / Heap on first get. Failed UTF-8 is sticky.
-//! Nested `assignee` / `origin` merge each complete LEN into a child that
-//! shares the island-root buffer. Repeated `watchers` appends one child per
-//! occurrence. `attributes` stores map-entry spans and materialises on first
+//! Nested `assignee` / `origin` / `watchers` store each complete LEN as an
+//! unparsed child on the island-root buffer; the child's first field getter
+//! walks that body. Repeated `watchers` appends one child per occurrence. `attributes` stores map-entry spans and materialises on first
 //! get. Repeated `labels` stores element spans and materialises on first get.
 //! Oneof is still skipped. Getters require a finished
 //! input stream so last-wins is final. `into_eager` re-merges `_wire` into
@@ -15,7 +15,9 @@ use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::{Buf, BufMut};
 use ::core::ops::{ControlFlow, Deref};
 use ::puroro::{DecodeError, HasDefault, MapRef, Message, Optional};
-use ::puroro_rt::decode::{LazyScan, ScannedRecord, merge_scanned_field, scanned_len_span};
+use ::puroro_rt::decode::{
+    LazyMessage, LazyScan, ScannedRecord, merge_scanned_field, scanned_len_span,
+};
 use ::puroro_rt::{
     BitPacked, Closed, Expanded, Explicit, FieldDeallocVisitor, FieldVisitorMut, Implicit, Inline,
     InteriorBitArray, LazyMapField, LazyRepeatedField, LegacyRequired, MessageCommon, Open, Packed,

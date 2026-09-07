@@ -484,6 +484,47 @@ fn second_parent_merge_from_merges_child() {
     assert_eq!(addr.city().unwrap().get(), "B");
 }
 
+#[test]
+fn second_parent_merge_from_after_child_get() {
+    let mut first = Address::new();
+    first.street_mut().set("A");
+    let mut second = Address::new();
+    second.city_mut().set("B");
+
+    let mut wire1 = Vec::new();
+    encode_message_field(FIELD_ASSIGNEE, &first.encode_to_vec(), &mut wire1);
+    let mut wire2 = Vec::new();
+    encode_message_field(FIELD_ASSIGNEE, &second.encode_to_vec(), &mut wire2);
+
+    let mut lazy = TaskLazy::new();
+    lazy.merge_from(&mut wire1.as_slice()).unwrap();
+    assert_eq!(
+        lazy.assignee().unwrap().unwrap().street().unwrap().get(),
+        "A"
+    );
+    lazy.merge_from(&mut wire2.as_slice()).unwrap();
+    let addr = lazy.assignee().unwrap().unwrap();
+    assert_eq!(addr.street().unwrap().get(), "A");
+    assert_eq!(addr.city().unwrap().get(), "B");
+}
+
+#[test]
+fn watchers_second_child_does_not_require_first_street() {
+    let mut a = Address::new();
+    a.street_mut().set("one");
+    let mut b = Address::new();
+    b.street_mut().set("two");
+
+    let mut bytes = Vec::new();
+    encode_message_field(FIELD_WATCHERS, &a.encode_to_vec(), &mut bytes);
+    encode_message_field(FIELD_WATCHERS, &b.encode_to_vec(), &mut bytes);
+
+    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let watchers = lazy.watchers().unwrap();
+    assert_eq!(watchers.len(), 2);
+    assert_eq!(watchers[1].street().unwrap().get(), "two");
+}
+
 fn encode_map_string_i32(key: &str, value: i32, buf: &mut Vec<u8>) {
     let mut entry = Vec::new();
     encode_len_bytes(1, key.as_bytes(), &mut entry);

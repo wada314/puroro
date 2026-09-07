@@ -7,7 +7,7 @@ use ::core::iter;
 use ::core::ops::ControlFlow;
 use ::puroro::{DecodeBuf, DecodeError, HasDefault, Message, Optional, RECURSION_LIMIT};
 use ::puroro_rt::decode::{
-    LazyScan, ScannedRecord, SharedWire, WireSpan, merge_scanned_field, scanned_len_span,
+    LazyMessage, LazyScan, ScannedRecord, merge_scanned_field, scanned_len_span,
 };
 use ::puroro_rt::{
     CloneIn, DeallocateIn, DefaultIn, EncodeCtx, Explicit, FieldCloneIn, FieldDeallocVisitor,
@@ -68,12 +68,15 @@ impl<A: Allocator> AddressLazy<A> {
     where
         A: Clone,
     {
-        self.scan.require_finished()?;
+        self.ensure_scanned()?;
         self.street.try_str(&self._common, self.scan.wire())
     }
 
-    pub fn has_street(&self) -> Result<bool, DecodeError> {
-        self.scan.require_finished()?;
+    pub fn has_street(&self) -> Result<bool, DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self._common.is_bit_set(BIT_STREET))
     }
 
@@ -81,22 +84,31 @@ impl<A: Allocator> AddressLazy<A> {
     where
         A: Clone,
     {
-        self.scan.require_finished()?;
+        self.ensure_scanned()?;
         self.city.try_str(&self._common, self.scan.wire())
     }
 
-    pub fn has_city(&self) -> Result<bool, DecodeError> {
-        self.scan.require_finished()?;
+    pub fn has_city(&self) -> Result<bool, DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self._common.is_bit_set(BIT_CITY))
     }
 
-    pub fn postal_code(&self) -> Result<Optional<u32, impl HasDefault<u32>>, DecodeError> {
-        self.scan.require_finished()?;
+    pub fn postal_code(&self) -> Result<Optional<u32, impl HasDefault<u32>>, DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self.postal_code.bind(&self._common).optional())
     }
 
-    pub fn latitude(&self) -> Result<Optional<f64, impl HasDefault<f64>>, DecodeError> {
-        self.scan.require_finished()?;
+    pub fn latitude(&self) -> Result<Optional<f64, impl HasDefault<f64>>, DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self.latitude.bind(&self._common).optional())
     }
 
@@ -178,21 +190,15 @@ impl<A: Allocator + Clone> AddressLazy<A> {
         })?;
         Ok(eager)
     }
+}
 
-    /// Merge one complete Address body that already lives in `root`.
-    pub(crate) fn merge_shared(
-        &mut self,
-        root: &SharedWire<A>,
-        span: WireSpan,
-    ) -> Result<(), DecodeError> {
-        self.scan.adopt(root);
-        self.scan.record_region(span);
-        let payload = span.slice(root.as_bytes())?;
-        let records = self.scan.scan_complete(payload)?;
-        for rec in records {
-            self.apply_record(&rec, span.offset)?;
-        }
-        Ok(())
+impl<A: Allocator + Clone> LazyMessage<A> for AddressLazy<A> {
+    fn scan(&self) -> &LazyScan<A> {
+        &self.scan
+    }
+
+    fn scan_mut(&mut self) -> &mut LazyScan<A> {
+        &mut self.scan
     }
 
     fn apply_record(&mut self, rec: &ScannedRecord<A>, origin: usize) -> Result<(), DecodeError> {

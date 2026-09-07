@@ -3,15 +3,25 @@
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::BufMut;
+use ::core::cell::Cell;
+use ::core::ptr;
 use ::puroro::DecodeError;
+use ::std::vec::Vec;
 
 use super::record::{RecordScanner, ScannedRecord, WireSpan};
 use super::shared_wire::SharedWire;
 
 /// Accumulates input bytes and yields complete records with `_wire` origins.
+///
+/// A nested child may sit in an **unparsed** state: [`regions`](Self::regions)
+/// name complete bodies on the island buffer, but the record scanner has not
+/// walked them yet. Field getters call [`LazyMessage::ensure_scanned`] and
+/// parse then. Encode / `into_eager` may use the regions without parsing.
 pub struct LazyScan<A: Allocator = Global> {
     scanner: RecordScanner<A>,
     finished: bool,
+    /// `false` when [`regions`](Self::regions) are waiting for a first field get.
+    applied: Cell<bool>,
     wire: SharedWire<A>,
     /// Payload spans in [`wire`](Self::wire) when this node is not the island
     /// root. Empty means encode / replay uses the whole buffer.
@@ -35,6 +45,23 @@ impl<A: Allocator> LazyScan<A> {
         } else {
             Err(DecodeError::UnfinishedMessage)
         }
+    }
+
+    /// `true` when catalog slots match a completed parse (or an empty message).
+    pub fn is_applied(&self) -> bool {
+        self.applied.get()
+    }
+
+    pub fn mark_applied(&self) {
+        self.applied.set(true);
+    }
+
+    pub fn mark_unapplied(&self) {
+        self.applied.set(false);
+    }
+
+    pub fn regions(&self) -> &[WireSpan] {
+        &self.regions
     }
 
     /// Byte length of the message body (regions, or the whole island buffer).
@@ -88,6 +115,7 @@ impl<A: Allocator + Clone> LazyScan<A> {
         Self {
             scanner: RecordScanner::new_in(alloc.clone()),
             finished: true,
+            applied: Cell::new(true),
             wire: SharedWire::empty(alloc.clone()),
             regions: AllocVec::new_in(alloc),
         }
@@ -125,13 +153,38 @@ impl<A: Allocator + Clone> LazyScan<A> {
         self.regions.push(span);
     }
 
-    /// Parse a complete message body without appending it to `_wire`.
-    pub fn scan_complete(
+    /// Adopt `root` and record `span`.
+    ///
+    /// Returns [`Some`] when catalog slots are already applied and the caller
+    /// must parse this occurrence immediately. The first region on an empty
+    /// applied shell stays unparsed until the first field getter.
+    pub(crate) fn store_shared(
         &mut self,
-        body: &[u8],
+        root: &SharedWire<A>,
+        span: WireSpan,
+    ) -> Option<WireSpan> {
+        self.adopt(root);
+        let first_region = self.regions.is_empty();
+        let was_applied = self.is_applied();
+        self.record_region(span);
+        if first_region && was_applied {
+            self.mark_unapplied();
+            None
+        } else if was_applied {
+            Some(span)
+        } else {
+            None
+        }
+    }
+
+    /// Parse one already-recorded body without appending it to `_wire`.
+    pub fn scan_region(
+        &mut self,
+        span: WireSpan,
     ) -> Result<AllocVec<ScannedRecord<A>, A>, DecodeError> {
         self.finished = false;
-        let records = self.scanner.push(body)?;
+        let payload = span.slice(self.wire.as_bytes())?;
+        let records = self.scanner.push(payload)?;
         self.scanner.finish()?;
         self.finished = true;
         Ok(records)
@@ -141,8 +194,61 @@ impl<A: Allocator + Clone> LazyScan<A> {
         Self {
             scanner: self.scanner.clone(),
             finished: self.finished,
+            applied: Cell::new(self.applied.get()),
             wire: self.wire.clone_in(alloc.clone()),
             regions: self.regions.clone(),
         }
+    }
+}
+
+/// Generated lazy message: field matching stays here; scan deferral does not.
+///
+/// Implement [`scan`](Self::scan), [`scan_mut`](Self::scan_mut), and
+/// [`apply_record`](Self::apply_record). Getters call
+/// [`ensure_scanned`](Self::ensure_scanned); a parent nested LEN calls
+/// [`merge_shared`](Self::merge_shared).
+pub trait LazyMessage<A: Allocator + Clone> {
+    fn scan(&self) -> &LazyScan<A>;
+    fn scan_mut(&mut self) -> &mut LazyScan<A>;
+    fn apply_record(&mut self, rec: &ScannedRecord<A>, origin: usize) -> Result<(), DecodeError>;
+
+    /// Parse stored regions on the first field get.
+    fn ensure_scanned(&self) -> Result<(), DecodeError> {
+        self.scan().require_finished()?;
+        if self.scan().is_applied() {
+            return Ok(());
+        }
+        // SAFETY: field getters hold `&self` only; ingest uses `&mut self` and
+        // does not overlap. The first get walks stored regions once.
+        let this = ptr::from_ref(self).cast_mut();
+        unsafe { (*this).apply_pending() }
+    }
+
+    /// Remember one complete message body on `root` without walking its tags.
+    ///
+    /// The first field getter parses every stored region (protobuf merge). If
+    /// slots were already applied, this occurrence is parsed immediately.
+    fn merge_shared(&mut self, root: &SharedWire<A>, span: WireSpan) -> Result<(), DecodeError> {
+        if let Some(span) = self.scan_mut().store_shared(root, span) {
+            self.apply_span(span)?;
+        }
+        Ok(())
+    }
+
+    fn apply_pending(&mut self) -> Result<(), DecodeError> {
+        let regions: Vec<WireSpan> = self.scan().regions().to_vec();
+        for span in regions {
+            self.apply_span(span)?;
+        }
+        self.scan().mark_applied();
+        Ok(())
+    }
+
+    fn apply_span(&mut self, span: WireSpan) -> Result<(), DecodeError> {
+        let records = self.scan_mut().scan_region(span)?;
+        for rec in records {
+            self.apply_record(&rec, span.offset)?;
+        }
+        Ok(())
     }
 }

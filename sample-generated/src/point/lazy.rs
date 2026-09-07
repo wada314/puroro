@@ -6,10 +6,11 @@ use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
 use ::core::ops::ControlFlow;
 use ::puroro::{DecodeError, Message};
-use ::puroro_rt::decode::{LazyScan, ScannedRecord, SharedWire, WireSpan, merge_scanned_field};
+use ::puroro_rt::decode::{LazyMessage, LazyScan, ScannedRecord, merge_scanned_field};
 use ::puroro_rt::{
     FieldDeallocVisitor, FieldVisitorMut, Implicit, MessageCommon, ProtoInt32, SingularField,
 };
+use ::std::vec::Vec;
 
 use crate::Point;
 use crate::point::{FIELD_X, FIELD_Y};
@@ -41,13 +42,19 @@ impl PointLazy<Global> {
 }
 
 impl<A: Allocator> PointLazy<A> {
-    pub fn x(&self) -> Result<i32, DecodeError> {
-        self.scan.require_finished()?;
+    pub fn x(&self) -> Result<i32, DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self.x.bind(&self._common).value())
     }
 
-    pub fn y(&self) -> Result<i32, DecodeError> {
-        self.scan.require_finished()?;
+    pub fn y(&self) -> Result<i32, DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self.y.bind(&self._common).value())
     }
 
@@ -86,9 +93,9 @@ impl<A: Allocator + Clone> PointLazy<A> {
     }
 
     pub fn push(&mut self, chunk: &[u8]) -> Result<(), DecodeError> {
-        let (_origin, records) = self.scan.push(chunk)?;
+        let (origin, records) = self.scan.push(chunk)?;
         for rec in records {
-            self.apply_record(&rec)?;
+            self.apply_record(&rec, origin)?;
         }
         Ok(())
     }
@@ -121,24 +128,18 @@ impl<A: Allocator + Clone> PointLazy<A> {
         })?;
         Ok(eager)
     }
+}
 
-    /// Merge one complete Point body that already lives in `root`.
-    pub(crate) fn merge_shared(
-        &mut self,
-        root: &SharedWire<A>,
-        span: WireSpan,
-    ) -> Result<(), DecodeError> {
-        self.scan.adopt(root);
-        self.scan.record_region(span);
-        let payload = span.slice(root.as_bytes())?;
-        let records = self.scan.scan_complete(payload)?;
-        for rec in records {
-            self.apply_record(&rec)?;
-        }
-        Ok(())
+impl<A: Allocator + Clone> LazyMessage<A> for PointLazy<A> {
+    fn scan(&self) -> &LazyScan<A> {
+        &self.scan
     }
 
-    fn apply_record(&mut self, rec: &ScannedRecord<A>) -> Result<(), DecodeError> {
+    fn scan_mut(&mut self) -> &mut LazyScan<A> {
+        &mut self.scan
+    }
+
+    fn apply_record(&mut self, rec: &ScannedRecord<A>, _origin: usize) -> Result<(), DecodeError> {
         match rec.field_number.as_u32() {
             FIELD_X => merge_scanned_field(&rec.field, |wire_type, buf| {
                 self.x.bind_mut(&mut self._common).merge(wire_type, buf, 0)
