@@ -5,20 +5,22 @@
 //! Nested `assignee` / `origin` merge each complete LEN into a child that
 //! shares the island-root buffer. Repeated `watchers` appends one child per
 //! occurrence. `attributes` stores map-entry spans and materialises on first
-//! get. Oneof / repeated string are still skipped. Getters require a finished
+//! get. Repeated `labels` stores element spans and materialises on first get.
+//! Oneof is still skipped. Getters require a finished
 //! input stream so last-wins is final. `into_eager` re-merges `_wire` into
 //! [`Task`]; encode writes `_wire` as-is.
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::{Buf, BufMut};
-use ::core::ops::ControlFlow;
+use ::core::ops::{ControlFlow, Deref};
 use ::puroro::{DecodeError, HasDefault, MapRef, Message, Optional};
 use ::puroro_rt::decode::{LazyScan, ScannedRecord, merge_scanned_field, scanned_len_span};
 use ::puroro_rt::{
     BitPacked, Closed, Expanded, Explicit, FieldDeallocVisitor, FieldVisitorMut, Implicit, Inline,
-    InteriorBitArray, LazyMapField, LegacyRequired, MessageCommon, Open, Packed, ProtoBool,
-    ProtoBytes, ProtoEnum, ProtoInt32, ProtoString, RepeatedField, SingularField, WireOrSso,
+    InteriorBitArray, LazyMapField, LazyRepeatedField, LegacyRequired, MessageCommon, Open, Packed,
+    ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32, ProtoString, RepeatedField, SingularField,
+    WireOrSso,
 };
 
 use crate::Task;
@@ -29,7 +31,7 @@ use crate::task::defaults::MaxRetriesDefault;
 use crate::task::{
     BIT_DONE_VALUE, BIT_FLAG, BIT_FLAG_VALUE, BIT_MAX_RETRIES, BIT_OWNER_ID,
     BIT_OWNER_ID_LAZY_KIND, BIT_PAYLOAD, BIT_PAYLOAD_LAZY_KIND, BIT_PRIORITY, BIT_TITLE,
-    BIT_TITLE_LAZY_KIND, FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_DONE, FIELD_FLAG,
+    BIT_TITLE_LAZY_KIND, FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_DONE, FIELD_FLAG, FIELD_LABELS,
     FIELD_MAX_RETRIES, FIELD_ORIGIN, FIELD_OWNER_ID, FIELD_PAYLOAD, FIELD_PRIORITY, FIELD_SCORE,
     FIELD_SCORES, FIELD_STATUS, FIELD_TAG_IDS, FIELD_TITLE, FIELD_VOTES, FIELD_WATCHERS,
 };
@@ -62,6 +64,7 @@ pub struct TaskLazy<A: Allocator = Global> {
     assignee: Option<AddressLazy<A>>,
     origin: Option<PointLazy<A>>,
     watchers: AllocVec<AddressLazy<A>, A>,
+    labels: LazyRepeatedField<ProtoString, Expanded, { FIELD_LABELS }, A>,
     attributes: LazyMapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>,
     score: SingularField<ProtoInt32, Implicit, { FIELD_SCORE }, A>,
     max_retries: SingularField<
@@ -175,6 +178,17 @@ impl<A: Allocator> TaskLazy<A> {
         Ok(self.scores.bind(&self._common).as_slice())
     }
 
+    pub fn labels(&self) -> Result<&[impl Deref<Target = str>], DecodeError>
+    where
+        A: Clone,
+    {
+        self.require_finished()?;
+        Ok(self
+            .labels
+            .bind(self.scan.wire(), &self._common)?
+            .as_slice())
+    }
+
     pub fn status<'a>(&'a self) -> Result<Optional<Status, impl HasDefault<Status>>, DecodeError>
     where
         A: 'a,
@@ -285,6 +299,7 @@ impl<A: Allocator + Clone> TaskLazy<A> {
             assignee: None,
             origin: None,
             watchers: AllocVec::new_in(alloc.clone()),
+            labels: LazyRepeatedField::new_in(alloc.clone()),
             attributes: LazyMapField::new_in(alloc.clone()),
             score: SingularField::new_in(alloc.clone()),
             max_retries: SingularField::new_in(alloc.clone()),
@@ -334,8 +349,8 @@ impl<A: Allocator + Clone> TaskLazy<A> {
 
     /// Decode every field from `_wire` into an eager [`Task`].
     ///
-    /// Fields the lazy getters still skip (repeated string, oneof) are applied
-    /// here because the full ingest bytes are replayed.
+    /// Fields the lazy getters still skip (oneof) are applied here because the
+    /// full ingest bytes are replayed.
     pub fn into_eager(self) -> Result<Task<A>, DecodeError> {
         self.require_finished()?;
         let mut eager = Task::new_in(self._common.alloc.clone());
@@ -383,6 +398,11 @@ impl<A: Allocator + Clone> TaskLazy<A> {
                 child.merge_shared(self.scan.shared(), span)?;
                 self.watchers.push(child);
                 Ok(())
+            }
+            FIELD_LABELS => {
+                let span = scanned_len_span(origin, rec)?;
+                self.labels
+                    .store_span(span, self.scan.wire(), &self._common)
             }
             FIELD_ATTRIBUTES => {
                 let span = scanned_len_span(origin, rec)?;
@@ -441,6 +461,7 @@ impl<A: Allocator + Clone> TaskLazy<A> {
 
 impl<A: Allocator> Drop for TaskLazy<A> {
     fn drop(&mut self) {
+        self.labels.deallocate(&self._common);
         self.attributes.deallocate(&self._common);
         let mut v = FieldDeallocVisitor::new(&self._common);
         let _ = self.visit_fields_mut(&mut v);

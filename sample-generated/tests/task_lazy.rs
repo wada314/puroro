@@ -62,6 +62,7 @@ fn empty_message_is_implicit_zero() {
     assert!(lazy.assignee().unwrap().is_none());
     assert!(lazy.origin().unwrap().is_none());
     assert!(lazy.watchers().unwrap().is_empty());
+    assert!(lazy.labels().unwrap().is_empty());
     assert!(lazy.attributes().unwrap().is_empty());
 }
 
@@ -190,7 +191,8 @@ fn incremental_chunks_join_one_record() {
 #[test]
 fn skips_len_records() {
     let mut bytes = Vec::new();
-    encode_len_bytes(FIELD_LABELS, b"ignored", &mut bytes);
+    // Field 99 is not a known `Task` field — still skipped (oneof is too).
+    encode_len_bytes(99, b"ignored", &mut bytes);
     encode_varint_field(
         field_number_const::<FIELD_SCORE>(),
         Varint::from_int32(7),
@@ -598,6 +600,66 @@ fn attributes_rejects_non_len_wire() {
         TaskLazy::decode(&bytes[..]).err(),
         Some(DecodeError::InvalidTag)
     );
+}
+
+#[test]
+fn labels_append_and_empty_string() {
+    let mut bytes = Vec::new();
+    encode_len_bytes(FIELD_LABELS, b"urgent", &mut bytes);
+    encode_len_bytes(FIELD_LABELS, b"", &mut bytes);
+    encode_len_bytes(FIELD_LABELS, b"docs", &mut bytes);
+
+    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let labels = lazy.labels().unwrap();
+    assert_eq!(labels.len(), 3);
+    assert_eq!(&*labels[0], "urgent");
+    assert_eq!(&*labels[1], "");
+    assert_eq!(&*labels[2], "docs");
+    assert_eq!(&*lazy.labels().unwrap()[0], "urgent");
+}
+
+#[test]
+fn labels_second_merge_from_appends() {
+    let mut first = Vec::new();
+    encode_len_bytes(FIELD_LABELS, b"a", &mut first);
+    let mut second = Vec::new();
+    encode_len_bytes(FIELD_LABELS, b"b", &mut second);
+
+    let mut lazy = TaskLazy::new();
+    lazy.merge_from(&mut first.as_slice()).unwrap();
+    lazy.merge_from(&mut second.as_slice()).unwrap();
+    let labels = lazy.labels().unwrap();
+    assert_eq!(labels.len(), 2);
+    assert_eq!(&*labels[0], "a");
+    assert_eq!(&*labels[1], "b");
+}
+
+#[test]
+fn labels_merge_from_after_first_get() {
+    let mut first = Vec::new();
+    encode_len_bytes(FIELD_LABELS, b"a", &mut first);
+    let mut second = Vec::new();
+    encode_len_bytes(FIELD_LABELS, b"b", &mut second);
+
+    let mut lazy = TaskLazy::new();
+    lazy.merge_from(&mut first.as_slice()).unwrap();
+    assert_eq!(lazy.labels().unwrap().len(), 1);
+    lazy.merge_from(&mut second.as_slice()).unwrap();
+    let labels = lazy.labels().unwrap();
+    assert_eq!(labels.len(), 2);
+    assert_eq!(&*labels[0], "a");
+    assert_eq!(&*labels[1], "b");
+}
+
+#[test]
+fn labels_invalid_utf8() {
+    let mut bytes = Vec::new();
+    encode_len_bytes(FIELD_LABELS, b"ok", &mut bytes);
+    encode_len_bytes(FIELD_LABELS, &[0xff, 0xfe], &mut bytes);
+
+    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    assert_eq!(lazy.labels().err(), Some(DecodeError::InvalidUtf8));
+    assert_eq!(lazy.labels().err(), Some(DecodeError::InvalidUtf8));
 }
 
 #[test]

@@ -32,7 +32,9 @@ pub use fields::oneof::{
     OneofVariantRef, OneofView, OneofViewMut,
 };
 pub use fields::oneof_variant::OneofVariant;
-pub use fields::repeated::{Expanded, Packed, RepeatedField, RepeatedFieldMut, RepeatedFieldRef};
+pub use fields::repeated::{
+    Expanded, LazyRepeatedField, Packed, RepeatedField, RepeatedFieldMut, RepeatedFieldRef,
+};
 pub use fields::shared::field_presence::{Explicit, Implicit, LegacyRequired, Message, Oneof};
 pub use fields::shared::{
     AddressableSlot, BitPacked, Boxed, CloneBound, CloneFieldsVisitor, DeallocateBound,

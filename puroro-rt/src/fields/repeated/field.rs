@@ -234,13 +234,46 @@ where
         T: RepeatedElementMerge<A>,
         A: Clone,
     {
-        let alloc = self.common.alloc.clone();
+        self.field
+            .merge_from_wire(wire_type, buf, self.common.alloc.clone(), depth)
+    }
+}
+
+impl<T, E, const FIELD: u32, A> RepeatedField<T, E, FIELD, A>
+where
+    T: RepeatedElement,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator,
+{
+    /// Appends one wire occurrence using `alloc` (no [`MessageCommon`] borrow).
+    pub fn merge_from_wire<B: DecodeBuf>(
+        &mut self,
+        wire_type: WireType,
+        buf: &mut B,
+        alloc: A,
+        depth: usize,
+    ) -> Result<(), DecodeError>
+    where
+        T: RepeatedElementMerge<A>,
+        A: Clone,
+    {
         // SAFETY: an owned clone of the message allocator owns this vector's
         // buffer.
-        let mut g = unsafe { self.field.values.with_alloc(alloc.clone()) };
+        let mut g = unsafe { self.values.with_alloc(alloc.clone()) };
         T::merge_occurrence(wire_type, buf, alloc, depth, |elem| {
             g.push(elem);
         })
+    }
+
+    /// Appends an already-decoded element using `alloc`.
+    pub fn push_in(&mut self, elem: T::Element<A>, alloc: A)
+    where
+        A: Clone,
+    {
+        // SAFETY: an owned clone of the message allocator owns this vector's
+        // buffer.
+        let mut g = unsafe { self.values.with_alloc(alloc) };
+        g.push(elem);
     }
 }
 

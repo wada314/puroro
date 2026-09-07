@@ -290,10 +290,24 @@ lands here.
 
 **Done:** sample `TaskLazy` takes chunked or gathered input, `finish`es,
 numericals applied on the scan, string/bytes `WireOrSso`, nested + map as
-offsets, `TaskMessageFallible` shared with eager.
+offsets, repeated `labels` as an offset list (first get materialises),
+`TaskMessageFallible` shared with eager.
 
 **Not done:** `TaskView`, lazy mutation, intra-field repeated cursors,
-zero-copy spanning LEN, plugin, layout unification, packed-as-unread-slice.
+zero-copy spanning LEN, plugin, layout unification, packed-as-unread-slice,
+oneof.
+
+## Revisit later — VERIFY string vs closed-enum unknown
+
+`utf8_validation=VERIFY` failures are **not** locked to the closed-enum
+`UnknownClosedEnum` → `unknown_fields` path.
+
+v1 lazy `labels` (and eager repeated `string` merge) treat `InvalidUtf8` as
+a getter / merge failure for that materialise. Per-occurrence divert — skip
+the bad LEN, keep valid elements, park the raw record — should be cheap to
+add later on the materialise / `RepeatedElement` merge path. Do not treat
+the current policy as final. Same question applies to singular lazy
+`Failed` vs diverting `title` into unknowns.
 
 ## Pointers
 
