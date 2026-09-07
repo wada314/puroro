@@ -11,20 +11,33 @@ use ::std::vec::Vec;
 use super::record::{RecordScanner, ScannedRecord, WireSpan};
 use super::shared_wire::SharedWire;
 
-/// Ingest state stored in [`MessageCommon`](crate::MessageCommon)::`scan`.
+/// Ingest layout stored in [`MessageCommon`](crate::MessageCommon)::`lazy`.
 ///
-/// Eager messages use [`()`] (ZST). Lazy messages use [`LazyScan`].
+/// Implemented by [`Eager`] (ZST) and [`Lazy`].
 pub trait MessageScan<A: Allocator>: Sized {
     fn new_scan(alloc: A) -> Self;
     fn clone_scan(&self, alloc: A) -> Self;
 }
 
-impl<A: Allocator> MessageScan<A> for () {
+/// Eager ingest layout: no leftover, island buffer, or unparsed regions.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct Eager;
+
+/// Lazy ingest layout: owns the [`LazyScan`] machine.
+pub struct Lazy<A: Allocator = Global> {
+    pub scan: LazyScan<A>,
+}
+
+impl<A: Allocator> MessageScan<A> for Eager {
     #[inline]
-    fn new_scan(_alloc: A) -> Self {}
+    fn new_scan(_alloc: A) -> Self {
+        Self
+    }
 
     #[inline]
-    fn clone_scan(&self, _alloc: A) -> Self {}
+    fn clone_scan(&self, _alloc: A) -> Self {
+        Self
+    }
 }
 
 /// Accumulates input bytes and yields complete records with `_wire` origins.
@@ -217,15 +230,19 @@ impl<A: Allocator + Clone> LazyScan<A> {
     }
 }
 
-impl<A: Allocator + Clone> MessageScan<A> for LazyScan<A> {
+impl<A: Allocator + Clone> MessageScan<A> for Lazy<A> {
     #[inline]
     fn new_scan(alloc: A) -> Self {
-        Self::new_in(alloc)
+        Self {
+            scan: LazyScan::new_in(alloc),
+        }
     }
 
     #[inline]
     fn clone_scan(&self, alloc: A) -> Self {
-        self.clone_in(alloc)
+        Self {
+            scan: self.scan.clone_in(alloc),
+        }
     }
 }
 

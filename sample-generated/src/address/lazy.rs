@@ -68,7 +68,8 @@ impl<A: Allocator> AddressLazy<A> {
         A: Clone,
     {
         self.ensure_scanned()?;
-        self.street.try_str(&self._common, self._common.scan.wire())
+        self.street
+            .try_str(&self._common, self._common.lazy.scan.wire())
     }
 
     pub fn has_street(&self) -> Result<bool, DecodeError>
@@ -84,7 +85,8 @@ impl<A: Allocator> AddressLazy<A> {
         A: Clone,
     {
         self.ensure_scanned()?;
-        self.city.try_str(&self._common, self._common.scan.wire())
+        self.city
+            .try_str(&self._common, self._common.lazy.scan.wire())
     }
 
     pub fn has_city(&self) -> Result<bool, DecodeError>
@@ -112,11 +114,11 @@ impl<A: Allocator> AddressLazy<A> {
     }
 
     pub fn encoded_len(&self) -> Result<usize, DecodeError> {
-        self._common.scan.encoded_len()
+        self._common.lazy.scan.encoded_len()
     }
 
     pub fn encode<B: BufMut>(&self, buf: &mut B) -> Result<(), DecodeError> {
-        self._common.scan.encode(buf)
+        self._common.lazy.scan.encode(buf)
     }
 
     pub fn encode_to_vec(&self) -> Result<Vec<u8>, DecodeError> {
@@ -149,7 +151,7 @@ impl<A: Allocator + Clone> AddressLazy<A> {
     }
 
     pub fn push(&mut self, chunk: &[u8]) -> Result<(), DecodeError> {
-        let (origin, records) = self._common.scan.push(chunk)?;
+        let (origin, records) = self._common.lazy.scan.push(chunk)?;
         for rec in records {
             self.apply_record(&rec, origin)?;
         }
@@ -157,7 +159,7 @@ impl<A: Allocator + Clone> AddressLazy<A> {
     }
 
     pub fn finish(&mut self) -> Result<(), DecodeError> {
-        self._common.scan.finish()
+        self._common.lazy.scan.finish()
     }
 
     pub fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
@@ -180,9 +182,9 @@ impl<A: Allocator + Clone> AddressLazy<A> {
 
     /// Decode every field from `_wire` into an eager [`Address`].
     pub fn into_eager(self) -> Result<Address<A>, DecodeError> {
-        self._common.scan.require_finished()?;
+        self._common.lazy.scan.require_finished()?;
         let mut eager = Address::new_in(self._common.alloc.clone());
-        self._common.scan.for_each_body(|chunk| {
+        self._common.lazy.scan.for_each_body(|chunk| {
             let mut buf = chunk;
             Message::merge_from(&mut eager, &mut buf)
         })?;
@@ -192,11 +194,11 @@ impl<A: Allocator + Clone> AddressLazy<A> {
 
 impl<A: Allocator + Clone> LazyMessage<A> for AddressLazy<A> {
     fn scan(&self) -> &LazyScan<A> {
-        &self._common.scan
+        &self._common.lazy.scan
     }
 
     fn scan_mut(&mut self) -> &mut LazyScan<A> {
-        &mut self._common.scan
+        &mut self._common.lazy.scan
     }
 
     fn apply_record(&mut self, rec: &ScannedRecord<A>, origin: usize) -> Result<(), DecodeError> {
@@ -248,10 +250,10 @@ impl<A: Allocator> PartialEq for AddressLazy<A> {
     fn eq(&self, other: &Self) -> bool {
         let mut left = Vec::new();
         let mut right = Vec::new();
-        if self._common.scan.write_bodies(&mut left).is_err() {
+        if self._common.lazy.scan.write_bodies(&mut left).is_err() {
             return false;
         }
-        if other._common.scan.write_bodies(&mut right).is_err() {
+        if other._common.lazy.scan.write_bodies(&mut right).is_err() {
             return false;
         }
         left == right
@@ -275,11 +277,11 @@ impl<A: Allocator> DeallocateIn<A> for AddressLazy<A> {
 
 impl<A: Allocator> MessageEncode for AddressLazy<A> {
     fn encoded_len(&self, _ctx: &mut EncodeCtx) -> usize {
-        self._common.scan.body_len()
+        self._common.lazy.scan.body_len()
     }
 
     fn encode_raw<B: BufMut>(&self, _ctx: &mut EncodeCtx, buf: &mut B) {
-        let _ = self._common.scan.write_bodies(buf);
+        let _ = self._common.lazy.scan.write_bodies(buf);
     }
 }
 

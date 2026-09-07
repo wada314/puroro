@@ -58,11 +58,11 @@ impl<A: Allocator> PointLazy<A> {
     }
 
     pub fn encoded_len(&self) -> Result<usize, DecodeError> {
-        self._common.scan.encoded_len()
+        self._common.lazy.scan.encoded_len()
     }
 
     pub fn encode<B: BufMut>(&self, buf: &mut B) -> Result<(), DecodeError> {
-        self._common.scan.encode(buf)
+        self._common.lazy.scan.encode(buf)
     }
 
     pub fn encode_to_vec(&self) -> Result<Vec<u8>, DecodeError> {
@@ -91,7 +91,7 @@ impl<A: Allocator + Clone> PointLazy<A> {
     }
 
     pub fn push(&mut self, chunk: &[u8]) -> Result<(), DecodeError> {
-        let (origin, records) = self._common.scan.push(chunk)?;
+        let (origin, records) = self._common.lazy.scan.push(chunk)?;
         for rec in records {
             self.apply_record(&rec, origin)?;
         }
@@ -99,7 +99,7 @@ impl<A: Allocator + Clone> PointLazy<A> {
     }
 
     pub fn finish(&mut self) -> Result<(), DecodeError> {
-        self._common.scan.finish()
+        self._common.lazy.scan.finish()
     }
 
     pub fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
@@ -118,9 +118,9 @@ impl<A: Allocator + Clone> PointLazy<A> {
 
     /// Decode every field from `_wire` into an eager [`Point`].
     pub fn into_eager(self) -> Result<Point<A>, DecodeError> {
-        self._common.scan.require_finished()?;
+        self._common.lazy.scan.require_finished()?;
         let mut eager = Point::new_in(self._common.alloc.clone());
-        self._common.scan.for_each_body(|chunk| {
+        self._common.lazy.scan.for_each_body(|chunk| {
             let mut buf = chunk;
             Message::merge_from(&mut eager, &mut buf)
         })?;
@@ -130,11 +130,11 @@ impl<A: Allocator + Clone> PointLazy<A> {
 
 impl<A: Allocator + Clone> LazyMessage<A> for PointLazy<A> {
     fn scan(&self) -> &LazyScan<A> {
-        &self._common.scan
+        &self._common.lazy.scan
     }
 
     fn scan_mut(&mut self) -> &mut LazyScan<A> {
-        &mut self._common.scan
+        &mut self._common.lazy.scan
     }
 
     fn apply_record(&mut self, rec: &ScannedRecord<A>, _origin: usize) -> Result<(), DecodeError> {

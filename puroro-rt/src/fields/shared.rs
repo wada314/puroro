@@ -20,6 +20,7 @@ pub(crate) mod slot_init;
 pub(crate) mod value_layout;
 pub(crate) mod value_slot;
 
+pub use crate::decode::{Eager, Lazy};
 pub use crate::fields::wire::wire_or_sso::WireOrSso;
 pub use crate::unknown_fields::{DiscardUnknowns, UnknownFields, UnknownStore};
 pub use ::unmanaged::DefaultIn;
@@ -37,7 +38,7 @@ pub use value_slot::AddressableSlot;
 use ::core::cell::UnsafeCell;
 use ::core::mem::ManuallyDrop;
 
-use crate::decode::{LazyScan, MessageScan, UnknownFieldsIter, iter_unknown_fields};
+use crate::decode::{MessageScan, UnknownFieldsIter, iter_unknown_fields};
 use ::allocator_api2::alloc::Allocator;
 use ::bitvec::{
     array::BitArray,
@@ -221,16 +222,17 @@ pub trait MessageCommonAlloc {
 /// `U` selects preserve ([`UnknownFields`], default) or discard
 /// ([`DiscardUnknowns`]).
 ///
-/// `S` is the message-wide ingest machine (chunk `push` / `finish`, leftover,
-/// island `_wire`, unparsed child regions). Eager messages do not keep that
-/// state, so `S` defaults to [`()`] (ZST) and does not grow the struct. Lazy
-/// messages use [`LazyScan`] so the generated type still has only `_common`
-/// plus one field per proto field. Construct / clone go through
+/// `L` is the ingest layout: [`Eager`] (default ZST) or [`Lazy`] (owns
+/// [`LazyScan`](crate::decode::LazyScan)). That is the message-wide ingest
+/// machine (chunk `push` / `finish`, leftover, island `_wire`, unparsed child
+/// regions). Eager does not keep that state and does not grow the struct.
+/// Lazy keeps it on `_common.lazy` so the generated type still has only
+/// `_common` plus one field per proto field. Construct / clone go through
 /// [`MessageScan`](crate::decode::MessageScan).
 ///
 /// Catalog bounds use [`MessageCommonBits`] / [`MessageCommonAlloc`] on `&Self`
 /// rather than constraining `B` directly.
-pub struct MessageCommon<B, A: Allocator, U: UnknownStore<A> = UnknownFields<A>, S = ()> {
+pub struct MessageCommon<B, A: Allocator, U: UnknownStore<A> = UnknownFields<A>, L = Eager> {
     /// Common bits (`BitArray` sized by codegen): presence, packed bool values,
     /// and string / bytes SSO heap-arm bits.
     pub bits: B,
@@ -240,26 +242,26 @@ pub struct MessageCommon<B, A: Allocator, U: UnknownStore<A> = UnknownFields<A>,
     /// Canonical allocator for the whole message (cloned for growth / clone;
     /// teardown borrows `&self.alloc`).
     pub alloc: A,
-    /// Eager: `()`. Lazy: [`LazyScan`] (island buffer, leftover, unparsed regions).
-    pub scan: S,
+    /// [`Eager`] or [`Lazy`] (`Lazy.scan` is the island buffer / leftover).
+    pub lazy: L,
 }
 
-/// [`MessageCommon`] with a lazy [`LazyScan`] ingest slot.
-pub type LazyMessageCommon<B, A, U = UnknownFields<A>> = MessageCommon<B, A, U, LazyScan<A>>;
+/// [`MessageCommon`] with a [`Lazy`] ingest slot.
+pub type LazyMessageCommon<B, A, U = UnknownFields<A>> = MessageCommon<B, A, U, Lazy<A>>;
 
-impl<B, A: Allocator + Clone, U: UnknownStore<A>, S: MessageScan<A>> MessageCommon<B, A, U, S> {
+impl<B, A: Allocator + Clone, U: UnknownStore<A>, L: MessageScan<A>> MessageCommon<B, A, U, L> {
     /// Creates common state with the given common bits and allocator.
     pub fn new_in(bits: B, alloc: A) -> Self {
         let unknown_fields = ManuallyDrop::new(U::new());
         Self {
             bits,
             unknown_fields,
-            scan: S::new_scan(alloc.clone()),
+            lazy: L::new_scan(alloc.clone()),
             alloc,
         }
     }
 
-    /// Deep-copies common bits, unknown-field bytes, and scan state into `alloc`.
+    /// Deep-copies common bits, unknown-field bytes, and ingest layout into `alloc`.
     #[inline]
     pub fn clone_in(&self, alloc: A) -> Self
     where
@@ -271,7 +273,7 @@ impl<B, A: Allocator + Clone, U: UnknownStore<A>, S: MessageScan<A>> MessageComm
                 &*self.unknown_fields,
                 alloc.clone(),
             )),
-            scan: self.scan.clone_scan(alloc.clone()),
+            lazy: self.lazy.clone_scan(alloc.clone()),
             alloc,
         }
     }
