@@ -21,7 +21,7 @@ use super::MapKey;
 use crate::decode;
 use crate::encode::{self, field_number_const};
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
-use crate::fields::shared::{FieldDeallocate, MessageCommon};
+use crate::fields::shared::{FieldDeallocate, MessageCommon, MessageCommonAlloc};
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut,
 };
@@ -69,19 +69,19 @@ where
 
     /// Shared bound view (pairs this field with message common state).
     #[inline]
-    pub fn bind<'a, Pb>(
+    pub fn bind<'a, Cx: MessageCommonAlloc<Alloc = A>>(
         &'a self,
-        common: &'a MessageCommon<Pb, A>,
-    ) -> MapFieldRef<'a, K, V, FIELD, A, Pb> {
+        common: &'a Cx,
+    ) -> MapFieldRef<'a, K, V, FIELD, A, Cx> {
         MapFieldRef::new(self, common)
     }
 
     /// Mutable bound view (pairs this field with message common state).
     #[inline]
-    pub fn bind_mut<'f, 'c, Pb>(
+    pub fn bind_mut<'f, 'c, Cx: MessageCommonAlloc<Alloc = A>>(
         &'f mut self,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> MapFieldMut<'f, 'c, K, V, FIELD, A, Pb> {
+        common: &'c mut Cx,
+    ) -> MapFieldMut<'f, 'c, K, V, FIELD, A, Cx> {
         MapFieldMut::new(self, common)
     }
 
@@ -130,15 +130,16 @@ where
     }
 }
 
-impl<K, V, const FIELD: u32, A, P> FieldDeallocate<MessageCommon<P, A>> for MapField<K, V, FIELD, A>
+impl<K, V, const FIELD: u32, A, C> FieldDeallocate<C> for MapField<K, V, FIELD, A>
 where
     K: MapKey,
     V: RepeatedElement,
     A: Allocator,
+    C: MessageCommonAlloc<Alloc = A>,
 {
     #[inline]
-    fn deallocate(&mut self, common: &MessageCommon<P, A>) {
-        let alloc = &common.alloc;
+    fn deallocate(&mut self, common: &C) {
+        let alloc = common.alloc();
         for (k, v) in self.entries.drain() {
             // SAFETY: message allocator owns key / value payloads.
             unsafe {
@@ -239,7 +240,7 @@ where
 }
 
 /// Short-lived shared binding of a map field to its message common state.
-pub struct MapFieldRef<'a, K, V, const FIELD: u32, A, Pb>
+pub struct MapFieldRef<'a, K, V, const FIELD: u32, A, Cx>
 where
     K: MapKey,
     V: RepeatedElement,
@@ -247,17 +248,17 @@ where
 {
     field: &'a MapField<K, V, FIELD, A>,
     #[allow(dead_code)]
-    common: &'a MessageCommon<Pb, A>,
+    common: &'a Cx,
 }
 
-impl<'a, K, V, const FIELD: u32, A, Pb> MapFieldRef<'a, K, V, FIELD, A, Pb>
+impl<'a, K, V, const FIELD: u32, A, Cx> MapFieldRef<'a, K, V, FIELD, A, Cx>
 where
     K: MapKey,
     V: RepeatedElement,
     A: Allocator,
 {
     #[inline]
-    fn new(field: &'a MapField<K, V, FIELD, A>, common: &'a MessageCommon<Pb, A>) -> Self {
+    fn new(field: &'a MapField<K, V, FIELD, A>, common: &'a Cx) -> Self {
         Self { field, common }
     }
 
@@ -279,24 +280,25 @@ where
 }
 
 /// Short-lived binding of a map field to its message common state.
-pub struct MapFieldMut<'f, 'c, K, V, const FIELD: u32, A, Pb>
+pub struct MapFieldMut<'f, 'c, K, V, const FIELD: u32, A, Cx: MessageCommonAlloc<Alloc = A>>
 where
     K: MapKey,
     V: RepeatedElement,
     A: Allocator,
 {
     field: &'f mut MapField<K, V, FIELD, A>,
-    common: &'c mut MessageCommon<Pb, A>,
+    common: &'c mut Cx,
 }
 
-impl<'f, 'c, K, V, const FIELD: u32, A, Pb> MapFieldMut<'f, 'c, K, V, FIELD, A, Pb>
+impl<'f, 'c, K, V, const FIELD: u32, A, Cx> MapFieldMut<'f, 'c, K, V, FIELD, A, Cx>
 where
     K: MapKey,
     V: RepeatedElement,
     A: Allocator,
+    Cx: MessageCommonAlloc<Alloc = A>,
 {
     #[inline]
-    fn new(field: &'f mut MapField<K, V, FIELD, A>, common: &'c mut MessageCommon<Pb, A>) -> Self {
+    fn new(field: &'f mut MapField<K, V, FIELD, A>, common: &'c mut Cx) -> Self {
         Self { field, common }
     }
 
@@ -309,7 +311,7 @@ where
         K::Element<A>: Eq + Hash,
         Q: ?Sized + Hash + Equivalent<K::Element<A>>,
     {
-        let alloc = self.common.alloc.clone();
+        let alloc = self.common.clone_alloc();
         self.field
             .entries
             .get_mut(key)
@@ -326,8 +328,8 @@ where
         K::Element<A>: Eq + Hash + Borrow<K::RefView>,
     {
         if self.field.entries.get(key).is_none() {
-            let owned_key = key.to_owned_in(self.common.alloc.clone());
-            let value = V::default_element(self.common.alloc.clone());
+            let owned_key = key.to_owned_in(self.common.clone_alloc());
+            let value = V::default_element(self.common.clone_alloc());
             self.insert(owned_key, value);
         }
         self.get_element_mut(key)
@@ -343,7 +345,7 @@ where
     where
         K::Element<A>: Eq + Hash,
     {
-        self.field.insert_last_wins(key, value, &self.common.alloc);
+        self.field.insert_last_wins(key, value, self.common.alloc());
     }
 
     pub fn remove<Q>(&mut self, key: &Q)
@@ -352,7 +354,7 @@ where
         Q: ?Sized + Hash + Equivalent<K::Element<A>>,
     {
         if let Some((old_key, old_value)) = self.field.entries.remove_entry(key) {
-            let alloc = &self.common.alloc;
+            let alloc = self.common.alloc();
             // SAFETY: message allocator owns removed key / value payloads.
             unsafe {
                 K::deallocate_element(old_key, alloc);
@@ -362,7 +364,7 @@ where
     }
 
     pub fn clear(&mut self) {
-        let alloc = &self.common.alloc;
+        let alloc = self.common.alloc();
         for (k, v) in self.field.entries.drain() {
             // SAFETY: message allocator owns key / value payloads.
             unsafe {
@@ -390,7 +392,7 @@ where
         }
         let len = decode::decode_varint(buf)? as usize;
         let mut guard = buf.push_limit_guard(len)?;
-        let alloc = self.common.alloc.clone();
+        let alloc = self.common.clone_alloc();
         let (key, value) = decode_map_entry::<K, V, A, _>(&mut *guard, alloc, depth)?;
         self.insert(key, value);
         Ok(())
@@ -400,8 +402,8 @@ where
 // Blanket `puroro::{MapRef, MapMut}` over catalog bind views (`RefView` for key
 // and value markers).
 
-impl<'a, K, V, const FIELD: u32, A, Pb> MapRef<K::RefView, V::RefView>
-    for MapFieldRef<'a, K, V, FIELD, A, Pb>
+impl<'a, K, V, const FIELD: u32, A, Cx> MapRef<K::RefView, V::RefView>
+    for MapFieldRef<'a, K, V, FIELD, A, Cx>
 where
     K: MapKey,
     V: RepeatedElement,
@@ -420,12 +422,13 @@ where
     }
 }
 
-impl<'f, 'c, K, V, const FIELD: u32, A, Pb> MapMut<K::RefView, V::RefView>
-    for MapFieldMut<'f, 'c, K, V, FIELD, A, Pb>
+impl<'f, 'c, K, V, const FIELD: u32, A, Cx> MapMut<K::RefView, V::RefView>
+    for MapFieldMut<'f, 'c, K, V, FIELD, A, Cx>
 where
     K: MapKey,
     V: RepeatedElementMut + RepeatedElementMerge<A>,
     A: Allocator + Clone,
+    Cx: MessageCommonAlloc<Alloc = A>,
     K::RefView: Hash + Eq + ToOwnedIn<A, Owned = K::Element<A>>,
     K::Element<A>: Hash + Eq + Borrow<K::RefView>,
 {

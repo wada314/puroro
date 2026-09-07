@@ -17,7 +17,7 @@ use ::unmanaged::vec::VecGuard;
 
 use crate::encode::field_number_const;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
-use crate::fields::shared::{FieldDeallocate, MessageCommon};
+use crate::fields::shared::{FieldDeallocate, MessageCommon, MessageCommonAlloc};
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedVecMut,
 };
@@ -64,38 +64,38 @@ where
 
     /// Binds this field to `common` for read access.
     #[inline]
-    pub fn bind<'a, Pb>(
+    pub fn bind<'a, Cx: MessageCommonAlloc<Alloc = A>>(
         &'a self,
-        common: &'a MessageCommon<Pb, A>,
-    ) -> RepeatedFieldRef<'a, T, E, FIELD, A, Pb> {
+        common: &'a Cx,
+    ) -> RepeatedFieldRef<'a, T, E, FIELD, A, Cx> {
         RepeatedFieldRef::new(self, common)
     }
 
     /// Binds this field to `common` for mutation.
     #[inline]
-    pub fn bind_mut<'f, 'c, Pb>(
+    pub fn bind_mut<'f, 'c, Cx: MessageCommonAlloc<Alloc = A>>(
         &'f mut self,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> RepeatedFieldMut<'f, 'c, T, E, FIELD, A, Pb> {
+        common: &'c mut Cx,
+    ) -> RepeatedFieldMut<'f, 'c, T, E, FIELD, A, Cx> {
         RepeatedFieldMut::new(self, common)
     }
 }
 
-impl<T, E, const FIELD: u32, A, P> FieldDeallocate<MessageCommon<P, A>>
-    for RepeatedField<T, E, FIELD, A>
+impl<T, E, const FIELD: u32, A, C> FieldDeallocate<C> for RepeatedField<T, E, FIELD, A>
 where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator,
+    C: MessageCommonAlloc<Alloc = A>,
     T::Element<A>: DeallocateIn<A>,
 {
     /// Releases every element (when heap-backed) and the backing buffer.
     #[inline]
-    fn deallocate(&mut self, common: &MessageCommon<P, A>) {
+    fn deallocate(&mut self, common: &C) {
         // SAFETY: called once; `&common.alloc` is interchangeable with the
         // clones that grew the buffer. Reconstructs `Vec<T, &A>` for the free.
         let v = unsafe { ManuallyDrop::take(&mut self.values) };
-        unsafe { v.deallocate(&common.alloc) };
+        unsafe { v.deallocate(common.alloc()) };
     }
 }
 
@@ -110,23 +110,23 @@ pub struct RepeatedFieldRef<
     E: RepeatedEncoding<T, A>,
     const FIELD: u32,
     A: Allocator,
-    Pb,
+    Cx,
 > {
     field: &'a RepeatedField<T, E, FIELD, A>,
     /// Bound for symmetry with [`RepeatedFieldMut`]; unused by current getters.
     #[allow(dead_code)]
-    common: &'a MessageCommon<Pb, A>,
+    common: &'a Cx,
     _encoding: PhantomData<E>,
 }
 
-impl<'a, T, E, const FIELD: u32, A, Pb> RepeatedFieldRef<'a, T, E, FIELD, A, Pb>
+impl<'a, T, E, const FIELD: u32, A, Cx> RepeatedFieldRef<'a, T, E, FIELD, A, Cx>
 where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator,
 {
     #[inline]
-    fn new(field: &'a RepeatedField<T, E, FIELD, A>, common: &'a MessageCommon<Pb, A>) -> Self {
+    fn new(field: &'a RepeatedField<T, E, FIELD, A>, common: &'a Cx) -> Self {
         Self {
             field,
             common,
@@ -157,24 +157,22 @@ pub struct RepeatedFieldMut<
     E: RepeatedEncoding<T, A>,
     const FIELD: u32,
     A: Allocator,
-    Pb,
+    Cx: MessageCommonAlloc<Alloc = A>,
 > {
     field: &'f mut RepeatedField<T, E, FIELD, A>,
-    common: &'c mut MessageCommon<Pb, A>,
+    common: &'c mut Cx,
     _encoding: PhantomData<E>,
 }
 
-impl<'f, 'c, T, E, const FIELD: u32, A, Pb> RepeatedFieldMut<'f, 'c, T, E, FIELD, A, Pb>
+impl<'f, 'c, T, E, const FIELD: u32, A, Cx> RepeatedFieldMut<'f, 'c, T, E, FIELD, A, Cx>
 where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator,
+    Cx: MessageCommonAlloc<Alloc = A>,
 {
     #[inline]
-    fn new(
-        field: &'f mut RepeatedField<T, E, FIELD, A>,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> Self {
+    fn new(field: &'f mut RepeatedField<T, E, FIELD, A>, common: &'c mut Cx) -> Self {
         Self {
             field,
             common,
@@ -188,7 +186,7 @@ where
         T: RepeatedVecMut,
         A: Clone,
     {
-        let alloc = self.common.alloc.clone();
+        let alloc = self.common.clone_alloc();
         // SAFETY: an owned clone of the message allocator owns this vector's
         // buffer.
         unsafe { self.field.values.with_alloc(alloc) }
@@ -203,7 +201,7 @@ where
         T: RepeatedElementMut + RepeatedElementMerge<A>,
         A: Clone,
     {
-        let alloc = self.common.alloc.clone();
+        let alloc = self.common.clone_alloc();
         // SAFETY: an owned clone of the message allocator owns this vector's
         // buffer.
         RepeatedElementsMut::new(unsafe { self.field.values.with_alloc(alloc) })
@@ -214,7 +212,7 @@ where
     where
         A: Clone,
     {
-        let alloc = self.common.alloc.clone();
+        let alloc = self.common.clone_alloc();
         // SAFETY: owned clones of the message allocator own this vector's buffer
         // and every element.
         let mut g = unsafe { self.field.values.with_alloc(alloc.clone()) };
@@ -235,7 +233,7 @@ where
         A: Clone,
     {
         self.field
-            .merge_from_wire(wire_type, buf, self.common.alloc.clone(), depth)
+            .merge_from_wire(wire_type, buf, self.common.clone_alloc(), depth)
     }
 }
 

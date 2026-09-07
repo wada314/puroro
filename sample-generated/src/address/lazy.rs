@@ -11,7 +11,7 @@ use ::puroro_rt::decode::{
 };
 use ::puroro_rt::{
     CloneIn, DeallocateIn, DefaultIn, EncodeCtx, Explicit, FieldCloneIn, FieldDeallocVisitor,
-    FieldVisitorMut, InteriorBitArray, MessageCommon, MessageEncode, MessageMerge, ProtoDouble,
+    FieldVisitorMut, InteriorBitArray, LazyMessageCommon, MessageEncode, MessageMerge, ProtoDouble,
     ProtoFixed32, ProtoString, SingularField, WireOrSso,
 };
 use ::std::vec::Vec;
@@ -24,8 +24,7 @@ use crate::address::{
 
 /// Lazy `Address` with catalog numericals and `WireOrSso` strings.
 pub struct AddressLazy<A: Allocator = Global> {
-    scan: LazyScan<A>,
-    _common: MessageCommon<InteriorBitArray<2>, A>,
+    _common: LazyMessageCommon<InteriorBitArray<2>, A>,
     street: SingularField<
         ProtoString,
         Explicit<{ BIT_STREET }>,
@@ -69,7 +68,7 @@ impl<A: Allocator> AddressLazy<A> {
         A: Clone,
     {
         self.ensure_scanned()?;
-        self.street.try_str(&self._common, self.scan.wire())
+        self.street.try_str(&self._common, self._common.scan.wire())
     }
 
     pub fn has_street(&self) -> Result<bool, DecodeError>
@@ -85,7 +84,7 @@ impl<A: Allocator> AddressLazy<A> {
         A: Clone,
     {
         self.ensure_scanned()?;
-        self.city.try_str(&self._common, self.scan.wire())
+        self.city.try_str(&self._common, self._common.scan.wire())
     }
 
     pub fn has_city(&self) -> Result<bool, DecodeError>
@@ -113,11 +112,11 @@ impl<A: Allocator> AddressLazy<A> {
     }
 
     pub fn encoded_len(&self) -> Result<usize, DecodeError> {
-        self.scan.encoded_len()
+        self._common.scan.encoded_len()
     }
 
     pub fn encode<B: BufMut>(&self, buf: &mut B) -> Result<(), DecodeError> {
-        self.scan.encode(buf)
+        self._common.scan.encode(buf)
     }
 
     pub fn encode_to_vec(&self) -> Result<Vec<u8>, DecodeError> {
@@ -126,7 +125,7 @@ impl<A: Allocator> AddressLazy<A> {
         Ok(out)
     }
 
-    fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<InteriorBitArray<2>, A>>>(
+    fn visit_fields_mut<V: FieldVisitorMut<LazyMessageCommon<InteriorBitArray<2>, A>>>(
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
@@ -141,8 +140,7 @@ impl<A: Allocator> AddressLazy<A> {
 impl<A: Allocator + Clone> AddressLazy<A> {
     pub fn new_in(alloc: A) -> Self {
         Self {
-            scan: LazyScan::new_in(alloc.clone()),
-            _common: MessageCommon::new_in(InteriorBitArray::zero(), alloc.clone()),
+            _common: LazyMessageCommon::new_in(InteriorBitArray::zero(), alloc.clone()),
             street: SingularField::new_in(alloc.clone()),
             city: SingularField::new_in(alloc.clone()),
             postal_code: SingularField::new_in(alloc.clone()),
@@ -151,7 +149,7 @@ impl<A: Allocator + Clone> AddressLazy<A> {
     }
 
     pub fn push(&mut self, chunk: &[u8]) -> Result<(), DecodeError> {
-        let (origin, records) = self.scan.push(chunk)?;
+        let (origin, records) = self._common.scan.push(chunk)?;
         for rec in records {
             self.apply_record(&rec, origin)?;
         }
@@ -159,7 +157,7 @@ impl<A: Allocator + Clone> AddressLazy<A> {
     }
 
     pub fn finish(&mut self) -> Result<(), DecodeError> {
-        self.scan.finish()
+        self._common.scan.finish()
     }
 
     pub fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
@@ -182,9 +180,9 @@ impl<A: Allocator + Clone> AddressLazy<A> {
 
     /// Decode every field from `_wire` into an eager [`Address`].
     pub fn into_eager(self) -> Result<Address<A>, DecodeError> {
-        self.scan.require_finished()?;
+        self._common.scan.require_finished()?;
         let mut eager = Address::new_in(self._common.alloc.clone());
-        self.scan.for_each_body(|chunk| {
+        self._common.scan.for_each_body(|chunk| {
             let mut buf = chunk;
             Message::merge_from(&mut eager, &mut buf)
         })?;
@@ -194,11 +192,11 @@ impl<A: Allocator + Clone> AddressLazy<A> {
 
 impl<A: Allocator + Clone> LazyMessage<A> for AddressLazy<A> {
     fn scan(&self) -> &LazyScan<A> {
-        &self.scan
+        &self._common.scan
     }
 
     fn scan_mut(&mut self) -> &mut LazyScan<A> {
-        &mut self.scan
+        &mut self._common.scan
     }
 
     fn apply_record(&mut self, rec: &ScannedRecord<A>, origin: usize) -> Result<(), DecodeError> {
@@ -231,7 +229,6 @@ impl<A: Allocator + Clone> LazyMessage<A> for AddressLazy<A> {
 impl<A: Allocator + Clone> CloneIn<A> for AddressLazy<A> {
     fn clone_in(&self, alloc: A) -> Self {
         Self {
-            scan: self.scan.clone_in(alloc.clone()),
             _common: self._common.clone_in(alloc.clone()),
             street: self.street.clone_field(&self._common, alloc.clone()),
             city: self.city.clone_field(&self._common, alloc.clone()),
@@ -251,10 +248,10 @@ impl<A: Allocator> PartialEq for AddressLazy<A> {
     fn eq(&self, other: &Self) -> bool {
         let mut left = Vec::new();
         let mut right = Vec::new();
-        if self.scan.write_bodies(&mut left).is_err() {
+        if self._common.scan.write_bodies(&mut left).is_err() {
             return false;
         }
-        if other.scan.write_bodies(&mut right).is_err() {
+        if other._common.scan.write_bodies(&mut right).is_err() {
             return false;
         }
         left == right
@@ -278,11 +275,11 @@ impl<A: Allocator> DeallocateIn<A> for AddressLazy<A> {
 
 impl<A: Allocator> MessageEncode for AddressLazy<A> {
     fn encoded_len(&self, _ctx: &mut EncodeCtx) -> usize {
-        self.scan.body_len()
+        self._common.scan.body_len()
     }
 
     fn encode_raw<B: BufMut>(&self, _ctx: &mut EncodeCtx, buf: &mut B) {
-        let _ = self.scan.write_bodies(buf);
+        let _ = self._common.scan.write_bodies(buf);
     }
 }
 

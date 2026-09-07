@@ -10,7 +10,7 @@ mod record;
 mod shared_wire;
 mod varint;
 
-pub use self::lazy_scan::{LazyMessage, LazyScan};
+pub use self::lazy_scan::{LazyMessage, LazyScan, MessageScan};
 pub use self::record::{
     RecordScanner, ScannedRecord, WireSpan, merge_scanned_field, scanned_len_payload,
     scanned_len_span,

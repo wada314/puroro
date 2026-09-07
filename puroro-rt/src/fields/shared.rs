@@ -37,7 +37,7 @@ pub use value_slot::AddressableSlot;
 use ::core::cell::UnsafeCell;
 use ::core::mem::ManuallyDrop;
 
-use crate::decode::{UnknownFieldsIter, iter_unknown_fields};
+use crate::decode::{LazyScan, MessageScan, UnknownFieldsIter, iter_unknown_fields};
 use ::allocator_api2::alloc::Allocator;
 use ::bitvec::{
     array::BitArray,
@@ -219,9 +219,18 @@ pub trait MessageCommonAlloc {
 /// releases it via [`deallocate`](Self::deallocate) in its `Drop`.
 ///
 /// `U` selects preserve ([`UnknownFields`], default) or discard
-/// ([`DiscardUnknowns`]). Catalog bounds use [`MessageCommonBits`] /
-/// [`MessageCommonAlloc`] on `&Self` rather than constraining `B` directly.
-pub struct MessageCommon<B, A: Allocator, U: UnknownStore<A> = UnknownFields<A>> {
+/// ([`DiscardUnknowns`]).
+///
+/// `S` is the message-wide ingest machine (chunk `push` / `finish`, leftover,
+/// island `_wire`, unparsed child regions). Eager messages do not keep that
+/// state, so `S` defaults to [`()`] (ZST) and does not grow the struct. Lazy
+/// messages use [`LazyScan`] so the generated type still has only `_common`
+/// plus one field per proto field. Construct / clone go through
+/// [`MessageScan`](crate::decode::MessageScan).
+///
+/// Catalog bounds use [`MessageCommonBits`] / [`MessageCommonAlloc`] on `&Self`
+/// rather than constraining `B` directly.
+pub struct MessageCommon<B, A: Allocator, U: UnknownStore<A> = UnknownFields<A>, S = ()> {
     /// Common bits (`BitArray` sized by codegen): presence, packed bool values,
     /// and string / bytes SSO heap-arm bits.
     pub bits: B,
@@ -231,20 +240,26 @@ pub struct MessageCommon<B, A: Allocator, U: UnknownStore<A> = UnknownFields<A>>
     /// Canonical allocator for the whole message (cloned for growth / clone;
     /// teardown borrows `&self.alloc`).
     pub alloc: A,
+    /// Eager: `()`. Lazy: [`LazyScan`] (island buffer, leftover, unparsed regions).
+    pub scan: S,
 }
 
-impl<B, A: Allocator + Clone, U: UnknownStore<A>> MessageCommon<B, A, U> {
+/// [`MessageCommon`] with a lazy [`LazyScan`] ingest slot.
+pub type LazyMessageCommon<B, A, U = UnknownFields<A>> = MessageCommon<B, A, U, LazyScan<A>>;
+
+impl<B, A: Allocator + Clone, U: UnknownStore<A>, S: MessageScan<A>> MessageCommon<B, A, U, S> {
     /// Creates common state with the given common bits and allocator.
     pub fn new_in(bits: B, alloc: A) -> Self {
         let unknown_fields = ManuallyDrop::new(U::new());
         Self {
             bits,
             unknown_fields,
+            scan: S::new_scan(alloc.clone()),
             alloc,
         }
     }
 
-    /// Deep-copies common bits and unknown-field bytes into `alloc`.
+    /// Deep-copies common bits, unknown-field bytes, and scan state into `alloc`.
     #[inline]
     pub fn clone_in(&self, alloc: A) -> Self
     where
@@ -256,12 +271,13 @@ impl<B, A: Allocator + Clone, U: UnknownStore<A>> MessageCommon<B, A, U> {
                 &*self.unknown_fields,
                 alloc.clone(),
             )),
+            scan: self.scan.clone_scan(alloc.clone()),
             alloc,
         }
     }
 }
 
-impl<B, A: Allocator, U: UnknownStore<A>> MessageCommon<B, A, U> {
+impl<B, A: Allocator, U: UnknownStore<A>, S> MessageCommon<B, A, U, S> {
     /// Iterates preserved unknown fields as structured views.
     ///
     /// Storage remains a contiguous wire blob when preserving; this only
@@ -290,7 +306,9 @@ impl<B, A: Allocator, U: UnknownStore<A>> MessageCommon<B, A, U> {
     }
 }
 
-impl<B: BitStorage, A: Allocator, U: UnknownStore<A>> MessageCommonBits for MessageCommon<B, A, U> {
+impl<B: BitStorage, A: Allocator, U: UnknownStore<A>, S> MessageCommonBits
+    for MessageCommon<B, A, U, S>
+{
     #[inline]
     fn is_bit_set(&self, bit: usize) -> bool {
         self.bits.is_set(bit)
@@ -307,7 +325,7 @@ impl<B: BitStorage, A: Allocator, U: UnknownStore<A>> MessageCommonBits for Mess
     }
 }
 
-impl<B, A: Allocator, U: UnknownStore<A>> MessageCommonAlloc for MessageCommon<B, A, U> {
+impl<B, A: Allocator, U: UnknownStore<A>, S> MessageCommonAlloc for MessageCommon<B, A, U, S> {
     type Alloc = A;
 
     #[inline]
@@ -339,8 +357,8 @@ pub trait MessageCommonSharedBits: MessageCommonBits {
     fn set_bit_shared(&self, bit: usize, value: bool);
 }
 
-impl<const N: usize, A: Allocator, U: UnknownStore<A>> MessageCommonSharedBits
-    for MessageCommon<InteriorBitArray<N>, A, U>
+impl<const N: usize, A: Allocator, U: UnknownStore<A>, S> MessageCommonSharedBits
+    for MessageCommon<InteriorBitArray<N>, A, U, S>
 {
     #[inline]
     fn set_bit_shared(&self, bit: usize, value: bool) {
@@ -348,7 +366,7 @@ impl<const N: usize, A: Allocator, U: UnknownStore<A>> MessageCommonSharedBits
     }
 }
 
-impl<B, A: Allocator, U: UnknownStore<A>> MessageBinding<A> for MessageCommon<B, A, U>
+impl<B, A: Allocator, U: UnknownStore<A>, S> MessageBinding<A> for MessageCommon<B, A, U, S>
 where
     Self: MessageCommonBits,
 {
@@ -360,7 +378,7 @@ where
     }
 }
 
-impl<B, A: Allocator, U: UnknownStore<A>> MessageBindingMut<A> for MessageCommon<B, A, U>
+impl<B, A: Allocator, U: UnknownStore<A>, S> MessageBindingMut<A> for MessageCommon<B, A, U, S>
 where
     Self: MessageCommonBits,
 {
@@ -372,7 +390,7 @@ where
 
 /// Inherent bit helpers — same as [`MessageCommonBits`], for call sites that
 /// already have a concrete [`MessageCommon`].
-impl<B, A: Allocator, U: UnknownStore<A>> MessageCommon<B, A, U> {
+impl<B, A: Allocator, U: UnknownStore<A>, S> MessageCommon<B, A, U, S> {
     /// Returns whether bit `bit` is set.
     #[inline]
     pub fn is_bit_set(&self, bit: usize) -> bool

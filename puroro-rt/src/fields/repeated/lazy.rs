@@ -13,7 +13,7 @@ use ::unmanaged::{DeallocateIn, UnmanagedString, UnmanagedVec};
 use super::encoding::RepeatedEncoding;
 use super::field::{RepeatedField, RepeatedFieldRef};
 use crate::decode::WireSpan;
-use crate::fields::shared::{FieldDeallocate, MessageCommon};
+use crate::fields::shared::{FieldDeallocate, MessageCommonAlloc};
 use crate::fields::wire::len::{ProtoBytes, ProtoString, ProtoStringUnchecked};
 use crate::fields::wire::repeated_element::RepeatedElement;
 
@@ -79,11 +79,11 @@ where
     }
 
     /// Record one element LEN. If already materialised, append it now.
-    pub fn store_span<P>(
+    pub fn store_span<Cx: MessageCommonAlloc<Alloc = A>>(
         &mut self,
         span: WireSpan,
         wire: &[u8],
-        common: &MessageCommon<P, A>,
+        common: &Cx,
     ) -> Result<(), DecodeError>
     where
         A: Clone,
@@ -91,17 +91,17 @@ where
     {
         self.spans.push(span);
         if let Some(field) = self.ready.get_mut() {
-            append_span(field, span, wire, common.alloc.clone())?;
+            append_span(field, span, wire, common.clone_alloc())?;
         }
         Ok(())
     }
 
     /// Materialise on first call, then return the catalog repeated view.
-    pub fn bind<'a, P>(
+    pub fn bind<'a, Cx: MessageCommonAlloc<Alloc = A>>(
         &'a self,
         wire: &'a [u8],
-        common: &'a MessageCommon<P, A>,
-    ) -> Result<RepeatedFieldRef<'a, T, E, FIELD, A, P>, DecodeError>
+        common: &'a Cx,
+    ) -> Result<RepeatedFieldRef<'a, T, E, FIELD, A, Cx>, DecodeError>
     where
         A: Clone,
         T: DecodeLenBody<A>,
@@ -111,9 +111,9 @@ where
         // never overlap it with `store_span` (`&mut self`).
         let ready = unsafe { &mut *self.ready.get() };
         if ready.is_none() {
-            let mut field = RepeatedField::new_in(common.alloc.clone());
+            let mut field = RepeatedField::new_in(common.clone_alloc());
             for &span in &self.spans {
-                if let Err(e) = append_span(&mut field, span, wire, common.alloc.clone()) {
+                if let Err(e) = append_span(&mut field, span, wire, common.clone_alloc()) {
                     FieldDeallocate::deallocate(&mut field, common);
                     return Err(e);
                 }
@@ -127,7 +127,7 @@ where
     }
 
     /// Release a materialised [`RepeatedField`]. Spans need no teardown.
-    pub fn deallocate<P>(&mut self, common: &MessageCommon<P, A>)
+    pub fn deallocate<Cx: MessageCommonAlloc<Alloc = A>>(&mut self, common: &Cx)
     where
         T::Element<A>: DeallocateIn<A>,
     {

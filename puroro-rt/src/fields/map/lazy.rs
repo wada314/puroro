@@ -9,7 +9,7 @@ use ::puroro::DecodeError;
 use super::MapKey;
 use super::field::{MapField, MapFieldRef};
 use crate::decode::WireSpan;
-use crate::fields::shared::{FieldDeallocate, MessageCommon};
+use crate::fields::shared::{FieldDeallocate, MessageCommonAlloc};
 use crate::fields::wire::repeated_element::{RepeatedElement, RepeatedElementMerge};
 
 /// Offset list of map-entry LENs, optionally promoted to a [`MapField`].
@@ -40,11 +40,11 @@ where
     }
 
     /// Record one map-entry LEN. If already materialised, merge it now.
-    pub fn store_span<P>(
+    pub fn store_span<Cx: MessageCommonAlloc<Alloc = A>>(
         &mut self,
         span: WireSpan,
         wire: &[u8],
-        common: &MessageCommon<P, A>,
+        common: &Cx,
     ) -> Result<(), DecodeError>
     where
         A: Clone,
@@ -55,17 +55,17 @@ where
         self.spans.push(span);
         if let Some(map) = self.ready.get_mut() {
             let payload = span.slice(wire)?;
-            map.merge_entry_body(&mut &payload[..], common.alloc.clone(), 0)?;
+            map.merge_entry_body(&mut &payload[..], common.clone_alloc(), 0)?;
         }
         Ok(())
     }
 
     /// Materialise on first call, then return the catalog map view.
-    pub fn bind<'a, P>(
+    pub fn bind<'a, Cx: MessageCommonAlloc<Alloc = A>>(
         &'a self,
         wire: &'a [u8],
-        common: &'a MessageCommon<P, A>,
-    ) -> Result<MapFieldRef<'a, K, V, FIELD, A, P>, DecodeError>
+        common: &'a Cx,
+    ) -> Result<MapFieldRef<'a, K, V, FIELD, A, Cx>, DecodeError>
     where
         A: Clone,
         K: RepeatedElementMerge<A>,
@@ -76,7 +76,7 @@ where
         // never overlap it with `store_span` (`&mut self`).
         let ready = unsafe { &mut *self.ready.get() };
         if ready.is_none() {
-            let mut map = MapField::new_in(common.alloc.clone());
+            let mut map = MapField::new_in(common.clone_alloc());
             for &span in &self.spans {
                 let payload = match span.slice(wire) {
                     Ok(p) => p,
@@ -85,7 +85,7 @@ where
                         return Err(e);
                     }
                 };
-                if let Err(e) = map.merge_entry_body(&mut &payload[..], common.alloc.clone(), 0) {
+                if let Err(e) = map.merge_entry_body(&mut &payload[..], common.clone_alloc(), 0) {
                     FieldDeallocate::deallocate(&mut map, common);
                     return Err(e);
                 }
@@ -96,7 +96,7 @@ where
     }
 
     /// Release a materialised [`MapField`]. Spans need no teardown.
-    pub fn deallocate<P>(&mut self, common: &MessageCommon<P, A>) {
+    pub fn deallocate<Cx: MessageCommonAlloc<Alloc = A>>(&mut self, common: &Cx) {
         if let Some(mut map) = self.ready.get_mut().take() {
             FieldDeallocate::deallocate(&mut map, common);
         }

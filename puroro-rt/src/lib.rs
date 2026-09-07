@@ -41,9 +41,9 @@ pub use fields::shared::{
     DebugStructVisitor, DiscardUnknowns, EncodeRawVisitor, EncodedLenVisitor, FieldCloneIn,
     FieldDeallocVisitor, FieldDeallocate, FieldEncode, FieldEqVisitor, FieldPairVisitor,
     FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Inline, InlineOrHeap, InteriorBitArray,
-    MessageBinding, MessageBindingMut, MessageCommon, MessageCommonAlloc, MessageCommonBits,
-    MessageCommonSharedBits, SSO_HEAP, SSO_INLINE, UnknownFields, UnknownStore, ValueLayout,
-    WireOrSso,
+    LazyMessageCommon, MessageBinding, MessageBindingMut, MessageCommon, MessageCommonAlloc,
+    MessageCommonBits, MessageCommonSharedBits, SSO_HEAP, SSO_INLINE, UnknownFields, UnknownStore,
+    ValueLayout, WireOrSso,
 };
 pub use fields::singular::{
     SingularField, SingularFieldAccess, SingularFieldMut, SingularFieldRef,

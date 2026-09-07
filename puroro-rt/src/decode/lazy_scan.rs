@@ -11,6 +11,22 @@ use ::std::vec::Vec;
 use super::record::{RecordScanner, ScannedRecord, WireSpan};
 use super::shared_wire::SharedWire;
 
+/// Ingest state stored in [`MessageCommon`](crate::MessageCommon)::`scan`.
+///
+/// Eager messages use [`()`] (ZST). Lazy messages use [`LazyScan`].
+pub trait MessageScan<A: Allocator>: Sized {
+    fn new_scan(alloc: A) -> Self;
+    fn clone_scan(&self, alloc: A) -> Self;
+}
+
+impl<A: Allocator> MessageScan<A> for () {
+    #[inline]
+    fn new_scan(_alloc: A) -> Self {}
+
+    #[inline]
+    fn clone_scan(&self, _alloc: A) -> Self {}
+}
+
 /// Accumulates input bytes and yields complete records with `_wire` origins.
 ///
 /// A nested child may sit in an **unparsed** state: [`regions`](Self::regions)
@@ -198,6 +214,18 @@ impl<A: Allocator + Clone> LazyScan<A> {
             wire: self.wire.clone_in(alloc.clone()),
             regions: self.regions.clone(),
         }
+    }
+}
+
+impl<A: Allocator + Clone> MessageScan<A> for LazyScan<A> {
+    #[inline]
+    fn new_scan(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+
+    #[inline]
+    fn clone_scan(&self, alloc: A) -> Self {
+        self.clone_in(alloc)
     }
 }
 

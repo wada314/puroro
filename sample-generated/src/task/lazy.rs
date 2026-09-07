@@ -15,14 +15,12 @@ use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::{Buf, BufMut};
 use ::core::ops::{ControlFlow, Deref};
 use ::puroro::{DecodeError, HasDefault, MapRef, Message, Optional};
-use ::puroro_rt::decode::{
-    LazyMessage, LazyScan, ScannedRecord, merge_scanned_field, scanned_len_span,
-};
+use ::puroro_rt::decode::{LazyMessage, ScannedRecord, merge_scanned_field, scanned_len_span};
 use ::puroro_rt::{
     BitPacked, Closed, Expanded, Explicit, FieldDeallocVisitor, FieldVisitorMut, Implicit, Inline,
-    InteriorBitArray, LazyMapField, LazyRepeatedField, LegacyRequired, MessageCommon, Open, Packed,
-    ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32, ProtoString, RepeatedField, SingularField,
-    WireOrSso,
+    InteriorBitArray, LazyMapField, LazyMessageCommon, LazyRepeatedField, LegacyRequired, Open,
+    Packed, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32, ProtoString, RepeatedField,
+    SingularField, WireOrSso,
 };
 
 use crate::Task;
@@ -40,8 +38,7 @@ use crate::task::{
 
 /// Lazy `Task` with numerical catalog slots and singular `WireOrSso` LEN.
 pub struct TaskLazy<A: Allocator = Global> {
-    scan: LazyScan<A>,
-    _common: MessageCommon<InteriorBitArray<3>, A>,
+    _common: LazyMessageCommon<InteriorBitArray<3>, A>,
     title: SingularField<
         ProtoString,
         Explicit<{ BIT_TITLE }>,
@@ -121,7 +118,7 @@ impl<A: Allocator> TaskLazy<A> {
         A: Clone,
     {
         self.require_finished()?;
-        self.title.try_str(&self._common, self.scan.wire())
+        self.title.try_str(&self._common, self._common.scan.wire())
     }
 
     /// Wire presence only; does not UTF-8-check the payload.
@@ -135,7 +132,8 @@ impl<A: Allocator> TaskLazy<A> {
         A: Clone,
     {
         self.require_finished()?;
-        self.owner_id.try_str(&self._common, self.scan.wire())
+        self.owner_id
+            .try_str(&self._common, self._common.scan.wire())
     }
 
     /// Wire presence only; does not UTF-8-check the payload.
@@ -149,7 +147,8 @@ impl<A: Allocator> TaskLazy<A> {
         A: Clone,
     {
         self.require_finished()?;
-        self.payload.try_bytes(&self._common, self.scan.wire())
+        self.payload
+            .try_bytes(&self._common, self._common.scan.wire())
     }
 
     pub fn has_payload(&self) -> Result<bool, DecodeError> {
@@ -187,7 +186,7 @@ impl<A: Allocator> TaskLazy<A> {
         self.require_finished()?;
         Ok(self
             .labels
-            .bind(self.scan.wire(), &self._common)?
+            .bind(self._common.scan.wire(), &self._common)?
             .as_slice())
     }
 
@@ -247,17 +246,18 @@ impl<A: Allocator> TaskLazy<A> {
         A: Clone,
     {
         self.require_finished()?;
-        self.attributes.bind(self.scan.wire(), &self._common)
+        self.attributes
+            .bind(self._common.scan.wire(), &self._common)
     }
 
     /// Length of the gathered `_wire`. Same as a single-buffer ingest.
     pub fn encoded_len(&self) -> Result<usize, DecodeError> {
-        self.scan.encoded_len()
+        self._common.scan.encoded_len()
     }
 
     /// Write `_wire` as-is (not a canonical field-by-field encode).
     pub fn encode<B: BufMut>(&self, buf: &mut B) -> Result<(), DecodeError> {
-        self.scan.encode(buf)
+        self._common.scan.encode(buf)
     }
 
     pub fn encode_to_vec(&self) -> Result<Vec<u8>, DecodeError> {
@@ -267,10 +267,10 @@ impl<A: Allocator> TaskLazy<A> {
     }
 
     fn require_finished(&self) -> Result<(), DecodeError> {
-        self.scan.require_finished()
+        self._common.scan.require_finished()
     }
 
-    fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<InteriorBitArray<3>, A>>>(
+    fn visit_fields_mut<V: FieldVisitorMut<LazyMessageCommon<InteriorBitArray<3>, A>>>(
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
@@ -293,8 +293,7 @@ impl<A: Allocator> TaskLazy<A> {
 impl<A: Allocator + Clone> TaskLazy<A> {
     pub fn new_in(alloc: A) -> Self {
         Self {
-            scan: LazyScan::new_in(alloc.clone()),
-            _common: MessageCommon::new_in(InteriorBitArray::zero(), alloc.clone()),
+            _common: LazyMessageCommon::new_in(InteriorBitArray::zero(), alloc.clone()),
             title: SingularField::new_in(alloc.clone()),
             owner_id: SingularField::new_in(alloc.clone()),
             payload: SingularField::new_in(alloc.clone()),
@@ -319,7 +318,7 @@ impl<A: Allocator + Clone> TaskLazy<A> {
     /// singular LEN records store a span into `_wire`. Nested message LENs are
     /// merged into a child lazy message. Map entries append a span.
     pub fn push(&mut self, chunk: &[u8]) -> Result<(), DecodeError> {
-        let (origin, records) = self.scan.push(chunk)?;
+        let (origin, records) = self._common.scan.push(chunk)?;
         for rec in records {
             self.apply_record(&rec, origin)?;
         }
@@ -328,7 +327,7 @@ impl<A: Allocator + Clone> TaskLazy<A> {
 
     /// Close the current input stream. Non-empty leftover is truncated input.
     pub fn finish(&mut self) -> Result<(), DecodeError> {
-        self.scan.finish()
+        self._common.scan.finish()
     }
 
     /// Merge one complete message body (push remaining bytes, then finish).
@@ -356,7 +355,7 @@ impl<A: Allocator + Clone> TaskLazy<A> {
     pub fn into_eager(self) -> Result<Task<A>, DecodeError> {
         self.require_finished()?;
         let mut eager = Task::new_in(self._common.alloc.clone());
-        self.scan.for_each_body(|chunk| {
+        self._common.scan.for_each_body(|chunk| {
             let mut buf = chunk;
             Message::merge_from(&mut eager, &mut buf)
         })?;
@@ -385,31 +384,31 @@ impl<A: Allocator + Clone> TaskLazy<A> {
                 let child = self
                     .assignee
                     .get_or_insert_with(|| AddressLazy::new_in(self._common.alloc.clone()));
-                child.merge_shared(self.scan.shared(), span)
+                child.merge_shared(self._common.scan.shared(), span)
             }
             FIELD_ORIGIN => {
                 let span = scanned_len_span(origin, rec)?;
                 let child = self
                     .origin
                     .get_or_insert_with(|| PointLazy::new_in(self._common.alloc.clone()));
-                child.merge_shared(self.scan.shared(), span)
+                child.merge_shared(self._common.scan.shared(), span)
             }
             FIELD_WATCHERS => {
                 let span = scanned_len_span(origin, rec)?;
                 let mut child = AddressLazy::new_in(self._common.alloc.clone());
-                child.merge_shared(self.scan.shared(), span)?;
+                child.merge_shared(self._common.scan.shared(), span)?;
                 self.watchers.push(child);
                 Ok(())
             }
             FIELD_LABELS => {
                 let span = scanned_len_span(origin, rec)?;
                 self.labels
-                    .store_span(span, self.scan.wire(), &self._common)
+                    .store_span(span, self._common.scan.wire(), &self._common)
             }
             FIELD_ATTRIBUTES => {
                 let span = scanned_len_span(origin, rec)?;
                 self.attributes
-                    .store_span(span, self.scan.wire(), &self._common)
+                    .store_span(span, self._common.scan.wire(), &self._common)
             }
             FIELD_SCORE => merge_scanned_field(&rec.field, |wire_type, buf| {
                 self.score

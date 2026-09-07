@@ -8,7 +8,7 @@ use ::core::ops::ControlFlow;
 use ::puroro::{DecodeError, Message};
 use ::puroro_rt::decode::{LazyMessage, LazyScan, ScannedRecord, merge_scanned_field};
 use ::puroro_rt::{
-    FieldDeallocVisitor, FieldVisitorMut, Implicit, MessageCommon, ProtoInt32, SingularField,
+    FieldDeallocVisitor, FieldVisitorMut, Implicit, LazyMessageCommon, ProtoInt32, SingularField,
 };
 use ::std::vec::Vec;
 
@@ -17,8 +17,7 @@ use crate::point::{FIELD_X, FIELD_Y};
 
 /// Lazy `Point` with catalog numerical slots.
 pub struct PointLazy<A: Allocator = Global> {
-    scan: LazyScan<A>,
-    _common: MessageCommon<BitArray<[u8; 1], Lsb0>, A>,
+    _common: LazyMessageCommon<BitArray<[u8; 1], Lsb0>, A>,
     x: SingularField<ProtoInt32, Implicit, { FIELD_X }, A>,
     y: SingularField<ProtoInt32, Implicit, { FIELD_Y }, A>,
 }
@@ -59,11 +58,11 @@ impl<A: Allocator> PointLazy<A> {
     }
 
     pub fn encoded_len(&self) -> Result<usize, DecodeError> {
-        self.scan.encoded_len()
+        self._common.scan.encoded_len()
     }
 
     pub fn encode<B: BufMut>(&self, buf: &mut B) -> Result<(), DecodeError> {
-        self.scan.encode(buf)
+        self._common.scan.encode(buf)
     }
 
     pub fn encode_to_vec(&self) -> Result<Vec<u8>, DecodeError> {
@@ -72,7 +71,7 @@ impl<A: Allocator> PointLazy<A> {
         Ok(out)
     }
 
-    fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
+    fn visit_fields_mut<V: FieldVisitorMut<LazyMessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
@@ -85,15 +84,14 @@ impl<A: Allocator> PointLazy<A> {
 impl<A: Allocator + Clone> PointLazy<A> {
     pub fn new_in(alloc: A) -> Self {
         Self {
-            scan: LazyScan::new_in(alloc.clone()),
-            _common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
+            _common: LazyMessageCommon::new_in(BitArray::ZERO, alloc.clone()),
             x: SingularField::new_in(alloc.clone()),
             y: SingularField::new_in(alloc),
         }
     }
 
     pub fn push(&mut self, chunk: &[u8]) -> Result<(), DecodeError> {
-        let (origin, records) = self.scan.push(chunk)?;
+        let (origin, records) = self._common.scan.push(chunk)?;
         for rec in records {
             self.apply_record(&rec, origin)?;
         }
@@ -101,7 +99,7 @@ impl<A: Allocator + Clone> PointLazy<A> {
     }
 
     pub fn finish(&mut self) -> Result<(), DecodeError> {
-        self.scan.finish()
+        self._common.scan.finish()
     }
 
     pub fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
@@ -120,9 +118,9 @@ impl<A: Allocator + Clone> PointLazy<A> {
 
     /// Decode every field from `_wire` into an eager [`Point`].
     pub fn into_eager(self) -> Result<Point<A>, DecodeError> {
-        self.scan.require_finished()?;
+        self._common.scan.require_finished()?;
         let mut eager = Point::new_in(self._common.alloc.clone());
-        self.scan.for_each_body(|chunk| {
+        self._common.scan.for_each_body(|chunk| {
             let mut buf = chunk;
             Message::merge_from(&mut eager, &mut buf)
         })?;
@@ -132,11 +130,11 @@ impl<A: Allocator + Clone> PointLazy<A> {
 
 impl<A: Allocator + Clone> LazyMessage<A> for PointLazy<A> {
     fn scan(&self) -> &LazyScan<A> {
-        &self.scan
+        &self._common.scan
     }
 
     fn scan_mut(&mut self) -> &mut LazyScan<A> {
-        &mut self.scan
+        &mut self._common.scan
     }
 
     fn apply_record(&mut self, rec: &ScannedRecord<A>, _origin: usize) -> Result<(), DecodeError> {
