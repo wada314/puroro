@@ -22,8 +22,8 @@
 //! | [`shared`] | `MessageCommon`, presence / visitors / value layout |
 //! | [`wire`] | `SingularType`, markers, repeated-element traits |
 //! | [`singular`] | `SingularField` (+ bound views) |
-//! | [`repeated`] | `RepeatedField`, `Packed` / `Expanded` |
-//! | [`map`] | `MapField`, `LazyMapField`, `MapKey` |
+//! | [`repeated`] | `RepeatedField` (`RepeatedReady` / `RepeatedSpans`), `Packed` / `Expanded` |
+//! | [`map`] | `MapField` (`MapReady` / `MapSpans`), `MapKey` |
 //! | [`oneof`] | `OneofSlot`, `OneofView` |
 //! | [`oneof_variant`] | `OneofVariant` (field-number dispatch) |
 

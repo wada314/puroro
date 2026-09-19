@@ -1,17 +1,22 @@
 //! Unified repeated field wrapper — generic over element marker and encode policy.
 //!
-//! Elements are stored in an allocator-less [`UnmanagedVec`] wrapped in
-//! [`ManuallyDrop`]. Growth and release borrow the message allocator.
+//! [`RepeatedReady`] (the default `L`) stores elements in an allocator-less
+//! [`UnmanagedVec`] wrapped in [`ManuallyDrop`]. Growth and release borrow the
+//! message allocator. [`RepeatedSpans`] stores element-LEN offsets and builds
+//! that vec on first get.
 
+use ::core::cell::UnsafeCell;
 use ::core::fmt::{Debug, Formatter, Result as FmtResult};
 use ::core::marker::PhantomData;
 use ::core::mem::ManuallyDrop;
 
 use ::allocator_api2::alloc::Allocator;
+use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::BufMut;
 use ::puroro::{DecodeBuf, DecodeError, WireType};
 use ::unmanaged::CloneIn;
 use ::unmanaged::DeallocateIn;
+use ::unmanaged::UnmanagedString;
 use ::unmanaged::UnmanagedVec;
 use ::unmanaged::vec::VecGuard;
 
@@ -19,6 +24,7 @@ use crate::decode::{LazyMessage, SharedWire, WireSpan};
 use crate::encode::field_number_const;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{DefaultIn, FieldDeallocate, MessageCommon, MessageCommonAlloc};
+use crate::fields::wire::len::{ProtoBytes, ProtoString, ProtoStringUnchecked};
 use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedVecMut,
@@ -28,17 +34,135 @@ use crate::message_encode::{EncodeCtx, MessageEncode};
 use super::container::RepeatedElementsMut;
 use super::encoding::RepeatedEncoding;
 
-/// Repeated field parametrised by type marker `T`, encode policy `E`, and allocator `A`.
+/// How a [`RepeatedField`] holds elements.
 ///
-/// Parameter order: `T`, `E`, `FIELD`, `A`.
-pub struct RepeatedField<T, E, const FIELD: u32, A>
+/// [`RepeatedReady`] is the element vec. [`RepeatedSpans`] is an offset list
+/// plus an optional materialised vec. Unlike oneof's ingest `L`, this
+/// parameter changes the field's own storage.
+pub trait RepeatedLayout<T, E, const FIELD: u32, A>
 where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator,
 {
-    values: ManuallyDrop<UnmanagedVec<T::Element<A>, A>>,
+    /// Payload stored on [`RepeatedField`].
+    type Storage;
+
+    /// Empty storage using `alloc` (element vec or the span vec).
+    fn new_storage(alloc: A) -> Self::Storage;
+}
+
+/// Eager repeated: the element vec is the field. Occurrences land during `merge`.
+pub struct RepeatedReady;
+
+/// Lazy repeated LEN: element-LEN offsets during the parent scan; vec on first get.
+pub struct RepeatedSpans;
+
+impl<T, E, const FIELD: u32, A> RepeatedLayout<T, E, FIELD, A> for RepeatedReady
+where
+    T: RepeatedElement,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator,
+{
+    type Storage = ManuallyDrop<UnmanagedVec<T::Element<A>, A>>;
+
+    #[inline]
+    fn new_storage(alloc: A) -> Self::Storage {
+        ManuallyDrop::new(UnmanagedVec::new(alloc))
+    }
+}
+
+/// Offset list plus an optional materialised [`RepeatedField`] (`L = `[`RepeatedReady`]).
+#[doc(hidden)]
+pub struct RepeatedSpanStorage<T, E, const FIELD: u32, A>
+where
+    T: RepeatedElement,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator,
+{
+    spans: AllocVec<WireSpan, A>,
+    ready: UnsafeCell<Option<RepeatedField<T, E, FIELD, A>>>,
+}
+
+impl<T, E, const FIELD: u32, A> RepeatedLayout<T, E, FIELD, A> for RepeatedSpans
+where
+    T: RepeatedElement,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator,
+{
+    type Storage = RepeatedSpanStorage<T, E, FIELD, A>;
+
+    #[inline]
+    fn new_storage(alloc: A) -> Self::Storage {
+        RepeatedSpanStorage {
+            spans: AllocVec::new_in(alloc),
+            ready: UnsafeCell::new(None),
+        }
+    }
+}
+
+/// Decode a scanned LEN **body** (length prefix already consumed).
+pub trait DecodeLenBody<A: Allocator>: RepeatedElement {
+    fn decode_len_body(bytes: &[u8], alloc: A) -> Result<Self::Element<A>, DecodeError>;
+}
+
+impl<A: Allocator + Clone> DecodeLenBody<A> for ProtoString {
+    fn decode_len_body(bytes: &[u8], alloc: A) -> Result<UnmanagedString<A>, DecodeError> {
+        let mut vec = AllocVec::with_capacity_in(bytes.len(), alloc.clone());
+        vec.extend_from_slice(bytes);
+        match UnmanagedString::from_utf8(UnmanagedVec::from_vec(vec)) {
+            Ok(s) => Ok(s),
+            Err(v) => {
+                // SAFETY: `alloc` owns the buffer produced above.
+                unsafe { v.deallocate(&alloc) };
+                Err(DecodeError::InvalidUtf8)
+            }
+        }
+    }
+}
+
+impl<A: Allocator + Clone> DecodeLenBody<A> for ProtoBytes {
+    fn decode_len_body(bytes: &[u8], alloc: A) -> Result<UnmanagedVec<u8, A>, DecodeError> {
+        let mut vec = AllocVec::with_capacity_in(bytes.len(), alloc);
+        vec.extend_from_slice(bytes);
+        Ok(UnmanagedVec::from_vec(vec))
+    }
+}
+
+impl<A: Allocator + Clone> DecodeLenBody<A> for ProtoStringUnchecked {
+    fn decode_len_body(bytes: &[u8], alloc: A) -> Result<UnmanagedVec<u8, A>, DecodeError> {
+        ProtoBytes::decode_len_body(bytes, alloc)
+    }
+}
+
+/// Repeated field parametrised by type marker `T`, encode policy `E`, and allocator `A`.
+///
+/// Parameter order: `T`, `E`, `FIELD`, `A`, `L`. `L` is [`RepeatedReady`]
+/// (default) or [`RepeatedSpans`].
+pub struct RepeatedField<T, E, const FIELD: u32, A, L = RepeatedReady>
+where
+    T: RepeatedElement,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator,
+    L: RepeatedLayout<T, E, FIELD, A>,
+{
+    storage: L::Storage,
     _encoding: PhantomData<E>,
+}
+
+impl<T, E, const FIELD: u32, A, L> RepeatedField<T, E, FIELD, A, L>
+where
+    T: RepeatedElement,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator,
+    L: RepeatedLayout<T, E, FIELD, A>,
+{
+    pub fn new_in(alloc: A) -> Self {
+        Self {
+            storage: L::new_storage(alloc),
+            _encoding: PhantomData,
+        }
+    }
 }
 
 impl<T, E, const FIELD: u32, A> RepeatedField<T, E, FIELD, A>
@@ -47,21 +171,14 @@ where
     E: RepeatedEncoding<T, A>,
     A: Allocator,
 {
-    pub fn new_in(alloc: A) -> Self {
-        Self {
-            values: ManuallyDrop::new(UnmanagedVec::new(alloc)),
-            _encoding: PhantomData,
-        }
-    }
-
     #[inline]
     pub fn as_slice(&self) -> &[T::Element<A>] {
-        &self.values
+        &self.storage
     }
 
     #[inline]
     pub fn is_empty(&self) -> bool {
-        self.values.is_empty()
+        self.storage.is_empty()
     }
 
     /// Binds this field to `common` for read access.
@@ -96,7 +213,7 @@ where
     fn deallocate(&mut self, common: &C) {
         // SAFETY: called once; `&common.alloc` is interchangeable with the
         // clones that grew the buffer. Reconstructs `Vec<T, &A>` for the free.
-        let v = unsafe { ManuallyDrop::take(&mut self.values) };
+        let v = unsafe { ManuallyDrop::take(&mut self.storage) };
         unsafe { v.deallocate(common.alloc()) };
     }
 }
@@ -191,7 +308,7 @@ where
         let alloc = self.common.clone_alloc();
         // SAFETY: an owned clone of the message allocator owns this vector's
         // buffer.
-        unsafe { self.field.values.with_alloc(alloc) }
+        unsafe { self.field.storage.with_alloc(alloc) }
     }
 
     /// Minimal container mutator ([`RepeatedContainerMut`](super::container::RepeatedContainerMut)).
@@ -206,7 +323,7 @@ where
         let alloc = self.common.clone_alloc();
         // SAFETY: an owned clone of the message allocator owns this vector's
         // buffer.
-        RepeatedElementsMut::new(unsafe { self.field.values.with_alloc(alloc) })
+        RepeatedElementsMut::new(unsafe { self.field.storage.with_alloc(alloc) })
     }
 
     /// Empties the vector (keeps capacity). Heap elements are freed first.
@@ -217,7 +334,7 @@ where
         let alloc = self.common.clone_alloc();
         // SAFETY: owned clones of the message allocator own this vector's buffer
         // and every element.
-        let mut g = unsafe { self.field.values.with_alloc(alloc.clone()) };
+        let mut g = unsafe { self.field.storage.with_alloc(alloc.clone()) };
         while let Some(elem) = g.pop() {
             unsafe { T::deallocate_element(elem, &alloc) };
         }
@@ -259,7 +376,7 @@ where
     {
         // SAFETY: an owned clone of the message allocator owns this vector's
         // buffer.
-        let mut g = unsafe { self.values.with_alloc(alloc.clone()) };
+        let mut g = unsafe { self.storage.with_alloc(alloc.clone()) };
         T::merge_occurrence(wire_type, buf, alloc, depth, |elem| {
             g.push(elem);
         })
@@ -272,9 +389,99 @@ where
     {
         // SAFETY: an owned clone of the message allocator owns this vector's
         // buffer.
-        let mut g = unsafe { self.values.with_alloc(alloc) };
+        let mut g = unsafe { self.storage.with_alloc(alloc) };
         g.push(elem);
     }
+}
+
+impl<T, E, const FIELD: u32, A> RepeatedField<T, E, FIELD, A, RepeatedSpans>
+where
+    T: RepeatedElement,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator,
+{
+    /// Record one element LEN. If already materialised, append it now.
+    pub fn store_span<Cx: MessageCommonAlloc<Alloc = A>>(
+        &mut self,
+        span: WireSpan,
+        wire: &[u8],
+        common: &Cx,
+    ) -> Result<(), DecodeError>
+    where
+        A: Clone,
+        T: DecodeLenBody<A>,
+    {
+        self.storage.spans.push(span);
+        if let Some(field) = self.storage.ready.get_mut() {
+            append_span(field, span, wire, common.clone_alloc())?;
+        }
+        Ok(())
+    }
+
+    /// Materialise on first call, then return the catalog repeated view.
+    pub fn bind<'a, Cx: MessageCommonAlloc<Alloc = A>>(
+        &'a self,
+        wire: &'a [u8],
+        common: &'a Cx,
+    ) -> Result<RepeatedFieldRef<'a, T, E, FIELD, A, Cx>, DecodeError>
+    where
+        A: Clone,
+        T: DecodeLenBody<A>,
+        T::Element<A>: DeallocateIn<A>,
+    {
+        // SAFETY: callers only `bind` after the parent stream is finished, and
+        // never overlap it with `store_span` (`&mut self`).
+        let ready = unsafe { &mut *self.storage.ready.get() };
+        if ready.is_none() {
+            let mut field = RepeatedField::new_in(common.clone_alloc());
+            for &span in &self.storage.spans {
+                if let Err(e) = append_span(&mut field, span, wire, common.clone_alloc()) {
+                    FieldDeallocate::deallocate(&mut field, common);
+                    return Err(e);
+                }
+            }
+            *ready = Some(field);
+        }
+        Ok(ready
+            .as_ref()
+            .expect("repeated field materialised")
+            .bind(common))
+    }
+}
+
+impl<T, E, const FIELD: u32, A, C> FieldDeallocate<C>
+    for RepeatedField<T, E, FIELD, A, RepeatedSpans>
+where
+    T: RepeatedElement,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator,
+    C: MessageCommonAlloc<Alloc = A>,
+    T::Element<A>: DeallocateIn<A>,
+{
+    /// Release a materialised [`RepeatedField`]. Spans need no teardown.
+    #[inline]
+    fn deallocate(&mut self, common: &C) {
+        if let Some(mut field) = self.storage.ready.get_mut().take() {
+            FieldDeallocate::deallocate(&mut field, common);
+        }
+    }
+}
+
+fn append_span<T, E, const FIELD: u32, A>(
+    field: &mut RepeatedField<T, E, FIELD, A>,
+    span: WireSpan,
+    wire: &[u8],
+    alloc: A,
+) -> Result<(), DecodeError>
+where
+    T: DecodeLenBody<A>,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator + Clone,
+{
+    let payload = span.slice(wire)?;
+    let elem = T::decode_len_body(payload, alloc.clone())?;
+    field.push_in(elem, alloc);
+    Ok(())
 }
 
 impl<M, E, const FIELD: u32, A> RepeatedField<ProtoMessage<M>, E, FIELD, A>
@@ -341,7 +548,7 @@ where
     A: Allocator,
 {
     fn encoded_len(&self, _common: &MessageCommon<P, A>, ctx: &mut EncodeCtx) -> usize {
-        if self.values.is_empty() {
+        if self.storage.is_empty() {
             0
         } else {
             E::encoded_len(field_number_const::<FIELD>(), self.as_slice(), ctx)
@@ -354,7 +561,7 @@ where
         ctx: &mut EncodeCtx,
         buf: &mut B,
     ) {
-        if !self.values.is_empty() {
+        if !self.storage.is_empty() {
             E::encode(field_number_const::<FIELD>(), self.as_slice(), ctx, buf);
         }
     }
@@ -370,8 +577,82 @@ where
 {
     fn clone_field(&self, _common: &MessageCommon<P, A>, alloc: A) -> Self {
         Self {
-            values: ManuallyDrop::new(self.values.clone_in(alloc)),
+            storage: ManuallyDrop::new(self.storage.clone_in(alloc)),
             _encoding: PhantomData,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::super::Expanded;
+    use super::{RepeatedField, RepeatedSpans};
+    use crate::decode::WireSpan;
+    use crate::fields::shared::{FieldDeallocate, MessageCommon};
+    use crate::fields::wire::ProtoString;
+    use ::allocator_api2::alloc::Global;
+    use ::bitvec::array::BitArray;
+    use ::bitvec::order::Lsb0;
+    use ::puroro::DecodeError;
+
+    type TestCommon = MessageCommon<BitArray<[u8; 1], Lsb0>, Global>;
+
+    #[test]
+    fn repeated_spans_materialise_append_and_later_store() {
+        let common = TestCommon::new_in(BitArray::ZERO, Global);
+        let mut field = RepeatedField::<ProtoString, Expanded, 8, _, RepeatedSpans>::new_in(Global);
+
+        let mut wire = b"urgentdocs".to_vec();
+        field
+            .store_span(WireSpan { offset: 0, len: 6 }, &wire, &common)
+            .unwrap();
+        field
+            .store_span(WireSpan { offset: 6, len: 4 }, &wire, &common)
+            .unwrap();
+
+        let first = field.bind(&wire, &common).unwrap().as_slice();
+        assert_eq!(first.len(), 2);
+        assert_eq!(&*first[0], "urgent");
+        assert_eq!(&*first[1], "docs");
+
+        let late_off = wire.len();
+        wire.extend_from_slice(b"more");
+        field
+            .store_span(
+                WireSpan {
+                    offset: late_off,
+                    len: 4,
+                },
+                &wire,
+                &common,
+            )
+            .unwrap();
+        let after = field.bind(&wire, &common).unwrap().as_slice();
+        assert_eq!(after.len(), 3);
+        assert_eq!(&*after[2], "more");
+
+        field.deallocate(&common);
+    }
+
+    #[test]
+    fn repeated_spans_invalid_utf8_is_sticky() {
+        let common = TestCommon::new_in(BitArray::ZERO, Global);
+        let mut field = RepeatedField::<ProtoString, Expanded, 8, _, RepeatedSpans>::new_in(Global);
+        let wire = [b'o', b'k', 0xff, 0xfe];
+        field
+            .store_span(WireSpan { offset: 0, len: 2 }, &wire, &common)
+            .unwrap();
+        field
+            .store_span(WireSpan { offset: 2, len: 2 }, &wire, &common)
+            .unwrap();
+        assert_eq!(
+            field.bind(&wire, &common).err(),
+            Some(DecodeError::InvalidUtf8)
+        );
+        assert_eq!(
+            field.bind(&wire, &common).err(),
+            Some(DecodeError::InvalidUtf8)
+        );
+        field.deallocate(&common);
     }
 }

@@ -6,8 +6,9 @@
 //! and [`SingularField::merge_shared`] (unparsed child on the island-root
 //! buffer). Repeated `watchers` uses catalog [`RepeatedField`] +
 //! [`RepeatedField::merge_shared`] (one child per occurrence). `attributes`
-//! stores map-entry spans and materialises on first get. Repeated `labels`
-//! stores element spans and materialises on first get.
+//! uses catalog [`MapField`] + [`MapSpans`] (entry-LEN offsets; HashMap on
+//! first get). Repeated `labels` uses catalog [`RepeatedField`] +
+//! [`RepeatedSpans`] (element-LEN offsets; vec on first get).
 //! Oneof `notification` uses catalog [`OneofSlot`]: numerical variants apply
 //! during the scan; string variants store a [`WireOrSso`] span; `postal`
 //! records an [`AddressLazy`] shell. Getters require a finished
@@ -21,9 +22,10 @@ use ::puroro::{DecodeError, HasDefault, MapRef, Message, Optional};
 use ::puroro_rt::decode::{ScannedRecord, merge_scanned_field, scanned_len_span};
 use ::puroro_rt::{
     BitPacked, Boxed, Closed, Expanded, Explicit, FieldDeallocVisitor, FieldVisitorMut, Implicit,
-    Inline, InteriorBitArray, LazyMapField, LazyMessageCommon, LazyRepeatedField, LegacyRequired,
+    Inline, InteriorBitArray, LazyMessageCommon, LegacyRequired, MapField, MapSpans,
     Message as MessagePresence, OneofGroup, OneofSlot, Open, Packed, ProtoBool, ProtoBytes,
-    ProtoEnum, ProtoInt32, ProtoMessage, ProtoString, RepeatedField, SingularField, WireOrSso,
+    ProtoEnum, ProtoInt32, ProtoMessage, ProtoString, RepeatedField, RepeatedSpans, SingularField,
+    WireOrSso,
 };
 
 use super::notification_lazy::NotificationLazyStorage;
@@ -71,8 +73,8 @@ pub struct TaskLazy<A: Allocator = Global> {
     origin:
         SingularField<ProtoMessage<PointLazy<A>>, Explicit<{ BIT_ORIGIN }>, { FIELD_ORIGIN }, A>,
     watchers: RepeatedField<ProtoMessage<AddressLazy<A>>, Expanded, { FIELD_WATCHERS }, A>,
-    labels: LazyRepeatedField<ProtoString, Expanded, { FIELD_LABELS }, A>,
-    attributes: LazyMapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>,
+    labels: RepeatedField<ProtoString, Expanded, { FIELD_LABELS }, A, RepeatedSpans>,
+    attributes: MapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A, MapSpans>,
     score: SingularField<ProtoInt32, Implicit, { FIELD_SCORE }, A>,
     max_retries: SingularField<
         ProtoInt32,
@@ -367,6 +369,8 @@ impl<A: Allocator> TaskLazy<A> {
         v.visit("origin", &mut self.origin)?;
         v.visit("watchers", &mut self.watchers)?;
         v.visit("notification", &mut self.notification)?;
+        v.visit("attributes", &mut self.attributes)?;
+        v.visit("labels", &mut self.labels)?;
         ControlFlow::Continue(())
     }
 }
@@ -381,8 +385,8 @@ impl<A: Allocator + Clone> TaskLazy<A> {
             assignee: SingularField::new_in(alloc.clone()),
             origin: SingularField::new_in(alloc.clone()),
             watchers: RepeatedField::new_in(alloc.clone()),
-            labels: LazyRepeatedField::new_in(alloc.clone()),
-            attributes: LazyMapField::new_in(alloc.clone()),
+            labels: RepeatedField::new_in(alloc.clone()),
+            attributes: MapField::new_in(alloc.clone()),
             score: SingularField::new_in(alloc.clone()),
             max_retries: SingularField::new_in(alloc.clone()),
             tag_ids: RepeatedField::new_in(alloc.clone()),
@@ -576,8 +580,6 @@ impl<A: Allocator + Clone> TaskLazy<A> {
 
 impl<A: Allocator> Drop for TaskLazy<A> {
     fn drop(&mut self) {
-        self.labels.deallocate(&self._common);
-        self.attributes.deallocate(&self._common);
         let mut v = FieldDeallocVisitor::new(&self._common);
         let _ = self.visit_fields_mut(&mut v);
         self._common.deallocate();

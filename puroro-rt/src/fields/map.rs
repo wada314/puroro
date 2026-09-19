@@ -3,18 +3,15 @@
 //! | Submodule | Contents |
 //! |---|---|
 //! | [`entry`] | map-entry wire encode / decode (`key=1`, `value=2`) |
-//! | [`field`] | [`MapField<K, V, FIELD, A>`] — `K: MapKey`, `V: RepeatedElement` |
-//! | [`lazy`] | [`LazyMapField`] — entry-LEN offset list, HashMap on first get |
+//! | [`field`] | [`MapField<K, V, FIELD, A, L>`] — `K: MapKey`, `V: RepeatedElement`; `L` is [`MapReady`] or [`MapSpans`] |
 //!
 //! Borrowed keys become stored [`RepeatedElement::Element`] values via
 //! [`ToOwnedIn`](::unmanaged::ToOwnedIn) on `RefView` (copy scalars / `str`).
 
 pub(crate) mod entry;
 pub(crate) mod field;
-pub(crate) mod lazy;
 
-pub use field::{MapField, MapFieldMut, MapFieldRef};
-pub use lazy::LazyMapField;
+pub use field::{MapField, MapFieldMut, MapFieldRef, MapReady, MapSpans};
 
 use crate::fields::wire::{
     ProtoBool, ProtoFixed32, ProtoFixed64, ProtoInt32, ProtoInt64, ProtoSFixed32, ProtoSFixed64,
