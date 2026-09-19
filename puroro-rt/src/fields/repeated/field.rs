@@ -15,13 +15,15 @@ use ::unmanaged::DeallocateIn;
 use ::unmanaged::UnmanagedVec;
 use ::unmanaged::vec::VecGuard;
 
+use crate::decode::{LazyMessage, SharedWire, WireSpan};
 use crate::encode::field_number_const;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
-use crate::fields::shared::{FieldDeallocate, MessageCommon, MessageCommonAlloc};
+use crate::fields::shared::{DefaultIn, FieldDeallocate, MessageCommon, MessageCommonAlloc};
+use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedVecMut,
 };
-use crate::message_encode::EncodeCtx;
+use crate::message_encode::{EncodeCtx, MessageEncode};
 
 use super::container::RepeatedElementsMut;
 use super::encoding::RepeatedEncoding;
@@ -272,6 +274,30 @@ where
         // buffer.
         let mut g = unsafe { self.values.with_alloc(alloc) };
         g.push(elem);
+    }
+}
+
+impl<M, E, const FIELD: u32, A> RepeatedField<ProtoMessage<M>, E, FIELD, A>
+where
+    M: MessageEncode + LazyMessage<A> + DefaultIn<A>,
+    E: RepeatedEncoding<ProtoMessage<M>, A>,
+    A: Allocator + Clone,
+{
+    /// Append one still-lazy child that records `span` on the island-root buffer.
+    ///
+    /// Does not walk the child's tags. The child's first field getter parses
+    /// stored regions. Distinct from singular last-wins: each occurrence is a
+    /// new list element (same as eager repeated message).
+    pub fn merge_shared<Cx: MessageCommonAlloc<Alloc = A>>(
+        &mut self,
+        root: &SharedWire<A>,
+        span: WireSpan,
+        common: &Cx,
+    ) -> Result<(), DecodeError> {
+        let mut child = M::default_in(common.clone_alloc());
+        child.merge_shared(root, span)?;
+        self.push_in(child, common.clone_alloc());
+        Ok(())
     }
 }
 

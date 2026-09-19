@@ -154,6 +154,7 @@ impl<A: Allocator> OneofGroup for NotificationStorage<A> {
     type Bits = BitArray<[u8; 2], Lsb0>;
     type Alloc = A;
     type Unknown = UnknownFields<A>;
+    type Layout = ::puroro_rt::Eager;
 
     fn case(storage: &Self) -> Self::Case {
         match storage {
@@ -223,8 +224,10 @@ impl<A: Allocator> OneofGroup for NotificationStorage<A> {
     }
 }
 
-impl<A: Allocator> OneofVariant<{ super::FIELD_EMAIL_ADDRESS }> for NotificationStorage<A> {
-    type Value = EmailAddressField<A>;
+impl<Ea, Pn, Wh, Po, Ur> OneofVariant<{ super::FIELD_EMAIL_ADDRESS }>
+    for Notification<Ea, Pn, Wh, Po, Ur>
+{
+    type Value = Ea;
 
     fn variant_ref(&self) -> Option<&Self::Value> {
         match self {
@@ -245,8 +248,10 @@ impl<A: Allocator> OneofVariant<{ super::FIELD_EMAIL_ADDRESS }> for Notification
     }
 }
 
-impl<A: Allocator> OneofVariant<{ super::FIELD_PHONE_NUMBER }> for NotificationStorage<A> {
-    type Value = PhoneNumberField<A>;
+impl<Ea, Pn, Wh, Po, Ur> OneofVariant<{ super::FIELD_PHONE_NUMBER }>
+    for Notification<Ea, Pn, Wh, Po, Ur>
+{
+    type Value = Pn;
 
     fn variant_ref(&self) -> Option<&Self::Value> {
         match self {
@@ -267,8 +272,10 @@ impl<A: Allocator> OneofVariant<{ super::FIELD_PHONE_NUMBER }> for NotificationS
     }
 }
 
-impl<A: Allocator> OneofVariant<{ super::FIELD_WEBHOOK_ID }> for NotificationStorage<A> {
-    type Value = WebhookIdField<A>;
+impl<Ea, Pn, Wh, Po, Ur> OneofVariant<{ super::FIELD_WEBHOOK_ID }>
+    for Notification<Ea, Pn, Wh, Po, Ur>
+{
+    type Value = Wh;
 
     fn variant_ref(&self) -> Option<&Self::Value> {
         match self {
@@ -289,8 +296,10 @@ impl<A: Allocator> OneofVariant<{ super::FIELD_WEBHOOK_ID }> for NotificationSto
     }
 }
 
-impl<A: Allocator> OneofVariant<{ super::FIELD_POSTAL }> for NotificationStorage<A> {
-    type Value = PostalField<A>;
+impl<Ea, Pn, Wh, Po, Ur> OneofVariant<{ super::FIELD_POSTAL }>
+    for Notification<Ea, Pn, Wh, Po, Ur>
+{
+    type Value = Po;
 
     fn variant_ref(&self) -> Option<&Self::Value> {
         match self {
@@ -311,8 +320,10 @@ impl<A: Allocator> OneofVariant<{ super::FIELD_POSTAL }> for NotificationStorage
     }
 }
 
-impl<A: Allocator> OneofVariant<{ super::FIELD_URGENT }> for NotificationStorage<A> {
-    type Value = UrgentField<A>;
+impl<Ea, Pn, Wh, Po, Ur> OneofVariant<{ super::FIELD_URGENT }>
+    for Notification<Ea, Pn, Wh, Po, Ur>
+{
+    type Value = Ur;
 
     fn variant_ref(&self) -> Option<&Self::Value> {
         match self {

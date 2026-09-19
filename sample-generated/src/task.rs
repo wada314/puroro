@@ -7,6 +7,7 @@ pub(crate) mod defaults;
 mod fallible;
 mod lazy;
 pub mod notification;
+mod notification_lazy;
 
 pub use fallible::TaskMessageFallible;
 pub use lazy::TaskLazy;
@@ -36,6 +37,8 @@ pub const BIT_ORIGIN: usize = 14; // origin (inlined nested Point, EXPLICIT pres
 pub const BIT_TITLE_LAZY_KIND: usize = 15; // lazy-only 2-bit WireOrSso kind (this bit and the next)
 pub const BIT_OWNER_ID_LAZY_KIND: usize = 17; // lazy-only 2-bit WireOrSso kind (this bit and the next)
 pub const BIT_PAYLOAD_LAZY_KIND: usize = 19; // lazy-only 2-bit WireOrSso kind (this bit and the next)
+pub const BIT_EMAIL_ADDRESS_LAZY_KIND: usize = 21; // lazy oneof email WireOrSso kind
+pub const BIT_PHONE_NUMBER_LAZY_KIND: usize = 23; // lazy oneof phone WireOrSso kind
 
 // ---------------------------------------------------------------------------
 // Proto field numbers

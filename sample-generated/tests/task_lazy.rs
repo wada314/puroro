@@ -5,8 +5,9 @@ use ::puroro_rt::INLINE_CAP;
 use ::puroro_rt::Varint;
 use ::puroro_rt::encode::{encode_varint_field, field_number_const};
 use ::puroro_sample_generated::task::{
-    FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_LABELS, FIELD_ORIGIN, FIELD_OWNER_ID, FIELD_PAYLOAD,
-    FIELD_SCORE, FIELD_SCORES, FIELD_TAG_IDS, FIELD_TITLE, FIELD_WATCHERS,
+    FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_EMAIL_ADDRESS, FIELD_LABELS, FIELD_ORIGIN,
+    FIELD_OWNER_ID, FIELD_PAYLOAD, FIELD_PHONE_NUMBER, FIELD_POSTAL, FIELD_SCORE, FIELD_SCORES,
+    FIELD_TAG_IDS, FIELD_TITLE, FIELD_URGENT, FIELD_WATCHERS, FIELD_WEBHOOK_ID, NotificationCase,
 };
 use ::puroro_sample_generated::{Address, Point, Priority, Status, Task, TaskLazy};
 
@@ -64,6 +65,12 @@ fn empty_message_is_implicit_zero() {
     assert!(lazy.watchers().unwrap().is_empty());
     assert!(lazy.labels().unwrap().is_empty());
     assert!(lazy.attributes().unwrap().is_empty());
+    assert!(lazy.notification().unwrap().is_none());
+    assert!(!lazy.email_address().unwrap().is_set());
+    assert!(!lazy.webhook_id().unwrap().is_set());
+    assert_eq!(lazy.webhook_id().unwrap().get(), -1);
+    assert!(lazy.postal().unwrap().is_none());
+    assert!(!lazy.urgent().unwrap().is_set());
 }
 
 #[test]
@@ -842,4 +849,109 @@ fn nested_child_encode_is_body_only() {
     let child = lazy.assignee().unwrap().unwrap();
     assert_eq!(child.encode_to_vec().unwrap(), addr.encode_to_vec());
     assert_ne!(child.encode_to_vec().unwrap(), bytes);
+}
+
+#[test]
+fn oneof_email_last_wins() {
+    let mut bytes = Vec::new();
+    encode_len_bytes(FIELD_EMAIL_ADDRESS, b"first@x", &mut bytes);
+    encode_len_bytes(FIELD_EMAIL_ADDRESS, b"second@x", &mut bytes);
+    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    assert_eq!(
+        lazy.notification().unwrap(),
+        Some(NotificationCase::EmailAddress)
+    );
+    assert_eq!(lazy.email_address().unwrap().get(), "second@x");
+    assert!(!lazy.phone_number().unwrap().is_set());
+}
+
+#[test]
+fn oneof_switch_email_to_webhook() {
+    let mut bytes = Vec::new();
+    encode_len_bytes(FIELD_EMAIL_ADDRESS, b"a@x.com", &mut bytes);
+    encode_varint_field(
+        field_number_const::<FIELD_WEBHOOK_ID>(),
+        Varint::from_int32(7),
+        &mut bytes,
+    );
+    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    assert_eq!(
+        lazy.notification().unwrap(),
+        Some(NotificationCase::WebhookId)
+    );
+    assert!(!lazy.email_address().unwrap().is_set());
+    assert_eq!(lazy.webhook_id().unwrap().get(), 7);
+}
+
+#[test]
+fn oneof_switch_webhook_to_email() {
+    let mut bytes = Vec::new();
+    encode_varint_field(
+        field_number_const::<FIELD_WEBHOOK_ID>(),
+        Varint::from_int32(3),
+        &mut bytes,
+    );
+    encode_len_bytes(FIELD_EMAIL_ADDRESS, b"b@x.com", &mut bytes);
+    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    assert_eq!(
+        lazy.notification().unwrap(),
+        Some(NotificationCase::EmailAddress)
+    );
+    assert_eq!(lazy.email_address().unwrap().get(), "b@x.com");
+    assert!(!lazy.webhook_id().unwrap().is_set());
+    assert_eq!(lazy.webhook_id().unwrap().get(), -1);
+}
+
+#[test]
+fn oneof_postal_and_urgent() {
+    let mut addr = Address::new();
+    addr.street_mut().set("Oak");
+    let mut bytes = Vec::new();
+    encode_len_bytes(FIELD_POSTAL, &addr.encode_to_vec(), &mut bytes);
+    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    assert_eq!(lazy.notification().unwrap(), Some(NotificationCase::Postal));
+    assert_eq!(
+        lazy.postal().unwrap().unwrap().street().unwrap().get(),
+        "Oak"
+    );
+
+    let mut urgent = Vec::new();
+    encode_varint_field(
+        field_number_const::<FIELD_URGENT>(),
+        Varint::from_bool(true),
+        &mut urgent,
+    );
+    let lazy = TaskLazy::decode(&urgent[..]).unwrap();
+    assert_eq!(lazy.notification().unwrap(), Some(NotificationCase::Urgent));
+    assert!(lazy.urgent().unwrap().get());
+    assert!(lazy.postal().unwrap().is_none());
+}
+
+#[test]
+fn oneof_same_postal_occurrences_merge() {
+    let mut first = Address::new();
+    first.street_mut().set("Oak");
+    let mut second = Address::new();
+    second.city_mut().set("Kyoto");
+    let mut bytes = Vec::new();
+    encode_len_bytes(FIELD_POSTAL, &first.encode_to_vec(), &mut bytes);
+    encode_len_bytes(FIELD_POSTAL, &second.encode_to_vec(), &mut bytes);
+    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let postal = lazy.postal().unwrap().unwrap();
+    assert_eq!(postal.street().unwrap().get(), "Oak");
+    assert_eq!(postal.city().unwrap().get(), "Kyoto");
+}
+
+#[test]
+fn oneof_phone_and_invalid_utf8_email() {
+    let mut bytes = Vec::new();
+    encode_len_bytes(FIELD_PHONE_NUMBER, b"555-0100", &mut bytes);
+    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    assert_eq!(lazy.phone_number().unwrap().get(), "555-0100");
+
+    let mut bad = Vec::new();
+    encode_len_bytes(FIELD_EMAIL_ADDRESS, &[0xff, 0xfe], &mut bad);
+    let lazy = TaskLazy::decode(&bad[..]).unwrap();
+    assert_eq!(lazy.email_address().err(), Some(DecodeError::InvalidUtf8));
+    assert_eq!(lazy.email_address().err(), Some(DecodeError::InvalidUtf8));
 }

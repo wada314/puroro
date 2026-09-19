@@ -349,6 +349,7 @@ fn render_module_body(
             type Bits = #bits_ty;
             type Alloc = A;
             #unknown_assoc
+            type Layout = ::puroro_rt::Eager;
 
             fn case(storage: &Self) -> Self::Case {
                 match storage {

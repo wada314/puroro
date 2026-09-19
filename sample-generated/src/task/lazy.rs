@@ -4,26 +4,29 @@
 //! spans promote to Inline / Heap on first get. Failed UTF-8 is sticky.
 //! Nested `assignee` / `origin` use catalog [`SingularField`] + [`ProtoMessage`]
 //! and [`SingularField::merge_shared`] (unparsed child on the island-root
-//! buffer). Repeated `watchers` appends one child per occurrence. `attributes`
+//! buffer). Repeated `watchers` uses catalog [`RepeatedField`] +
+//! [`RepeatedField::merge_shared`] (one child per occurrence). `attributes`
 //! stores map-entry spans and materialises on first get. Repeated `labels`
 //! stores element spans and materialises on first get.
-//! Oneof is still skipped. Getters require a finished
+//! Oneof `notification` uses catalog [`OneofSlot`]: numerical variants apply
+//! during the scan; string variants store a [`WireOrSso`] span; `postal`
+//! records an [`AddressLazy`] shell. Getters require a finished
 //! input stream so last-wins is final. `into_eager` re-merges `_wire` into
 //! [`Task`]; encode writes `_wire` as-is.
 
 use ::allocator_api2::alloc::{Allocator, Global};
-use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::{Buf, BufMut};
 use ::core::ops::{ControlFlow, Deref};
 use ::puroro::{DecodeError, HasDefault, MapRef, Message, Optional};
-use ::puroro_rt::decode::{LazyMessage, ScannedRecord, merge_scanned_field, scanned_len_span};
+use ::puroro_rt::decode::{ScannedRecord, merge_scanned_field, scanned_len_span};
 use ::puroro_rt::{
     BitPacked, Boxed, Closed, Expanded, Explicit, FieldDeallocVisitor, FieldVisitorMut, Implicit,
     Inline, InteriorBitArray, LazyMapField, LazyMessageCommon, LazyRepeatedField, LegacyRequired,
-    Message as MessagePresence, Open, Packed, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32,
-    ProtoMessage, ProtoString, RepeatedField, SingularField, WireOrSso,
+    Message as MessagePresence, OneofGroup, OneofSlot, Open, Packed, ProtoBool, ProtoBytes,
+    ProtoEnum, ProtoInt32, ProtoMessage, ProtoString, RepeatedField, SingularField, WireOrSso,
 };
 
+use super::notification_lazy::NotificationLazyStorage;
 use crate::Task;
 use crate::address::AddressLazy;
 use crate::enums::{Priority, Status};
@@ -32,14 +35,16 @@ use crate::task::defaults::MaxRetriesDefault;
 use crate::task::{
     BIT_DONE_VALUE, BIT_FLAG, BIT_FLAG_VALUE, BIT_MAX_RETRIES, BIT_ORIGIN, BIT_OWNER_ID,
     BIT_OWNER_ID_LAZY_KIND, BIT_PAYLOAD, BIT_PAYLOAD_LAZY_KIND, BIT_PRIORITY, BIT_TITLE,
-    BIT_TITLE_LAZY_KIND, FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_DONE, FIELD_FLAG, FIELD_LABELS,
-    FIELD_MAX_RETRIES, FIELD_ORIGIN, FIELD_OWNER_ID, FIELD_PAYLOAD, FIELD_PRIORITY, FIELD_SCORE,
-    FIELD_SCORES, FIELD_STATUS, FIELD_TAG_IDS, FIELD_TITLE, FIELD_VOTES, FIELD_WATCHERS,
+    BIT_TITLE_LAZY_KIND, FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_DONE, FIELD_EMAIL_ADDRESS,
+    FIELD_FLAG, FIELD_LABELS, FIELD_MAX_RETRIES, FIELD_ORIGIN, FIELD_OWNER_ID, FIELD_PAYLOAD,
+    FIELD_PHONE_NUMBER, FIELD_POSTAL, FIELD_PRIORITY, FIELD_SCORE, FIELD_SCORES, FIELD_STATUS,
+    FIELD_TAG_IDS, FIELD_TITLE, FIELD_URGENT, FIELD_VOTES, FIELD_WATCHERS, FIELD_WEBHOOK_ID,
+    NotificationCase,
 };
 
 /// Lazy `Task` with numerical catalog slots and singular `WireOrSso` LEN.
 pub struct TaskLazy<A: Allocator = Global> {
-    _common: LazyMessageCommon<InteriorBitArray<3>, A>,
+    _common: LazyMessageCommon<InteriorBitArray<4>, A>,
     title: SingularField<
         ProtoString,
         Explicit<{ BIT_TITLE }>,
@@ -65,7 +70,7 @@ pub struct TaskLazy<A: Allocator = Global> {
         SingularField<ProtoMessage<AddressLazy<A>>, MessagePresence, { FIELD_ASSIGNEE }, A, Boxed>,
     origin:
         SingularField<ProtoMessage<PointLazy<A>>, Explicit<{ BIT_ORIGIN }>, { FIELD_ORIGIN }, A>,
-    watchers: AllocVec<AddressLazy<A>, A>,
+    watchers: RepeatedField<ProtoMessage<AddressLazy<A>>, Expanded, { FIELD_WATCHERS }, A>,
     labels: LazyRepeatedField<ProtoString, Expanded, { FIELD_LABELS }, A>,
     attributes: LazyMapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>,
     score: SingularField<ProtoInt32, Implicit, { FIELD_SCORE }, A>,
@@ -95,6 +100,7 @@ pub struct TaskLazy<A: Allocator = Global> {
         BitPacked<{ BIT_FLAG_VALUE }>,
     >,
     votes: RepeatedField<ProtoBool, Packed, { FIELD_VOTES }, A>,
+    notification: OneofSlot<NotificationLazyStorage<A>>,
 }
 
 impl<A: Allocator + Clone + Default> Default for TaskLazy<A> {
@@ -242,7 +248,74 @@ impl<A: Allocator> TaskLazy<A> {
 
     pub fn watchers(&self) -> Result<&[AddressLazy<A>], DecodeError> {
         self.require_finished()?;
-        Ok(&self.watchers)
+        Ok(self.watchers.bind(&self._common).as_slice())
+    }
+
+    pub fn notification(&self) -> Result<Option<NotificationCase>, DecodeError> {
+        self.require_finished()?;
+        Ok(self
+            .notification
+            .as_ref()
+            .map(NotificationLazyStorage::case))
+    }
+
+    pub fn email_address(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
+    where
+        A: Clone,
+    {
+        self.require_finished()?;
+        match self
+            .notification
+            .bind(&self._common)
+            .variant_of::<FIELD_EMAIL_ADDRESS>()
+            .as_field()
+        {
+            Some(f) => f.try_str(&self._common, self._common.lazy.scan.wire()),
+            None => Ok(Optional::new(None)),
+        }
+    }
+
+    pub fn phone_number(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
+    where
+        A: Clone,
+    {
+        self.require_finished()?;
+        match self
+            .notification
+            .bind(&self._common)
+            .variant_of::<FIELD_PHONE_NUMBER>()
+            .as_field()
+        {
+            Some(f) => f.try_str(&self._common, self._common.lazy.scan.wire()),
+            None => Ok(Optional::new(None)),
+        }
+    }
+
+    pub fn webhook_id(&self) -> Result<Optional<i32, impl HasDefault<i32>>, DecodeError> {
+        self.require_finished()?;
+        Ok(self
+            .notification
+            .bind(&self._common)
+            .variant_of::<FIELD_WEBHOOK_ID>()
+            .optional())
+    }
+
+    pub fn postal(&self) -> Result<Option<&AddressLazy<A>>, DecodeError> {
+        self.require_finished()?;
+        Ok(self
+            .notification
+            .bind(&self._common)
+            .variant_of::<FIELD_POSTAL>()
+            .get())
+    }
+
+    pub fn urgent(&self) -> Result<Optional<bool, impl HasDefault<bool>>, DecodeError> {
+        self.require_finished()?;
+        Ok(self
+            .notification
+            .bind(&self._common)
+            .variant_of::<FIELD_URGENT>()
+            .optional())
     }
 
     pub fn attributes(&self) -> Result<impl MapRef<str, i32> + '_, DecodeError>
@@ -274,7 +347,7 @@ impl<A: Allocator> TaskLazy<A> {
         self._common.lazy.scan.require_finished()
     }
 
-    fn visit_fields_mut<V: FieldVisitorMut<LazyMessageCommon<InteriorBitArray<3>, A>>>(
+    fn visit_fields_mut<V: FieldVisitorMut<LazyMessageCommon<InteriorBitArray<4>, A>>>(
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
@@ -292,6 +365,8 @@ impl<A: Allocator> TaskLazy<A> {
         v.visit("votes", &mut self.votes)?;
         v.visit("assignee", &mut self.assignee)?;
         v.visit("origin", &mut self.origin)?;
+        v.visit("watchers", &mut self.watchers)?;
+        v.visit("notification", &mut self.notification)?;
         ControlFlow::Continue(())
     }
 }
@@ -305,7 +380,7 @@ impl<A: Allocator + Clone> TaskLazy<A> {
             payload: SingularField::new_in(alloc.clone()),
             assignee: SingularField::new_in(alloc.clone()),
             origin: SingularField::new_in(alloc.clone()),
-            watchers: AllocVec::new_in(alloc.clone()),
+            watchers: RepeatedField::new_in(alloc.clone()),
             labels: LazyRepeatedField::new_in(alloc.clone()),
             attributes: LazyMapField::new_in(alloc.clone()),
             score: SingularField::new_in(alloc.clone()),
@@ -316,7 +391,8 @@ impl<A: Allocator + Clone> TaskLazy<A> {
             priority: SingularField::new_in(alloc.clone()),
             done: SingularField::new_in(alloc.clone()),
             flag: SingularField::new_in(alloc.clone()),
-            votes: RepeatedField::new_in(alloc),
+            votes: RepeatedField::new_in(alloc.clone()),
+            notification: OneofSlot::new_in(alloc),
         }
     }
 
@@ -356,8 +432,8 @@ impl<A: Allocator + Clone> TaskLazy<A> {
 
     /// Decode every field from `_wire` into an eager [`Task`].
     ///
-    /// Fields the lazy getters still skip (oneof) are applied here because the
-    /// full ingest bytes are replayed.
+    /// Fields not yet materialised on the lazy getters are applied here because
+    /// the full ingest bytes are replayed.
     pub fn into_eager(self) -> Result<Task<A>, DecodeError> {
         self.require_finished()?;
         let mut eager = Task::new_in(self._common.alloc.clone());
@@ -397,11 +473,47 @@ impl<A: Allocator + Clone> TaskLazy<A> {
             }
             FIELD_WATCHERS => {
                 let span = scanned_len_span(origin, rec)?;
-                let mut child = AddressLazy::new_in(self._common.alloc.clone());
-                child.merge_shared(self._common.lazy.scan.shared(), span)?;
-                self.watchers.push(child);
+                let root = self._common.lazy.scan.shared().clone_handle();
+                self.watchers.merge_shared(&root, span, &self._common)
+            }
+            FIELD_EMAIL_ADDRESS => {
+                let span = scanned_len_span(origin, rec)?;
+                self.notification
+                    .bind_mut(&mut self._common)
+                    .variant_mut::<FIELD_EMAIL_ADDRESS>()
+                    .store_len_span(span, &mut self._common);
                 Ok(())
             }
+            FIELD_PHONE_NUMBER => {
+                let span = scanned_len_span(origin, rec)?;
+                self.notification
+                    .bind_mut(&mut self._common)
+                    .variant_mut::<FIELD_PHONE_NUMBER>()
+                    .store_len_span(span, &mut self._common);
+                Ok(())
+            }
+            FIELD_WEBHOOK_ID => merge_scanned_field(&rec.field, |wire_type, buf| {
+                self.notification
+                    .bind_mut(&mut self._common)
+                    .variant_mut::<FIELD_WEBHOOK_ID>()
+                    .bind_mut(&mut self._common)
+                    .merge(wire_type, buf, 0)
+            }),
+            FIELD_POSTAL => {
+                let span = scanned_len_span(origin, rec)?;
+                let root = self._common.lazy.scan.shared().clone_handle();
+                self.notification
+                    .bind_mut(&mut self._common)
+                    .variant_mut::<FIELD_POSTAL>()
+                    .merge_shared(&root, span, &mut self._common)
+            }
+            FIELD_URGENT => merge_scanned_field(&rec.field, |wire_type, buf| {
+                self.notification
+                    .bind_mut(&mut self._common)
+                    .variant_mut::<FIELD_URGENT>()
+                    .bind_mut(&mut self._common)
+                    .merge(wire_type, buf, 0)
+            }),
             FIELD_LABELS => {
                 let span = scanned_len_span(origin, rec)?;
                 self.labels
