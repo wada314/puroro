@@ -1,109 +1,32 @@
-//! Read-oriented `Task` that applies numericals during a resumable scan.
+//! Inherent API for [`TaskLazy`](crate::TaskLazy) (`TaskImpl<A, Lazy<A>>`).
 //!
-//! Singular string / bytes use [`SingularField`] + [`WireOrSso`]: Wire
-//! spans promote to Inline / Heap on first get. Failed UTF-8 is sticky.
-//! Nested `assignee` / `origin` use catalog [`SingularField`] + [`ProtoMessage`]
-//! and [`SingularField::merge_shared`] (unparsed child on the island-root
-//! buffer). Repeated `watchers` uses catalog [`RepeatedField`] +
-//! [`RepeatedField::merge_shared`] (one child per occurrence). `attributes`
-//! uses catalog [`MapField`] + [`MapSpans`] (entry-LEN offsets; HashMap on
-//! first get). Repeated `labels` uses catalog [`RepeatedField`] +
-//! [`RepeatedSpans`] (element-LEN offsets; vec on first get).
-//! Oneof `notification` uses catalog [`OneofSlot`]: numerical variants apply
-//! during the scan; string variants store a [`WireOrSso`] span; `postal`
-//! records an [`AddressLazy`] shell. Getters require a finished
-//! input stream so last-wins is final. `into_eager` re-merges `_wire` into
-//! [`Task`]; encode writes `_wire` as-is.
+//! Read-oriented: numericals apply during the scan; LEN fields store spans
+//! (`WireOrSso` / `RepeatedSpans` / `MapSpans` / lazy children). Getters
+//! require `finish`. `into_eager` re-merges `_wire` into [`Task`](crate::Task).
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bytes::{Buf, BufMut};
-use ::core::ops::{ControlFlow, Deref};
+use ::core::ops::Deref;
 use ::puroro::{DecodeError, HasDefault, MapRef, Message, Optional};
 use ::puroro_rt::decode::{ScannedRecord, merge_scanned_field, scanned_len_span};
 use ::puroro_rt::{
-    BitPacked, Boxed, Closed, Expanded, Explicit, FieldDeallocVisitor, FieldVisitorMut, Implicit,
-    Inline, InteriorBitArray, LazyMessageCommon, LegacyRequired, MapField, MapSpans,
-    Message as MessagePresence, OneofGroup, OneofSlot, Open, Packed, ProtoBool, ProtoBytes,
-    ProtoEnum, ProtoInt32, ProtoMessage, ProtoString, RepeatedField, RepeatedSpans, SingularField,
-    WireOrSso,
+    InteriorBitArray, LazyMessageCommon, MapField, OneofGroup, OneofSlot, RepeatedField,
+    SingularField,
 };
 
 use super::notification_lazy::NotificationLazyStorage;
 use crate::Task;
+use crate::TaskLazy;
 use crate::address::AddressLazy;
 use crate::enums::{Priority, Status};
 use crate::point::PointLazy;
-use crate::task::defaults::MaxRetriesDefault;
 use crate::task::{
-    BIT_DONE_VALUE, BIT_FLAG, BIT_FLAG_VALUE, BIT_MAX_RETRIES, BIT_ORIGIN, BIT_OWNER_ID,
-    BIT_OWNER_ID_LAZY_KIND, BIT_PAYLOAD, BIT_PAYLOAD_LAZY_KIND, BIT_PRIORITY, BIT_TITLE,
-    BIT_TITLE_LAZY_KIND, FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_DONE, FIELD_EMAIL_ADDRESS,
-    FIELD_FLAG, FIELD_LABELS, FIELD_MAX_RETRIES, FIELD_ORIGIN, FIELD_OWNER_ID, FIELD_PAYLOAD,
-    FIELD_PHONE_NUMBER, FIELD_POSTAL, FIELD_PRIORITY, FIELD_SCORE, FIELD_SCORES, FIELD_STATUS,
-    FIELD_TAG_IDS, FIELD_TITLE, FIELD_URGENT, FIELD_VOTES, FIELD_WATCHERS, FIELD_WEBHOOK_ID,
-    NotificationCase,
+    BIT_OWNER_ID, BIT_PAYLOAD, BIT_TITLE, FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_DONE,
+    FIELD_EMAIL_ADDRESS, FIELD_FLAG, FIELD_LABELS, FIELD_MAX_RETRIES, FIELD_ORIGIN, FIELD_OWNER_ID,
+    FIELD_PAYLOAD, FIELD_PHONE_NUMBER, FIELD_POSTAL, FIELD_PRIORITY, FIELD_SCORE, FIELD_SCORES,
+    FIELD_STATUS, FIELD_TAG_IDS, FIELD_TITLE, FIELD_URGENT, FIELD_VOTES, FIELD_WATCHERS,
+    FIELD_WEBHOOK_ID, NotificationCase,
 };
-
-/// Lazy `Task` with numerical catalog slots and singular `WireOrSso` LEN.
-pub struct TaskLazy<A: Allocator = Global> {
-    _common: LazyMessageCommon<InteriorBitArray<4>, A>,
-    title: SingularField<
-        ProtoString,
-        Explicit<{ BIT_TITLE }>,
-        { FIELD_TITLE },
-        A,
-        WireOrSso<{ BIT_TITLE_LAZY_KIND }>,
-    >,
-    owner_id: SingularField<
-        ProtoString,
-        LegacyRequired<{ BIT_OWNER_ID }>,
-        { FIELD_OWNER_ID },
-        A,
-        WireOrSso<{ BIT_OWNER_ID_LAZY_KIND }>,
-    >,
-    payload: SingularField<
-        ProtoBytes,
-        Explicit<{ BIT_PAYLOAD }>,
-        { FIELD_PAYLOAD },
-        A,
-        WireOrSso<{ BIT_PAYLOAD_LAZY_KIND }>,
-    >,
-    assignee:
-        SingularField<ProtoMessage<AddressLazy<A>>, MessagePresence, { FIELD_ASSIGNEE }, A, Boxed>,
-    origin:
-        SingularField<ProtoMessage<PointLazy<A>>, Explicit<{ BIT_ORIGIN }>, { FIELD_ORIGIN }, A>,
-    watchers: RepeatedField<ProtoMessage<AddressLazy<A>>, Expanded, { FIELD_WATCHERS }, A>,
-    labels: RepeatedField<ProtoString, Expanded, { FIELD_LABELS }, A, RepeatedSpans>,
-    attributes: MapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A, MapSpans>,
-    score: SingularField<ProtoInt32, Implicit, { FIELD_SCORE }, A>,
-    max_retries: SingularField<
-        ProtoInt32,
-        Explicit<{ BIT_MAX_RETRIES }>,
-        { FIELD_MAX_RETRIES },
-        A,
-        Inline,
-        MaxRetriesDefault,
-    >,
-    tag_ids: RepeatedField<ProtoInt32, Packed, { FIELD_TAG_IDS }, A>,
-    scores: RepeatedField<ProtoInt32, Expanded, { FIELD_SCORES }, A>,
-    status: SingularField<ProtoEnum<Status, Open>, Implicit, { FIELD_STATUS }, A>,
-    priority: SingularField<
-        ProtoEnum<Priority, Closed>,
-        Explicit<{ BIT_PRIORITY }>,
-        { FIELD_PRIORITY },
-        A,
-    >,
-    done: SingularField<ProtoBool, Implicit, { FIELD_DONE }, A, BitPacked<{ BIT_DONE_VALUE }>>,
-    flag: SingularField<
-        ProtoBool,
-        Explicit<{ BIT_FLAG }>,
-        { FIELD_FLAG },
-        A,
-        BitPacked<{ BIT_FLAG_VALUE }>,
-    >,
-    votes: RepeatedField<ProtoBool, Packed, { FIELD_VOTES }, A>,
-    notification: OneofSlot<NotificationLazyStorage<A>>,
-}
 
 impl<A: Allocator + Clone + Default> Default for TaskLazy<A> {
     fn default() -> Self {
@@ -123,7 +46,7 @@ impl TaskLazy<Global> {
     }
 }
 
-impl<A: Allocator> TaskLazy<A> {
+impl<A: Allocator + Clone> TaskLazy<A> {
     pub fn title(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
     where
         A: Clone,
@@ -348,31 +271,6 @@ impl<A: Allocator> TaskLazy<A> {
     fn require_finished(&self) -> Result<(), DecodeError> {
         self._common.lazy.scan.require_finished()
     }
-
-    fn visit_fields_mut<V: FieldVisitorMut<LazyMessageCommon<InteriorBitArray<4>, A>>>(
-        &mut self,
-        v: &mut V,
-    ) -> ControlFlow<V::Break> {
-        v.visit("title", &mut self.title)?;
-        v.visit("owner_id", &mut self.owner_id)?;
-        v.visit("payload", &mut self.payload)?;
-        v.visit("score", &mut self.score)?;
-        v.visit("max_retries", &mut self.max_retries)?;
-        v.visit("tag_ids", &mut self.tag_ids)?;
-        v.visit("scores", &mut self.scores)?;
-        v.visit("status", &mut self.status)?;
-        v.visit("priority", &mut self.priority)?;
-        v.visit("done", &mut self.done)?;
-        v.visit("flag", &mut self.flag)?;
-        v.visit("votes", &mut self.votes)?;
-        v.visit("assignee", &mut self.assignee)?;
-        v.visit("origin", &mut self.origin)?;
-        v.visit("watchers", &mut self.watchers)?;
-        v.visit("notification", &mut self.notification)?;
-        v.visit("attributes", &mut self.attributes)?;
-        v.visit("labels", &mut self.labels)?;
-        ControlFlow::Continue(())
-    }
 }
 
 impl<A: Allocator + Clone> TaskLazy<A> {
@@ -575,13 +473,5 @@ impl<A: Allocator + Clone> TaskLazy<A> {
             }),
             _ => Ok(()),
         }
-    }
-}
-
-impl<A: Allocator> Drop for TaskLazy<A> {
-    fn drop(&mut self) {
-        let mut v = FieldDeallocVisitor::new(&self._common);
-        let _ = self.visit_fields_mut(&mut v);
-        self._common.deallocate();
     }
 }

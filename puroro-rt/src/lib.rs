@@ -38,7 +38,7 @@ pub use fields::repeated::{
 };
 pub use fields::shared::field_presence::{Explicit, Implicit, LegacyRequired, Message, Oneof};
 pub use fields::shared::{
-    AddressableSlot, BitPacked, Boxed, CloneBound, CloneFieldsVisitor, DeallocateBound,
+    AddressableSlot, BitPacked, BitStorage, Boxed, CloneBound, CloneFieldsVisitor, DeallocateBound,
     DebugStructVisitor, DiscardUnknowns, Eager, EncodeRawVisitor, EncodedLenVisitor, FieldCloneIn,
     FieldDeallocVisitor, FieldDeallocate, FieldEncode, FieldEqVisitor, FieldPairVisitor,
     FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Inline, InlineOrHeap, InteriorBitArray,

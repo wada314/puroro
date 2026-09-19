@@ -22,28 +22,27 @@ use puroro::{
 };
 use puroro_rt::decode::{decode_tag, skip_field_and_save};
 use puroro_rt::{
-    BitPacked, Boxed, CloneFieldsVisitor, CloneIn, Closed, DebugStructVisitor, EncodeCtx,
+    BitPacked, Boxed, CloneFieldsVisitor, CloneIn, Closed, DebugStructVisitor, Eager, EncodeCtx,
     EncodeRawVisitor, EncodedLenVisitor, Expanded, Explicit, FieldDeallocVisitor, FieldEqVisitor,
-    FieldPairVisitor, FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Implicit, Inline,
-    InlineOrHeap, LegacyRequired, MapField, Message as MessagePresence, MessageCommon,
-    MessageEncode, MessageMerge, OneofSlot, Open, Packed, ProtoBool, ProtoBytes, ProtoEnum,
-    ProtoInt32, ProtoMessage, ProtoString, RepeatedField, SingularField,
+    FieldPairVisitor, FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Implicit, Inline, Lazy,
+    MapField, Message as MessagePresence, MessageCommon, MessageEncode, MessageMerge, OneofSlot,
+    Open, Packed, ProtoBool, ProtoEnum, ProtoInt32, ProtoMessage, RepeatedField, SingularField,
+    UnknownFields,
 };
 
 use crate::Address;
 use crate::AddressLazy;
 use crate::Point;
 use crate::enums::{Priority, Status};
+use crate::task::TaskLayout;
 use crate::task::defaults::MaxRetriesDefault;
 use crate::task::notification::NotificationStorage;
 use crate::task::{
-    BIT_DONE_VALUE, BIT_FLAG, BIT_FLAG_VALUE, BIT_MAX_RETRIES, BIT_ORIGIN, BIT_OWNER_ID,
-    BIT_OWNER_ID_SSO, BIT_PAYLOAD, BIT_PAYLOAD_SSO, BIT_PRIORITY, BIT_TITLE, BIT_TITLE_SSO,
-    FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_DONE, FIELD_EMAIL_ADDRESS, FIELD_FLAG, FIELD_LABELS,
-    FIELD_MAX_RETRIES, FIELD_ORIGIN, FIELD_OWNER_ID, FIELD_PAYLOAD, FIELD_PHONE_NUMBER,
-    FIELD_POSTAL, FIELD_PRIORITY, FIELD_SCORE, FIELD_SCORES, FIELD_STATUS, FIELD_TAG_IDS,
-    FIELD_TITLE, FIELD_URGENT, FIELD_VOTES, FIELD_WATCHERS, FIELD_WEBHOOK_ID, Notification,
-    NotificationCase,
+    BIT_DONE_VALUE, BIT_FLAG, BIT_FLAG_VALUE, BIT_MAX_RETRIES, BIT_PRIORITY, FIELD_ASSIGNEE,
+    FIELD_ATTRIBUTES, FIELD_DONE, FIELD_EMAIL_ADDRESS, FIELD_FLAG, FIELD_LABELS, FIELD_MAX_RETRIES,
+    FIELD_ORIGIN, FIELD_OWNER_ID, FIELD_PAYLOAD, FIELD_PHONE_NUMBER, FIELD_POSTAL, FIELD_PRIORITY,
+    FIELD_SCORE, FIELD_SCORES, FIELD_STATUS, FIELD_TAG_IDS, FIELD_TITLE, FIELD_URGENT, FIELD_VOTES,
+    FIELD_WATCHERS, FIELD_WEBHOOK_ID, Notification, NotificationCase,
 };
 
 // ---------------------------------------------------------------------------
@@ -51,17 +50,14 @@ use crate::task::{
 // ---------------------------------------------------------------------------
 
 /// Reference `Task` message from `DESIGN.md`.
-pub struct Task<A: Allocator = Global> {
-    _common: MessageCommon<BitArray<[u8; 2], Lsb0>, A>,
-    title: SingularField<
-        ProtoString,
-        Explicit<{ BIT_TITLE }>,
-        { FIELD_TITLE },
-        A,
-        InlineOrHeap<{ BIT_TITLE_SSO }>,
-    >, // proto: string title = 1;
-    score: SingularField<ProtoInt32, Implicit, { FIELD_SCORE }, A>, // proto: int32 score = 2;
-    max_retries: SingularField<
+///
+/// `L` is the ingest layout ([`Eager`] / [`Lazy`]). Public names stay the
+/// aliases [`Task`] / [`TaskLazy`].
+pub struct TaskImpl<A: Allocator = Global, L: TaskLayout<A> = Eager> {
+    pub(crate) _common: MessageCommon<L::Bits, A, UnknownFields<A>, L>,
+    pub(crate) title: L::Title,
+    pub(crate) score: SingularField<ProtoInt32, Implicit, { FIELD_SCORE }, A>, // proto: int32 score = 2;
+    pub(crate) max_retries: SingularField<
         ProtoInt32,
         Explicit<{ BIT_MAX_RETRIES }>,
         { FIELD_MAX_RETRIES },
@@ -69,49 +65,44 @@ pub struct Task<A: Allocator = Global> {
         Inline,
         MaxRetriesDefault,
     >, // proto: int32 max_retries = 3;
-    owner_id: SingularField<
-        ProtoString,
-        LegacyRequired<{ BIT_OWNER_ID }>,
-        { FIELD_OWNER_ID },
-        A,
-        InlineOrHeap<{ BIT_OWNER_ID_SSO }>,
-    >, // proto: string owner_id = 4;
-    payload: SingularField<
-        ProtoBytes,
-        Explicit<{ BIT_PAYLOAD }>,
-        { FIELD_PAYLOAD },
-        A,
-        InlineOrHeap<{ BIT_PAYLOAD_SSO }>,
-    >, // proto: bytes payload = 5;
-    tag_ids: RepeatedField<ProtoInt32, Packed, { FIELD_TAG_IDS }, A>, // proto: repeated int32 tag_ids = 6 [packed];
-    scores: RepeatedField<ProtoInt32, Expanded, { FIELD_SCORES }, A>, // proto: repeated int32 scores = 7;
-    labels: RepeatedField<ProtoString, Expanded, { FIELD_LABELS }, A>, // proto: repeated string labels = 8;
-    status: SingularField<ProtoEnum<Status, Open>, Implicit, { FIELD_STATUS }, A>, // proto: Status status = 9;
-    priority: SingularField<
+    pub(crate) owner_id: L::OwnerId,
+    pub(crate) payload: L::Payload,
+    pub(crate) tag_ids: RepeatedField<ProtoInt32, Packed, { FIELD_TAG_IDS }, A>, // proto: repeated int32 tag_ids = 6 [packed];
+    pub(crate) scores: RepeatedField<ProtoInt32, Expanded, { FIELD_SCORES }, A>, // proto: repeated int32 scores = 7;
+    pub(crate) labels: L::Labels,
+    pub(crate) status: SingularField<ProtoEnum<Status, Open>, Implicit, { FIELD_STATUS }, A>, // proto: Status status = 9;
+    pub(crate) priority: SingularField<
         ProtoEnum<Priority, Closed>,
         Explicit<{ BIT_PRIORITY }>,
         { FIELD_PRIORITY },
         A,
     >, // proto: Priority priority = 10;
-    assignee:
+    pub(crate) assignee:
         SingularField<ProtoMessage<AddressLazy<A>>, MessagePresence, { FIELD_ASSIGNEE }, A, Boxed>, // proto: Address assignee = 11 (lazy child)
     // proto: oneof notification { string email_address=12; string phone_number=13;
     //                             int32 webhook_id=14 [default=-1]; Address postal=15;
     //                             bool urgent=18; }
-    notification: OneofSlot<NotificationStorage<A>>,
-    done: SingularField<ProtoBool, Implicit, { FIELD_DONE }, A, BitPacked<{ BIT_DONE_VALUE }>>, // proto: bool done = 16;
-    flag: SingularField<
+    pub(crate) notification: OneofSlot<L::Notification>,
+    pub(crate) done:
+        SingularField<ProtoBool, Implicit, { FIELD_DONE }, A, BitPacked<{ BIT_DONE_VALUE }>>, // proto: bool done = 16;
+    pub(crate) flag: SingularField<
         ProtoBool,
         Explicit<{ BIT_FLAG }>,
         { FIELD_FLAG },
         A,
         BitPacked<{ BIT_FLAG_VALUE }>,
     >, // proto: bool flag = 17;
-    watchers: RepeatedField<ProtoMessage<Address<A>>, Expanded, { FIELD_WATCHERS }, A>, // proto: repeated Address watchers = 19
-    votes: RepeatedField<ProtoBool, Packed, { FIELD_VOTES }, A>, // proto: repeated bool votes = 20;
-    attributes: MapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>, // proto: map<string, int32> attributes = 21;
-    origin: SingularField<ProtoMessage<Point<A>>, Explicit<{ BIT_ORIGIN }>, { FIELD_ORIGIN }, A>, // proto: Point origin = 22 (inlined)
+    pub(crate) watchers: L::Watchers,
+    pub(crate) votes: RepeatedField<ProtoBool, Packed, { FIELD_VOTES }, A>, // proto: repeated bool votes = 20;
+    pub(crate) attributes: L::Attributes,
+    pub(crate) origin: L::Origin,
 }
+
+/// Eager [`TaskImpl`].
+pub type Task<A = Global> = TaskImpl<A, Eager>;
+
+/// Lazy [`TaskImpl`].
+pub type TaskLazy<A = Global> = TaskImpl<A, Lazy<A>>;
 
 impl<A: Allocator> Task<A> {
     pub fn title<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>>
@@ -345,32 +336,6 @@ impl<A: Allocator> Task<A> {
         v.visit("votes", &self.votes, &mut dst.votes)?;
         v.visit("attributes", &self.attributes, &mut dst.attributes)?;
         v.visit("origin", &self.origin, &mut dst.origin)?;
-        ControlFlow::Continue(())
-    }
-
-    /// Scalar / mut: invoke `v` once per catalog field.
-    fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<BitArray<[u8; 2], Lsb0>, A>>>(
-        &mut self,
-        v: &mut V,
-    ) -> ControlFlow<V::Break> {
-        v.visit("title", &mut self.title)?;
-        v.visit("score", &mut self.score)?;
-        v.visit("max_retries", &mut self.max_retries)?;
-        v.visit("owner_id", &mut self.owner_id)?;
-        v.visit("payload", &mut self.payload)?;
-        v.visit("tag_ids", &mut self.tag_ids)?;
-        v.visit("scores", &mut self.scores)?;
-        v.visit("labels", &mut self.labels)?;
-        v.visit("status", &mut self.status)?;
-        v.visit("priority", &mut self.priority)?;
-        v.visit("assignee", &mut self.assignee)?;
-        v.visit("notification", &mut self.notification)?;
-        v.visit("done", &mut self.done)?;
-        v.visit("flag", &mut self.flag)?;
-        v.visit("watchers", &mut self.watchers)?;
-        v.visit("votes", &mut self.votes)?;
-        v.visit("attributes", &mut self.attributes)?;
-        v.visit("origin", &mut self.origin)?;
         ControlFlow::Continue(())
     }
 }
@@ -721,7 +686,34 @@ impl<A: Allocator> fmt::Debug for Task<A> {
 // Drop — releases every unmanaged field through the single allocator
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator> Drop for Task<A> {
+impl<A: Allocator, L: TaskLayout<A>> TaskImpl<A, L> {
+    fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<L::Bits, A, UnknownFields<A>, L>>>(
+        &mut self,
+        v: &mut V,
+    ) -> ControlFlow<V::Break> {
+        v.visit("title", &mut self.title)?;
+        v.visit("score", &mut self.score)?;
+        v.visit("max_retries", &mut self.max_retries)?;
+        v.visit("owner_id", &mut self.owner_id)?;
+        v.visit("payload", &mut self.payload)?;
+        v.visit("tag_ids", &mut self.tag_ids)?;
+        v.visit("scores", &mut self.scores)?;
+        v.visit("labels", &mut self.labels)?;
+        v.visit("status", &mut self.status)?;
+        v.visit("priority", &mut self.priority)?;
+        v.visit("assignee", &mut self.assignee)?;
+        v.visit("notification", &mut self.notification)?;
+        v.visit("done", &mut self.done)?;
+        v.visit("flag", &mut self.flag)?;
+        v.visit("watchers", &mut self.watchers)?;
+        v.visit("votes", &mut self.votes)?;
+        v.visit("attributes", &mut self.attributes)?;
+        v.visit("origin", &mut self.origin)?;
+        ControlFlow::Continue(())
+    }
+}
+
+impl<A: Allocator, L: TaskLayout<A>> Drop for TaskImpl<A, L> {
     fn drop(&mut self) {
         let mut v = FieldDeallocVisitor::new(&self._common);
         let _ = self.visit_fields_mut(&mut v);

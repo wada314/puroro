@@ -54,7 +54,7 @@ use ::bitvec::{
 /// Read/write interface to the packed bit array stored in [`MessageCommon`].
 ///
 /// Catalog code bounds [`MessageCommonBits`] on the common context instead.
-pub(crate) trait BitStorage {
+pub trait BitStorage {
     fn is_set(&self, bit: usize) -> bool;
     fn set(&mut self, bit: usize, value: bool);
     fn bit_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0>;
