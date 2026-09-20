@@ -16,19 +16,23 @@ use core::ops::DerefMut;
 use puroro::{DecodeBuf, DecodeError, Message};
 use puroro_rt::decode::{decode_tag, skip_field_and_save};
 use puroro_rt::{
-    CloneFieldsVisitor, CloneIn, DebugStructVisitor, EncodeCtx, EncodeRawVisitor,
+    CloneFieldsVisitor, CloneIn, DebugStructVisitor, Eager, EncodeCtx, EncodeRawVisitor,
     EncodedLenVisitor, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut,
-    FieldVisitor, FieldVisitorMut, Implicit, MessageCommon, MessageEncode, MessageMerge,
-    ProtoInt32, SingularField,
+    FieldVisitor, FieldVisitorMut, Implicit, Lazy, MessageCommon, MessageEncode, MessageMerge,
+    ProtoInt32, SingularField, UnknownFields,
 };
 
+use crate::point::PointLayout;
 use crate::point::{FIELD_X, FIELD_Y};
 
-pub struct Point<A: Allocator = Global> {
-    _common: MessageCommon<BitArray<[u8; 1], Lsb0>, A>,
-    x: SingularField<ProtoInt32, Implicit, { FIELD_X }, A>,
-    y: SingularField<ProtoInt32, Implicit, { FIELD_Y }, A>,
+pub struct PointImpl<A: Allocator = Global, L: PointLayout<A> = Eager> {
+    pub(crate) _common: MessageCommon<L::Bits, A, UnknownFields<A>, L>,
+    pub(crate) x: SingularField<ProtoInt32, Implicit, { FIELD_X }, A>,
+    pub(crate) y: SingularField<ProtoInt32, Implicit, { FIELD_Y }, A>,
 }
+
+pub type Point<A = Global> = PointImpl<A, Eager>;
+pub type PointLazy<A = Global> = PointImpl<A, Lazy<A>>;
 
 impl<A: Allocator> Point<A> {
     pub fn x(&self) -> i32 {
@@ -68,15 +72,6 @@ impl<A: Allocator> Point<A> {
     {
         v.visit("x", &self.x, &mut dst.x)?;
         v.visit("y", &self.y, &mut dst.y)?;
-        ControlFlow::Continue(())
-    }
-
-    fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
-        &mut self,
-        v: &mut V,
-    ) -> ControlFlow<V::Break> {
-        v.visit("x", &mut self.x)?;
-        v.visit("y", &mut self.y)?;
         ControlFlow::Continue(())
     }
 }
@@ -162,7 +157,18 @@ impl<A: Allocator> fmt::Debug for Point<A> {
     }
 }
 
-impl<A: Allocator> Drop for Point<A> {
+impl<A: Allocator, L: PointLayout<A>> PointImpl<A, L> {
+    fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<L::Bits, A, UnknownFields<A>, L>>>(
+        &mut self,
+        v: &mut V,
+    ) -> ControlFlow<V::Break> {
+        v.visit("x", &mut self.x)?;
+        v.visit("y", &mut self.y)?;
+        ControlFlow::Continue(())
+    }
+}
+
+impl<A: Allocator, L: PointLayout<A>> Drop for PointImpl<A, L> {
     fn drop(&mut self) {
         let mut v = FieldDeallocVisitor::new(&self._common);
         let _ = self.visit_fields_mut(&mut v);

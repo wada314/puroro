@@ -50,6 +50,12 @@ where
 
     /// Empty storage using `alloc` (element vec or the span vec).
     fn new_storage(alloc: A) -> Self::Storage;
+
+    /// Release `storage` through `common`'s allocator.
+    fn deallocate_storage<C>(storage: &mut Self::Storage, common: &C)
+    where
+        C: MessageCommonAlloc<Alloc = A>,
+        T::Element<A>: DeallocateIn<A>;
 }
 
 /// Eager repeated: the element vec is the field. Occurrences land during `merge`.
@@ -69,6 +75,18 @@ where
     #[inline]
     fn new_storage(alloc: A) -> Self::Storage {
         ManuallyDrop::new(UnmanagedVec::new(alloc))
+    }
+
+    #[inline]
+    fn deallocate_storage<C>(storage: &mut Self::Storage, common: &C)
+    where
+        C: MessageCommonAlloc<Alloc = A>,
+        T::Element<A>: DeallocateIn<A>,
+    {
+        // SAFETY: called once; `&common.alloc` is interchangeable with the
+        // clones that grew the buffer. Reconstructs `Vec<T, &A>` for the free.
+        let v = unsafe { ManuallyDrop::take(storage) };
+        unsafe { v.deallocate(common.alloc()) };
     }
 }
 
@@ -97,6 +115,17 @@ where
         RepeatedSpanStorage {
             spans: AllocVec::new_in(alloc),
             ready: UnsafeCell::new(None),
+        }
+    }
+
+    #[inline]
+    fn deallocate_storage<C>(storage: &mut Self::Storage, common: &C)
+    where
+        C: MessageCommonAlloc<Alloc = A>,
+        T::Element<A>: DeallocateIn<A>,
+    {
+        if let Some(mut field) = storage.ready.get_mut().take() {
+            FieldDeallocate::deallocate(&mut field, common);
         }
     }
 }
@@ -200,21 +229,19 @@ where
     }
 }
 
-impl<T, E, const FIELD: u32, A, C> FieldDeallocate<C> for RepeatedField<T, E, FIELD, A>
+impl<T, E, const FIELD: u32, A, L, C> FieldDeallocate<C> for RepeatedField<T, E, FIELD, A, L>
 where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator,
+    L: RepeatedLayout<T, E, FIELD, A>,
     C: MessageCommonAlloc<Alloc = A>,
     T::Element<A>: DeallocateIn<A>,
 {
     /// Releases every element (when heap-backed) and the backing buffer.
     #[inline]
     fn deallocate(&mut self, common: &C) {
-        // SAFETY: called once; `&common.alloc` is interchangeable with the
-        // clones that grew the buffer. Reconstructs `Vec<T, &A>` for the free.
-        let v = unsafe { ManuallyDrop::take(&mut self.storage) };
-        unsafe { v.deallocate(common.alloc()) };
+        L::deallocate_storage(&mut self.storage, common);
     }
 }
 
@@ -446,24 +473,6 @@ where
             .as_ref()
             .expect("repeated field materialised")
             .bind(common))
-    }
-}
-
-impl<T, E, const FIELD: u32, A, C> FieldDeallocate<C>
-    for RepeatedField<T, E, FIELD, A, RepeatedSpans>
-where
-    T: RepeatedElement,
-    E: RepeatedEncoding<T, A>,
-    A: Allocator,
-    C: MessageCommonAlloc<Alloc = A>,
-    T::Element<A>: DeallocateIn<A>,
-{
-    /// Release a materialised [`RepeatedField`]. Spans need no teardown.
-    #[inline]
-    fn deallocate(&mut self, common: &C) {
-        if let Some(mut field) = self.storage.ready.get_mut().take() {
-            FieldDeallocate::deallocate(&mut field, common);
-        }
     }
 }
 

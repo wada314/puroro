@@ -1,48 +1,27 @@
-//! Read-oriented `Address`. Numericals apply during scan; strings use WireOrSso.
+//! Inherent API for [`AddressLazy`](crate::AddressLazy) (`AddressImpl<A, Lazy<A>>`).
+//!
+//! Numericals apply during scan; strings use WireOrSso. Getters require
+//! `finish`. `into_eager` re-merges `_wire` into [`Address`](crate::Address).
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bytes::{Buf, BufMut};
 use ::core::fmt::{self, Debug, Formatter};
 use ::core::iter;
-use ::core::ops::ControlFlow;
 use ::puroro::{DecodeBuf, DecodeError, HasDefault, Message, Optional, RECURSION_LIMIT};
 use ::puroro_rt::decode::{
     LazyMessage, LazyScan, ScannedRecord, merge_scanned_field, scanned_len_span,
 };
 use ::puroro_rt::{
-    CloneIn, DeallocateIn, DefaultIn, EncodeCtx, Explicit, FieldCloneIn, FieldDeallocVisitor,
-    FieldVisitorMut, InteriorBitArray, LazyMessageCommon, MessageEncode, MessageMerge, ProtoDouble,
-    ProtoFixed32, ProtoString, SingularField, WireOrSso,
+    CloneIn, DeallocateIn, DefaultIn, EncodeCtx, FieldCloneIn, InteriorBitArray, LazyMessageCommon,
+    MessageEncode, MessageMerge, SingularField,
 };
 use ::std::vec::Vec;
 
 use crate::Address;
+use crate::AddressLazy;
 use crate::address::{
-    BIT_CITY, BIT_CITY_LAZY_KIND, BIT_LATITUDE, BIT_POSTAL_CODE, BIT_STREET, BIT_STREET_LAZY_KIND,
-    FIELD_CITY, FIELD_LATITUDE, FIELD_POSTAL_CODE, FIELD_STREET,
+    BIT_CITY, BIT_STREET, FIELD_CITY, FIELD_LATITUDE, FIELD_POSTAL_CODE, FIELD_STREET,
 };
-
-/// Lazy `Address` with catalog numericals and `WireOrSso` strings.
-pub struct AddressLazy<A: Allocator = Global> {
-    _common: LazyMessageCommon<InteriorBitArray<2>, A>,
-    street: SingularField<
-        ProtoString,
-        Explicit<{ BIT_STREET }>,
-        { FIELD_STREET },
-        A,
-        WireOrSso<{ BIT_STREET_LAZY_KIND }>,
-    >,
-    city: SingularField<
-        ProtoString,
-        Explicit<{ BIT_CITY }>,
-        { FIELD_CITY },
-        A,
-        WireOrSso<{ BIT_CITY_LAZY_KIND }>,
-    >,
-    postal_code:
-        SingularField<ProtoFixed32, Explicit<{ BIT_POSTAL_CODE }>, { FIELD_POSTAL_CODE }, A>,
-    latitude: SingularField<ProtoDouble, Explicit<{ BIT_LATITUDE }>, { FIELD_LATITUDE }, A>,
-}
 
 impl<A: Allocator + Clone + Default> Default for AddressLazy<A> {
     fn default() -> Self {
@@ -125,17 +104,6 @@ impl<A: Allocator> AddressLazy<A> {
         let mut out = Vec::with_capacity(self.encoded_len()?);
         self.encode(&mut out)?;
         Ok(out)
-    }
-
-    fn visit_fields_mut<V: FieldVisitorMut<LazyMessageCommon<InteriorBitArray<2>, A>>>(
-        &mut self,
-        v: &mut V,
-    ) -> ControlFlow<V::Break> {
-        v.visit("street", &mut self.street)?;
-        v.visit("city", &mut self.city)?;
-        v.visit("postal_code", &mut self.postal_code)?;
-        v.visit("latitude", &mut self.latitude)?;
-        ControlFlow::Continue(())
     }
 }
 
@@ -336,13 +304,5 @@ impl<A: Allocator> Message for AddressLazy<A> {
 
     fn validate(&self) -> Result<(), DecodeError> {
         Ok(())
-    }
-}
-
-impl<A: Allocator> Drop for AddressLazy<A> {
-    fn drop(&mut self) {
-        let mut v = FieldDeallocVisitor::new(&self._common);
-        let _ = self.visit_fields_mut(&mut v);
-        self._common.deallocate();
     }
 }

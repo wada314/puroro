@@ -45,6 +45,12 @@ pub trait MapLayout<K: MapKey, V: RepeatedElement, const FIELD: u32, A: Allocato
 
     /// Empty storage using `alloc` (HashMap hasher or the span vec).
     fn new_storage(alloc: A) -> Self::Storage;
+
+    /// Release `storage` through `common`'s allocator.
+    fn deallocate_storage<C: MessageCommonAlloc<Alloc = A>>(
+        storage: &mut Self::Storage,
+        common: &C,
+    );
 }
 
 /// Eager map: the `HashMap` is the field. Entries land during `merge`.
@@ -64,6 +70,21 @@ where
     #[inline]
     fn new_storage(alloc: A) -> Self::Storage {
         HashMap::with_hasher_in(DefaultHashBuilder::default(), alloc)
+    }
+
+    #[inline]
+    fn deallocate_storage<C: MessageCommonAlloc<Alloc = A>>(
+        storage: &mut Self::Storage,
+        common: &C,
+    ) {
+        let alloc = common.alloc();
+        for (k, v) in storage.drain() {
+            // SAFETY: message allocator owns key / value payloads.
+            unsafe {
+                K::deallocate_element(k, alloc);
+                V::deallocate_element(v, alloc);
+            }
+        }
     }
 }
 
@@ -92,6 +113,16 @@ where
         MapSpanStorage {
             spans: AllocVec::new_in(alloc),
             ready: UnsafeCell::new(None),
+        }
+    }
+
+    #[inline]
+    fn deallocate_storage<C: MessageCommonAlloc<Alloc = A>>(
+        storage: &mut Self::Storage,
+        common: &C,
+    ) {
+        if let Some(mut map) = storage.ready.get_mut().take() {
+            FieldDeallocate::deallocate(&mut map, common);
         }
     }
 }
@@ -271,39 +302,17 @@ where
     }
 }
 
-impl<K, V, const FIELD: u32, A, C> FieldDeallocate<C> for MapField<K, V, FIELD, A, MapSpans>
+impl<K, V, const FIELD: u32, A, L, C> FieldDeallocate<C> for MapField<K, V, FIELD, A, L>
 where
     K: MapKey,
     V: RepeatedElement,
     A: Allocator,
-    C: MessageCommonAlloc<Alloc = A>,
-{
-    /// Release a materialised [`MapField`]. Spans need no teardown.
-    #[inline]
-    fn deallocate(&mut self, common: &C) {
-        if let Some(mut map) = self.storage.ready.get_mut().take() {
-            FieldDeallocate::deallocate(&mut map, common);
-        }
-    }
-}
-
-impl<K, V, const FIELD: u32, A, C> FieldDeallocate<C> for MapField<K, V, FIELD, A>
-where
-    K: MapKey,
-    V: RepeatedElement,
-    A: Allocator,
+    L: MapLayout<K, V, FIELD, A>,
     C: MessageCommonAlloc<Alloc = A>,
 {
     #[inline]
     fn deallocate(&mut self, common: &C) {
-        let alloc = common.alloc();
-        for (k, v) in self.storage.drain() {
-            // SAFETY: message allocator owns key / value payloads.
-            unsafe {
-                K::deallocate_element(k, alloc);
-                V::deallocate_element(v, alloc);
-            }
-        }
+        L::deallocate_storage(&mut self.storage, common);
     }
 }
 

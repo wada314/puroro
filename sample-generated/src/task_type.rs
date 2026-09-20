@@ -25,9 +25,9 @@ use puroro_rt::{
     BitPacked, Boxed, CloneFieldsVisitor, CloneIn, Closed, DebugStructVisitor, Eager, EncodeCtx,
     EncodeRawVisitor, EncodedLenVisitor, Expanded, Explicit, FieldDeallocVisitor, FieldEqVisitor,
     FieldPairVisitor, FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Implicit, Inline, Lazy,
-    MapField, Message as MessagePresence, MessageCommon, MessageEncode, MessageMerge, OneofSlot,
-    Open, Packed, ProtoBool, ProtoEnum, ProtoInt32, ProtoMessage, RepeatedField, SingularField,
-    UnknownFields,
+    LegacyRequired, MapField, Message as MessagePresence, MessageCommon, MessageEncode,
+    MessageMerge, OneofSlot, Open, Packed, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32,
+    ProtoMessage, ProtoString, RepeatedField, SingularField, UnknownFields,
 };
 
 use crate::Address;
@@ -38,11 +38,12 @@ use crate::task::TaskLayout;
 use crate::task::defaults::MaxRetriesDefault;
 use crate::task::notification::NotificationStorage;
 use crate::task::{
-    BIT_DONE_VALUE, BIT_FLAG, BIT_FLAG_VALUE, BIT_MAX_RETRIES, BIT_PRIORITY, FIELD_ASSIGNEE,
-    FIELD_ATTRIBUTES, FIELD_DONE, FIELD_EMAIL_ADDRESS, FIELD_FLAG, FIELD_LABELS, FIELD_MAX_RETRIES,
-    FIELD_ORIGIN, FIELD_OWNER_ID, FIELD_PAYLOAD, FIELD_PHONE_NUMBER, FIELD_POSTAL, FIELD_PRIORITY,
-    FIELD_SCORE, FIELD_SCORES, FIELD_STATUS, FIELD_TAG_IDS, FIELD_TITLE, FIELD_URGENT, FIELD_VOTES,
-    FIELD_WATCHERS, FIELD_WEBHOOK_ID, Notification, NotificationCase,
+    BIT_DONE_VALUE, BIT_FLAG, BIT_FLAG_VALUE, BIT_MAX_RETRIES, BIT_ORIGIN, BIT_OWNER_ID,
+    BIT_PAYLOAD, BIT_PRIORITY, BIT_TITLE, FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_DONE,
+    FIELD_EMAIL_ADDRESS, FIELD_FLAG, FIELD_LABELS, FIELD_MAX_RETRIES, FIELD_ORIGIN, FIELD_OWNER_ID,
+    FIELD_PAYLOAD, FIELD_PHONE_NUMBER, FIELD_POSTAL, FIELD_PRIORITY, FIELD_SCORE, FIELD_SCORES,
+    FIELD_STATUS, FIELD_TAG_IDS, FIELD_TITLE, FIELD_URGENT, FIELD_VOTES, FIELD_WATCHERS,
+    FIELD_WEBHOOK_ID, Notification, NotificationCase,
 };
 
 // ---------------------------------------------------------------------------
@@ -55,7 +56,8 @@ use crate::task::{
 /// aliases [`Task`] / [`TaskLazy`].
 pub struct TaskImpl<A: Allocator = Global, L: TaskLayout<A> = Eager> {
     pub(crate) _common: MessageCommon<L::Bits, A, UnknownFields<A>, L>,
-    pub(crate) title: L::Title,
+    pub(crate) title:
+        SingularField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }, A, L::TitleLen>, // proto: string title = 1;
     pub(crate) score: SingularField<ProtoInt32, Implicit, { FIELD_SCORE }, A>, // proto: int32 score = 2;
     pub(crate) max_retries: SingularField<
         ProtoInt32,
@@ -65,11 +67,18 @@ pub struct TaskImpl<A: Allocator = Global, L: TaskLayout<A> = Eager> {
         Inline,
         MaxRetriesDefault,
     >, // proto: int32 max_retries = 3;
-    pub(crate) owner_id: L::OwnerId,
-    pub(crate) payload: L::Payload,
+    pub(crate) owner_id: SingularField<
+        ProtoString,
+        LegacyRequired<{ BIT_OWNER_ID }>,
+        { FIELD_OWNER_ID },
+        A,
+        L::OwnerIdLen,
+    >, // proto: string owner_id = 4;
+    pub(crate) payload:
+        SingularField<ProtoBytes, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }, A, L::PayloadLen>, // proto: bytes payload = 5;
     pub(crate) tag_ids: RepeatedField<ProtoInt32, Packed, { FIELD_TAG_IDS }, A>, // proto: repeated int32 tag_ids = 6 [packed];
     pub(crate) scores: RepeatedField<ProtoInt32, Expanded, { FIELD_SCORES }, A>, // proto: repeated int32 scores = 7;
-    pub(crate) labels: L::Labels,
+    pub(crate) labels: RepeatedField<ProtoString, Expanded, { FIELD_LABELS }, A, L::Repeated>, // proto: repeated string labels = 8;
     pub(crate) status: SingularField<ProtoEnum<Status, Open>, Implicit, { FIELD_STATUS }, A>, // proto: Status status = 9;
     pub(crate) priority: SingularField<
         ProtoEnum<Priority, Closed>,
@@ -92,10 +101,12 @@ pub struct TaskImpl<A: Allocator = Global, L: TaskLayout<A> = Eager> {
         A,
         BitPacked<{ BIT_FLAG_VALUE }>,
     >, // proto: bool flag = 17;
-    pub(crate) watchers: L::Watchers,
+    pub(crate) watchers:
+        RepeatedField<ProtoMessage<L::WatchersMsg>, Expanded, { FIELD_WATCHERS }, A>, // proto: repeated Address watchers = 19;
     pub(crate) votes: RepeatedField<ProtoBool, Packed, { FIELD_VOTES }, A>, // proto: repeated bool votes = 20;
-    pub(crate) attributes: L::Attributes,
-    pub(crate) origin: L::Origin,
+    pub(crate) attributes: MapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A, L::Map>, // proto: map<string, int32> attributes = 21;
+    pub(crate) origin:
+        SingularField<ProtoMessage<L::OriginMsg>, Explicit<{ BIT_ORIGIN }>, { FIELD_ORIGIN }, A>, // proto: Point origin = 22;
 }
 
 /// Eager [`TaskImpl`].

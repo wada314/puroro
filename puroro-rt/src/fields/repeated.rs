@@ -6,5 +6,6 @@ pub(crate) mod field;
 
 pub use encoding::{Expanded, Packed};
 pub use field::{
-    DecodeLenBody, RepeatedField, RepeatedFieldMut, RepeatedFieldRef, RepeatedReady, RepeatedSpans,
+    DecodeLenBody, RepeatedField, RepeatedFieldMut, RepeatedFieldRef, RepeatedLayout,
+    RepeatedReady, RepeatedSpans,
 };

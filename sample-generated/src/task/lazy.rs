@@ -15,11 +15,11 @@ use ::puroro_rt::{
 };
 
 use super::notification_lazy::NotificationLazyStorage;
+use crate::AddressLazy;
+use crate::PointLazy;
 use crate::Task;
 use crate::TaskLazy;
-use crate::address::AddressLazy;
 use crate::enums::{Priority, Status};
-use crate::point::PointLazy;
 use crate::task::{
     BIT_OWNER_ID, BIT_PAYLOAD, BIT_TITLE, FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_DONE,
     FIELD_EMAIL_ADDRESS, FIELD_FLAG, FIELD_LABELS, FIELD_MAX_RETRIES, FIELD_ORIGIN, FIELD_OWNER_ID,

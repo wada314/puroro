@@ -14,41 +14,33 @@ use core::ops::DerefMut;
 use puroro::{DecodeBuf, DecodeError, Message};
 use puroro_rt::decode::{decode_tag, skip_field_and_save};
 use puroro_rt::{
-    CloneFieldsVisitor, CloneIn, DebugStructVisitor, EncodeCtx, EncodeRawVisitor,
+    CloneFieldsVisitor, CloneIn, DebugStructVisitor, Eager, EncodeCtx, EncodeRawVisitor,
     EncodedLenVisitor, Explicit, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor,
-    FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, InlineOrHeap, MessageCommon, MessageEncode,
-    MessageMerge, ProtoDouble, ProtoFixed32, ProtoString, SingularField,
+    FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Lazy, MessageCommon, MessageEncode,
+    MessageMerge, ProtoDouble, ProtoFixed32, SingularField, UnknownFields,
 };
 
+use crate::address::AddressLayout;
 use crate::address::{
-    AddressLazy, BIT_CITY, BIT_CITY_SSO, BIT_LATITUDE, BIT_POSTAL_CODE, BIT_STREET, BIT_STREET_SSO,
-    FIELD_CITY, FIELD_LATITUDE, FIELD_POSTAL_CODE, FIELD_STREET,
+    BIT_LATITUDE, BIT_POSTAL_CODE, FIELD_CITY, FIELD_LATITUDE, FIELD_POSTAL_CODE, FIELD_STREET,
 };
 
 // ---------------------------------------------------------------------------
 // Message struct
 // ---------------------------------------------------------------------------
 
-pub struct Address<A: Allocator = Global> {
-    _common: MessageCommon<BitArray<[u8; 1], Lsb0>, A>,
-    street: SingularField<
-        ProtoString,
-        Explicit<{ BIT_STREET }>,
-        { FIELD_STREET },
-        A,
-        InlineOrHeap<{ BIT_STREET_SSO }>,
-    >, // proto: string street = 1;
-    city: SingularField<
-        ProtoString,
-        Explicit<{ BIT_CITY }>,
-        { FIELD_CITY },
-        A,
-        InlineOrHeap<{ BIT_CITY_SSO }>,
-    >, // proto: string city = 2;
-    postal_code:
+pub struct AddressImpl<A: Allocator = Global, L: AddressLayout<A> = Eager> {
+    pub(crate) _common: MessageCommon<L::Bits, A, UnknownFields<A>, L>,
+    pub(crate) street: L::Street,
+    pub(crate) city: L::City,
+    pub(crate) postal_code:
         SingularField<ProtoFixed32, Explicit<{ BIT_POSTAL_CODE }>, { FIELD_POSTAL_CODE }, A>, // proto: fixed32 postal_code = 3;
-    latitude: SingularField<ProtoDouble, Explicit<{ BIT_LATITUDE }>, { FIELD_LATITUDE }, A>, // proto: double latitude = 4;
+    pub(crate) latitude:
+        SingularField<ProtoDouble, Explicit<{ BIT_LATITUDE }>, { FIELD_LATITUDE }, A>, // proto: double latitude = 4;
 }
+
+pub type Address<A = Global> = AddressImpl<A, Eager>;
+pub type AddressLazy<A = Global> = AddressImpl<A, Lazy<A>>;
 
 impl<A: Allocator> Address<A> {
     pub fn street<'a>(&'a self) -> ::puroro::Optional<&'a str, impl ::puroro::HasDefault<&'a str>>
@@ -116,18 +108,6 @@ impl<A: Allocator> Address<A> {
         v.visit("city", &self.city, &mut dst.city)?;
         v.visit("postal_code", &self.postal_code, &mut dst.postal_code)?;
         v.visit("latitude", &self.latitude, &mut dst.latitude)?;
-        ControlFlow::Continue(())
-    }
-
-    /// Scalar / mut.
-    fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
-        &mut self,
-        v: &mut V,
-    ) -> ControlFlow<V::Break> {
-        v.visit("street", &mut self.street)?;
-        v.visit("city", &mut self.city)?;
-        v.visit("postal_code", &mut self.postal_code)?;
-        v.visit("latitude", &mut self.latitude)?;
         ControlFlow::Continue(())
     }
 }
@@ -259,7 +239,20 @@ impl<A: Allocator> fmt::Debug for Address<A> {
 // Drop — releases every unmanaged field through the single allocator
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator> Drop for Address<A> {
+impl<A: Allocator, L: AddressLayout<A>> AddressImpl<A, L> {
+    fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<L::Bits, A, UnknownFields<A>, L>>>(
+        &mut self,
+        v: &mut V,
+    ) -> ControlFlow<V::Break> {
+        v.visit("street", &mut self.street)?;
+        v.visit("city", &mut self.city)?;
+        v.visit("postal_code", &mut self.postal_code)?;
+        v.visit("latitude", &mut self.latitude)?;
+        ControlFlow::Continue(())
+    }
+}
+
+impl<A: Allocator, L: AddressLayout<A>> Drop for AddressImpl<A, L> {
     fn drop(&mut self) {
         let mut v = FieldDeallocVisitor::new(&self._common);
         let _ = self.visit_fields_mut(&mut v);

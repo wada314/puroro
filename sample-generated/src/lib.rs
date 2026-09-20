@@ -16,8 +16,9 @@
 //! forms. See `IMPLEMENTATION.md` § "Path qualification (naming)" and
 //! `DESIGN.md` § "Path qualification".
 //!
-//! **Module layout.** Message structs are public at this crate root (`Address`,
-//! `Task` / `TaskLazy` (`TaskImpl<A, Eager|Lazy<A>>`), `AddressLazy`, `PointLazy`, `School`, `Student`, `Point`, `Marker`) — the parent of their
+//! **Module layout.** Message structs are public at this crate root
+//! (`Task` / `TaskLazy` (`TaskImpl`), `Address` / `AddressLazy` (`AddressImpl`),
+//! `Point` / `PointLazy` (`PointImpl`), `School`, `Student`, `Marker`) — the parent of their
 //! snake_case companion modules (`address`, `task`, `school`, `student`,
 //! `point`, `marker`) which hold `FIELD_*` / `BIT_*`, defaults, and oneofs.
 //! Production output follows the same rule under the protobuf `package`
@@ -47,12 +48,12 @@ mod school_type;
 mod student_type;
 mod task_type;
 
-pub use address::AddressLazy;
-pub use address_type::Address;
+pub use address::AddressLayout;
+pub use address_type::{Address, AddressImpl, AddressLazy};
 pub use enums::{Priority, Status};
 pub use marker_type::Marker;
-pub use point::PointLazy;
-pub use point_type::Point;
+pub use point::PointLayout;
+pub use point_type::{Point, PointImpl, PointLazy};
 pub use school_type::School;
 pub use student_type::Student;
 pub use task::{TaskLayout, TaskMessageFallible};

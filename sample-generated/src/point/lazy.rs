@@ -1,27 +1,22 @@
-//! Read-oriented `Point`. Both fields are implicit int32 numericals.
+//! Inherent API for [`PointLazy`](crate::PointLazy) (`PointImpl<A, Lazy<A>>`).
+//!
+//! Both fields are implicit int32 numericals. Getters require `finish`.
+//! `into_eager` re-merges `_wire` into [`Point`](crate::Point).
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
-use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
-use ::core::ops::ControlFlow;
 use ::puroro::{DecodeError, Message};
 use ::puroro_rt::decode::{LazyMessage, LazyScan, ScannedRecord, merge_scanned_field};
 use ::puroro_rt::{
-    CloneIn, DeallocateIn, DefaultIn, EncodeCtx, FieldCloneIn, FieldDeallocVisitor,
-    FieldVisitorMut, Implicit, LazyMessageCommon, MessageEncode, ProtoInt32, SingularField,
+    CloneIn, DeallocateIn, DefaultIn, EncodeCtx, FieldCloneIn, LazyMessageCommon, MessageEncode,
+    SingularField,
 };
 use ::std::vec::Vec;
 
 use crate::Point;
+use crate::PointLazy;
 use crate::point::{FIELD_X, FIELD_Y};
-
-/// Lazy `Point` with catalog numerical slots.
-pub struct PointLazy<A: Allocator = Global> {
-    _common: LazyMessageCommon<BitArray<[u8; 1], Lsb0>, A>,
-    x: SingularField<ProtoInt32, Implicit, { FIELD_X }, A>,
-    y: SingularField<ProtoInt32, Implicit, { FIELD_Y }, A>,
-}
 
 impl<A: Allocator + Clone + Default> Default for PointLazy<A> {
     fn default() -> Self {
@@ -70,15 +65,6 @@ impl<A: Allocator> PointLazy<A> {
         let mut out = Vec::with_capacity(self.encoded_len()?);
         self.encode(&mut out)?;
         Ok(out)
-    }
-
-    fn visit_fields_mut<V: FieldVisitorMut<LazyMessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
-        &mut self,
-        v: &mut V,
-    ) -> ControlFlow<V::Break> {
-        v.visit("x", &mut self.x)?;
-        v.visit("y", &mut self.y)?;
-        ControlFlow::Continue(())
     }
 }
 
@@ -184,13 +170,5 @@ impl<A: Allocator + Clone> DefaultIn<A> for PointLazy<A> {
     #[inline]
     fn default_in(alloc: A) -> Self {
         Self::new_in(alloc)
-    }
-}
-
-impl<A: Allocator> Drop for PointLazy<A> {
-    fn drop(&mut self) {
-        let mut v = FieldDeallocVisitor::new(&self._common);
-        let _ = self.visit_fields_mut(&mut v);
-        self._common.deallocate();
     }
 }
