@@ -8,7 +8,6 @@ mod fallible;
 pub(crate) mod layout;
 mod lazy;
 pub mod notification;
-mod notification_lazy;
 
 pub use fallible::TaskMessageFallible;
 pub use layout::TaskLayout;

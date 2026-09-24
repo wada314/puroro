@@ -1,50 +1,36 @@
-//! Per-ingest associated types for [`AddressImpl`](crate::address_type::AddressImpl).
+//! Per-ingest **kinds** for [`AddressImpl`](crate::address_type::AddressImpl).
 //!
-//! Numericals stay on the struct. String slots change with `L`.
+//! Numericals stay on the struct. This trait only names the string value
+//! slots that change (`InlineOrHeap` vs `WireOrSso`).
+//!
+//! Not a [`MessageScan`](::puroro_rt::decode::MessageScan) supertrait: eager
+//! parents name [`AddressLazy`](crate::AddressLazy) as a child type, which must
+//! stay well-formed without `A: Clone`.
 
 use ::allocator_api2::alloc::Allocator;
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::puroro_rt::{
-    BitStorage, Eager, Explicit, FieldDeallocate, InlineOrHeap, InteriorBitArray, Lazy,
-    MessageCommon, ProtoString, SingularField, UnknownFields, WireOrSso,
+    BitStorage, Eager, InlineOrHeap, InteriorBitArray, Lazy, ProtoString, ValueLayout, WireOrSso,
 };
 
-use super::{
-    BIT_CITY, BIT_CITY_LAZY_KIND, BIT_CITY_SSO, BIT_STREET, BIT_STREET_LAZY_KIND, BIT_STREET_SSO,
-    FIELD_CITY, FIELD_STREET,
-};
+use super::{BIT_CITY_LAZY_KIND, BIT_CITY_SSO, BIT_STREET_LAZY_KIND, BIT_STREET_SSO};
 
-/// Field wrappers that change between eager `Address` and lazy `AddressLazy`.
-///
-/// Not a [`MessageScan`](::puroro_rt::decode::MessageScan) supertrait: eager
-/// parents name [`AddressLazy`](crate::AddressLazy) as a child type, which must
-/// stay well-formed without `A: Clone`.
+/// Catalog kinds that change between eager `Address` and lazy `AddressLazy`.
 pub trait AddressLayout<A: Allocator>: Sized {
     type Bits: Default + Clone + BitStorage;
 
-    type Street: FieldDeallocate<MessageCommon<Self::Bits, A, UnknownFields<A>, Self>>;
-    type City: FieldDeallocate<MessageCommon<Self::Bits, A, UnknownFields<A>, Self>>;
+    /// Singular string slot (`InlineOrHeap<{SSO}>` or `WireOrSso<{KIND}>`).
+    type StreetLen: ValueLayout<ProtoString, A>;
+    type CityLen: ValueLayout<ProtoString, A>;
 
     fn empty_bits() -> Self::Bits;
 }
 
 impl<A: Allocator> AddressLayout<A> for Eager {
     type Bits = BitArray<[u8; 1], Lsb0>;
-    type Street = SingularField<
-        ProtoString,
-        Explicit<{ BIT_STREET }>,
-        { FIELD_STREET },
-        A,
-        InlineOrHeap<{ BIT_STREET_SSO }>,
-    >;
-    type City = SingularField<
-        ProtoString,
-        Explicit<{ BIT_CITY }>,
-        { FIELD_CITY },
-        A,
-        InlineOrHeap<{ BIT_CITY_SSO }>,
-    >;
+    type StreetLen = InlineOrHeap<{ BIT_STREET_SSO }>;
+    type CityLen = InlineOrHeap<{ BIT_CITY_SSO }>;
 
     #[inline]
     fn empty_bits() -> Self::Bits {
@@ -54,20 +40,8 @@ impl<A: Allocator> AddressLayout<A> for Eager {
 
 impl<A: Allocator> AddressLayout<A> for Lazy<A> {
     type Bits = InteriorBitArray<2>;
-    type Street = SingularField<
-        ProtoString,
-        Explicit<{ BIT_STREET }>,
-        { FIELD_STREET },
-        A,
-        WireOrSso<{ BIT_STREET_LAZY_KIND }>,
-    >;
-    type City = SingularField<
-        ProtoString,
-        Explicit<{ BIT_CITY }>,
-        { FIELD_CITY },
-        A,
-        WireOrSso<{ BIT_CITY_LAZY_KIND }>,
-    >;
+    type StreetLen = WireOrSso<{ BIT_STREET_LAZY_KIND }>;
+    type CityLen = WireOrSso<{ BIT_CITY_LAZY_KIND }>;
 
     #[inline]
     fn empty_bits() -> Self::Bits {

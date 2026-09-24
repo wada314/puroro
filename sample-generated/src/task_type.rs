@@ -91,7 +91,7 @@ pub struct TaskImpl<A: Allocator = Global, L: TaskLayout<A> = Eager> {
     // proto: oneof notification { string email_address=12; string phone_number=13;
     //                             int32 webhook_id=14 [default=-1]; Address postal=15;
     //                             bool urgent=18; }
-    pub(crate) notification: OneofSlot<L::Notification>,
+    pub(crate) notification: OneofSlot<NotificationStorage<A, L>>,
     pub(crate) done:
         SingularField<ProtoBool, Implicit, { FIELD_DONE }, A, BitPacked<{ BIT_DONE_VALUE }>>, // proto: bool done = 16;
     pub(crate) flag: SingularField<
@@ -214,7 +214,10 @@ impl<A: Allocator> Task<A> {
         Case = NotificationCase,
         Ref = Notification<&'a str, &'a str, i32, &'a Address<A>, bool>,
     > + 'a {
-        ::puroro_rt::OneofView::<NotificationStorage<A>>::new(&self.notification, &self._common)
+        ::puroro_rt::OneofView::<NotificationStorage<A, Eager>>::new(
+            &self.notification,
+            &self._common,
+        )
     }
 
     pub fn email_address<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>>
@@ -572,7 +575,7 @@ impl<A: Allocator + Clone> Task<A> {
     /// `puroro-rt` mut handles do not appear in this signature — prefer per-variant
     /// `_mut` accessors for typed mutation.
     pub fn notification_mut<'a>(&'a mut self) -> impl OneofViewMut<Case = NotificationCase> + 'a {
-        ::puroro_rt::OneofViewMut::<NotificationStorage<A>>::new(
+        ::puroro_rt::OneofViewMut::<NotificationStorage<A, Eager>>::new(
             &mut self.notification,
             &mut self._common,
         )

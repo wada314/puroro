@@ -7,7 +7,7 @@
 //! - singular string / bytes value slot (`InlineOrHeap` vs `WireOrSso`)
 //! - repeated / map storage (`*Ready` vs `*Spans`)
 //! - nested message type (`*Impl<A, Eager>` vs `*Impl<A, Lazy<A>>`)
-//! - oneof storage
+//! - oneof string slots and `postal` child
 //!
 //! Field wrappers themselves live on [`TaskImpl`](crate::task_type::TaskImpl).
 
@@ -17,18 +17,16 @@ use ::bitvec::order::Lsb0;
 use ::puroro_rt::decode::MessageScan;
 use ::puroro_rt::{
     BitStorage, DeallocateBound, DeallocateIn, Eager, Expanded, InlineOrHeap, InteriorBitArray,
-    Lazy, MapLayout, MapReady, MapSpans, MessageCommon, MessageEncode, OneofDeallocate, ProtoBytes,
-    ProtoInt32, ProtoString, RepeatedLayout, RepeatedReady, RepeatedSpans, UnknownFields,
-    ValueLayout, WireOrSso,
+    Lazy, MapLayout, MapReady, MapSpans, MessageEncode, ProtoBytes, ProtoInt32, ProtoString,
+    RepeatedLayout, RepeatedReady, RepeatedSpans, ValueLayout, WireOrSso,
 };
 
 use crate::AddressImpl;
 use crate::PointImpl;
 
-use super::notification::NotificationStorage;
-use super::notification_lazy::NotificationLazyStorage;
 use super::{
-    BIT_OWNER_ID_LAZY_KIND, BIT_OWNER_ID_SSO, BIT_PAYLOAD_LAZY_KIND, BIT_PAYLOAD_SSO,
+    BIT_EMAIL_ADDRESS_LAZY_KIND, BIT_EMAIL_ADDRESS_SSO, BIT_OWNER_ID_LAZY_KIND, BIT_OWNER_ID_SSO,
+    BIT_PAYLOAD_LAZY_KIND, BIT_PAYLOAD_SSO, BIT_PHONE_NUMBER_LAZY_KIND, BIT_PHONE_NUMBER_SSO,
     BIT_TITLE_LAZY_KIND, BIT_TITLE_SSO, FIELD_ATTRIBUTES, FIELD_LABELS,
 };
 
@@ -52,7 +50,11 @@ pub trait TaskLayout<A: Allocator>: MessageScan<A> + Sized {
     /// Nested `watchers` element (`AddressImpl<A, Eager>` or `AddressImpl<A, Lazy<A>>`).
     type WatchersMsg: MessageEncode + DeallocateBound<A> + DeallocateIn<A>;
 
-    type Notification: OneofDeallocate<MessageCommon<Self::Bits, A, UnknownFields<A>, Self>>;
+    /// `notification` string slots (`InlineOrHeap<{SSO}>` or `WireOrSso<{KIND}>`).
+    type EmailLen: ValueLayout<ProtoString, A>;
+    type PhoneLen: ValueLayout<ProtoString, A>;
+    /// `notification.postal` (`AddressImpl<A, Eager>` or `AddressImpl<A, Lazy<A>>`).
+    type PostalMsg: MessageEncode + DeallocateBound<A> + DeallocateIn<A>;
 
     fn empty_bits() -> Self::Bits;
 }
@@ -66,7 +68,9 @@ impl<A: Allocator> TaskLayout<A> for Eager {
     type Map = MapReady;
     type OriginMsg = PointImpl<A, Eager>;
     type WatchersMsg = AddressImpl<A, Eager>;
-    type Notification = NotificationStorage<A>;
+    type EmailLen = InlineOrHeap<{ BIT_EMAIL_ADDRESS_SSO }>;
+    type PhoneLen = InlineOrHeap<{ BIT_PHONE_NUMBER_SSO }>;
+    type PostalMsg = AddressImpl<A, Eager>;
 
     #[inline]
     fn empty_bits() -> Self::Bits {
@@ -83,7 +87,9 @@ impl<A: Allocator + Clone> TaskLayout<A> for Lazy<A> {
     type Map = MapSpans;
     type OriginMsg = PointImpl<A, Lazy<A>>;
     type WatchersMsg = AddressImpl<A, Lazy<A>>;
-    type Notification = NotificationLazyStorage<A>;
+    type EmailLen = WireOrSso<{ BIT_EMAIL_ADDRESS_LAZY_KIND }>;
+    type PhoneLen = WireOrSso<{ BIT_PHONE_NUMBER_LAZY_KIND }>;
+    type PostalMsg = AddressImpl<A, Lazy<A>>;
 
     #[inline]
     fn empty_bits() -> Self::Bits {

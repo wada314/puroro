@@ -63,15 +63,17 @@ use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::BufMut;
 use ::puroro_rt::{
-    BitPacked, FieldCloneIn, FieldDeallocate, FieldEncode, Inline, InlineOrHeap, MessageCommon,
-    MessageCommonAlloc, MessageCommonBits, Oneof, OneofDeallocate, OneofEncodable, OneofGroup,
-    OneofVariant, ProtoBool, ProtoInt32, ProtoMessage, ProtoString, SingularField,
-    SingularFieldAccess, UnknownFields, UnknownStore,
+    BitPacked, FieldCloneIn, FieldDeallocate, FieldEncode, Inline, InlineOrHeap, InteriorBitArray,
+    Lazy, MessageCommon, MessageCommonAlloc, MessageCommonBits, Oneof, OneofDeallocate,
+    OneofEncodable, OneofGroup, OneofVariant, ProtoBool, ProtoInt32, ProtoMessage, ProtoString,
+    SingularField, SingularFieldAccess, UnknownFields, UnknownStore, WireOrSso,
 };
 
 use crate::Address;
+use crate::AddressLazy;
 
 use super::defaults::WebhookIdDefault;
+use super::layout::TaskLayout;
 
 /// Canonical shape for `oneof notification`.
 ///
@@ -101,23 +103,24 @@ pub enum NotificationCase {
     Urgent,
 }
 
-type EmailAddressField<A> = SingularField<
+type EmailAddressField<A, L> = SingularField<
     ProtoString,
     Oneof,
     { super::FIELD_EMAIL_ADDRESS },
     A,
-    InlineOrHeap<{ super::BIT_EMAIL_ADDRESS_SSO }>,
+    <L as TaskLayout<A>>::EmailLen,
 >;
-type PhoneNumberField<A> = SingularField<
+type PhoneNumberField<A, L> = SingularField<
     ProtoString,
     Oneof,
     { super::FIELD_PHONE_NUMBER },
     A,
-    InlineOrHeap<{ super::BIT_PHONE_NUMBER_SSO }>,
+    <L as TaskLayout<A>>::PhoneLen,
 >;
 type WebhookIdField<A> =
     SingularField<ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }, A, Inline, WebhookIdDefault>;
-type PostalField<A> = SingularField<ProtoMessage<Address<A>>, Oneof, { super::FIELD_POSTAL }, A>;
+type PostalField<A, L> =
+    SingularField<ProtoMessage<<L as TaskLayout<A>>::PostalMsg>, Oneof, { super::FIELD_POSTAL }, A>;
 type UrgentField<A> = SingularField<
     ProtoBool,
     Oneof,
@@ -127,15 +130,39 @@ type UrgentField<A> = SingularField<
 >;
 
 /// Owned storage for `oneof notification` (crate-internal).
-pub(crate) type NotificationStorage<A> = Notification<
-    EmailAddressField<A>,
-    PhoneNumberField<A>,
+///
+/// `L` selects string slots and the `postal` child. [`OneofGroup`] stay
+/// separate for [`Eager`](::puroro_rt::Eager) / [`Lazy`](::puroro_rt::Lazy)
+/// because the bound views differ (lazy is read-oriented).
+pub(crate) type NotificationStorage<A, L = ::puroro_rt::Eager> = Notification<
+    EmailAddressField<A, L>,
+    PhoneNumberField<A, L>,
     WebhookIdField<A>,
-    PostalField<A>,
+    PostalField<A, L>,
     UrgentField<A>,
 >;
 
-impl<A: Allocator> OneofGroup for NotificationStorage<A> {
+impl<A: Allocator> OneofGroup
+    for Notification<
+        SingularField<
+            ProtoString,
+            Oneof,
+            { super::FIELD_EMAIL_ADDRESS },
+            A,
+            InlineOrHeap<{ super::BIT_EMAIL_ADDRESS_SSO }>,
+        >,
+        SingularField<
+            ProtoString,
+            Oneof,
+            { super::FIELD_PHONE_NUMBER },
+            A,
+            InlineOrHeap<{ super::BIT_PHONE_NUMBER_SSO }>,
+        >,
+        WebhookIdField<A>,
+        SingularField<ProtoMessage<Address<A>>, Oneof, { super::FIELD_POSTAL }, A>,
+        UrgentField<A>,
+    >
+{
     type Case = NotificationCase;
     type Ref<'a>
         = Notification<&'a str, &'a str, i32, &'a Address<A>, bool>
@@ -143,10 +170,10 @@ impl<A: Allocator> OneofGroup for NotificationStorage<A> {
         A: 'a;
     type Mut<'a>
         = Notification<
-        <EmailAddressField<A> as SingularFieldAccess>::Mut<'a>,
-        <PhoneNumberField<A> as SingularFieldAccess>::Mut<'a>,
+        <EmailAddressField<A, ::puroro_rt::Eager> as SingularFieldAccess>::Mut<'a>,
+        <PhoneNumberField<A, ::puroro_rt::Eager> as SingularFieldAccess>::Mut<'a>,
         <WebhookIdField<A> as SingularFieldAccess>::Mut<'a>,
-        <PostalField<A> as SingularFieldAccess>::Mut<'a>,
+        <PostalField<A, ::puroro_rt::Eager> as SingularFieldAccess>::Mut<'a>,
         <UrgentField<A> as SingularFieldAccess>::Mut<'a>,
     >
     where
@@ -220,6 +247,99 @@ impl<A: Allocator> OneofGroup for NotificationStorage<A> {
     {
         common.set_bit(super::BIT_EMAIL_ADDRESS_SSO, false);
         common.set_bit(super::BIT_PHONE_NUMBER_SSO, false);
+        common.set_bit(super::BIT_URGENT_VALUE, false);
+    }
+}
+
+impl<A: Allocator + Clone> OneofGroup
+    for Notification<
+        SingularField<
+            ProtoString,
+            Oneof,
+            { super::FIELD_EMAIL_ADDRESS },
+            A,
+            WireOrSso<{ super::BIT_EMAIL_ADDRESS_LAZY_KIND }>,
+        >,
+        SingularField<
+            ProtoString,
+            Oneof,
+            { super::FIELD_PHONE_NUMBER },
+            A,
+            WireOrSso<{ super::BIT_PHONE_NUMBER_LAZY_KIND }>,
+        >,
+        WebhookIdField<A>,
+        SingularField<ProtoMessage<AddressLazy<A>>, Oneof, { super::FIELD_POSTAL }, A>,
+        UrgentField<A>,
+    >
+{
+    type Case = NotificationCase;
+    type Ref<'a>
+        = NotificationCase
+    where
+        A: 'a;
+    type Mut<'a>
+        = ()
+    where
+        A: 'a;
+    type Bits = InteriorBitArray<4>;
+    type Alloc = A;
+    type Unknown = UnknownFields<A>;
+    type Layout = Lazy<A>;
+
+    fn case(storage: &Self) -> Self::Case {
+        match storage {
+            Self::EmailAddress(_) => NotificationCase::EmailAddress,
+            Self::PhoneNumber(_) => NotificationCase::PhoneNumber,
+            Self::WebhookId(_) => NotificationCase::WebhookId,
+            Self::Postal(_) => NotificationCase::Postal,
+            Self::Urgent(_) => NotificationCase::Urgent,
+        }
+    }
+
+    fn to_ref<'a>(
+        storage: &'a Self,
+        _common: &'a MessageCommon<Self::Bits, Self::Alloc, Self::Unknown, Self::Layout>,
+    ) -> Self::Ref<'a> {
+        Self::case(storage)
+    }
+
+    fn to_mut<'a>(
+        _storage: &'a mut Self,
+        _common: &'a mut MessageCommon<Self::Bits, Self::Alloc, Self::Unknown, Self::Layout>,
+    ) -> Self::Mut<'a>
+    where
+        A: Clone,
+    {
+    }
+
+    fn clone_storage_in(
+        storage: &Self,
+        common: &MessageCommon<Self::Bits, Self::Alloc, Self::Unknown, Self::Layout>,
+        alloc: Self::Alloc,
+    ) -> Self
+    where
+        A: Clone,
+    {
+        match storage {
+            Self::EmailAddress(f) => {
+                Self::EmailAddress(FieldCloneIn::clone_field(f, common, alloc))
+            }
+            Self::PhoneNumber(f) => Self::PhoneNumber(FieldCloneIn::clone_field(f, common, alloc)),
+            Self::WebhookId(f) => Self::WebhookId(FieldCloneIn::clone_field(f, common, alloc)),
+            Self::Postal(f) => Self::Postal(FieldCloneIn::clone_field(f, common, alloc)),
+            Self::Urgent(f) => Self::Urgent(FieldCloneIn::clone_field(f, common, alloc)),
+        }
+    }
+
+    fn after_deallocate(
+        common: &mut MessageCommon<Self::Bits, Self::Alloc, Self::Unknown, Self::Layout>,
+    ) where
+        A: Clone,
+    {
+        common.set_bit(super::BIT_EMAIL_ADDRESS_LAZY_KIND, false);
+        common.set_bit(super::BIT_EMAIL_ADDRESS_LAZY_KIND + 1, false);
+        common.set_bit(super::BIT_PHONE_NUMBER_LAZY_KIND, false);
+        common.set_bit(super::BIT_PHONE_NUMBER_LAZY_KIND + 1, false);
         common.set_bit(super::BIT_URGENT_VALUE, false);
     }
 }
@@ -344,7 +464,27 @@ impl<Ea, Pn, Wh, Po, Ur> OneofVariant<{ super::FIELD_URGENT }>
     }
 }
 
-impl<A: Allocator> OneofEncodable<A> for NotificationStorage<A> {
+impl<A: Allocator> OneofEncodable<A>
+    for Notification<
+        SingularField<
+            ProtoString,
+            Oneof,
+            { super::FIELD_EMAIL_ADDRESS },
+            A,
+            InlineOrHeap<{ super::BIT_EMAIL_ADDRESS_SSO }>,
+        >,
+        SingularField<
+            ProtoString,
+            Oneof,
+            { super::FIELD_PHONE_NUMBER },
+            A,
+            InlineOrHeap<{ super::BIT_PHONE_NUMBER_SSO }>,
+        >,
+        WebhookIdField<A>,
+        SingularField<ProtoMessage<Address<A>>, Oneof, { super::FIELD_POSTAL }, A>,
+        UrgentField<A>,
+    >
+{
     fn encoded_len<P, U: UnknownStore<A>>(
         &self,
         common: &MessageCommon<P, A, U>,
@@ -380,15 +520,18 @@ impl<A: Allocator> OneofEncodable<A> for NotificationStorage<A> {
     }
 }
 
-impl<A: Allocator, P, U: UnknownStore<A>> OneofDeallocate<MessageCommon<P, A, U>>
-    for NotificationStorage<A>
+impl<Ea, Pn, Wh, Po, Ur, C> OneofDeallocate<C> for Notification<Ea, Pn, Wh, Po, Ur>
 where
-    MessageCommon<P, A, U>: MessageCommonBits,
+    Ea: FieldDeallocate<C>,
+    Pn: FieldDeallocate<C>,
+    Wh: FieldDeallocate<C>,
+    Po: FieldDeallocate<C>,
+    Ur: FieldDeallocate<C>,
 {
     /// # Safety
     ///
     /// `common.alloc` must be the allocator that owns the variant's buffer.
-    unsafe fn deallocate(self, common: &MessageCommon<P, A, U>) {
+    unsafe fn deallocate(self, common: &C) {
         match self {
             Self::EmailAddress(mut f) => f.deallocate(common),
             Self::PhoneNumber(mut f) => f.deallocate(common),

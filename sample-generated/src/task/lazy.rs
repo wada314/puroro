@@ -14,7 +14,7 @@ use ::puroro_rt::{
     SingularField,
 };
 
-use super::notification_lazy::NotificationLazyStorage;
+use super::notification::NotificationStorage;
 use crate::AddressLazy;
 use crate::PointLazy;
 use crate::Task;
@@ -181,7 +181,7 @@ impl<A: Allocator + Clone> TaskLazy<A> {
         Ok(self
             .notification
             .as_ref()
-            .map(NotificationLazyStorage::case))
+            .map(NotificationStorage::<A, ::puroro_rt::Lazy<A>>::case))
     }
 
     pub fn email_address(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>

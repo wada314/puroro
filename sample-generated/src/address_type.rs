@@ -17,12 +17,13 @@ use puroro_rt::{
     CloneFieldsVisitor, CloneIn, DebugStructVisitor, Eager, EncodeCtx, EncodeRawVisitor,
     EncodedLenVisitor, Explicit, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor,
     FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Lazy, MessageCommon, MessageEncode,
-    MessageMerge, ProtoDouble, ProtoFixed32, SingularField, UnknownFields,
+    MessageMerge, ProtoDouble, ProtoFixed32, ProtoString, SingularField, UnknownFields,
 };
 
 use crate::address::AddressLayout;
 use crate::address::{
-    BIT_LATITUDE, BIT_POSTAL_CODE, FIELD_CITY, FIELD_LATITUDE, FIELD_POSTAL_CODE, FIELD_STREET,
+    BIT_CITY, BIT_LATITUDE, BIT_POSTAL_CODE, BIT_STREET, FIELD_CITY, FIELD_LATITUDE,
+    FIELD_POSTAL_CODE, FIELD_STREET,
 };
 
 // ---------------------------------------------------------------------------
@@ -31,8 +32,10 @@ use crate::address::{
 
 pub struct AddressImpl<A: Allocator = Global, L: AddressLayout<A> = Eager> {
     pub(crate) _common: MessageCommon<L::Bits, A, UnknownFields<A>, L>,
-    pub(crate) street: L::Street,
-    pub(crate) city: L::City,
+    pub(crate) street:
+        SingularField<ProtoString, Explicit<{ BIT_STREET }>, { FIELD_STREET }, A, L::StreetLen>, // proto: string street = 1;
+    pub(crate) city:
+        SingularField<ProtoString, Explicit<{ BIT_CITY }>, { FIELD_CITY }, A, L::CityLen>, // proto: string city = 2;
     pub(crate) postal_code:
         SingularField<ProtoFixed32, Explicit<{ BIT_POSTAL_CODE }>, { FIELD_POSTAL_CODE }, A>, // proto: fixed32 postal_code = 3;
     pub(crate) latitude:
