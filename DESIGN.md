@@ -216,7 +216,7 @@ This section is the normative reference for what the code generator emits. All f
 This section is the **normative** eager-path shape. Hand-written [`sample-generated/`](sample-generated/) is the reference implementation of that shape; the live `protoc-gen-puroro` plugin emits the same eager-path field families (status: [IMPLEMENTATION.md §3](IMPLEMENTATION.md#3-implementation-status)). Deliberate sample-vs-production differences — flat modules, short-name `use`s, no `@generated` header — are documented there and in [IMPLEMENTATION.md §9](IMPLEMENTATION.md#9-struct-layout). For each message type the generator must emit:
 
 1. **The primary struct** — a full-featured owned implementation (§4.0–4.10), internally a product of **`puroro_rt::fields` catalog types** + shared `MessageCommon` (see [IMPLEMENTATION.md §2](IMPLEMENTATION.md#2-architecture-overview)). Field accessors are **inherent methods** on that struct.
-2. **(Future) Per-message traits + specialized structs** — `FooMessage` / `FooMessageFallible` and alternative layouts (`TaskLazy`, `TaskView`) for generic interoperability across implementations ([§8](#8-future-work)). They are **not** part of the eager path; [`sample-generated/`](sample-generated/) remains the normative shape until then.
+2. **(Future) Per-message traits + specialized structs** — `foo::Message` / `foo::MessageFallible` (in that message's companion module) and alternative layouts (`TaskLazy`, `TaskView`) for generic interoperability across implementations ([§8](#8-future-work)). They are **not** part of the eager path; [`sample-generated/`](sample-generated/) remains the normative shape until then.
 
 Generated Rust is not hand-edited. Navigational comments in generated output are **not required**; semantics and usage are documented on the library API (`puroro` / `puroro-rt` rustdoc) and in this document / [IMPLEMENTATION.md](IMPLEMENTATION.md). Production modules still carry an `@generated` file header ([IMPLEMENTATION.md §9](IMPLEMENTATION.md#generated-headers)). Reference shape: [`sample-generated/`](sample-generated/).
 
@@ -237,6 +237,8 @@ Generated Rust is not hand-edited. Navigational comments in generated output are
 | `oneof notification` inside `Task` | Submodule `example::v1::task::notification` (see [§4.7](#47-oneof-fields)) |
 
 Do **not** `pub use` a nested type into the same module as its parent struct. That is what would make `message Foo { message Foo {} }` (and `message Foo { enum Foo {} }`) collide.
+
+**Companion item names omit the message.** The companion module is already the namespace, so generated items there do not repeat the message's Pascal name. For `message Task` the paths are `task::Inner`, `task::Kind`, `task::notification::Notification`, `task::MaxRetriesDefault` — not `TaskInner` / `TaskNotification` / `TaskMaxRetriesDefault`. The same rule covers message-local traits: `task::Message` and `task::MessageFallible`, not `TaskMessage` / `TaskMessageFallible`. The hand-written sample's ingest-kind trait follows it too (`task::Layout`, `address::Layout`, `point::Layout`); the plugin does not emit that trait yet. Do not `pub use` these into the parent next to the struct. `Message` would sit beside `puroro::Message`, and `Layout` / `MessageFallible` would collide across messages. Callers qualify them (`task::MessageFallible`). `Layout` and `MessageFallible` are generic identifiers; keep the companion module in the path rather than importing the bare name.
 
 Message-typed *fields* (e.g. `Address assignee`) reference sibling generated types by path; they do **not** by themselves create a nested module under the parent message.
 
@@ -312,7 +314,7 @@ If a new public API would need a `puroro-rt` name, **add or reexport a stable st
 
 ### 4.0 Inherent accessors (current)
 
-The normative generated API is the concrete message struct's inherent `impl` block. Sample messages ([`Task`](sample-generated/src/task_type.rs) / [`School`](sample-generated/src/school_type.rs) / [`Student`](sample-generated/src/student_type.rs) / [`Point`](sample-generated/src/point_type.rs) / [`Address`](sample-generated/src/address_type.rs)) are owned-only (`Drop` / `Message`); an inlined child is a full `M`, not a view over a shared parent common. Per-message traits (`FooMessage` / `FooMessageFallible`) stay [§8](#8-future-work). Callers of today's generated plugin output use the concrete type (or [`Message`](#message) for codec / infrastructure).
+The normative generated API is the concrete message struct's inherent `impl` block. Sample messages ([`Task`](sample-generated/src/task_type.rs) / [`School`](sample-generated/src/school_type.rs) / [`Student`](sample-generated/src/student_type.rs) / [`Point`](sample-generated/src/point_type.rs) / [`Address`](sample-generated/src/address_type.rs)) are owned-only (`Drop` / `Message`); an inlined child is a full `M`, not a view over a shared parent common. Per-message traits (`foo::Message` / `foo::MessageFallible`, in the companion) stay [§8](#8-future-work). Callers of today's generated plugin output use the concrete type (or [`Message`](#message) for codec / infrastructure).
 
 **Read / write shape (eager `Task<A>`):**
 
@@ -1204,7 +1206,7 @@ Repeated field accessors return a reference to a contiguous sequence rather than
 
 ### Inherent accessors as the current public contract
 
-Today the generator emits only the concrete struct and its inherent accessors ([§4.0](#40-inherent-accessors-current)). Per-message traits (`FooMessage` / `FooMessageFallible`) are reserved for [§8](#8-future-work) so that eager, lazy, and view layouts can share one generic read API later. Plugin-generated generic code still uses [`Message`](#message) for codec / infrastructure, or is monomorphised over the concrete type for field access.
+Today the generator emits only the concrete struct and its inherent accessors ([§4.0](#40-inherent-accessors-current)). Per-message traits (`foo::Message` / `foo::MessageFallible`, in the companion) are reserved for [§8](#8-future-work) so that eager, lazy, and view layouts can share one generic read API later. Plugin-generated generic code still uses [`Message`](#message) for codec / infrastructure, or is monomorphised over the concrete type for field access.
 
 ### `Default` bound on `Message::decode`
 
@@ -1220,7 +1222,7 @@ Groups (`SGroup` / `EGroup`) are not generated and are not stored in unknown fie
 
 ### Module layout: package-first, rename when needed
 
-Protobuf `package` is the primary Rust module hierarchy. Message structs live in the package module (or a parent message's companion). Snake_case submodules are companions for `FIELD_*` / nested types / oneofs, and are merged when distinct proto identities map to the same path; item-level clashes are left to `rustc`. Users who want a different path use generate-time rename options (not `.proto` options). Cross-references inside the forest use `self::_root::…`. Details: [§4 Module layout and naming](#module-layout-and-naming), [Path qualification](#path-qualification).
+Protobuf `package` is the primary Rust module hierarchy. Message structs live in the package module (or a parent message's companion). Snake_case submodules are companions for `FIELD_*` / nested types / oneofs / message-local traits (`Message`, `MessageFallible`), and items in a companion omit the message name. Companions are merged when distinct proto identities map to the same path; item-level clashes are left to `rustc`. Users who want a different path use generate-time rename options (not `.proto` options). Cross-references inside the forest use `self::_root::…`. Details: [§4 Module layout and naming](#module-layout-and-naming), [Path qualification](#path-qualification).
 
 ### `protoc` plugin as the primary codegen path
 
@@ -1242,20 +1244,20 @@ Eager `Task<A>` stores decoded field data in allocator-less `unmanaged` containe
 
 Planned interoperability traits, emitted per message once specialized layouts land:
 
-- **`FooMessage`** — infallible getters matching the inherent shapes in [§4.0](#40-inherent-accessors-current) (for eager implementations).
-- **`FooMessageFallible`** — `Result`-returning getters for lazy / view layouts (`Error = DecodeError` or `Infallible` on eager).
+- **`foo::Message`** — infallible getters matching the inherent shapes in [§4.0](#40-inherent-accessors-current) (for eager implementations). Defined in the companion (`task::Message` for `message Task`). Not re-exported beside the struct.
+- **`foo::MessageFallible`** — `Result`-returning getters for lazy / view layouts (`Error = DecodeError` or `Infallible` on eager). Same placement (`task::MessageFallible`).
 
-These traits are **not** yet emitted by `protoc-gen-puroro`. The hand-written [`sample-generated`](sample-generated/) crate implements [`TaskMessageFallible`](sample-generated/src/task/fallible.rs) on eager `Task` (`Error = Infallible`). [`TaskLazy`](sample-generated/src/task/lazy.rs) currently exposes numerical getters, singular `title` / `owner_id` / `payload` via `WireOrSso`, nested `assignee` / `origin` / `watchers` as [`AddressLazy`](sample-generated/src/address/lazy.rs) / [`PointLazy`](sample-generated/src/point/lazy.rs), and `attributes` as a map-entry offset list ([`LazyMapField`](puroro-rt/src/fields/map/lazy.rs)) that materialises on first get. Successive singular message LENs merge into the still-lazy child during the parent scan; the child shares the island-root [`SharedWire`](puroro-rt/src/decode/shared_wire.rs) and does not copy the LEN payload. `into_eager` replays `_wire` into eager `Task`; finished encode writes `_wire` as-is. Oneof / repeated string getters are still skipped; the type does not implement the trait yet. Other sample messages do not implement the traits. When the generator adds the traits, explicit-presence fields should keep `Optional` as the primary read API; convenience `has_*` / `*_raw` wrappers (if any) would be trait defaults, not a second required surface on the concrete struct.
+These traits are **not** yet emitted by `protoc-gen-puroro`. The hand-written [`sample-generated`](sample-generated/) crate implements [`task::MessageFallible`](sample-generated/src/task/fallible.rs) on eager `Task` (`Error = Infallible`). [`TaskLazy`](sample-generated/src/task/lazy.rs) currently exposes numerical getters, singular `title` / `owner_id` / `payload` via `WireOrSso`, nested `assignee` / `origin` / `watchers` as [`AddressLazy`](sample-generated/src/address/lazy.rs) / [`PointLazy`](sample-generated/src/point/lazy.rs), and `attributes` as a map-entry offset list ([`LazyMapField`](puroro-rt/src/fields/map/lazy.rs)) that materialises on first get. Successive singular message LENs merge into the still-lazy child during the parent scan; the child shares the island-root [`SharedWire`](puroro-rt/src/decode/shared_wire.rs) and does not copy the LEN payload. `into_eager` replays `_wire` into eager `Task`; finished encode writes `_wire` as-is. Oneof / repeated string getters are still skipped; the type does not implement the trait yet. Other sample messages do not implement the traits. When the generator adds the traits, explicit-presence fields should keep `Optional` as the primary read API; convenience `has_*` / `*_raw` wrappers (if any) would be trait defaults, not a second required surface on the concrete struct.
 
 ### Specialized message implementations
 
-In addition to the primary `Task<A>` struct, the following specialized implementations are planned. Each would implement `TaskMessageFallible` (and possibly `TaskMessage`) and be interchangeable with `Task<A>` in generic code that depends only on the trait.
+In addition to the primary `Task<A>` struct, the following specialized implementations are planned. Each would implement `task::MessageFallible` (and possibly `task::Message`) and be interchangeable with `Task<A>` in generic code that depends only on the trait.
 
 #### `TaskLazy<A>` — lazy parse timing
 
 Implementation lock (2026-09-06): [`.cursor/plans/lazy-decoder.md`](.cursor/plans/lazy-decoder.md). That note supersedes the per-field rescan / `FieldCache` machine below until this section is rewritten.
 
-`TaskLazy<A>` would implement the same field surface as `Task<A>` via `TaskMessageFallible` (`Error = DecodeError`).  All decoding — wire scanning **and** semantic interpretation — is deferred until a getter runs.
+`TaskLazy<A>` would implement the same field surface as `Task<A>` via `task::MessageFallible` (`Error = DecodeError`).  All decoding — wire scanning **and** semantic interpretation — is deferred until a getter runs.
 
 ##### Wire buffer: `bytes::Bytes` (shared, sliceable)
 
@@ -1361,9 +1363,9 @@ There is no meaningful partial **semantic** decode within a singular string or s
 
 ##### Trait implementation
 
-- Implements `TaskMessageFallible` with `Error = DecodeError` (once that trait exists; see [Per-message traits](#per-message-traits-not-yet-generated)).
+- Implements `task::MessageFallible` with `Error = DecodeError` (once that trait exists; see [Per-message traits](#per-message-traits-not-yet-generated)).
 - Explicit-presence fields implement the fallible `Optional` getter; any `has_*` / `*_raw` conveniences would be trait defaults only.
-- Does **not** implement `TaskMessage` (infallible) — all access goes through the fallible trait.
+- Does **not** implement `task::Message` (infallible) — all access goes through the fallible trait.
 
 **Native methods beyond the trait:**
 
@@ -1376,7 +1378,7 @@ There is no meaningful partial **semantic** decode within a singular string or s
 - String / bytes fields return subslices into the input buffer.
 - Read-only; tied to buffer lifetime.
 - Fully lazy (scan on each access) or semi-eager (field-offset index built once).
-- Implements `TaskMessageFallible` with `Error = DecodeError`.
+- Implements `task::MessageFallible` with `Error = DecodeError`.
 - Repeated fields support early termination via fallible iterators.
 
 **Native methods beyond the trait:** `title() -> Result<&'buf str, …>` (buffer lifetime, not `&self`), `to_owned(alloc) -> Task<A>`, `tag_ids_raw() -> Result<&'buf [u8], …>`.
@@ -1384,18 +1386,18 @@ There is no meaningful partial **semantic** decode within a singular string or s
 #### Relationship between implementations
 
 ```
-TaskMessage (infallible trait)
+task::Message (infallible trait)
     ↑ impl
     Task<A>  ←── primary, all-in-one
 
-TaskMessageFallible (Result-returning trait)
+task::MessageFallible (Result-returning trait)
     ↑ impl
     Task<A>        (Error = Infallible)
     TaskLazy<A>    (Error = DecodeError)
     TaskView<'buf> (Error = DecodeError)
 ```
 
-Generic code that only reads fields can be written once against `TaskMessageFallible` and used with `Task<A>`, `TaskLazy<A>`, or `TaskView<'buf>`.
+Generic code that only reads fields can be written once against `task::MessageFallible` and used with `Task<A>`, `TaskLazy<A>`, or `TaskView<'buf>`.
 
 ---
 

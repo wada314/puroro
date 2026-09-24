@@ -44,7 +44,7 @@ packed fields show up in numbers.
   duplication hurts (step 9). Until then the sample types are `Task` and
   `TaskLazy`.
 
-- Shared generic read surface: `TaskMessageFallible` (`Error = Infallible` on
+- Shared generic read surface: `task::MessageFallible` (`Error = Infallible` on
   eager, `DecodeError` on lazy). Eager inherent `_mut` stays off the trait.
 - Lazy is **read-oriented**. Mutation is `into_eager(self) -> Result<Task<A>,
   DecodeError>` (and then the existing mut API). No lazy `_mut` in v1.
@@ -159,7 +159,7 @@ applied numericals / promoted SSO; unpromoted LEN stays offsets.
 One hard piece per step. Each step ends with tests that do not require the
 next step. Do not start the plugin until step 9.
 
-### Step 1 — `TaskMessageFallible` on eager `Task` (done 2026-09-06)
+### Step 1 — `task::MessageFallible` on eager `Task` (done 2026-09-06)
 
 Sample only. Getters match inherent shapes wrapped in `Result<_, Infallible>`
 (or an associated `Error`). No `_mut` on the trait.
@@ -291,7 +291,7 @@ lands here.
 **Done:** sample `TaskLazy` takes chunked or gathered input, `finish`es,
 numericals applied on the scan, string/bytes `WireOrSso`, nested + map as
 offsets, repeated `labels` as an offset list (first get materialises),
-`TaskMessageFallible` shared with eager.
+`task::MessageFallible` shared with eager.
 
 **Not done:** `TaskView`, lazy mutation, intra-field repeated cursors,
 zero-copy spanning LEN, plugin, layout unification, packed-as-unread-slice,

@@ -22,10 +22,9 @@ use puroro_rt::{
     ProtoInt32, SingularField, UnknownFields,
 };
 
-use crate::point::PointLayout;
-use crate::point::{FIELD_X, FIELD_Y};
+use crate::point::{self, FIELD_X, FIELD_Y};
 
-pub struct PointImpl<A: Allocator = Global, L: PointLayout<A> = Eager> {
+pub struct PointImpl<A: Allocator = Global, L: point::Layout<A> = Eager> {
     pub(crate) _common: MessageCommon<L::Bits, A, UnknownFields<A>, L>,
     pub(crate) x: SingularField<ProtoInt32, Implicit, { FIELD_X }, A>,
     pub(crate) y: SingularField<ProtoInt32, Implicit, { FIELD_Y }, A>,
@@ -157,7 +156,7 @@ impl<A: Allocator> fmt::Debug for Point<A> {
     }
 }
 
-impl<A: Allocator, L: PointLayout<A>> PointImpl<A, L> {
+impl<A: Allocator, L: point::Layout<A>> PointImpl<A, L> {
     fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<L::Bits, A, UnknownFields<A>, L>>>(
         &mut self,
         v: &mut V,
@@ -168,7 +167,7 @@ impl<A: Allocator, L: PointLayout<A>> PointImpl<A, L> {
     }
 }
 
-impl<A: Allocator, L: PointLayout<A>> Drop for PointImpl<A, L> {
+impl<A: Allocator, L: point::Layout<A>> Drop for PointImpl<A, L> {
     fn drop(&mut self) {
         let mut v = FieldDeallocVisitor::new(&self._common);
         let _ = self.visit_fields_mut(&mut v);

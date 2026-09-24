@@ -20,9 +20,8 @@ use puroro_rt::{
     MessageMerge, ProtoDouble, ProtoFixed32, ProtoString, SingularField, UnknownFields,
 };
 
-use crate::address::AddressLayout;
 use crate::address::{
-    BIT_CITY, BIT_LATITUDE, BIT_POSTAL_CODE, BIT_STREET, FIELD_CITY, FIELD_LATITUDE,
+    self, BIT_CITY, BIT_LATITUDE, BIT_POSTAL_CODE, BIT_STREET, FIELD_CITY, FIELD_LATITUDE,
     FIELD_POSTAL_CODE, FIELD_STREET,
 };
 
@@ -30,7 +29,7 @@ use crate::address::{
 // Message struct
 // ---------------------------------------------------------------------------
 
-pub struct AddressImpl<A: Allocator = Global, L: AddressLayout<A> = Eager> {
+pub struct AddressImpl<A: Allocator = Global, L: address::Layout<A> = Eager> {
     pub(crate) _common: MessageCommon<L::Bits, A, UnknownFields<A>, L>,
     pub(crate) street:
         SingularField<ProtoString, Explicit<{ BIT_STREET }>, { FIELD_STREET }, A, L::StreetLen>, // proto: string street = 1;
@@ -242,7 +241,7 @@ impl<A: Allocator> fmt::Debug for Address<A> {
 // Drop — releases every unmanaged field through the single allocator
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator, L: AddressLayout<A>> AddressImpl<A, L> {
+impl<A: Allocator, L: address::Layout<A>> AddressImpl<A, L> {
     fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<L::Bits, A, UnknownFields<A>, L>>>(
         &mut self,
         v: &mut V,
@@ -255,7 +254,7 @@ impl<A: Allocator, L: AddressLayout<A>> AddressImpl<A, L> {
     }
 }
 
-impl<A: Allocator, L: AddressLayout<A>> Drop for AddressImpl<A, L> {
+impl<A: Allocator, L: address::Layout<A>> Drop for AddressImpl<A, L> {
     fn drop(&mut self) {
         let mut v = FieldDeallocVisitor::new(&self._common);
         let _ = self.visit_fields_mut(&mut v);

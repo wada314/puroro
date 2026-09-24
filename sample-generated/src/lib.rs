@@ -20,7 +20,9 @@
 //! (`Task` / `TaskLazy` (`TaskImpl`), `Address` / `AddressLazy` (`AddressImpl`),
 //! `Point` / `PointLazy` (`PointImpl`), `School`, `Student`, `Marker`) — the parent of their
 //! snake_case companion modules (`address`, `task`, `school`, `student`,
-//! `point`, `marker`) which hold `FIELD_*` / `BIT_*`, defaults, and oneofs.
+//! `point`, `marker`) which hold `FIELD_*` / `BIT_*`, defaults, oneofs, and
+//! message-local traits (`Layout`, `MessageFallible`). Those items omit the
+//! message name and are not re-exported beside the struct.
 //! Production output follows the same rule under the protobuf `package`
 //! module. This sample stays flat (no `example::v1` prefix) for readability.
 //! The `*_type` files are a hand-written split so the crate root stays small;
@@ -48,13 +50,10 @@ mod school_type;
 mod student_type;
 mod task_type;
 
-pub use address::AddressLayout;
 pub use address_type::{Address, AddressImpl, AddressLazy};
 pub use enums::{Priority, Status};
 pub use marker_type::Marker;
-pub use point::PointLayout;
 pub use point_type::{Point, PointImpl, PointLazy};
 pub use school_type::School;
 pub use student_type::Student;
-pub use task::{TaskLayout, TaskMessageFallible};
 pub use task_type::{Task, TaskImpl, TaskLazy};

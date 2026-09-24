@@ -12,13 +12,13 @@ use ::puroro_rt::{BitStorage, Eager, Lazy};
 ///
 /// Not a [`MessageScan`](::puroro_rt::decode::MessageScan) supertrait: nested
 /// [`PointLazy`](crate::PointLazy) must stay well-formed without `A: Clone`.
-pub trait PointLayout<A: Allocator>: Sized {
+pub trait Layout<A: Allocator>: Sized {
     type Bits: Default + Clone + BitStorage;
 
     fn empty_bits() -> Self::Bits;
 }
 
-impl<A: Allocator> PointLayout<A> for Eager {
+impl<A: Allocator> Layout<A> for Eager {
     type Bits = BitArray<[u8; 1], Lsb0>;
 
     #[inline]
@@ -27,7 +27,7 @@ impl<A: Allocator> PointLayout<A> for Eager {
     }
 }
 
-impl<A: Allocator> PointLayout<A> for Lazy<A> {
+impl<A: Allocator> Layout<A> for Lazy<A> {
     type Bits = BitArray<[u8; 1], Lsb0>;
 
     #[inline]

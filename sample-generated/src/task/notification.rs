@@ -73,7 +73,7 @@ use crate::Address;
 use crate::AddressLazy;
 
 use super::defaults::WebhookIdDefault;
-use super::layout::TaskLayout;
+use super::layout;
 
 /// Canonical shape for `oneof notification`.
 ///
@@ -108,19 +108,23 @@ type EmailAddressField<A, L> = SingularField<
     Oneof,
     { super::FIELD_EMAIL_ADDRESS },
     A,
-    <L as TaskLayout<A>>::EmailLen,
+    <L as layout::Layout<A>>::EmailLen,
 >;
 type PhoneNumberField<A, L> = SingularField<
     ProtoString,
     Oneof,
     { super::FIELD_PHONE_NUMBER },
     A,
-    <L as TaskLayout<A>>::PhoneLen,
+    <L as layout::Layout<A>>::PhoneLen,
 >;
 type WebhookIdField<A> =
     SingularField<ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }, A, Inline, WebhookIdDefault>;
-type PostalField<A, L> =
-    SingularField<ProtoMessage<<L as TaskLayout<A>>::PostalMsg>, Oneof, { super::FIELD_POSTAL }, A>;
+type PostalField<A, L> = SingularField<
+    ProtoMessage<<L as layout::Layout<A>>::PostalMsg>,
+    Oneof,
+    { super::FIELD_POSTAL },
+    A,
+>;
 type UrgentField<A> = SingularField<
     ProtoBool,
     Oneof,

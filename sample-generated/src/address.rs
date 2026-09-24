@@ -6,7 +6,7 @@ pub(crate) mod defaults;
 pub(crate) mod layout;
 mod lazy;
 
-pub use layout::AddressLayout;
+pub use layout::Layout;
 
 // ---------------------------------------------------------------------------
 // Bit indices — presence then string SSO heap bits (1 = heap / 0 = inline),

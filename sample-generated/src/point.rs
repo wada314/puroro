@@ -5,7 +5,7 @@
 pub(crate) mod layout;
 mod lazy;
 
-pub use layout::PointLayout;
+pub use layout::Layout;
 
 pub const FIELD_X: u32 = 1; // x
 pub const FIELD_Y: u32 = 2; // y

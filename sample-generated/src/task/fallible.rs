@@ -14,7 +14,7 @@ use ::core::convert::Infallible;
 use ::core::ops::Deref;
 use ::puroro::{HasDefault, MapRef, OneofView, Optional};
 
-/// Shared `notification()` projection used by [`TaskMessageFallible`].
+/// Shared `notification()` projection used by [`MessageFallible`].
 type NotificationRef<'a, A> = Notification<&'a str, &'a str, i32, &'a Address<A>, bool>;
 
 /// Per-message fallible getters for `Task`.
@@ -22,7 +22,7 @@ type NotificationRef<'a, A> = Notification<&'a str, &'a str, i32, &'a Address<A>
 /// Call inherent methods on a concrete [`Task`](crate::Task) when you do not
 /// need the generic surface; they stay infallible and do not go through
 /// [`Result`].
-pub trait TaskMessageFallible {
+pub trait MessageFallible {
     type Error;
     type Alloc: Allocator;
 
@@ -56,7 +56,7 @@ pub trait TaskMessageFallible {
     fn urgent(&self) -> Result<Optional<bool, impl HasDefault<bool>>, Self::Error>;
 }
 
-impl<A: Allocator> TaskMessageFallible for Task<A> {
+impl<A: Allocator> MessageFallible for Task<A> {
     type Error = Infallible;
     type Alloc = A;
 

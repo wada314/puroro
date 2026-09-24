@@ -34,11 +34,10 @@ use crate::Address;
 use crate::AddressLazy;
 use crate::Point;
 use crate::enums::{Priority, Status};
-use crate::task::TaskLayout;
 use crate::task::defaults::MaxRetriesDefault;
 use crate::task::notification::NotificationStorage;
 use crate::task::{
-    BIT_DONE_VALUE, BIT_FLAG, BIT_FLAG_VALUE, BIT_MAX_RETRIES, BIT_ORIGIN, BIT_OWNER_ID,
+    self, BIT_DONE_VALUE, BIT_FLAG, BIT_FLAG_VALUE, BIT_MAX_RETRIES, BIT_ORIGIN, BIT_OWNER_ID,
     BIT_PAYLOAD, BIT_PRIORITY, BIT_TITLE, FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_DONE,
     FIELD_EMAIL_ADDRESS, FIELD_FLAG, FIELD_LABELS, FIELD_MAX_RETRIES, FIELD_ORIGIN, FIELD_OWNER_ID,
     FIELD_PAYLOAD, FIELD_PHONE_NUMBER, FIELD_POSTAL, FIELD_PRIORITY, FIELD_SCORE, FIELD_SCORES,
@@ -54,7 +53,7 @@ use crate::task::{
 ///
 /// `L` is the ingest layout ([`Eager`] / [`Lazy`]). Public names stay the
 /// aliases [`Task`] / [`TaskLazy`].
-pub struct TaskImpl<A: Allocator = Global, L: TaskLayout<A> = Eager> {
+pub struct TaskImpl<A: Allocator = Global, L: task::Layout<A> = Eager> {
     pub(crate) _common: MessageCommon<L::Bits, A, UnknownFields<A>, L>,
     pub(crate) title:
         SingularField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }, A, L::TitleLen>, // proto: string title = 1;
@@ -700,7 +699,7 @@ impl<A: Allocator> fmt::Debug for Task<A> {
 // Drop — releases every unmanaged field through the single allocator
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator, L: TaskLayout<A>> TaskImpl<A, L> {
+impl<A: Allocator, L: task::Layout<A>> TaskImpl<A, L> {
     fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<L::Bits, A, UnknownFields<A>, L>>>(
         &mut self,
         v: &mut V,
@@ -727,7 +726,7 @@ impl<A: Allocator, L: TaskLayout<A>> TaskImpl<A, L> {
     }
 }
 
-impl<A: Allocator, L: TaskLayout<A>> Drop for TaskImpl<A, L> {
+impl<A: Allocator, L: task::Layout<A>> Drop for TaskImpl<A, L> {
     fn drop(&mut self) {
         let mut v = FieldDeallocVisitor::new(&self._common);
         let _ = self.visit_fields_mut(&mut v);

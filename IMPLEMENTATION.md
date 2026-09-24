@@ -852,7 +852,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 
 **Shared `MessageCommon` — taken down.** Sharing the parent common (child `Body` + parent `Window` / `*Bound` / `*View` / `SharedMessage`, always-view getters) was implemented on the sample and then reverted. Do not revive it unless the product lock below is reopened. Reasons:
 
-1. **Same-type API.** Owned and inlined children must stay one `M`. Getters are `Option<&M>` / `&mut M`; `school.student()` is `&Student`. Sharing makes the inlined slot a Body, so that assignment does not type-check. Unifying boxed and inlined getters then forced always-view types and `FooMessage` traits on every message.
+1. **Same-type API.** Owned and inlined children must stay one `M`. Getters are `Option<&M>` / `&mut M`; `school.student()` is `&Student`. Sharing makes the inlined slot a Body, so that assignment does not type-check. Unifying boxed and inlined getters then forced always-view types and `foo::Message` traits on every message.
 2. **Generated-type split.** Every message grew Body / Bound / View / Mut, bit-base bookkeeping, oneof subtree ranges, and a second catalog marker. That surface was too expensive for the size win.
 3. **The size win was the unknown word.** Sharing only bits + alloc barely helps `Global`. A real shrink needed the parent to hold the child’s unknowns (a child map). That store leaked into encode / isolation / `clear_*` / oneof and was removed; each message now has its own flat [`UnknownFields`](puroro-rt/src/unknown_fields.rs) blob (or baked [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs)).
 

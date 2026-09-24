@@ -17,7 +17,7 @@ use ::puroro_rt::{
 use super::{BIT_CITY_LAZY_KIND, BIT_CITY_SSO, BIT_STREET_LAZY_KIND, BIT_STREET_SSO};
 
 /// Catalog kinds that change between eager `Address` and lazy `AddressLazy`.
-pub trait AddressLayout<A: Allocator>: Sized {
+pub trait Layout<A: Allocator>: Sized {
     type Bits: Default + Clone + BitStorage;
 
     /// Singular string slot (`InlineOrHeap<{SSO}>` or `WireOrSso<{KIND}>`).
@@ -27,7 +27,7 @@ pub trait AddressLayout<A: Allocator>: Sized {
     fn empty_bits() -> Self::Bits;
 }
 
-impl<A: Allocator> AddressLayout<A> for Eager {
+impl<A: Allocator> Layout<A> for Eager {
     type Bits = BitArray<[u8; 1], Lsb0>;
     type StreetLen = InlineOrHeap<{ BIT_STREET_SSO }>;
     type CityLen = InlineOrHeap<{ BIT_CITY_SSO }>;
@@ -38,7 +38,7 @@ impl<A: Allocator> AddressLayout<A> for Eager {
     }
 }
 
-impl<A: Allocator> AddressLayout<A> for Lazy<A> {
+impl<A: Allocator> Layout<A> for Lazy<A> {
     type Bits = InteriorBitArray<2>;
     type StreetLen = WireOrSso<{ BIT_STREET_LAZY_KIND }>;
     type CityLen = WireOrSso<{ BIT_CITY_LAZY_KIND }>;

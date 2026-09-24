@@ -1,12 +1,12 @@
-//! Read a `Task` only through [`TaskMessageFallible`].
+//! Read a `Task` only through [`task::MessageFallible`].
 
 use ::puroro::{BytesMut, MapMut, MapRef, OneofView, RepeatedStringMut, StringMut};
-use ::puroro_sample_generated::task::NotificationCase;
-use ::puroro_sample_generated::{Address, Point, Priority, Status, Task, TaskMessageFallible};
+use ::puroro_sample_generated::task::{self, NotificationCase};
+use ::puroro_sample_generated::{Address, Point, Priority, Status, Task};
 
-/// Touches every `TaskMessageFallible` getter. Must not call inherent `Task`
+/// Touches every `task::MessageFallible` getter. Must not call inherent `Task`
 /// accessors (except through the trait impl).
-fn read_via_trait<M: TaskMessageFallible>(m: &M) -> Result<usize, M::Error>
+fn read_via_trait<M: task::MessageFallible>(m: &M) -> Result<usize, M::Error>
 where
     M::Alloc: Clone,
 {
@@ -72,13 +72,13 @@ fn eager_task_readable_through_fallible_trait() {
     let n = read_via_trait(&task).unwrap_or_else(|e| match e {});
     assert!(n > 0);
     assert_eq!(
-        TaskMessageFallible::title(&task)
+        task::MessageFallible::title(&task)
             .unwrap_or_else(|e| match e {})
             .get(),
         "lazy-step-1"
     );
     assert_eq!(
-        TaskMessageFallible::notification(&task)
+        task::MessageFallible::notification(&task)
             .unwrap_or_else(|e| match e {})
             .case(),
         Some(NotificationCase::EmailAddress)

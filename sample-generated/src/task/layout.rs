@@ -31,7 +31,7 @@ use super::{
 };
 
 /// Catalog kinds that change between eager `Task` and lazy `TaskLazy`.
-pub trait TaskLayout<A: Allocator>: MessageScan<A> + Sized {
+pub trait Layout<A: Allocator>: MessageScan<A> + Sized {
     /// Presence / SSO / lazy-kind bits packed into [`MessageCommon`].
     type Bits: Default + Clone + BitStorage;
 
@@ -59,7 +59,7 @@ pub trait TaskLayout<A: Allocator>: MessageScan<A> + Sized {
     fn empty_bits() -> Self::Bits;
 }
 
-impl<A: Allocator> TaskLayout<A> for Eager {
+impl<A: Allocator> Layout<A> for Eager {
     type Bits = BitArray<[u8; 2], Lsb0>;
     type TitleLen = InlineOrHeap<{ BIT_TITLE_SSO }>;
     type OwnerIdLen = InlineOrHeap<{ BIT_OWNER_ID_SSO }>;
@@ -78,7 +78,7 @@ impl<A: Allocator> TaskLayout<A> for Eager {
     }
 }
 
-impl<A: Allocator + Clone> TaskLayout<A> for Lazy<A> {
+impl<A: Allocator + Clone> Layout<A> for Lazy<A> {
     type Bits = InteriorBitArray<4>;
     type TitleLen = WireOrSso<{ BIT_TITLE_LAZY_KIND }>;
     type OwnerIdLen = WireOrSso<{ BIT_OWNER_ID_LAZY_KIND }>;

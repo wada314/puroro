@@ -1,5 +1,5 @@
-//! Companion namespace for [`crate::Task`]: `FIELD_*` / `BIT_*`, defaults, and
-//! the `notification` oneof submodule.
+//! Companion namespace for [`crate::Task`]: `FIELD_*` / `BIT_*`, [`Layout`],
+//! [`MessageFallible`], defaults, and the `notification` oneof submodule.
 //!
 //! The `Task` struct itself lives in the crate root (the parent module).
 
@@ -9,8 +9,8 @@ pub(crate) mod layout;
 mod lazy;
 pub mod notification;
 
-pub use fallible::TaskMessageFallible;
-pub use layout::TaskLayout;
+pub use fallible::MessageFallible;
+pub use layout::Layout;
 pub use notification::{Notification, NotificationCase};
 
 // ---------------------------------------------------------------------------
