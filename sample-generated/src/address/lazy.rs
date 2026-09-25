@@ -1,7 +1,8 @@
 //! Inherent API for [`AddressLazy`](crate::AddressLazy) (`AddressImpl<A, Lazy<A>>`).
 //!
-//! Numericals apply during scan; strings use WireOrSso. Getters require
-//! `finish`. `into_eager` re-merges `_wire` into [`Address`](crate::Address).
+//! Numericals apply during scan; strings use WireOrSso. Getters call
+//! [`LazyMessage::ensure_scanned`](::puroro_rt::decode::LazyMessage::ensure_scanned).
+//! `into_eager` re-merges `_wire` into [`Address`](crate::Address).
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bytes::{Buf, BufMut};
@@ -41,7 +42,7 @@ impl AddressLazy<Global> {
     }
 }
 
-impl<A: Allocator> AddressLazy<A> {
+impl<A: Allocator + Clone> AddressLazy<A> {
     pub fn street(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
     where
         A: Clone,
@@ -214,27 +215,31 @@ impl<A: Allocator + Clone> Clone for AddressLazy<A> {
     }
 }
 
-impl<A: Allocator> PartialEq for AddressLazy<A> {
+impl<A: Allocator + Clone> PartialEq for AddressLazy<A> {
     fn eq(&self, other: &Self) -> bool {
-        let mut left = Vec::new();
-        let mut right = Vec::new();
-        if self._common.lazy.scan.write_bodies(&mut left).is_err() {
+        if self.ensure_scanned().is_err() || other.ensure_scanned().is_err() {
             return false;
         }
-        if other._common.lazy.scan.write_bodies(&mut right).is_err() {
-            return false;
+        match (self.clone().into_eager(), other.clone().into_eager()) {
+            (Ok(left), Ok(right)) => left == right,
+            _ => false,
         }
-        left == right
     }
 }
 
-impl<A: Allocator> Debug for AddressLazy<A> {
+impl<A: Allocator + Clone> Debug for AddressLazy<A> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        f.debug_struct("AddressLazy").finish_non_exhaustive()
+        if self.ensure_scanned().is_err() {
+            return f.debug_struct("AddressLazy").finish_non_exhaustive();
+        }
+        match self.clone().into_eager() {
+            Ok(eager) => Debug::fmt(&eager, f),
+            Err(_) => f.debug_struct("AddressLazy").finish_non_exhaustive(),
+        }
     }
 }
 
-impl<A: Allocator> DeallocateIn<A> for AddressLazy<A> {
+impl<A: Allocator + Clone> DeallocateIn<A> for AddressLazy<A> {
     #[inline]
     unsafe fn deallocate_in(self, _alloc: &A) {
         drop(self);
@@ -243,13 +248,17 @@ impl<A: Allocator> DeallocateIn<A> for AddressLazy<A> {
 
 ::puroro_rt::impl_owned_slot_bounds!(AddressLazy);
 
-impl<A: Allocator> MessageEncode for AddressLazy<A> {
+impl<A: Allocator + Clone> MessageEncode for AddressLazy<A> {
     fn encoded_len(&self, _ctx: &mut EncodeCtx) -> usize {
         self._common.lazy.scan.body_len()
     }
 
     fn encode_raw<B: BufMut>(&self, _ctx: &mut EncodeCtx, buf: &mut B) {
-        let _ = self._common.lazy.scan.write_bodies(buf);
+        self._common
+            .lazy
+            .scan
+            .write_bodies(buf)
+            .expect("lazy wire span out of range");
     }
 }
 
@@ -273,7 +282,7 @@ impl<A: Allocator + Clone> DefaultIn<A> for AddressLazy<A> {
     }
 }
 
-impl<A: Allocator> Message for AddressLazy<A> {
+impl<A: Allocator + Clone> Message for AddressLazy<A> {
     type Alloc = A;
 
     fn new_in(alloc: A) -> Self

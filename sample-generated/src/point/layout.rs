@@ -10,8 +10,9 @@ use ::puroro_rt::{BitStorage, Eager, Lazy};
 
 /// Ingest bits for [`PointImpl`](crate::point_type::PointImpl).
 ///
-/// Not a [`MessageScan`](::puroro_rt::decode::MessageScan) supertrait: nested
-/// [`PointLazy`](crate::PointLazy) must stay well-formed without `A: Clone`.
+/// Not a [`MessageScan`](::puroro_rt::decode::MessageScan) supertrait.
+/// [`PointImpl`](crate::point_type::PointImpl) requires `A: Clone` on the struct,
+/// together with every other generated message.
 pub trait Layout<A: Allocator>: Sized {
     type Bits: Default + Clone + BitStorage;
 

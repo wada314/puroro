@@ -163,7 +163,7 @@ protobuf-core           Varint, Tag, WireType
 | FieldKind IR (`plan_fields`, bit assignment, catalog kind) | **Done** — scalars / repeated / enum / oneof / map / custom defaults; synthetic `map_entry` messages planned as `FieldKind::Map` (not emitted as structs) |
 | FieldKind → catalog emission (struct members, accessors, visitors) | **Done** — singular + repeated scalar / string / bytes / bool / enum / message; real oneof groups; maps; `[default = …]` markers (`mod defaults` + `SingularField` `D`); nested message/enum decls; zero-less enums (`Type`/`Label`); official `descriptor.proto`+`plugin.proto` compile-tested. Typed extensions / services not yet |
 
-Live plugin emits the eager-path field families shown by [`sample-generated/`](sample-generated/) (`Task` / `Address` / `School`) via `resolved::resolve` + [`field_kind::plan_fields`](protoc-gen-puroro/src/field_kind.rs): singular / repeated / enum / message / real oneof / map / custom defaults. Coverage is split across [`puroro-codegen-tests`](puroro-codegen-tests/) fixtures (`scalars`, `oneof_basic`, `map_basic`, `custom_defaults`, `utf8_validation`, …; official `descriptor.proto` / `plugin.proto` by `official_plugin`). Deliberate differences from the hand-written sample — flat module layout, short-name `use`s, and omitted `@generated` headers — are documented in [§9](#9-struct-layout) / [§17.1](#171-submessage-inline-optimisation); they are not missing field features. Remaining generator gaps outside the sample surface: typed extensions, services, `FileTree` layout.
+Live plugin emits the eager-path field families shown by [`sample-generated/`](sample-generated/) (`Task` / `Address` / `School`) via `resolved::resolve` + [`field_kind::plan_fields`](protoc-gen-puroro/src/field_kind.rs): singular / repeated / enum / message / real oneof / map / custom defaults. Coverage is split across [`puroro-codegen-tests`](puroro-codegen-tests/) fixtures (`scalars`, `oneof_basic`, `map_basic`, `custom_defaults`, `utf8_validation`, …; official `descriptor.proto` / `plugin.proto` by `official_plugin`). Deliberate differences from the hand-written sample — flat module layout, short-name `use`s, omitted `@generated` headers, and a struct bound of `A: Allocator` where the sample requires `A: Allocator + Clone` ([DESIGN.md](DESIGN.md#why-a-clone-is-a-struct-bound)) — are documented in [§9](#9-struct-layout) / [§17.1](#171-submessage-inline-optimisation); they are not missing field features. Remaining generator gaps outside the sample surface: typed extensions, services, `FileTree` layout.
 
 ---
 
@@ -432,7 +432,7 @@ Full singular signature: `SingularField<T, P, FIELD, A, L = Inline, D = ProtoDef
 ## 9. Struct layout
 
 ```rust
-pub struct Task<A: Allocator = Global> {
+pub struct Task<A: Allocator + Clone = Global> {
     _common: MessageCommon<BitArray<[u8; 2], Lsb0>, A>,
     title: SingularField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }, A, InlineOrHeap<{ BIT_TITLE_SSO }>>,
     score: SingularField<ProtoInt32, Implicit, { FIELD_SCORE }, A>,
@@ -462,7 +462,7 @@ pub struct Task<A: Allocator = Global> {
 }
 ```
 
-The `A: Allocator + Clone` struct bound is what lets the generated `Drop` clone the allocator into nested children and free every field from one place. Heap payloads use `unmanaged` types parameterized by `A` plus `PhantomData<A>` (no allocator *instance* in the field, except maps — see below). Protobuf markers are allocator-free; field wrappers carry `A` so slots/`DefaultIn<A>` / `DeallocateIn<A>` associate against `MessageCommon<B, A>`. Singular `bool` uses `SingularField<ProtoBool, …, A, BitPacked<VALUE_BIT>>` with ZST `Slot = ()`; the value lives in `_common.bits`.
+Every generated message struct is `A: Allocator + Clone` (eager and lazy). Why that bound is on the struct — owned `A` by value, lazy [`SharedWire`](puroro-rt/src/decode/shared_wire.rs) handles, and a uniform bound so callers do not observe laziness — is [DESIGN.md](DESIGN.md#why-a-clone-is-a-struct-bound). The same bound is what lets the generated `Drop` clone the allocator into nested children and free every field from one place. Heap payloads use `unmanaged` types parameterized by `A` plus `PhantomData<A>` (no allocator *instance* in the field, except maps — see below). Protobuf markers are allocator-free; field wrappers carry `A` so slots/`DefaultIn<A>` / `DeallocateIn<A>` associate against `MessageCommon<B, A>`. Singular `bool` uses `SingularField<ProtoBool, …, A, BitPacked<VALUE_BIT>>` with ZST `Slot = ()`; the value lives in `_common.bits`.
 
 **Owned `A` instances:** `_common.alloc`, plus one embedded `A` per `MapField` (`hashbrown::HashMap` owns its allocator).
 

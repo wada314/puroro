@@ -29,7 +29,7 @@ use crate::address::{
 // Message struct
 // ---------------------------------------------------------------------------
 
-pub struct AddressImpl<A: Allocator = Global, L: address::Layout<A> = Eager> {
+pub struct AddressImpl<A: Allocator + Clone = Global, L: address::Layout<A> = Eager> {
     pub(crate) _common: MessageCommon<L::Bits, A, UnknownFields<A>, L>,
     pub(crate) street:
         SingularField<ProtoString, Explicit<{ BIT_STREET }>, { FIELD_STREET }, A, L::StreetLen>, // proto: string street = 1;
@@ -44,7 +44,7 @@ pub struct AddressImpl<A: Allocator = Global, L: address::Layout<A> = Eager> {
 pub type Address<A = Global> = AddressImpl<A, Eager>;
 pub type AddressLazy<A = Global> = AddressImpl<A, Lazy<A>>;
 
-impl<A: Allocator> Address<A> {
+impl<A: Allocator + Clone> Address<A> {
     pub fn street<'a>(&'a self) -> ::puroro::Optional<&'a str, impl ::puroro::HasDefault<&'a str>>
     where
         A: 'a,
@@ -217,7 +217,7 @@ impl<A: Allocator + Clone> Clone for Address<A> {
     }
 }
 
-impl<A: Allocator> PartialEq for Address<A> {
+impl<A: Allocator + Clone> PartialEq for Address<A> {
     fn eq(&self, other: &Self) -> bool {
         matches!(
             self.visit_field_pairs(
@@ -229,7 +229,7 @@ impl<A: Allocator> PartialEq for Address<A> {
     }
 }
 
-impl<A: Allocator> fmt::Debug for Address<A> {
+impl<A: Allocator + Clone> fmt::Debug for Address<A> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut v = DebugStructVisitor::new(f.debug_struct("Address"), &self._common);
         let _ = self.visit_fields(&mut v);
@@ -241,7 +241,7 @@ impl<A: Allocator> fmt::Debug for Address<A> {
 // Drop — releases every unmanaged field through the single allocator
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator, L: address::Layout<A>> AddressImpl<A, L> {
+impl<A: Allocator + Clone, L: address::Layout<A>> AddressImpl<A, L> {
     fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<L::Bits, A, UnknownFields<A>, L>>>(
         &mut self,
         v: &mut V,
@@ -254,7 +254,7 @@ impl<A: Allocator, L: address::Layout<A>> AddressImpl<A, L> {
     }
 }
 
-impl<A: Allocator, L: address::Layout<A>> Drop for AddressImpl<A, L> {
+impl<A: Allocator + Clone, L: address::Layout<A>> Drop for AddressImpl<A, L> {
     fn drop(&mut self) {
         let mut v = FieldDeallocVisitor::new(&self._common);
         let _ = self.visit_fields_mut(&mut v);
@@ -266,7 +266,7 @@ impl<A: Allocator, L: address::Layout<A>> Drop for AddressImpl<A, L> {
 // DeallocateIn — required for nested `UnmanagedBox` / catalog bounds
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator> ::puroro_rt::DeallocateIn<A> for Address<A> {
+impl<A: Allocator + Clone> ::puroro_rt::DeallocateIn<A> for Address<A> {
     #[inline]
     unsafe fn deallocate_in(self, _alloc: &A) {
         // Heap is owned by `self._common.alloc`; parent-passed `alloc` is only
@@ -281,7 +281,7 @@ impl<A: Allocator> ::puroro_rt::DeallocateIn<A> for Address<A> {
 // Message
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator> MessageEncode for Address<A> {
+impl<A: Allocator + Clone> MessageEncode for Address<A> {
     fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
         let mut v = EncodedLenVisitor::new(&self._common, ctx);
         let _ = self.visit_fields(&mut v);
@@ -354,7 +354,7 @@ impl<A: Allocator + Clone> ::puroro_rt::DefaultIn<A> for Address<A> {
     }
 }
 
-impl<A: Allocator> Message for Address<A> {
+impl<A: Allocator + Clone> Message for Address<A> {
     type Alloc = A;
 
     fn new_in(alloc: A) -> Self

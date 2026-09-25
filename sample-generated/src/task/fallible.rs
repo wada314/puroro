@@ -24,7 +24,7 @@ type NotificationRef<'a, A> = Notification<&'a str, &'a str, i32, &'a Address<A>
 /// [`Result`].
 pub trait MessageFallible {
     type Error;
-    type Alloc: Allocator;
+    type Alloc: Allocator + Clone;
 
     fn title(&self) -> Result<Optional<&str, impl HasDefault<&str>>, Self::Error>;
     fn score(&self) -> Result<i32, Self::Error>;
@@ -56,7 +56,7 @@ pub trait MessageFallible {
     fn urgent(&self) -> Result<Optional<bool, impl HasDefault<bool>>, Self::Error>;
 }
 
-impl<A: Allocator> MessageFallible for Task<A> {
+impl<A: Allocator + Clone> MessageFallible for Task<A> {
     type Error = Infallible;
     type Alloc = A;
 

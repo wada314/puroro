@@ -26,12 +26,12 @@ use crate::marker::FIELD_N;
 
 type Common<A> = MessageCommon<BitArray<[u8; 1], Lsb0>, A, DiscardUnknowns>;
 
-pub struct Marker<A: Allocator = Global> {
+pub struct Marker<A: Allocator + Clone = Global> {
     _common: Common<A>,
     n: SingularField<ProtoInt32, Implicit, { FIELD_N }, A>,
 }
 
-impl<A: Allocator> Marker<A> {
+impl<A: Allocator + Clone> Marker<A> {
     pub fn n(&self) -> i32 {
         self.n.bind(&self._common).value()
     }
@@ -123,7 +123,7 @@ impl<A: Allocator + Clone> Clone for Marker<A> {
     }
 }
 
-impl<A: Allocator> PartialEq for Marker<A> {
+impl<A: Allocator + Clone> PartialEq for Marker<A> {
     fn eq(&self, other: &Self) -> bool {
         matches!(
             self.visit_field_pairs(
@@ -135,7 +135,7 @@ impl<A: Allocator> PartialEq for Marker<A> {
     }
 }
 
-impl<A: Allocator> fmt::Debug for Marker<A> {
+impl<A: Allocator + Clone> fmt::Debug for Marker<A> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut v = DebugStructVisitor::new(f.debug_struct("Marker"), &self._common);
         let _ = self.visit_fields(&mut v);
@@ -143,7 +143,7 @@ impl<A: Allocator> fmt::Debug for Marker<A> {
     }
 }
 
-impl<A: Allocator> Drop for Marker<A> {
+impl<A: Allocator + Clone> Drop for Marker<A> {
     fn drop(&mut self) {
         let mut v = FieldDeallocVisitor::new(&self._common);
         let _ = self.visit_fields_mut(&mut v);
@@ -151,7 +151,7 @@ impl<A: Allocator> Drop for Marker<A> {
     }
 }
 
-impl<A: Allocator> ::puroro_rt::DeallocateIn<A> for Marker<A> {
+impl<A: Allocator + Clone> ::puroro_rt::DeallocateIn<A> for Marker<A> {
     #[inline]
     unsafe fn deallocate_in(self, _alloc: &A) {
         drop(self);
@@ -160,7 +160,7 @@ impl<A: Allocator> ::puroro_rt::DeallocateIn<A> for Marker<A> {
 
 ::puroro_rt::impl_owned_slot_bounds!(Marker);
 
-impl<A: Allocator> MessageEncode for Marker<A> {
+impl<A: Allocator + Clone> MessageEncode for Marker<A> {
     fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
         let mut v = EncodedLenVisitor::new(&self._common, ctx);
         let _ = self.visit_fields(&mut v);
@@ -211,7 +211,7 @@ impl<A: Allocator + Clone> ::puroro_rt::DefaultIn<A> for Marker<A> {
     }
 }
 
-impl<A: Allocator> Message for Marker<A> {
+impl<A: Allocator + Clone> Message for Marker<A> {
     type Alloc = A;
 
     fn new_in(alloc: A) -> Self

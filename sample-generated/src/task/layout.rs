@@ -10,11 +10,14 @@
 //! - oneof string slots and `postal` child
 //!
 //! Field wrappers themselves live on [`TaskImpl`](crate::task_type::TaskImpl).
+//!
+//! Not a [`MessageScan`](::puroro_rt::decode::MessageScan) supertrait.
+//! [`TaskImpl`](crate::task_type::TaskImpl) requires `A: Clone` on the struct,
+//! together with every other generated message.
 
 use ::allocator_api2::alloc::Allocator;
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
-use ::puroro_rt::decode::MessageScan;
 use ::puroro_rt::{
     BitStorage, DeallocateBound, DeallocateIn, Eager, Expanded, InlineOrHeap, InteriorBitArray,
     Lazy, MapLayout, MapReady, MapSpans, MessageEncode, ProtoBytes, ProtoInt32, ProtoString,
@@ -31,7 +34,7 @@ use super::{
 };
 
 /// Catalog kinds that change between eager `Task` and lazy `TaskLazy`.
-pub trait Layout<A: Allocator>: MessageScan<A> + Sized {
+pub trait Layout<A: Allocator>: Sized {
     /// Presence / SSO / lazy-kind bits packed into [`MessageCommon`].
     type Bits: Default + Clone + BitStorage;
 
@@ -59,7 +62,7 @@ pub trait Layout<A: Allocator>: MessageScan<A> + Sized {
     fn empty_bits() -> Self::Bits;
 }
 
-impl<A: Allocator> Layout<A> for Eager {
+impl<A: Allocator + Clone> Layout<A> for Eager {
     type Bits = BitArray<[u8; 2], Lsb0>;
     type TitleLen = InlineOrHeap<{ BIT_TITLE_SSO }>;
     type OwnerIdLen = InlineOrHeap<{ BIT_OWNER_ID_SSO }>;

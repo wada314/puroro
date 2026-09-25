@@ -24,7 +24,7 @@ use puroro_rt::{
 
 use crate::point::{self, FIELD_X, FIELD_Y};
 
-pub struct PointImpl<A: Allocator = Global, L: point::Layout<A> = Eager> {
+pub struct PointImpl<A: Allocator + Clone = Global, L: point::Layout<A> = Eager> {
     pub(crate) _common: MessageCommon<L::Bits, A, UnknownFields<A>, L>,
     pub(crate) x: SingularField<ProtoInt32, Implicit, { FIELD_X }, A>,
     pub(crate) y: SingularField<ProtoInt32, Implicit, { FIELD_Y }, A>,
@@ -33,7 +33,7 @@ pub struct PointImpl<A: Allocator = Global, L: point::Layout<A> = Eager> {
 pub type Point<A = Global> = PointImpl<A, Eager>;
 pub type PointLazy<A = Global> = PointImpl<A, Lazy<A>>;
 
-impl<A: Allocator> Point<A> {
+impl<A: Allocator + Clone> Point<A> {
     pub fn x(&self) -> i32 {
         self.x.bind(&self._common).value()
     }
@@ -136,7 +136,7 @@ impl<A: Allocator + Clone> Clone for Point<A> {
     }
 }
 
-impl<A: Allocator> PartialEq for Point<A> {
+impl<A: Allocator + Clone> PartialEq for Point<A> {
     fn eq(&self, other: &Self) -> bool {
         matches!(
             self.visit_field_pairs(
@@ -148,7 +148,7 @@ impl<A: Allocator> PartialEq for Point<A> {
     }
 }
 
-impl<A: Allocator> fmt::Debug for Point<A> {
+impl<A: Allocator + Clone> fmt::Debug for Point<A> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut v = DebugStructVisitor::new(f.debug_struct("Point"), &self._common);
         let _ = self.visit_fields(&mut v);
@@ -156,7 +156,7 @@ impl<A: Allocator> fmt::Debug for Point<A> {
     }
 }
 
-impl<A: Allocator, L: point::Layout<A>> PointImpl<A, L> {
+impl<A: Allocator + Clone, L: point::Layout<A>> PointImpl<A, L> {
     fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<L::Bits, A, UnknownFields<A>, L>>>(
         &mut self,
         v: &mut V,
@@ -167,7 +167,7 @@ impl<A: Allocator, L: point::Layout<A>> PointImpl<A, L> {
     }
 }
 
-impl<A: Allocator, L: point::Layout<A>> Drop for PointImpl<A, L> {
+impl<A: Allocator + Clone, L: point::Layout<A>> Drop for PointImpl<A, L> {
     fn drop(&mut self) {
         let mut v = FieldDeallocVisitor::new(&self._common);
         let _ = self.visit_fields_mut(&mut v);
@@ -175,7 +175,7 @@ impl<A: Allocator, L: point::Layout<A>> Drop for PointImpl<A, L> {
     }
 }
 
-impl<A: Allocator> ::puroro_rt::DeallocateIn<A> for Point<A> {
+impl<A: Allocator + Clone> ::puroro_rt::DeallocateIn<A> for Point<A> {
     #[inline]
     unsafe fn deallocate_in(self, _alloc: &A) {
         drop(self);
@@ -184,7 +184,7 @@ impl<A: Allocator> ::puroro_rt::DeallocateIn<A> for Point<A> {
 
 ::puroro_rt::impl_owned_slot_bounds!(Point);
 
-impl<A: Allocator> MessageEncode for Point<A> {
+impl<A: Allocator + Clone> MessageEncode for Point<A> {
     fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
         let mut v = EncodedLenVisitor::new(&self._common, ctx);
         let _ = self.visit_fields(&mut v);
@@ -240,7 +240,7 @@ impl<A: Allocator + Clone> ::puroro_rt::DefaultIn<A> for Point<A> {
     }
 }
 
-impl<A: Allocator> Message for Point<A> {
+impl<A: Allocator + Clone> Message for Point<A> {
     type Alloc = A;
 
     fn new_in(alloc: A) -> Self

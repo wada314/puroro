@@ -382,15 +382,16 @@ where
     }
 }
 
-impl<K, V, const FIELD: u32, A, P> FieldCloneIn<MessageCommon<P, A>> for MapField<K, V, FIELD, A>
+impl<K, V, const FIELD: u32, A, Cx> FieldCloneIn<Cx> for MapField<K, V, FIELD, A>
 where
     K: MapKey,
     V: RepeatedElement,
     A: Allocator + Clone,
     K::Element<A>: CloneIn<A> + Eq + Hash,
     V::Element<A>: CloneIn<A>,
+    Cx: MessageCommonAlloc<Alloc = A>,
 {
-    fn clone_field(&self, _common: &MessageCommon<P, A>, alloc: A) -> Self {
+    fn clone_field(&self, _common: &Cx, alloc: A) -> Self {
         let mut out = HashMap::with_capacity_and_hasher_in(
             self.storage.len(),
             DefaultHashBuilder::default(),
@@ -402,6 +403,29 @@ where
                 .map(|(k, v)| (k.clone_in(alloc.clone()), v.clone_in(alloc.clone()))),
         );
         Self { storage: out }
+    }
+}
+
+impl<K, V, const FIELD: u32, A, Cx> FieldCloneIn<Cx> for MapField<K, V, FIELD, A, MapSpans>
+where
+    K: MapKey,
+    V: RepeatedElement,
+    A: Allocator + Clone,
+    K::Element<A>: CloneIn<A> + Eq + Hash,
+    V::Element<A>: CloneIn<A>,
+    Cx: MessageCommonAlloc<Alloc = A>,
+{
+    fn clone_field(&self, common: &Cx, alloc: A) -> Self {
+        // SAFETY: `ready` is written only through `&mut self` (`store_span` / `bind`).
+        // `clone_field` shares `self` and does not overlap those borrows.
+        let ready = unsafe { (*self.storage.ready.get()).as_ref() };
+        let ready = ready.map(|map| map.clone_field(common, alloc.clone()));
+        Self {
+            storage: MapSpanStorage {
+                spans: self.storage.spans.clone(),
+                ready: UnsafeCell::new(ready),
+            },
+        }
     }
 }
 

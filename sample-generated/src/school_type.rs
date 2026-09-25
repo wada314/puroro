@@ -23,7 +23,7 @@ use crate::Student;
 use crate::school::{BIT_NAME, BIT_NAME_SSO, BIT_STUDENT, FIELD_NAME, FIELD_STUDENT};
 
 /// Sample `School` — owned root with one inlined [`Student`].
-pub struct School<A: Allocator = Global> {
+pub struct School<A: Allocator + Clone = Global> {
     _common: MessageCommon<BitArray<[u8; 1], Lsb0>, A>,
     name: SingularField<
         ProtoString,
@@ -36,7 +36,7 @@ pub struct School<A: Allocator = Global> {
         SingularField<ProtoMessage<Student<A>>, Explicit<{ BIT_STUDENT }>, { FIELD_STUDENT }, A>,
 }
 
-impl<A: Allocator> School<A> {
+impl<A: Allocator + Clone> School<A> {
     pub fn name<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>>
     where
         A: 'a,
@@ -150,7 +150,7 @@ impl<A: Allocator + Clone> Clone for School<A> {
     }
 }
 
-impl<A: Allocator> PartialEq for School<A> {
+impl<A: Allocator + Clone> PartialEq for School<A> {
     fn eq(&self, other: &Self) -> bool {
         matches!(
             self.visit_field_pairs(
@@ -162,7 +162,7 @@ impl<A: Allocator> PartialEq for School<A> {
     }
 }
 
-impl<A: Allocator> fmt::Debug for School<A> {
+impl<A: Allocator + Clone> fmt::Debug for School<A> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut v = DebugStructVisitor::new(f.debug_struct("School"), &self._common);
         let _ = self.visit_fields(&mut v);
@@ -170,7 +170,7 @@ impl<A: Allocator> fmt::Debug for School<A> {
     }
 }
 
-impl<A: Allocator> Drop for School<A> {
+impl<A: Allocator + Clone> Drop for School<A> {
     fn drop(&mut self) {
         let mut v = FieldDeallocVisitor::new(&self._common);
         let _ = self.visit_fields_mut(&mut v);
@@ -178,7 +178,7 @@ impl<A: Allocator> Drop for School<A> {
     }
 }
 
-impl<A: Allocator> ::puroro_rt::DeallocateIn<A> for School<A> {
+impl<A: Allocator + Clone> ::puroro_rt::DeallocateIn<A> for School<A> {
     #[inline]
     unsafe fn deallocate_in(self, _alloc: &A) {
         drop(self);
@@ -187,7 +187,7 @@ impl<A: Allocator> ::puroro_rt::DeallocateIn<A> for School<A> {
 
 ::puroro_rt::impl_owned_slot_bounds!(School);
 
-impl<A: Allocator> MessageEncode for School<A> {
+impl<A: Allocator + Clone> MessageEncode for School<A> {
     fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
         let mut v = EncodedLenVisitor::new(&self._common, ctx);
         let _ = self.visit_fields(&mut v);
@@ -245,7 +245,7 @@ impl<A: Allocator + Clone> ::puroro_rt::DefaultIn<A> for School<A> {
     }
 }
 
-impl<A: Allocator> Message for School<A> {
+impl<A: Allocator + Clone> Message for School<A> {
     type Alloc = A;
 
     fn new_in(alloc: A) -> Self

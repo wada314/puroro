@@ -4,12 +4,15 @@ use ::puroro::{BytesMut, DecodeError, MapMut, MapRef, Message, RepeatedStringMut
 use ::puroro_rt::INLINE_CAP;
 use ::puroro_rt::Varint;
 use ::puroro_rt::encode::{encode_varint_field, field_number_const};
+use ::puroro_sample_generated::address::FIELD_STREET;
 use ::puroro_sample_generated::task::{
     FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_EMAIL_ADDRESS, FIELD_LABELS, FIELD_ORIGIN,
     FIELD_OWNER_ID, FIELD_PAYLOAD, FIELD_PHONE_NUMBER, FIELD_POSTAL, FIELD_SCORE, FIELD_SCORES,
     FIELD_TAG_IDS, FIELD_TITLE, FIELD_URGENT, FIELD_WATCHERS, FIELD_WEBHOOK_ID, NotificationCase,
 };
-use ::puroro_sample_generated::{Address, Point, Priority, Status, Task, TaskLazy};
+use ::puroro_sample_generated::{
+    Address, AddressLazy, Point, PointLazy, Priority, Status, Task, TaskLazy,
+};
 
 fn encode_u64_varint(mut v: u64, buf: &mut Vec<u8>) {
     loop {
@@ -954,4 +957,71 @@ fn oneof_phone_and_invalid_utf8_email() {
     let lazy = TaskLazy::decode(&bad[..]).unwrap();
     assert_eq!(lazy.email_address().err(), Some(DecodeError::InvalidUtf8));
     assert_eq!(lazy.email_address().err(), Some(DecodeError::InvalidUtf8));
+}
+
+#[test]
+fn lazy_partial_eq_follows_eager_fields() {
+    let mut repeated = Vec::new();
+    encode_varint_field(
+        field_number_const::<FIELD_SCORE>(),
+        Varint::from_int32(1),
+        &mut repeated,
+    );
+    encode_varint_field(
+        field_number_const::<FIELD_SCORE>(),
+        Varint::from_int32(7),
+        &mut repeated,
+    );
+    let mut once = Vec::new();
+    encode_varint_field(
+        field_number_const::<FIELD_SCORE>(),
+        Varint::from_int32(7),
+        &mut once,
+    );
+    let repeated = TaskLazy::decode(&repeated[..]).unwrap();
+    let once = TaskLazy::decode(&once[..]).unwrap();
+    assert_eq!(repeated, once);
+    assert_eq!(repeated.clone().score().unwrap(), 7);
+
+    let mut other = Vec::new();
+    encode_varint_field(
+        field_number_const::<FIELD_SCORE>(),
+        Varint::from_int32(8),
+        &mut other,
+    );
+    assert_ne!(once, TaskLazy::decode(&other[..]).unwrap());
+
+    let mut left = TaskLazy::new();
+    left.push(&once.encode_to_vec().unwrap()).unwrap();
+    let mut right = TaskLazy::new();
+    right.push(&once.encode_to_vec().unwrap()).unwrap();
+    assert_ne!(left, right);
+
+    let mut streets = Vec::new();
+    encode_len_bytes(FIELD_STREET, b"old", &mut streets);
+    encode_len_bytes(FIELD_STREET, b"new", &mut streets);
+    let mut street = Vec::new();
+    encode_len_bytes(FIELD_STREET, b"new", &mut street);
+    assert_eq!(
+        AddressLazy::decode(&streets[..]).unwrap(),
+        AddressLazy::decode(&street[..]).unwrap()
+    );
+
+    let mut points = Vec::new();
+    encode_varint_field(
+        field_number_const::<1>(),
+        Varint::from_int32(1),
+        &mut points,
+    );
+    encode_varint_field(
+        field_number_const::<1>(),
+        Varint::from_int32(4),
+        &mut points,
+    );
+    let mut point = Vec::new();
+    encode_varint_field(field_number_const::<1>(), Varint::from_int32(4), &mut point);
+    assert_eq!(
+        PointLazy::decode(&points[..]).unwrap(),
+        PointLazy::decode(&point[..]).unwrap()
+    );
 }

@@ -3,9 +3,9 @@
 //! Numericals stay on the struct. This trait only names the string value
 //! slots that change (`InlineOrHeap` vs `WireOrSso`).
 //!
-//! Not a [`MessageScan`](::puroro_rt::decode::MessageScan) supertrait: eager
-//! parents name [`AddressLazy`](crate::AddressLazy) as a child type, which must
-//! stay well-formed without `A: Clone`.
+//! Not a [`MessageScan`](::puroro_rt::decode::MessageScan) supertrait.
+//! [`AddressImpl`](crate::address_type::AddressImpl) requires `A: Clone` on the
+//! struct, together with every other generated message.
 
 use ::allocator_api2::alloc::Allocator;
 use ::bitvec::array::BitArray;

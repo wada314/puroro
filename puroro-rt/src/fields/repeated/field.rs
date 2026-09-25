@@ -576,17 +576,41 @@ where
     }
 }
 
-impl<T, E, const FIELD: u32, A, P> FieldCloneIn<MessageCommon<P, A>>
-    for RepeatedField<T, E, FIELD, A>
+impl<T, E, const FIELD: u32, A, Cx> FieldCloneIn<Cx> for RepeatedField<T, E, FIELD, A>
 where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator + Clone,
     T::Element<A>: CloneIn<A>,
+    Cx: MessageCommonAlloc<Alloc = A>,
 {
-    fn clone_field(&self, _common: &MessageCommon<P, A>, alloc: A) -> Self {
+    fn clone_field(&self, _common: &Cx, alloc: A) -> Self {
         Self {
             storage: ManuallyDrop::new(self.storage.clone_in(alloc)),
+            _encoding: PhantomData,
+        }
+    }
+}
+
+impl<T, E, const FIELD: u32, A, Cx> FieldCloneIn<Cx>
+    for RepeatedField<T, E, FIELD, A, RepeatedSpans>
+where
+    T: RepeatedElement,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator + Clone,
+    T::Element<A>: CloneIn<A>,
+    Cx: MessageCommonAlloc<Alloc = A>,
+{
+    fn clone_field(&self, common: &Cx, alloc: A) -> Self {
+        // SAFETY: `ready` is written only through `&mut self` (`store_span` / `bind`).
+        // `clone_field` shares `self` and does not overlap those borrows.
+        let ready = unsafe { (*self.storage.ready.get()).as_ref() };
+        let ready = ready.map(|field| field.clone_field(common, alloc.clone()));
+        Self {
+            storage: RepeatedSpanStorage {
+                spans: self.storage.spans.clone(),
+                ready: UnsafeCell::new(ready),
+            },
             _encoding: PhantomData,
         }
     }

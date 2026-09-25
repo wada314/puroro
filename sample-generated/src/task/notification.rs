@@ -146,7 +146,7 @@ pub(crate) type NotificationStorage<A, L = ::puroro_rt::Eager> = Notification<
     UrgentField<A>,
 >;
 
-impl<A: Allocator> OneofGroup
+impl<A: Allocator + Clone> OneofGroup
     for Notification<
         SingularField<
             ProtoString,
@@ -468,7 +468,7 @@ impl<Ea, Pn, Wh, Po, Ur> OneofVariant<{ super::FIELD_URGENT }>
     }
 }
 
-impl<A: Allocator> OneofEncodable<A>
+impl<A: Allocator + Clone> OneofEncodable<A>
     for Notification<
         SingularField<
             ProtoString,

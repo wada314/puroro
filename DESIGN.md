@@ -25,6 +25,7 @@ This document specifies the **public interface** of the `puroro` Protocol Buffer
    - 4.10 [Map fields](#410-map-fields)
 5. [Allocator design](#5-allocator-design)
    - 5.1 [Chosen design: single type parameter](#51-chosen-design-single-type-parameter)
+     - [Why `A: Clone` is a struct bound](#why-a-clone-is-a-struct-bound)
    - 5.2 [Alternative: per-field allocator type parameters](#52-alternative-per-field-allocator-type-parameters)
    - 5.3 [Alternative: dynamic dispatch (`Box<dyn Allocator>`)](#53-alternative-dynamic-dispatch-boxdyn-allocator)
    - 5.4 [Comparison summary](#54-comparison-summary)
@@ -73,7 +74,7 @@ The puroro project comprises several crates and tools with distinct roles:
 ## 1. Goals
 
 - **Protobuf spec compliance.** Support the canonical wire format (varints, I32, I64, LEN records, packed repeated, oneofs, unknown fields) for proto2, proto3, and editions. Deprecated group wire types (`SGroup` / `EGroup`) are never generated; the decoder does not preserve them (see [§0](#0-project-architecture)).
-- **Allocator support.** Every generated type is generic over `A: Allocator` using the `allocator-api2` crate. Arena allocators (e.g. `bumpalo`) and custom pools are first-class citizens.
+- **Allocator support.** Every generated message is generic over `A: Allocator + Clone` using the `allocator-api2` crate ([why `Clone` is on the struct](#why-a-clone-is-a-struct-bound)). Arena allocators (e.g. `bumpalo`) and custom pools are first-class citizens.
 - **Performance-oriented interface.** Accessors return borrowed references (`&str`, `&[u8]`, `&[T]`), never freshly allocated containers. The `encode_to_vec` / `encode_to_bytes` convenience methods allocate, but `encode_raw` does not.
 - **Rust idioms.** Private fields accessed via generated accessor methods; `Optional<T, impl HasDefault<T>>` for explicit-presence scalar, string, and enum fields; singular nested messages return `Option<&M>` / `&mut M` (inlined children are a full `M` with their own `MessageCommon`); no `unsafe` in user-visible APIs.
 - **`puroro` for users, `puroro-rt` for generators.** Library users of generated messages depend on the generated crate and **`puroro` only**. Generated code may use `puroro-rt` internally, but **must not surface `puroro-rt` types in public signatures** (see [§4](#public-signatures-must-not-surface-puroro-rt)).
@@ -995,14 +996,33 @@ Catalog type: `MapField<K, V, FIELD, A>` with `K: MapKey`, `V: RepeatedElement` 
 Every generated type carries a single allocator type parameter `A` that applies to all heap allocations within that message and its nested messages:
 
 ```rust
-pub struct Task<A: Allocator = Global> { /* … */ }
+pub struct Task<A: Allocator + Clone = Global> { /* … */ }
 ```
 
-`A` defaults to `Global`, so `Task` (without a type argument) works identically to a version without allocator support. The struct itself only requires `Allocator` (same as `Vec` / `HashMap`). `Clone` is an impl bound: each message clones its allocator into nested children and frees every field from a single `Drop` (see below).
+`A` defaults to `Global`, so `Task` (without a type argument) works identically to a version without allocator support. The struct bound is `Allocator + Clone` on every generated message, eager and lazy. Why `Clone` sits on the struct: [below](#why-a-clone-is-a-struct-bound).
+
+#### Why `A: Clone` is a struct bound
+
+Every generated message struct requires `A: Allocator + Clone`. The bound does not vary by method, and it does not vary by whether the message is eager, lazy, or contains a lazy child. Callers write one bound and do not have to know which fields are lazy.
+
+`Clone` is required because the allocator is stored by value and handed to children by value:
+
+- **Decoded data.** `MessageCommon` stores one `A`. Field operations and `Drop` clone it into unmanaged buffers, map tables, and nested children (see [Owned allocator, never a borrow](#owned-allocator-never-a-borrow) below). The type used to grow a buffer is the same `A` used to free it, and clones are interchangeable.
+- **Lazy wire handles.** A lazy child keeps a sliced view of the parent's wire and does not copy the LEN payload. [`SharedWire`](puroro-rt/src/decode/shared_wire.rs) stores `A` beside the `bytes::Bytes` blob and clones `A` in `clone_handle` / `slice`. The child type stays `AddressLazy<A>` with the parent's `A`.
+
+Giving the child `&A` would avoid `Clone`, and `&A: Allocator` whenever `A: Allocator`. The child would then be bound by the parent's lifetime, and each nesting level would add another reference (`Address<&A>`, then `Address<&&A>`). `AsRef` can peel those references back to `&A` at a call site, but the child's type parameter would still be a reference, not `A`. Keeping the child's allocator type equal to the parent's `A` is the point of the single type parameter.
+
+A narrower bound would leak laziness into the public API. `A: Clone` only on methods that walk a lazy field, or only on messages that contain one, changes the signature according to an implementation detail. An eager `Task` whose `assignee` is `AddressLazy<A>` needs the bound for `PartialEq`, `Debug`, and encode: those impls require the child to be `PartialEq` and `Debug`, and the child's impls scan and clone. A getter that only returns `&AddressLazy<A>` does not clone `A` itself; the struct bound still applies so that signature matches every other method.
+
+`Layout` traits stay `A: Allocator`, so naming a layout does not demand `Clone`. An impl whose associated types name another message struct (`PointImpl`, `AddressImpl`) uses `A: Allocator + Clone`, as does `MessageFallible::Alloc`.
+
+Typical allocators (`Global`, arena handles such as `bumpalo`) implement `Clone`.
 
 **Single canonical allocator (almost no per-field copies).** The allocator is stored in `MessageCommon.alloc`. Heap-backed singular / repeated / oneof fields do **not** embed an allocator *instance*: they use the private [`unmanaged`](unmanaged/) types — `UnmanagedBox<T, A>`, `UnmanagedVec<T, A>`, `UnmanagedString<A>` — which keep only `ptr`/`len`/`cap` (plus `PhantomData<A>`) inline and receive an owned allocator (an `alloc.clone()`) on each operation that (de)allocates. The allocator **type** `A` still appears on unmanaged buffers and on **field wrappers** (`SingularField<…, A>`, `RepeatedField<…, A>`, `MapField<…, A>`); markers themselves are allocator-free.
 
 **Exception — map fields.** Each `MapField` stores a `hashbrown::HashMap<…, A>` that **owns** its own `A` (hashbrown’s allocator-aware API embeds `A` in the table). Maps are uncommon, so the extra `A` per map field is accepted; `size_of::<Task<A>>` grows by roughly one `A` for `MessageCommon` plus one `A` per map field.
+
+<a id="owned-allocator-never-a-borrow"></a>
 
 **Owned allocator, never a borrow.** Operations pass the allocator **by value** rather than `&A`: the caller clones the canonical `MessageCommon.alloc` for each field operation. This keeps the allocator type consistently `A` for both a buffer's growth and its eventual free — mixing `&A` at allocation with `A` at deallocation is fragile and not obviously idempotent. Correctness relies on the `Allocator + Clone` contract that clones are interchangeable. (The one exception is building an *empty* `unmanaged` container, which never allocates, so it may borrow.)
 

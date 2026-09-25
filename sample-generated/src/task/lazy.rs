@@ -1,18 +1,24 @@
 //! Inherent API for [`TaskLazy`](crate::TaskLazy) (`TaskImpl<A, Lazy<A>>`).
 //!
 //! Read-oriented: numericals apply during the scan; LEN fields store spans
-//! (`WireOrSso` / `RepeatedSpans` / `MapSpans` / lazy children). Getters
-//! require `finish`. `into_eager` re-merges `_wire` into [`Task`](crate::Task).
+//! (`WireOrSso` / `RepeatedSpans` / `MapSpans` / lazy children). Getters call
+//! [`LazyMessage::ensure_scanned`](::puroro_rt::decode::LazyMessage::ensure_scanned).
+//! `into_eager` re-merges `_wire` into [`Task`](crate::Task).
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bytes::{Buf, BufMut};
+use ::core::fmt::{self, Debug, Formatter};
+use ::core::iter;
 use ::core::ops::Deref;
-use ::puroro::{DecodeError, HasDefault, MapRef, Message, Optional};
-use ::puroro_rt::decode::{ScannedRecord, merge_scanned_field, scanned_len_span};
-use ::puroro_rt::{
-    InteriorBitArray, LazyMessageCommon, MapField, OneofGroup, OneofSlot, RepeatedField,
-    SingularField,
+use ::puroro::{DecodeBuf, DecodeError, HasDefault, MapRef, Message, Optional, RECURSION_LIMIT};
+use ::puroro_rt::decode::{
+    LazyMessage, LazyScan, ScannedRecord, merge_scanned_field, scanned_len_span,
 };
+use ::puroro_rt::{
+    CloneIn, DeallocateIn, DefaultIn, EncodeCtx, FieldCloneIn, InteriorBitArray, LazyMessageCommon,
+    MapField, MessageEncode, MessageMerge, OneofGroup, OneofSlot, RepeatedField, SingularField,
+};
+use ::std::vec::Vec;
 
 use super::notification::NotificationStorage;
 use crate::AddressLazy;
@@ -51,14 +57,17 @@ impl<A: Allocator + Clone> TaskLazy<A> {
     where
         A: Clone,
     {
-        self.require_finished()?;
+        self.ensure_scanned()?;
         self.title
             .try_str(&self._common, self._common.lazy.scan.wire())
     }
 
     /// Wire presence only; does not UTF-8-check the payload.
-    pub fn has_title(&self) -> Result<bool, DecodeError> {
-        self.require_finished()?;
+    pub fn has_title(&self) -> Result<bool, DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self._common.is_bit_set(BIT_TITLE))
     }
 
@@ -66,14 +75,17 @@ impl<A: Allocator + Clone> TaskLazy<A> {
     where
         A: Clone,
     {
-        self.require_finished()?;
+        self.ensure_scanned()?;
         self.owner_id
             .try_str(&self._common, self._common.lazy.scan.wire())
     }
 
     /// Wire presence only; does not UTF-8-check the payload.
-    pub fn has_owner_id(&self) -> Result<bool, DecodeError> {
-        self.require_finished()?;
+    pub fn has_owner_id(&self) -> Result<bool, DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self._common.is_bit_set(BIT_OWNER_ID))
     }
 
@@ -81,36 +93,48 @@ impl<A: Allocator + Clone> TaskLazy<A> {
     where
         A: Clone,
     {
-        self.require_finished()?;
+        self.ensure_scanned()?;
         self.payload
             .try_bytes(&self._common, self._common.lazy.scan.wire())
     }
 
-    pub fn has_payload(&self) -> Result<bool, DecodeError> {
-        self.require_finished()?;
+    pub fn has_payload(&self) -> Result<bool, DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self._common.is_bit_set(BIT_PAYLOAD))
     }
 
-    pub fn score(&self) -> Result<i32, DecodeError> {
-        self.require_finished()?;
+    pub fn score(&self) -> Result<i32, DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self.score.bind(&self._common).value())
     }
 
     pub fn max_retries<'a>(&'a self) -> Result<Optional<i32, impl HasDefault<i32>>, DecodeError>
     where
-        A: 'a,
+        A: Clone + 'a,
     {
-        self.require_finished()?;
+        self.ensure_scanned()?;
         Ok(self.max_retries.bind(&self._common).optional())
     }
 
-    pub fn tag_ids(&self) -> Result<&[i32], DecodeError> {
-        self.require_finished()?;
+    pub fn tag_ids(&self) -> Result<&[i32], DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self.tag_ids.bind(&self._common).as_slice())
     }
 
-    pub fn scores(&self) -> Result<&[i32], DecodeError> {
-        self.require_finished()?;
+    pub fn scores(&self) -> Result<&[i32], DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self.scores.bind(&self._common).as_slice())
     }
 
@@ -118,7 +142,7 @@ impl<A: Allocator + Clone> TaskLazy<A> {
     where
         A: Clone,
     {
-        self.require_finished()?;
+        self.ensure_scanned()?;
         Ok(self
             .labels
             .bind(self._common.lazy.scan.wire(), &self._common)?
@@ -127,9 +151,9 @@ impl<A: Allocator + Clone> TaskLazy<A> {
 
     pub fn status<'a>(&'a self) -> Result<Optional<Status, impl HasDefault<Status>>, DecodeError>
     where
-        A: 'a,
+        A: Clone + 'a,
     {
-        self.require_finished()?;
+        self.ensure_scanned()?;
         Ok(self.status.bind(&self._common).optional())
     }
 
@@ -137,47 +161,65 @@ impl<A: Allocator + Clone> TaskLazy<A> {
         &'a self,
     ) -> Result<Optional<Priority, impl HasDefault<Priority>>, DecodeError>
     where
-        A: 'a,
+        A: Clone + 'a,
     {
-        self.require_finished()?;
+        self.ensure_scanned()?;
         Ok(self.priority.bind(&self._common).optional())
     }
 
-    pub fn done(&self) -> Result<bool, DecodeError> {
-        self.require_finished()?;
+    pub fn done(&self) -> Result<bool, DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self.done.bind(&self._common).value())
     }
 
     pub fn flag<'a>(&'a self) -> Result<Optional<bool, impl HasDefault<bool>>, DecodeError>
     where
-        A: 'a,
+        A: Clone + 'a,
     {
-        self.require_finished()?;
+        self.ensure_scanned()?;
         Ok(self.flag.bind(&self._common).optional())
     }
 
-    pub fn votes(&self) -> Result<&[bool], DecodeError> {
-        self.require_finished()?;
+    pub fn votes(&self) -> Result<&[bool], DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self.votes.bind(&self._common).as_slice())
     }
 
-    pub fn assignee(&self) -> Result<Option<&AddressLazy<A>>, DecodeError> {
-        self.require_finished()?;
+    pub fn assignee(&self) -> Result<Option<&AddressLazy<A>>, DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self.assignee.bind(&self._common).get())
     }
 
-    pub fn origin(&self) -> Result<Option<&PointLazy<A>>, DecodeError> {
-        self.require_finished()?;
+    pub fn origin(&self) -> Result<Option<&PointLazy<A>>, DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self.origin.bind(&self._common).get())
     }
 
-    pub fn watchers(&self) -> Result<&[AddressLazy<A>], DecodeError> {
-        self.require_finished()?;
+    pub fn watchers(&self) -> Result<&[AddressLazy<A>], DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self.watchers.bind(&self._common).as_slice())
     }
 
-    pub fn notification(&self) -> Result<Option<NotificationCase>, DecodeError> {
-        self.require_finished()?;
+    pub fn notification(&self) -> Result<Option<NotificationCase>, DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self
             .notification
             .as_ref()
@@ -188,7 +230,7 @@ impl<A: Allocator + Clone> TaskLazy<A> {
     where
         A: Clone,
     {
-        self.require_finished()?;
+        self.ensure_scanned()?;
         match self
             .notification
             .bind(&self._common)
@@ -204,7 +246,7 @@ impl<A: Allocator + Clone> TaskLazy<A> {
     where
         A: Clone,
     {
-        self.require_finished()?;
+        self.ensure_scanned()?;
         match self
             .notification
             .bind(&self._common)
@@ -216,8 +258,11 @@ impl<A: Allocator + Clone> TaskLazy<A> {
         }
     }
 
-    pub fn webhook_id(&self) -> Result<Optional<i32, impl HasDefault<i32>>, DecodeError> {
-        self.require_finished()?;
+    pub fn webhook_id(&self) -> Result<Optional<i32, impl HasDefault<i32>>, DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self
             .notification
             .bind(&self._common)
@@ -225,8 +270,11 @@ impl<A: Allocator + Clone> TaskLazy<A> {
             .optional())
     }
 
-    pub fn postal(&self) -> Result<Option<&AddressLazy<A>>, DecodeError> {
-        self.require_finished()?;
+    pub fn postal(&self) -> Result<Option<&AddressLazy<A>>, DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self
             .notification
             .bind(&self._common)
@@ -234,8 +282,11 @@ impl<A: Allocator + Clone> TaskLazy<A> {
             .get())
     }
 
-    pub fn urgent(&self) -> Result<Optional<bool, impl HasDefault<bool>>, DecodeError> {
-        self.require_finished()?;
+    pub fn urgent(&self) -> Result<Optional<bool, impl HasDefault<bool>>, DecodeError>
+    where
+        A: Clone,
+    {
+        self.ensure_scanned()?;
         Ok(self
             .notification
             .bind(&self._common)
@@ -247,7 +298,7 @@ impl<A: Allocator + Clone> TaskLazy<A> {
     where
         A: Clone,
     {
-        self.require_finished()?;
+        self.ensure_scanned()?;
         self.attributes
             .bind(self._common.lazy.scan.wire(), &self._common)
     }
@@ -266,10 +317,6 @@ impl<A: Allocator + Clone> TaskLazy<A> {
         let mut out = Vec::with_capacity(self.encoded_len()?);
         self.encode(&mut out)?;
         Ok(out)
-    }
-
-    fn require_finished(&self) -> Result<(), DecodeError> {
-        self._common.lazy.scan.require_finished()
     }
 }
 
@@ -319,6 +366,10 @@ impl<A: Allocator + Clone> TaskLazy<A> {
     /// A second call is a real protobuf merge: scalars last-wins, repeated
     /// appends. Distinct from concatenating I/O chunks of a single message.
     pub fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+        self.ingest_buf(buf)
+    }
+
+    fn ingest_buf<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
         while buf.has_remaining() {
             let n = buf.chunk().len();
             if n == 0 {
@@ -337,13 +388,23 @@ impl<A: Allocator + Clone> TaskLazy<A> {
     /// Fields not yet materialised on the lazy getters are applied here because
     /// the full ingest bytes are replayed.
     pub fn into_eager(self) -> Result<Task<A>, DecodeError> {
-        self.require_finished()?;
+        self._common.lazy.scan.require_finished()?;
         let mut eager = Task::new_in(self._common.alloc.clone());
         self._common.lazy.scan.for_each_body(|chunk| {
             let mut buf = chunk;
             Message::merge_from(&mut eager, &mut buf)
         })?;
         Ok(eager)
+    }
+}
+
+impl<A: Allocator + Clone> LazyMessage<A> for TaskLazy<A> {
+    fn scan(&self) -> &LazyScan<A> {
+        &self._common.lazy.scan
+    }
+
+    fn scan_mut(&mut self) -> &mut LazyScan<A> {
+        &mut self._common.lazy.scan
     }
 
     fn apply_record(&mut self, rec: &ScannedRecord<A>, origin: usize) -> Result<(), DecodeError> {
@@ -473,5 +534,138 @@ impl<A: Allocator + Clone> TaskLazy<A> {
             }),
             _ => Ok(()),
         }
+    }
+}
+
+impl<A: Allocator + Clone> CloneIn<A> for TaskLazy<A> {
+    fn clone_in(&self, alloc: A) -> Self {
+        Self {
+            _common: self._common.clone_in(alloc.clone()),
+            title: self.title.clone_field(&self._common, alloc.clone()),
+            score: self.score.clone_field(&self._common, alloc.clone()),
+            max_retries: self.max_retries.clone_field(&self._common, alloc.clone()),
+            owner_id: self.owner_id.clone_field(&self._common, alloc.clone()),
+            payload: self.payload.clone_field(&self._common, alloc.clone()),
+            tag_ids: self.tag_ids.clone_field(&self._common, alloc.clone()),
+            scores: self.scores.clone_field(&self._common, alloc.clone()),
+            labels: self.labels.clone_field(&self._common, alloc.clone()),
+            status: self.status.clone_field(&self._common, alloc.clone()),
+            priority: self.priority.clone_field(&self._common, alloc.clone()),
+            assignee: self.assignee.clone_field(&self._common, alloc.clone()),
+            notification: self.notification.clone_field(&self._common, alloc.clone()),
+            done: self.done.clone_field(&self._common, alloc.clone()),
+            flag: self.flag.clone_field(&self._common, alloc.clone()),
+            watchers: self.watchers.clone_field(&self._common, alloc.clone()),
+            votes: self.votes.clone_field(&self._common, alloc.clone()),
+            attributes: self.attributes.clone_field(&self._common, alloc.clone()),
+            origin: self.origin.clone_field(&self._common, alloc),
+        }
+    }
+}
+
+impl<A: Allocator + Clone> Clone for TaskLazy<A> {
+    fn clone(&self) -> Self {
+        self.clone_in(self._common.alloc.clone())
+    }
+}
+
+impl<A: Allocator + Clone> PartialEq for TaskLazy<A> {
+    fn eq(&self, other: &Self) -> bool {
+        if self.ensure_scanned().is_err() || other.ensure_scanned().is_err() {
+            return false;
+        }
+        match (self.clone().into_eager(), other.clone().into_eager()) {
+            (Ok(left), Ok(right)) => left == right,
+            _ => false,
+        }
+    }
+}
+
+impl<A: Allocator + Clone> Debug for TaskLazy<A> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        if self.ensure_scanned().is_err() {
+            return f.debug_struct("TaskLazy").finish_non_exhaustive();
+        }
+        match self.clone().into_eager() {
+            Ok(eager) => Debug::fmt(&eager, f),
+            Err(_) => f.debug_struct("TaskLazy").finish_non_exhaustive(),
+        }
+    }
+}
+
+impl<A: Allocator + Clone> DeallocateIn<A> for TaskLazy<A> {
+    #[inline]
+    unsafe fn deallocate_in(self, _alloc: &A) {
+        drop(self);
+    }
+}
+
+::puroro_rt::impl_owned_slot_bounds!(TaskLazy);
+
+impl<A: Allocator + Clone> MessageEncode for TaskLazy<A> {
+    fn encoded_len(&self, _ctx: &mut EncodeCtx) -> usize {
+        self._common.lazy.scan.body_len()
+    }
+
+    fn encode_raw<B: BufMut>(&self, _ctx: &mut EncodeCtx, buf: &mut B) {
+        self._common
+            .lazy
+            .scan
+            .write_bodies(buf)
+            .expect("lazy wire span out of range");
+    }
+}
+
+impl<A: Allocator + Clone> MessageMerge for TaskLazy<A> {
+    fn merge_from_with_depth<B: DecodeBuf>(
+        &mut self,
+        buf: &mut B,
+        depth: usize,
+    ) -> Result<(), DecodeError> {
+        if depth >= RECURSION_LIMIT {
+            return Err(DecodeError::RecursionLimitExceeded);
+        }
+        self.ingest_buf(buf)
+    }
+}
+
+impl<A: Allocator + Clone> DefaultIn<A> for TaskLazy<A> {
+    #[inline]
+    fn default_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+}
+
+impl<A: Allocator + Clone> Message for TaskLazy<A> {
+    type Alloc = A;
+
+    fn new_in(alloc: A) -> Self
+    where
+        A: Clone,
+    {
+        Self::new_in(alloc)
+    }
+
+    fn encode<B: BufMut>(&self, buf: &mut B) {
+        ::puroro_rt::encode_message(self, buf)
+    }
+
+    fn encode_to_vec(&self) -> Vec<u8> {
+        ::puroro_rt::encode_message_to_vec(self)
+    }
+
+    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError>
+    where
+        A: Clone,
+    {
+        self.ingest_buf(buf)
+    }
+
+    fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
+        iter::empty()
+    }
+
+    fn validate(&self) -> Result<(), DecodeError> {
+        Ok(())
     }
 }

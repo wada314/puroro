@@ -53,7 +53,7 @@ use crate::task::{
 ///
 /// `L` is the ingest layout ([`Eager`] / [`Lazy`]). Public names stay the
 /// aliases [`Task`] / [`TaskLazy`].
-pub struct TaskImpl<A: Allocator = Global, L: task::Layout<A> = Eager> {
+pub struct TaskImpl<A: Allocator + Clone = Global, L: task::Layout<A> = Eager> {
     pub(crate) _common: MessageCommon<L::Bits, A, UnknownFields<A>, L>,
     pub(crate) title:
         SingularField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }, A, L::TitleLen>, // proto: string title = 1;
@@ -114,7 +114,7 @@ pub type Task<A = Global> = TaskImpl<A, Eager>;
 /// Lazy [`TaskImpl`].
 pub type TaskLazy<A = Global> = TaskImpl<A, Lazy<A>>;
 
-impl<A: Allocator> Task<A> {
+impl<A: Allocator + Clone> Task<A> {
     pub fn title<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>>
     where
         A: 'a,
@@ -675,7 +675,7 @@ impl<A: Allocator + Clone> Clone for Task<A> {
     }
 }
 
-impl<A: Allocator> PartialEq for Task<A> {
+impl<A: Allocator + Clone> PartialEq for Task<A> {
     fn eq(&self, other: &Self) -> bool {
         matches!(
             self.visit_field_pairs(
@@ -687,7 +687,7 @@ impl<A: Allocator> PartialEq for Task<A> {
     }
 }
 
-impl<A: Allocator> fmt::Debug for Task<A> {
+impl<A: Allocator + Clone> fmt::Debug for Task<A> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut v = DebugStructVisitor::new(f.debug_struct("Task"), &self._common);
         let _ = self.visit_fields(&mut v);
@@ -699,7 +699,7 @@ impl<A: Allocator> fmt::Debug for Task<A> {
 // Drop — releases every unmanaged field through the single allocator
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator, L: task::Layout<A>> TaskImpl<A, L> {
+impl<A: Allocator + Clone, L: task::Layout<A>> TaskImpl<A, L> {
     fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<L::Bits, A, UnknownFields<A>, L>>>(
         &mut self,
         v: &mut V,
@@ -726,7 +726,7 @@ impl<A: Allocator, L: task::Layout<A>> TaskImpl<A, L> {
     }
 }
 
-impl<A: Allocator, L: task::Layout<A>> Drop for TaskImpl<A, L> {
+impl<A: Allocator + Clone, L: task::Layout<A>> Drop for TaskImpl<A, L> {
     fn drop(&mut self) {
         let mut v = FieldDeallocVisitor::new(&self._common);
         let _ = self.visit_fields_mut(&mut v);
@@ -738,7 +738,7 @@ impl<A: Allocator, L: task::Layout<A>> Drop for TaskImpl<A, L> {
 // DeallocateIn — required for nested `UnmanagedBox` / catalog bounds
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator> ::puroro_rt::DeallocateIn<A> for Task<A> {
+impl<A: Allocator + Clone> ::puroro_rt::DeallocateIn<A> for Task<A> {
     #[inline]
     unsafe fn deallocate_in(self, _alloc: &A) {
         // Heap is owned by `self._common.alloc`; parent-passed `alloc` is only
@@ -753,7 +753,7 @@ impl<A: Allocator> ::puroro_rt::DeallocateIn<A> for Task<A> {
 // Message
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator> MessageEncode for Task<A> {
+impl<A: Allocator + Clone> MessageEncode for Task<A> {
     fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
         let mut v = EncodedLenVisitor::new(&self._common, ctx);
         let _ = self.visit_fields(&mut v);
@@ -944,7 +944,7 @@ impl<A: Allocator + Clone> ::puroro_rt::DefaultIn<A> for Task<A> {
     }
 }
 
-impl<A: Allocator> Message for Task<A> {
+impl<A: Allocator + Clone> Message for Task<A> {
     type Alloc = A;
 
     fn new_in(alloc: A) -> Self

@@ -89,7 +89,9 @@ macro_rules! impl_copy_slot_bounds {
 #[macro_export]
 macro_rules! impl_owned_slot_bounds {
     ($t:ident) => {
-        impl<A: ::allocator_api2::alloc::Allocator> $crate::DeallocateBound<A> for $t<A> {
+        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone>
+            $crate::DeallocateBound<A> for $t<A>
+        {
             #[inline]
             fn deallocate_bound<Cx: $crate::MessageBindingMut<A>>(self, common: &Cx) {
                 unsafe { $crate::DeallocateIn::deallocate_in(self, common.alloc()) }

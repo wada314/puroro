@@ -2,7 +2,10 @@
 //!
 //! The first implementation stores bytes in [`Bytes`] (global allocator).
 //! [`SharedWire`] still carries `A` so a later `AllocVec` + refcount swap
-//! keeps the same call sites.
+//! keeps the same call sites. `clone_handle` / `slice` clone that `A` so a
+//! lazy child keeps the parent's allocator type. That is why generated
+//! messages require `A: Clone` on the struct; see DESIGN.md,
+//! "Why `A: Clone` is a struct bound".
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bytes::{Bytes, BytesMut};
