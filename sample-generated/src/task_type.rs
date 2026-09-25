@@ -86,7 +86,10 @@ pub struct TaskImpl<A: Allocator + Clone = Global, L: task::Layout<A> = Eager> {
         A,
     >, // proto: Priority priority = 10;
     pub(crate) assignee:
-        SingularField<ProtoMessage<AddressLazy<A>>, MessagePresence, { FIELD_ASSIGNEE }, A, Boxed>, // proto: Address assignee = 11 (lazy child)
+        SingularField<ProtoMessage<AddressLazy<A>>, MessagePresence, { FIELD_ASSIGNEE }, A, Boxed>, // proto: Address assignee = 11;
+    // Hand-written stand-in for `(puroro.child_parse) = LAZY`: pinned on both
+    // aliases, not the default. Unspecified fields follow `L` (`origin`,
+    // `watchers`, `postal`). See DESIGN.md, "Child parse timing".
     // proto: oneof notification { string email_address=12; string phone_number=13;
     //                             int32 webhook_id=14 [default=-1]; Address postal=15;
     //                             bool urgent=18; }

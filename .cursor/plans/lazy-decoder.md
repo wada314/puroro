@@ -49,6 +49,33 @@ packed fields show up in numbers.
 - Lazy is **read-oriented**. Mutation is `into_eager(self) -> Result<Task<A>,
   DecodeError>` (and then the existing mut API). No lazy `_mut` in v1.
 
+### Nested child parse timing (2026-09-24)
+
+Default: the child follows the parent layout. Eager parent stores an eager
+child; lazy parent stores a lazy child. Callers still pick the parent by
+using `Task` or `TaskLazy`. The option does not collapse those two aliases
+into one.
+
+Override with `(puroro.child_parse)` = `EAGER` / `LAZY` / `UNSPECIFIED`:
+
+1. Field option, when set.
+2. Otherwise the enclosing message option, when set (default for fields
+   declared on that message, not for every use of that type elsewhere).
+3. Otherwise follow the parent layout.
+
+Applies to singular messages, repeated messages, map values, and oneof
+message variants. Orthogonal to `(puroro.message_layout)` (inline vs boxed).
+A pin that differs from the parent is a concrete child type on both aliases.
+A follow-parent field is a `Layout` associated type.
+
+Sample: `origin` / `watchers` / `postal` are step 3. `assignee` is a
+hand-written field-level `LAZY` pin (`AddressLazy` even on eager `Task`,
+`set_assignee` goes through `into_lazy`). Do not emit that pin unless the
+option says so.
+
+Not in `options.proto` yet. Reserve `51404` on `FieldOptions` and
+`MessageOptions` when the generator starts reading it.
+
 ### Parse model (hybrid B + incremental scan)
 
 `merge_from` of two **complete** messages is protobuf merge (last-wins /
