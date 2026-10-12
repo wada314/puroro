@@ -130,7 +130,7 @@ protobuf-core           Varint, Tag, WireType
 | **Oneof** | **Yes** (replaces slot) | alloc |
 | Unknown tags | No | unknown buffer |
 
-`TaskLazy<A>` layout: [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing).
+`TaskLazy<A>` layout: [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing). The rejected per-field `FieldCache` machine is not the implementation.
 
 ---
 
@@ -151,7 +151,7 @@ protobuf-core           Varint, Tag, WireType
 | Closed-enum unknown → `DecodeError::UnknownClosedEnum` → unknown fields, `validate_required` | **Done** |
 | Nested message via `ProtoMessage<M>` (sample `origin` / `assignee` / `postal`) | **Done** |
 | Nested message via `SingularField<ProtoMessage<…>, …>` (repeated / fixtures) | **Done** |
-| [`sample-generated`](sample-generated/) (`Task` / `Address` / `School`) | **Done** — hand-written normative eager output |
+| [`sample-generated`](sample-generated/) (`Task` / `TaskLazy`, `Address` / `AddressLazy`, `School`) | **Done** — hand-written normative eager and lazy output |
 | `Fixed*` / float / double markers on `SingularField` / `RepeatedField` (via `NumericalType`) | **Done** |
 | Repeated catalog (`RepeatedField<T, E, FIELD>`) | **Done** |
 | `protoc-gen-puroro` plugin I/O (`CodeGeneratorRequest` / `Response`) | **Done** |
@@ -161,7 +161,7 @@ protobuf-core           Varint, Tag, WireType
 | Module forest + `ModuleLayout::SingleFile` | **Done** (`FileTree` deferred) |
 | Empty-message emission (no fields / nested types) | **Done** — compile-tested via [`puroro-codegen-tests`](puroro-codegen-tests/) (`protoc` + plugin) |
 | FieldKind IR (`plan_fields`, bit assignment, catalog kind) | **Done** — scalars / repeated / enum / oneof / map / custom defaults; synthetic `map_entry` messages planned as `FieldKind::Map` (not emitted as structs) |
-| FieldKind → catalog emission (struct members, accessors, visitors) | **Done** — singular + repeated scalar / string / bytes / bool / enum / message; real oneof groups; maps; `[default = …]` markers (`mod defaults` + `SingularField` `D`); nested message/enum decls; zero-less enums (`Type`/`Label`); official `descriptor.proto`+`plugin.proto` compile-tested. Typed extensions / services not yet |
+| FieldKind → catalog emission (struct members, accessors, visitors) | **Done** — eager and lazy aliases (`Name` / `NameLazy` = `NameImpl<A, Eager>` / `NameImpl<A, Lazy<A>>`); singular + repeated scalar / string / bytes / bool / enum / message; real oneof groups; maps; `[default = …]` markers (`mod defaults` + `SingularField` `D`); `(puroro.child_parse)` / `(puroro.message_child_parse)`; nested message/enum decls; zero-less enums (`Type`/`Label`); official `descriptor.proto`+`plugin.proto` compile-tested. `MessageFallible` is not emitted. Typed extensions / services not yet |
 
 Live plugin emits both aliases for every message (`Name` = `NameImpl<A, Eager>`, `NameLazy` = `NameImpl<A, Lazy<A>>`) via `resolved::resolve` + [`field_kind::plan_fields`](protoc-gen-puroro/src/field_kind.rs): singular / repeated / enum / message / real oneof / map / custom defaults, plus `(puroro.child_parse)` / `(puroro.message_child_parse)`. The struct bound is `A: Allocator + Clone` on both aliases ([DESIGN.md](DESIGN.md#why-a-clone-is-a-struct-bound)). Coverage is split across [`puroro-codegen-tests`](puroro-codegen-tests/) fixtures (`scalars`, `oneof_basic`, `map_basic`, `custom_defaults`, `utf8_validation`, `lazy_basic`, …; official `descriptor.proto` / `plugin.proto` by `official_plugin`). Deliberate differences from the hand-written sample — flat module layout, short-name `use`s, omitted `@generated` headers — are documented in [§9](#9-struct-layout) / [§17.1](#171-submessage-inline-optimisation); they are not missing field features. Remaining generator gaps outside the sample surface: typed extensions, services, `FileTree` layout.
 
@@ -840,7 +840,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 | Map wrappers | `MapField` + `MapKey` / `RepeatedElement` (sample `attributes`) | — |
 | `protoc-gen-puroro` field emission | Eager and lazy aliases (`Name` / `NameLazy`); singular / repeated / enum / message / oneof / map / defaults / `child_parse`; see [§3](#3-implementation-status) | Typed extensions / services |
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |
-| `TaskLazy` | Plugin emits `NameLazy` (hybrid scan + `WireOrSso`). Hand-written sample remains the shape reference | [`.cursor/plans/lazy-decoder.md`](.cursor/plans/lazy-decoder.md) — not the DESIGN §8 cache machine |
+| `TaskLazy` | Plugin emits `NameLazy` (one scan, numericals applied immediately, `WireOrSso` / span lists). Sample is the same shape. Lazy `unknown_fields()` is empty. `MessageFallible` is eager-only | [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing); lock: [`.cursor/plans/lazy-decoder.md`](.cursor/plans/lazy-decoder.md) |
 | `Hash` / `serde` | Deferred | Opt-in features |
 | Unknown-field reject-on-decode | Preserve / Discard only (`UnknownStore` is write-or-drop) | Optional `REJECT` (DESIGN.md §8.2): `DecodeError` on unknown tag; not a third blob store |
 | Submessage inline | Sample singular **and** oneof nested messages use [`ProtoMessage<M>`](puroro-rt/src/fields/wire/proto_message.rs): inline slot = full `M`, boxed slot = `UnmanagedBox<M>`, getters are `&M` / `&mut M`. Repeated / map store `M` | codegen ([§17.1](#171-submessage-inline-optimisation)) |

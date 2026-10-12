@@ -162,7 +162,7 @@ let s: &str = task.title().get();
 if task.max_retries().is_set() { … }
 ```
 
-**Lazy implementations (`TaskLazy`).** On the eager path, `Optional::new` receives `Some(value)` or `None` derived from the field's presence bit (in the message common bits) and value slot.  On the lazy path (future, [§8](#tasklaya--lazy-parse-timing)), getters **wire-scan** the stored buffer and semantically decode on demand; a fallible getter would return `Err` before constructing `Optional` if decode fails (e.g. `InvalidUtf8`). Presence checks via `optional().is_set()` may wire-scan without semantic decode.
+**Lazy implementations (`TaskLazy`).** On the eager path, `Optional::new` receives `Some(value)` or `None` derived from the field's presence bit and value slot. On the lazy alias ([§8](#tasklaya--lazy-parse-timing)), numericals are already materialised when the scan finishes. A string or bytes getter decodes its span on first read and returns `Err` before constructing `Optional` if that decode fails (for example `InvalidUtf8`). `has_*` reports wire presence and does not UTF-8-check the payload.
 
 The concrete `D` type is the field wrapper's default marker (`ProtoDefault`, or a message-local ZST such as `MaxRetriesDefault` for `[default = 3]`). Callers never name it: accessors return `Optional<…, impl HasDefault<T>>`.
 
@@ -214,10 +214,11 @@ pub trait Message: Sized {
 
 This section is the normative reference for what the code generator emits. All field patterns are illustrated using a single **editions** reference schema, since editions can express every variant (implicit/explicit presence, custom defaults, required-like semantics, open/closed enums, packed/expanded repeated) in one file.
 
-This section is the **normative** eager-path shape. Hand-written [`sample-generated/`](sample-generated/) is the reference implementation of that shape; the live `protoc-gen-puroro` plugin emits the same eager-path field families (status: [IMPLEMENTATION.md §3](IMPLEMENTATION.md#3-implementation-status)). Deliberate sample-vs-production differences — flat modules, short-name `use`s, no `@generated` header — are documented there and in [IMPLEMENTATION.md §9](IMPLEMENTATION.md#9-struct-layout). For each message type the generator must emit:
+This section is the **normative** eager-path shape. The lazy alias uses the same field names with `Result` getters and no mutators ([§8](#tasklaya--lazy-parse-timing)). Hand-written [`sample-generated/`](sample-generated/) is the reference implementation; the live `protoc-gen-puroro` plugin emits both aliases (status: [IMPLEMENTATION.md §3](IMPLEMENTATION.md#3-implementation-status)). Deliberate sample-vs-production differences — flat modules, short-name `use`s, no `@generated` header — are documented there and in [IMPLEMENTATION.md §9](IMPLEMENTATION.md#9-struct-layout). For each message type the generator must emit:
 
 1. **The primary struct** — a full-featured owned implementation (§4.0–4.10), internally a product of **`puroro_rt::fields` catalog types** + shared `MessageCommon` (see [IMPLEMENTATION.md §2](IMPLEMENTATION.md#2-architecture-overview)). Field accessors are **inherent methods** on that struct.
-2. **(Future) Per-message traits + specialized structs** — `foo::Message` / `foo::MessageFallible` (in that message's companion module) and alternative layouts (`TaskLazy`, `TaskView`) for generic interoperability across implementations ([§8](#8-future-work)). They are **not** part of the eager path; [`sample-generated/`](sample-generated/) remains the normative shape until then.
+2. **The lazy alias** — `TaskLazy<A> = TaskImpl<A, Lazy<A>>`, same field names, `Result<_, DecodeError>` getters, no `_mut` ([§8](#tasklaya--lazy-parse-timing)). [`sample-generated/`](sample-generated/) is the reference shape; the plugin emits the same pair of aliases.
+3. **(Future) Per-message traits and `TaskView`** — `foo::Message` / `foo::MessageFallible` (in that message's companion module) and `TaskView<'buf>` ([§8](#8-future-work)). The plugin does not emit those traits. The handwritten sample implements `task::MessageFallible` on eager `Task` only.
 
 Generated Rust is not hand-edited. Navigational comments in generated output are **not required**; semantics and usage are documented on the library API (`puroro` / `puroro-rt` rustdoc) and in this document / [IMPLEMENTATION.md](IMPLEMENTATION.md). Production modules still carry an `@generated` file header ([IMPLEMENTATION.md §9](IMPLEMENTATION.md#generated-headers)). Reference shape: [`sample-generated/`](sample-generated/).
 
@@ -239,7 +240,7 @@ Generated Rust is not hand-edited. Navigational comments in generated output are
 
 Do **not** `pub use` a nested type into the same module as its parent struct. That is what would make `message Foo { message Foo {} }` (and `message Foo { enum Foo {} }`) collide.
 
-**Companion item names omit the message.** The companion module is already the namespace, so generated items there do not repeat the message's Pascal name. For `message Task` the paths are `task::Inner`, `task::Kind`, `task::notification::Notification`, `task::MaxRetriesDefault` — not `TaskInner` / `TaskNotification` / `TaskMaxRetriesDefault`. The same rule covers message-local traits: `task::Message` and `task::MessageFallible`, not `TaskMessage` / `TaskMessageFallible`. The hand-written sample's ingest-kind trait follows it too (`task::Layout`, `address::Layout`, `point::Layout`); the plugin does not emit that trait yet. Do not `pub use` these into the parent next to the struct. `Message` would sit beside `puroro::Message`, and `Layout` / `MessageFallible` would collide across messages. Callers qualify them (`task::MessageFallible`). `Layout` and `MessageFallible` are generic identifiers; keep the companion module in the path rather than importing the bare name.
+**Companion item names omit the message.** The companion module is already the namespace, so generated items there do not repeat the message's Pascal name. For `message Task` the paths are `task::Inner`, `task::Kind`, `task::notification::Notification`, `task::MaxRetriesDefault` — not `TaskInner` / `TaskNotification` / `TaskMaxRetriesDefault`. The same rule covers message-local traits: `task::Message` and `task::MessageFallible`, not `TaskMessage` / `TaskMessageFallible`. The ingest-kind trait follows it too (`task::Layout`, `address::Layout`, `point::Layout`). The plugin emits that trait in the companion. Do not `pub use` these into the parent next to the struct. `Message` would sit beside `puroro::Message`, and `Layout` / `MessageFallible` would collide across messages. Callers qualify them (`task::MessageFallible`). `Layout` and `MessageFallible` are generic identifiers; keep the companion module in the path rather than importing the bare name.
 
 Message-typed *fields* (e.g. `Address assignee`) reference sibling generated types by path; they do **not** by themselves create a nested module under the parent message.
 
@@ -315,7 +316,7 @@ If a new public API would need a `puroro-rt` name, **add or reexport a stable st
 
 ### 4.0 Inherent accessors (current)
 
-The normative generated API is the concrete message struct's inherent `impl` block. Sample messages ([`Task`](sample-generated/src/task_type.rs) / [`School`](sample-generated/src/school_type.rs) / [`Student`](sample-generated/src/student_type.rs) / [`Point`](sample-generated/src/point_type.rs) / [`Address`](sample-generated/src/address_type.rs)) are owned-only (`Drop` / `Message`); an inlined child is a full `M`, not a view over a shared parent common. Per-message traits (`foo::Message` / `foo::MessageFallible`, in the companion) stay [§8](#8-future-work). Callers of today's generated plugin output use the concrete type (or [`Message`](#message) for codec / infrastructure).
+The normative generated API is the concrete message struct's inherent `impl` block. Sample messages ([`Task`](sample-generated/src/task_type.rs) / [`School`](sample-generated/src/school_type.rs) / [`Student`](sample-generated/src/student_type.rs) / [`Point`](sample-generated/src/point_type.rs) / [`Address`](sample-generated/src/address_type.rs)) are owned-only (`Drop` / `Message`); an inlined child is a full `M`, not a view over a shared parent common. Each message is also a lazy alias (`TaskLazy`, …) with fallible getters and no mutators ([§8](#tasklaya--lazy-parse-timing)). Per-message traits (`foo::Message` / `foo::MessageFallible`, in the companion) stay [§8](#8-future-work). Callers of today's generated plugin output use `Name` or `NameLazy` (or [`Message`](#message) for codec / infrastructure).
 
 **Read / write shape (eager `Task<A>`):**
 
@@ -1244,7 +1245,7 @@ Repeated field accessors return a reference to a contiguous sequence rather than
 
 ### Inherent accessors as the current public contract
 
-Today the generator emits only the concrete struct and its inherent accessors ([§4.0](#40-inherent-accessors-current)). Per-message traits (`foo::Message` / `foo::MessageFallible`, in the companion) are reserved for [§8](#8-future-work) so that eager, lazy, and view layouts can share one generic read API later. Plugin-generated generic code still uses [`Message`](#message) for codec / infrastructure, or is monomorphised over the concrete type for field access.
+The generator emits two aliases and their inherent accessors ([§4.0](#40-inherent-accessors-current)): eager `Name` and lazy `NameLazy`. Per-message traits (`foo::Message` / `foo::MessageFallible`, in the companion) are reserved for [§8](#8-future-work) so that eager, lazy, and view layouts can share one generic read API later. Plugin-generated generic code still uses [`Message`](#message) for codec / infrastructure, or is monomorphised over the concrete alias for field access.
 
 ### `Default` bound on `Message::decode`
 
@@ -1272,7 +1273,7 @@ The code generator is the `protoc-gen-puroro` crate, invoked as a `protoc` plugi
 
 ### `Bytes` for lazy wire storage vs `A: Allocator` for decoded values
 
-Eager `Task<A>` stores decoded field data in allocator-less `unmanaged` containers (`UnmanagedString`, `UnmanagedVec<i32>`, …) that share the single `MessageCommon.alloc`.  `TaskLazy<A>` stores the opaque wire stream in **`bytes::Bytes`** so nested messages can share the parent's allocation through **`Bytes::slice`** without copying LEN payloads.  Allocator customisation applies to **owned decoded data**; wire blobs prioritise cheap sharing and sub-slicing over per-field allocator control.
+Eager `Task<A>` stores decoded field data in allocator-less `unmanaged` containers (`UnmanagedString`, `UnmanagedVec<i32>`, …) that share the single `MessageCommon.alloc`. `TaskLazy<A>` stores the opaque wire stream in [`SharedWire`](puroro-rt/src/decode/shared_wire.rs) (`bytes::Bytes` plus `A`) so a nested lazy child can share the parent's allocation through a span without copying the LEN payload. Allocator customisation applies to **owned decoded data**; the wire blob prioritises cheap sharing and sub-slicing over placing those bytes in `A`.
 
 ---
 
@@ -1280,135 +1281,52 @@ Eager `Task<A>` stores decoded field data in allocator-less `unmanaged` containe
 
 ### Per-message traits (not yet generated)
 
-Planned interoperability traits, emitted per message once specialized layouts land:
+Planned interoperability traits. The lazy alias shipped without them:
 
 - **`foo::Message`** — infallible getters matching the inherent shapes in [§4.0](#40-inherent-accessors-current) (for eager implementations). Defined in the companion (`task::Message` for `message Task`). Not re-exported beside the struct.
 - **`foo::MessageFallible`** — `Result`-returning getters for lazy / view layouts (`Error = DecodeError` or `Infallible` on eager). Same placement (`task::MessageFallible`).
 
-These traits are **not** yet emitted by `protoc-gen-puroro`. The hand-written [`sample-generated`](sample-generated/) crate implements [`task::MessageFallible`](sample-generated/src/task/fallible.rs) on eager `Task` (`Error = Infallible`). [`TaskLazy`](sample-generated/src/task/lazy.rs) currently exposes numerical getters, singular `title` / `owner_id` / `payload` via `WireOrSso`, nested `assignee` / `origin` / `watchers` as [`AddressLazy`](sample-generated/src/address/lazy.rs) / [`PointLazy`](sample-generated/src/point/lazy.rs), and `attributes` as a map-entry offset list ([`LazyMapField`](puroro-rt/src/fields/map/lazy.rs)) that materialises on first get. Successive singular message LENs merge into the still-lazy child during the parent scan; the child shares the island-root [`SharedWire`](puroro-rt/src/decode/shared_wire.rs) and does not copy the LEN payload. `into_eager` replays `_wire` into eager `Task`; finished encode writes `_wire` as-is. Oneof / repeated string getters are still skipped; the type does not implement the trait yet. Other sample messages do not implement the traits. When the generator adds the traits, explicit-presence fields should keep `Optional` as the primary read API; convenience `has_*` / `*_raw` wrappers (if any) would be trait defaults, not a second required surface on the concrete struct.
+These traits are **not** yet emitted by `protoc-gen-puroro`. The hand-written [`sample-generated`](sample-generated/) crate implements [`task::MessageFallible`](sample-generated/src/task/fallible.rs) on eager `Task` (`Error = Infallible`). `TaskLazy` has the same inherent `Result` getters, including oneof and repeated string, and does not implement the trait: a follow-parent field is `Point` on `Task` and `PointLazy` on `TaskLazy`, so one trait cannot name both. Other sample messages do not implement the traits. When the generator adds them, explicit-presence fields should keep `Optional` as the primary read API; convenience `has_*` wrappers (if any) would be trait defaults, not a second required surface on the concrete struct. The lazy alias itself is specified under [lazy parse timing](#tasklaya--lazy-parse-timing).
 
 ### Specialized message implementations
 
-In addition to the primary `Task<A>` struct, the following specialized implementations are planned. Each would implement `task::MessageFallible` (and possibly `task::Message`) and be interchangeable with `Task<A>` in generic code that depends only on the trait.
+Every message has an eager alias and a lazy alias. `TaskView<'buf>` is still planned. A shared `task::MessageFallible` impl for all three is not emitted yet ([Per-message traits](#per-message-traits-not-yet-generated)).
 
 #### `TaskLazy<A>` — lazy parse timing
 
-Implementation lock (2026-09-06): [`.cursor/plans/lazy-decoder.md`](.cursor/plans/lazy-decoder.md). That note supersedes the per-field rescan / `FieldCache` machine below until this section is rewritten.
+Shipped, on the sample and in the plugin. The two aliases are one struct:
 
-`TaskLazy<A>` would implement the same field surface as `Task<A>` via `task::MessageFallible` (`Error = DecodeError`).  All decoding — wire scanning **and** semantic interpretation — is deferred until a getter runs.
-
-##### Wire buffer: `bytes::Bytes` (shared, sliceable)
-
-The internal wire buffer is **`bytes::Bytes`**, not `Vec<u8, A>`.  `Bytes` is a reference-counted handle to a shared byte allocation (internally `Arc` — the same pattern as `Rc`, but `Send + Sync`).  It is already a dependency of `puroro-rt` and is the standard choice in the Rust protobuf/network ecosystem (`prost`, `tonic`, `hyper`).
-
-| Property | Benefit for `TaskLazy` |
-|---|---|
-| Cheap `Clone` | Parent and child messages share one allocation — refcount increment only |
-| `.slice(range)` / `.slice_ref(sub)` | **Zero-copy** sub-range for nested messages — O(1), no payload memcpy |
-| Implements `bytes::Buf` | Wire scanners and existing encode/decode helpers work directly |
-
-**Why not `Vec<u8, A>` for `_wire`?**  Custom allocator support for the *wire blob* is less important than cheap sub-slicing.  Decoded values (`UnmanagedString`, `UnmanagedVec<i32>`, …) still allocate through `A: Allocator`.  Only the opaque wire storage uses `Bytes` (global/shared allocator).
-
-**Alternatives** if `Send` is not required: [`slice-rc`](https://docs.rs/slice-rc) (`Src<T>` — literal `Rc` with `.slice()`).  [`arc-slice`](https://docs.rs/arc-slice) (`ArcSlice` — similar to `Bytes` with custom metadata).  **`bytes::Bytes` is the default choice** unless a future requirement forces otherwise.
-
-##### `merge_from`: store the input buffer only
-
-`merge_from` performs **no parsing of any kind** — no tag reading, no field routing, no payload skipping, no UTF-8 validation. It only **appends the remaining input bytes** to `_wire: Bytes` and **invalidates all field caches**.
-
-| Concern | Behaviour |
-|---|---|
-| Internal storage | `_wire: Bytes` — complete wire stream accumulated across all `merge_from` calls |
-| Append cost | Concatenating on merge may reallocate — **O(n) per merge, not per field access** |
-| Proto merge semantics | Bytes are appended; last-wins / repeated-append applied when getters scan `_wire` |
-| Unknown fields | Stay inside `_wire`; not extracted at merge time |
-| Nested messages | Stay inside `_wire` until a getter slices them into a child |
-
-##### Internal storage (`TaskLazy<A>`)
-
-| Component | Type / role |
-|---|---|
-| `_wire` | `bytes::Bytes` — shared wire blob |
-| Per-field cache | `RefCell<FieldCache<T>>` or similar — see state machine below |
-| `_alloc` | `A` — for decoded values only, not for `_wire` |
-| Nested child | `AddressLazy { _wire: Bytes }` — subslice of parent via `.slice()`, zero-copy |
-
-**Interior mutability** is required because trait accessors take `&self` but populate caches on first decode.
-
-##### Field cache state machine
-
-Each field maintains a **cache slot** (independent of `_wire`).  Slots start **uninitialized** after every `merge_from` that appends data:
-
-```
-Uninitialized   — not yet scanned in _wire (or cache invalidated)
-Absent          — wire-scanned; field not on wire
-WireFound       — optional; payload located as Bytes subslice, not semantically decoded
-Parsed          — semantically decoded and cached
-Failed          — decode error; subsequent getters return Err without re-parsing
+```rust
+pub type Task<A = Global> = TaskImpl<A, Eager>;
+pub type TaskLazy<A = Global> = TaskImpl<A, Lazy<A>>;
 ```
 
-Typical transitions on getter access:
+Eager and lazy are not a runtime enum inside `Task`. Slots that must differ (string / bytes, repeated LEN, maps, follow-parent children) are associated types on the companion `Layout` trait. Numericals, enums, and bools use the same catalog slots on both aliases.
 
-1. **`Uninitialized` → scan `_wire`** (wire-level: read tags, match field number, skip or record payload bounds).
-2. **Presence-only check** (`optional().is_set()` / a future `has_*` trait default) stops after wire scan — sets `Absent` or `WireFound` / equivalent; **no semantic decode**.
-3. **`Optional` getter** continues to **semantic decode** → `Parsed` (or `Failed` on error).
-4. Subsequent calls hit `Parsed` / `Absent` / `Failed` directly.
+`TaskLazy` is read-oriented. It has no `_mut` or `clear_*`. To mutate, call `into_eager(self) -> Result<Task<A>, DecodeError>` and use the eager API. The implementation lock, including what v1 still does not do, is [`.cursor/plans/lazy-decoder.md`](.cursor/plans/lazy-decoder.md).
 
-**Caching is mandatory** once a field has been successfully decoded (`Parsed`).
+**When reads are valid.** `push` accepts one chunk of a single message and applies every complete record. `finish` fails if bytes remain. `merge_from` and `decode` ingest one complete message (`push`, then `finish`). A second `merge_from` is a protobuf merge, not more chunks of the first message. Getters fail until `finish`. They do not return a provisional value.
 
-##### Parse cursor (in `_wire`)
+**What a complete record does.**
 
-Each field that may be read incrementally (especially **repeated** fields) stores a **`cursor: usize`** — a byte offset into `_wire` marking how far a **field-specific wire scan** has progressed:
+| Kind | During the scan | On the getter |
+|---|---|---|
+| Singular numerical / enum / bool | Catalog merge (last wins) | Already materialised |
+| Repeated numerical, packed or expanded | Catalog merge into the vec | `&[T]` |
+| Singular / oneof string / bytes | Store a span (`WireOrSso`) | Semantic decode. `InvalidUtf8` is `Err` before `Optional` is built. A later get does not re-validate. `has_*` is presence only |
+| Nested message | Merge each LEN into the child | `Option<&Child>` |
+| Repeated message | One child per occurrence | `&[Child]` |
+| Map, repeated string, repeated bytes | Store spans | First get materialises the map or the element list |
 
-| Use case | Cursor role |
-|---|---|
-| **Singular fields** | First access scans `_wire` for the **last** occurrence of the field number; cursor not retained after `Parsed` |
-| **Repeated iterator** | Cursor resumes the wire scan for the next occurrence of the field number; each `next()` decodes one element and advances cursor |
-| **Packed repeated** | After locating a LEN record, a sub-cursor may track progress inside the packed payload |
-| **Negative cache** | Once a full scan finds no occurrences, slot becomes `Absent` — no rescan until next `merge_from` invalidates |
+Child layout follows [Child parse timing](#child-parse-timing). A follow-parent field is a `Layout` associated type. A pin is a concrete child type on both aliases.
 
-The cursor lives in the field's cache slot (or a companion scan state), always relative to **`_wire`**.
+The wire blob is [`SharedWire`](puroro-rt/src/decode/shared_wire.rs): `bytes::Bytes` plus the message's `A`. A lazy child keeps a handle and a span. It does not copy the LEN body. A LEN that straddles `push` chunks is copied when the record becomes complete. `&str` and a child body are one contiguous region. `Bytes` is the wire store because sub-slicing matters more than placing that blob in `A`. Decoded values still allocate through `A`.
 
-##### Getter timing and `Result<Optional<…>>` semantics
+**Encode and equality.** Encode of a finished lazy message writes the ingested wire as-is. Field order need not match an eager encode. After more than one `merge_from`, the encoded length is the concatenated ingest. `PartialEq` and `Debug` compare semantics by building the eager message. `unknown_fields()` on the lazy alias is empty. Unknown tags stay in the wire and appear on the eager message after `into_eager`.
 
-Explicit-presence fields expose `Result<Optional<T, impl HasDefault<T>>, DecodeError>` on the fallible trait.  **`Optional` is only constructed after a successful semantic decode** — never before.
+**Rejected.** An earlier sketch gave each field its own scan of the parent (`Uninitialized` / `WireFound` / `Parsed`, plus a per-field cursor and `tag_ids_all`). Last-wins singular getters would each walk the whole stream, so v1 does not do that. There is no public "is this field loaded?" API, no lazy `_mut`, and no getter before `finish`.
 
-| Accessor | Wire scan | Semantic decode | Error timing |
-|---|---|---|---|
-| Presence-only (`is_set` / optional future `has_*`) | **Yes** — scan `_wire` for field number; skip payloads | **No** | Wire errors (truncated tag, bad varint) → `Err`. Invalid UTF-8 in an unread payload → **not** detected |
-| `*_()` → `Result<Optional<…>>` | **Yes** — locate payload (or use cache) | **Yes** — full field decode | Semantic failure (e.g. `InvalidUtf8`) → **`Err` before `Optional` is built** |
-
-Because a presence-only check performs wire scanning but not semantic validation, **`title()?.is_set() == true` does not guarantee a later semantic read of the same field succeeds** if the cache was only at `WireFound` — malformed UTF-8 surfaces when the `Optional` getter runs the semantic decode.
-
-For **implicit-presence** scalars (`score`), the getter wire-scans for the last occurrence (or returns zero if absent), then semantically decodes.
-
-##### Nested messages — zero-copy via `Bytes::slice`
-
-On first access to `assignee()`, the parent wire-scans `_wire` for field 11, then sets the child's `_wire` to `parent._wire.slice(start..start + len)` — **O(1) refcount, no payload copy**. The child shares the parent's allocation until all `Bytes` handles are dropped. The child stores the subslice only; semantic decode happens when the child's getters run.
-
-Repeated nested messages each get their own `Bytes` subslice from the same parent allocation.
-
-> **Contrast with `TaskView<'buf>`.**  `TaskView` uses borrowed `&'buf [u8]` subslices (lifetimes).  `TaskLazy` uses owned `Bytes` subslices (reference counting) so nested types need no lifetime parameter and can live in struct fields indefinitely.
-
-##### Singular vs repeated decode granularity
-
-| Field kind | On getter access |
-|---|---|
-| Singular scalar / string / bytes / enum | Wire-scan `_wire` for last occurrence → **full semantic decode** of that payload |
-| Repeated | Wire-scan from **cursor** for next occurrence → decode **one element**; `tag_ids_all()` scans/decodes all remaining occurrences and may set `Parsed(Vec<…>)` |
-| Nested message | Wire-locate LEN payload → **`Bytes::slice` into child `_wire`** (zero-copy) → lazy subtree |
-
-There is no meaningful partial **semantic** decode within a singular string or scalar — once located on the wire, the full payload is decoded.
-
-##### Trait implementation
-
-- Implements `task::MessageFallible` with `Error = DecodeError` (once that trait exists; see [Per-message traits](#per-message-traits-not-yet-generated)).
-- Explicit-presence fields implement the fallible `Optional` getter; any `has_*` / `*_raw` conveniences would be trait defaults only.
-- Does **not** implement `task::Message` (infallible) — all access goes through the fallible trait.
-
-**Native methods beyond the trait:**
-
-- **`into_eager(self) -> Result<Task<A>, DecodeError>`** — wire-scan and decode all fields; build eager `Task<A>`.
-- **`tag_ids_all(&self) -> Result<&[i32], DecodeError>`** — decode all remaining repeated elements in one pass and cache `Parsed(Vec<…>)`.
+`TaskLazy` does not implement `task::MessageFallible`. Follow-parent fields change Rust type with the parent (`Point` versus `PointLazy`). It also does not implement an infallible per-message `task::Message`. Codec goes through [`Message`](#message), whose lazy `merge_from` is the ingest above and whose lazy `unknown_fields` is empty.
 
 #### `TaskView<'buf>` — zero-copy, buffer-referencing
 
@@ -1424,29 +1342,27 @@ There is no meaningful partial **semantic** decode within a singular string or s
 #### Relationship between implementations
 
 ```
-task::Message (infallible trait)
+task::Message (infallible trait, not emitted)
     ↑ impl
-    Task<A>  ←── primary, all-in-one
+    Task<A>        (planned)
 
-task::MessageFallible (Result-returning trait)
+task::MessageFallible (Result-returning trait, not emitted)
     ↑ impl
-    Task<A>        (Error = Infallible)
-    TaskLazy<A>    (Error = DecodeError)
-    TaskView<'buf> (Error = DecodeError)
+    Task<A>        (handwritten sample only, Error = Infallible)
+    TaskLazy<A>    (not implemented; inherent Result getters)
+    TaskView<'buf> (planned)
 ```
 
-Generic code that only reads fields can be written once against `task::MessageFallible` and used with `Task<A>`, `TaskLazy<A>`, or `TaskView<'buf>`.
+Generic code that only reads fields is meant to use `task::MessageFallible` with `Task<A>`, `TaskLazy<A>`, or `TaskView<'buf>`. Today only eager `Task` implements that trait. `TaskLazy` is a separate alias with its own inherent `Result` getters.
 
 ---
 
 ### Other future work
 
-- **UTF-8 validation (`NONE` path).** Expose an unchecked decode helper; wire per-field dispatch in generated code. (`VERIFY` path exists today.)
-- **Recursion limit enforcement.** Thread depth through nested `merge_from`; return `DecodeError::RecursionLimitExceeded`. (Error variant exists; enforcement is a stub.)
-- **Unknown-field preservation opt-out.** Runtime + plugin: `(puroro.unknown_fields) = DISCARD` bakes [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs). File-level / package default is not wired.
+- **Unknown-field preservation opt-out.** `(puroro.unknown_fields) = DISCARD` bakes [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs) on the eager alias. File-level / package default is not wired. The lazy alias's `unknown_fields()` iterator is empty either way; unknown tags stay in the ingested wire until `into_eager`.
 - **Unknown-field reject-on-decode.** Possible later option (e.g. `REJECT`) that returns `DecodeError` on an unrecognized tag. This is decode control flow, not a third store — `UnknownStore` would need a `Result` path. Preserve + `unknown_fields().next().is_none()` covers post-decode checks. A baked ZST reject is only warranted for “no store word **and** fail”. Closed-enum unknowns stay a separate decision (default: still divert; do not treat as a bad tag). Parent / child independent, same as Discard.
 - **Service / RPC definitions.** Out of scope for the runtime library.
 - **Well-known types.** `google.protobuf.Timestamp`, `Duration`, `Any`, etc.
 - **Reflection / descriptors.** Runtime introspection of message schema.
 - **Extensions.** See §6.5.
-- **Field storage inlining (runtime).** Small non-repeated nested messages, and short `string` / `bytes`, may avoid heap allocation — see [IMPLEMENTATION.md §17.1–17.2](IMPLEMENTATION.md#171-submessage-inline-optimisation).
+- **Repeated / map string and bytes SSO.** Singular string / bytes SSO and singular message inline-or-box are shipped. Repeated and map payloads stay on the heap — see [IMPLEMENTATION.md §17.2](IMPLEMENTATION.md#172-string--bytes-inline-optimisation).

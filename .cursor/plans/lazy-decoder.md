@@ -1,12 +1,21 @@
 # Plan: Lazy decoder (`TaskLazy`)
 
-Discussion lock (2026-09-06). DESIGN.md §8 still describes an older per-field
-rescan / `FieldCache` machine. This note is the implementation lock until that
-section is rewritten. Do not start from DESIGN §8's cache state machine.
+**Status (2026-10-12).** Steps 1–9 are done. The sample and the plugin both
+emit `Name` / `NameLazy` as `NameImpl<A, Eager>` / `NameImpl<A, Lazy<A>>`.
+[DESIGN.md §8](../../DESIGN.md#tasklaya--lazy-parse-timing) describes that
+alias. The per-field `FieldCache` machine is rejected; do not revive it.
+
+Still out of v1: `TaskView`, lazy mutation, `MessageFallible` on the lazy
+alias, intra-field repeated cursors, zero-copy spanning LEN, packed repeated
+left unread.
+
+Discussion lock (2026-09-06). Sentences below that say "do not introduce
+`TaskImpl` yet" or "plugin not done" are the original sequence. The status
+line wins.
 
 Hand-written sample first, same as eager. Plugin last.
 
-## Why this, not DESIGN §8 as written
+## Why not a per-field rescan
 
 Last-wins makes **independent per-field scans** a weak design: a singular getter
 must walk the whole parent stream, so N getters become N full scans.
@@ -292,8 +301,8 @@ No `HashMap` during scan. First map getter may materialise.
 
 Tests: last-wins per key, missing key/value defaults, empty map.
 
-Done (2026-09-06): `LazyMapField` stores `WireSpan`s during the parent scan
-and builds `MapField` on the first `attributes()`. A later parent
+Done (2026-09-06): `MapSpans` stores `WireSpan`s during the parent scan
+and builds the ready map on the first `attributes()`. A later parent
 `merge_from` after that get merges the new entry into the ready map.
 Missing key / value use proto defaults (`""` / `0`). Empty map is empty.
 
@@ -306,7 +315,7 @@ Tests: eager-vs-lazy `PartialEq` after `into_eager`; encode length equals
 `_wire` len when no extra merge after construction from one buffer.
 
 Done (2026-09-06): `into_eager` merges `_wire` into eager `Task` / `Address` /
-`Point` (so skipped oneof / `labels` still land). Finished encode writes
+`Point`. Finished encode writes
 `_wire` as-is. After two parent `merge_from`s, encode length is the
 concatenated ingest; `into_eager` matches eager merge of the same bodies.
 
@@ -316,16 +325,23 @@ One emit template, two aliases. Second struct emission from existing
 `FieldKind`. Public `push` / chunk API, if not already inherent from step 3,
 lands here.
 
+Done (2026-10-12): sample `TaskImpl<A, L>` and the plugin's `NameImpl<A, L>`.
+`push` / `finish` are inherent on the lazy alias. Oneof and repeated string /
+bytes are included. `Layout` associated types cover slots that differ.
+
 ## v1 done / not done
 
-**Done:** sample `TaskLazy` takes chunked or gathered input, `finish`es,
-numericals applied on the scan, string/bytes `WireOrSso`, nested + map as
-offsets, repeated `labels` as an offset list (first get materialises),
-`task::MessageFallible` shared with eager.
+**Done:** sample and plugin lazy aliases. Chunked or gathered input,
+`finish`, numericals applied on the scan, string / bytes `WireOrSso`, nested
+messages and maps as spans, repeated `labels` as a span list (first get
+materialises), oneof, `Layout` associated types. Eager `Task` implements
+handwritten `task::MessageFallible` (`Error = Infallible`).
 
-**Not done:** `TaskView`, lazy mutation, intra-field repeated cursors,
-zero-copy spanning LEN, plugin, layout unification, packed-as-unread-slice,
-oneof.
+**Not done:** `TaskView`, lazy mutation, `MessageFallible` for `TaskLazy`
+(follow-parent fields change type with the parent; the plugin does not emit
+the trait), intra-field repeated cursors, zero-copy spanning LEN,
+packed-as-unread-slice. Lazy `unknown_fields()` is empty; unknown tags stay
+in the wire and surface on `into_eager`.
 
 ## Revisit later — VERIFY string vs closed-enum unknown
 
@@ -341,7 +357,7 @@ the current policy as final. Same question applies to singular lazy
 
 ## Pointers
 
-- DESIGN.md §8 — historical; rewrite after step 5 or when aliases land.
-- IMPLEMENTATION.md §17 — `TaskLazy` row; point here until runtime exists.
+- DESIGN.md §8 — shipped lazy alias. This note keeps the lock and the rejected list.
+- IMPLEMENTATION.md §3 / §17 — plugin status. The runtime exists.
 - `sample-generated/` — eager normative output; lazy is added the same way.
 - `protobuf-core` — varint/tag partial only; no field-level partial API.
