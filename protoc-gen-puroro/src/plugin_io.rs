@@ -5,10 +5,11 @@
 
 use crate::descriptor::features::FeatureSet;
 use crate::descriptor::{
-    BYTES_LAYOUT_OPTION_NUMBER, BytesLayout, CodegenMeta, CodegenRequest, Edition, EnumDesc,
-    EnumValueDesc, FieldDesc, FieldLabel, FieldType, MESSAGE_LAYOUT_OPTION_NUMBER, MessageDesc,
-    MessageLayout, OneofDesc, ProtoFile, ProtoFqn, STRING_LAYOUT_OPTION_NUMBER, StringLayout,
-    Syntax, UNKNOWN_FIELDS_OPTION_NUMBER, UnknownFieldsPolicy,
+    BYTES_LAYOUT_OPTION_NUMBER, BytesLayout, CHILD_PARSE_OPTION_NUMBER, ChildParse, CodegenMeta,
+    CodegenRequest, Edition, EnumDesc, EnumValueDesc, FieldDesc, FieldLabel, FieldType,
+    MESSAGE_LAYOUT_OPTION_NUMBER, MessageDesc, MessageLayout, OneofDesc, ProtoFile, ProtoFqn,
+    STRING_LAYOUT_OPTION_NUMBER, StringLayout, Syntax, UNKNOWN_FIELDS_OPTION_NUMBER,
+    UnknownFieldsPolicy,
 };
 use crate::error::{Error, Result};
 use ::protobuf_core::{
@@ -209,6 +210,7 @@ fn decode_descriptor(bytes: &[u8]) -> Result<MessageDesc> {
         let mut oneofs = Vec::new();
         let mut map_entry = false;
         let mut unknown_fields = UnknownFieldsPolicy::Unspecified;
+        let mut child_parse = ChildParse::Unspecified;
 
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
@@ -226,6 +228,7 @@ fn decode_descriptor(bytes: &[u8]) -> Result<MessageDesc> {
                     let decoded = decode_message_options(expect_len(&field)?)?;
                     map_entry = decoded.map_entry;
                     unknown_fields = decoded.unknown_fields;
+                    child_parse = decoded.child_parse;
                 }
                 // repeated OneofDescriptorProto oneof_decl = 8;
                 8 => oneofs.push(decode_oneof(expect_len(&field)?)?),
@@ -241,6 +244,7 @@ fn decode_descriptor(bytes: &[u8]) -> Result<MessageDesc> {
             oneofs,
             map_entry,
             unknown_fields,
+            child_parse,
         })
     })
 }
@@ -248,6 +252,7 @@ fn decode_descriptor(bytes: &[u8]) -> Result<MessageDesc> {
 struct DecodedMessageOptions {
     map_entry: bool,
     unknown_fields: UnknownFieldsPolicy,
+    child_parse: ChildParse,
 }
 
 /// `MessageOptions`: `map_entry` (7) and `(puroro.unknown_fields)` (51403).
@@ -255,6 +260,7 @@ fn decode_message_options(bytes: &[u8]) -> Result<DecodedMessageOptions> {
     with_decoding_context("MessageOptions", || {
         let mut map_entry = false;
         let mut unknown_fields = UnknownFieldsPolicy::Unspecified;
+        let mut child_parse = ChildParse::Unspecified;
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
             match field.field_number.as_u32() {
@@ -263,12 +269,17 @@ fn decode_message_options(bytes: &[u8]) -> Result<DecodedMessageOptions> {
                 UNKNOWN_FIELDS_OPTION_NUMBER => {
                     unknown_fields = expect_enum(&field)?;
                 }
+                // extend MessageOptions { optional ChildParse message_child_parse = 51404; }
+                CHILD_PARSE_OPTION_NUMBER => {
+                    child_parse = expect_enum(&field)?;
+                }
                 _ => {}
             }
         }
         Ok(DecodedMessageOptions {
             map_entry,
             unknown_fields,
+            child_parse,
         })
     })
 }
@@ -287,6 +298,7 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
         let mut string_layout = None;
         let mut bytes_layout = None;
         let mut message_layout = None;
+        let mut child_parse = None;
         let mut features = FeatureSet::default();
 
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
@@ -312,6 +324,7 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
                     string_layout = decoded.string_layout;
                     bytes_layout = decoded.bytes_layout;
                     message_layout = decoded.message_layout;
+                    child_parse = decoded.child_parse;
                 }
                 // optional int32 oneof_index = 9;
                 9 => oneof_index = Some(expect_int32(&field)?),
@@ -334,6 +347,7 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
             string_layout,
             bytes_layout,
             message_layout,
+            child_parse,
             features,
         })
     })
@@ -367,6 +381,7 @@ struct DecodedFieldOptions {
     string_layout: Option<StringLayout>,
     bytes_layout: Option<BytesLayout>,
     message_layout: Option<MessageLayout>,
+    child_parse: Option<ChildParse>,
 }
 
 /// `FieldOptions`: `packed` (2), `features` (21), and puroro layout extensions.
@@ -377,6 +392,7 @@ fn decode_field_options(bytes: &[u8]) -> Result<DecodedFieldOptions> {
         let mut string_layout = None;
         let mut bytes_layout = None;
         let mut message_layout = None;
+        let mut child_parse = None;
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
             match field.field_number.as_u32() {
@@ -396,6 +412,10 @@ fn decode_field_options(bytes: &[u8]) -> Result<DecodedFieldOptions> {
                 MESSAGE_LAYOUT_OPTION_NUMBER => {
                     message_layout = Some(expect_enum(&field)?);
                 }
+                // extend FieldOptions { optional ChildParse child_parse = 51404; }
+                CHILD_PARSE_OPTION_NUMBER => {
+                    child_parse = Some(expect_enum(&field)?);
+                }
                 _ => {}
             }
         }
@@ -405,6 +425,7 @@ fn decode_field_options(bytes: &[u8]) -> Result<DecodedFieldOptions> {
             string_layout,
             bytes_layout,
             message_layout,
+            child_parse,
         })
     })
 }

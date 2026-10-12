@@ -52,6 +52,18 @@ pub fn fqn_to_message_root_path<'a>(message: &'a Message<'a>) -> Result<Path> {
     Ok(path)
 }
 
+/// `AddressLazy` in the same module as [`fqn_to_message_root_path`].
+pub fn fqn_to_message_lazy_path<'a>(message: &'a Message<'a>) -> Result<Path> {
+    message_sibling_path(message, "Lazy")
+}
+
+fn message_sibling_path<'a>(message: &'a Message<'a>, suffix: &str) -> Result<Path> {
+    let mut path = parent_module_path(message)?;
+    let ident = Ident::new(&format!("{}{suffix}", message.name()), Span::call_site());
+    path.segments.push(PathSegment::from(ident));
+    Ok(path)
+}
+
 fn root_path() -> Path {
     parse_quote!(self::_root)
 }

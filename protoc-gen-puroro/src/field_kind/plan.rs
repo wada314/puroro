@@ -2,7 +2,7 @@
 
 use super::{
     FieldKind, MessageStoragePlan, PlannedLayout, PlannedPresence, RepeatedEncodingKind,
-    WireTypeKind, field_number_const, value_bit_const,
+    ResolvedChildParse, WireTypeKind, field_number_const, resolve_child_parse, value_bit_const,
 };
 use crate::default_value::interpret_custom_default;
 use crate::descriptor::{BytesLayout, StringLayout};
@@ -17,6 +17,12 @@ pub struct MessageFieldPlan<'a> {
     /// Bits consumed in `MessageCommon` (presence + bool values + string / bytes
     /// SSO heap bits; SSO bit set means heap arm).
     bit_count: usize,
+    /// Eager [`bit_count`](Self::bit_count) plus 2 bits per lazy `WireOrSso` arm.
+    ///
+    /// Equal to `bit_count` when the message has no singular / oneof string or
+    /// bytes field. Lazy messages use `InteriorBitArray` only when this is
+    /// larger.
+    lazy_bit_count: usize,
     /// Bake [`DiscardUnknowns`] into `MessageCommon`.
     discard_unknowns: bool,
 }
@@ -35,6 +41,11 @@ pub struct PlannedField<'a> {
     /// e.g. `FIELD_TITLE`
     field_const: String,
     kind: FieldKind<'a>,
+    /// `(puroro.child_parse)` for this field. Only message-typed fields read it.
+    child_parse: ResolvedChildParse,
+    /// Start index of the lazy 2-bit `WireOrSso` arm. Singular / oneof
+    /// `string` / `bytes` only (including heap-pinned eager slots).
+    lazy_kind_bit: Option<usize>,
 }
 
 /// `OneofSlot` group: variants keep individual [`FieldKind`]s with [`PlannedPresence::Oneof`].
@@ -51,6 +62,13 @@ impl<'a> MessageFieldPlan<'a> {
 
     pub fn bit_count(&self) -> usize {
         self.bit_count
+    }
+
+    /// Bits the lazy message's `InteriorBitArray` must cover.
+    ///
+    /// Same as [`bit_count`](Self::bit_count) when no field stores a lazy LEN arm.
+    pub fn lazy_bit_count(&self) -> usize {
+        self.lazy_bit_count
     }
 
     /// Whether generated code should bake `DiscardUnknowns`.
@@ -78,6 +96,15 @@ impl<'a> PlannedField<'a> {
 
     pub fn kind(&self) -> &FieldKind<'a> {
         &self.kind
+    }
+
+    pub fn child_parse(&self) -> ResolvedChildParse {
+        self.child_parse
+    }
+
+    /// First of the two lazy `WireOrSso` kind bits, if this field has an arm.
+    pub fn lazy_kind_bit(&self) -> Option<usize> {
+        self.lazy_kind_bit
     }
 }
 
@@ -123,6 +150,22 @@ pub fn plan_fields<'a>(
             )));
         }
     }
+
+    // Lazy `WireOrSso` arms sit after the eager bits, in field-number order.
+    // Two bits each. Repeated / map LEN fields do not take an arm.
+    let mut kind_at = next_bit;
+    let mut numbers: Vec<i32> = planned_by_number.keys().copied().collect();
+    numbers.sort_unstable();
+    for number in numbers {
+        let planned = planned_by_number
+            .get_mut(&number)
+            .expect("number taken from the map");
+        if singular_len_slot(planned.kind()) {
+            planned.lazy_kind_bit = Some(kind_at);
+            kind_at += 2;
+        }
+    }
+    let lazy_bit_count = kind_at;
 
     // Second pass: struct member order (oneof groups collapse to one slot).
     let oneof_names: Vec<String> = message.oneofs().map(|o| o.name().to_owned()).collect();
@@ -195,8 +238,21 @@ pub fn plan_fields<'a>(
     Ok(MessageFieldPlan {
         members,
         bit_count: next_bit,
+        lazy_bit_count,
         discard_unknowns: message.discard_unknowns(),
     })
+}
+
+fn singular_len_slot(kind: &FieldKind<'_>) -> bool {
+    match kind {
+        FieldKind::Singular { wire, .. } => {
+            matches!(
+                wire,
+                WireTypeKind::String { .. } | WireTypeKind::Bytes { .. }
+            )
+        }
+        FieldKind::Repeated { .. } | FieldKind::Map { .. } => false,
+    }
 }
 
 fn plan_field<'a>(
@@ -302,6 +358,8 @@ fn plan_field<'a>(
         field,
         field_const,
         kind,
+        child_parse: resolve_child_parse(owner, field),
+        lazy_kind_bit: None,
     })
 }
 

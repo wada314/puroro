@@ -84,6 +84,9 @@ pub struct MessageDesc {
     /// `(puroro.unknown_fields)`, if set. Unspecified / Preserve keep the
     /// default store; Discard bakes `DiscardUnknowns` into the message.
     pub unknown_fields: UnknownFieldsPolicy,
+    /// `(puroro.child_parse)` on the message, if set. Default for fields
+    /// declared here when the field option is unset.
+    pub child_parse: ChildParse,
 }
 
 /// A field (`FieldDescriptorProto` subset).
@@ -109,6 +112,10 @@ pub struct FieldDesc {
     /// `(puroro.message_layout)`, if set. Singular nested messages use this to
     /// pick boxed vs inlined storage.
     pub message_layout: Option<MessageLayout>,
+    /// `(puroro.child_parse)`, if set on the field. Wins over the enclosing
+    /// message option. Meaningful for message-typed fields (singular, repeated,
+    /// map value, oneof variant).
+    pub child_parse: Option<ChildParse>,
     /// Field-level `options.features` (`FeatureSet`), if any fields were set.
     pub features: FeatureSet,
 }
@@ -235,6 +242,28 @@ impl UnknownFieldsPolicy {
     pub fn discard(self) -> bool {
         matches!(self, Self::Discard)
     }
+}
+
+/// Field number of `(puroro.child_parse)` on `FieldOptions` and `MessageOptions`.
+///
+/// Matches `proto/puroro/options.proto`. The same number is used on both
+/// options messages; they are separate extend targets.
+pub const CHILD_PARSE_OPTION_NUMBER: u32 = 51404;
+
+/// `(puroro.child_parse)` — eager vs lazy storage of a nested message.
+///
+/// [`Unspecified`](Self::Unspecified) (and an absent option) follows the
+/// parent layout. [`Eager`](Self::Eager) and [`Lazy`](Self::Lazy) pin the
+/// child on both parent aliases. A message-level value is the default for
+/// fields declared on that message, not for every use of the type.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, TryFrom)]
+#[try_from(repr)]
+#[repr(i32)]
+pub enum ChildParse {
+    #[default]
+    Unspecified = 0,
+    Eager = 1,
+    Lazy = 2,
 }
 
 /// A oneof declaration (`OneofDescriptorProto` subset).

@@ -247,6 +247,37 @@ pub fn sso_bit_const(proto_name: &str) -> String {
     format!("BIT_{}_SSO", to_upper_snake(proto_name))
 }
 
+/// `BIT_TITLE_LAZY_KIND` — start of the 2-bit `WireOrSso` arm (this bit and the next).
+pub fn lazy_kind_bit_const(proto_name: &str) -> String {
+    format!("BIT_{}_LAZY_KIND", to_upper_snake(proto_name))
+}
+
+/// How a nested message is stored relative to its parent.
+///
+/// Field option wins, then the enclosing message option, otherwise
+/// [`Follow`](Self::Follow) (eager parent stores the eager child, lazy parent
+/// stores the lazy child).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ResolvedChildParse {
+    Follow,
+    Eager,
+    Lazy,
+}
+
+/// Resolve `(puroro.child_parse)` for `field` declared on `owner`.
+pub fn resolve_child_parse(owner: &Message<'_>, field: &Field<'_>) -> ResolvedChildParse {
+    use crate::descriptor::ChildParse;
+    match field.child_parse().unwrap_or(ChildParse::Unspecified) {
+        ChildParse::Eager => ResolvedChildParse::Eager,
+        ChildParse::Lazy => ResolvedChildParse::Lazy,
+        ChildParse::Unspecified => match owner.child_parse() {
+            ChildParse::Eager => ResolvedChildParse::Eager,
+            ChildParse::Lazy => ResolvedChildParse::Lazy,
+            ChildParse::Unspecified => ResolvedChildParse::Follow,
+        },
+    }
+}
+
 /// Byte length of `BitArray<[u8; N], Lsb0>` for `bit_count` bits (`N == 0` allowed).
 pub fn bit_array_byte_len(bit_count: usize) -> usize {
     bit_count.div_ceil(8)

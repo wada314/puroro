@@ -52,13 +52,34 @@ enum UnknownFieldsPolicy {
   UNKNOWN_FIELDS_DISCARD = 2;
 }
 
+// Whether a nested message is stored eager or lazy.
+//
+// Unset and `CHILD_PARSE_UNSPECIFIED` follow the parent: an eager parent
+// stores the eager child, a lazy parent stores the lazy child. `EAGER` and
+// `LAZY` pin that child on both parent aliases. Orthogonal to
+// `message_layout` (inline vs boxed).
+//
+// On a message, this is the default for fields declared on that message.
+// It does not force every embedding of that type elsewhere. A field option
+// wins over the enclosing message option.
+enum ChildParse {
+  CHILD_PARSE_UNSPECIFIED = 0;
+  CHILD_PARSE_EAGER = 1;
+  CHILD_PARSE_LAZY = 2;
+}
+
 extend google.protobuf.FieldOptions {
   // Custom-option numbers 50000–99999 are for internal use.
   optional StringLayout string_layout = 51400;
   optional BytesLayout bytes_layout = 51401;
   optional MessageLayout message_layout = 51402;
+  optional ChildParse child_parse = 51404;
 }
 
 extend google.protobuf.MessageOptions {
   optional UnknownFieldsPolicy unknown_fields = 51403;
+  // Same field number as `FieldOptions.child_parse`. Extension names are
+  // unique in a package, so the message-level default cannot reuse that name.
+  // Proto syntax: `(puroro.message_child_parse)`.
+  optional ChildParse message_child_parse = 51404;
 }

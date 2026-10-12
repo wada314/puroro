@@ -56,11 +56,13 @@ child; lazy parent stores a lazy child. Callers still pick the parent by
 using `Task` or `TaskLazy`. The option does not collapse those two aliases
 into one.
 
-Override with `(puroro.child_parse)` = `EAGER` / `LAZY` / `UNSPECIFIED`:
+Override with `EAGER` / `LAZY` / `UNSPECIFIED`:
 
-1. Field option, when set.
-2. Otherwise the enclosing message option, when set (default for fields
-   declared on that message, not for every use of that type elsewhere).
+1. Field option `(puroro.child_parse)`, when set.
+2. Otherwise the enclosing message option `(puroro.message_child_parse)`,
+   when set (default for fields declared on that message, not for every use
+   of that type elsewhere). Extension names are unique in a package, so the
+   message option cannot reuse `child_parse`. Both use field number `51404`.
 3. Otherwise follow the parent layout.
 
 Applies to singular messages, repeated messages, map values, and oneof
@@ -73,8 +75,9 @@ hand-written field-level `LAZY` pin (`AddressLazy` even on eager `Task`,
 `set_assignee` goes through `into_lazy`). Do not emit that pin unless the
 option says so.
 
-Not in `options.proto` yet. Reserve `51404` on `FieldOptions` and
-`MessageOptions` when the generator starts reading it.
+`ChildParse` is in `options.proto`. The plugin reads field number `51404`
+on both `FieldOptions` (`child_parse`) and `MessageOptions`
+(`message_child_parse`).
 
 ### Parse model (hybrid B + incremental scan)
 

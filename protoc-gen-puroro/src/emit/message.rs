@@ -7,21 +7,24 @@
 
 use super::defaults;
 use super::ident::{escape_ident, is_simple_ident, to_pascal_case};
+use super::layout::{self, LayoutAssoc, LayoutAssocKind, LenAccess, MessageApply};
 use super::oneof::{self, OneofEmit, OneofVariantEmit};
-use super::type_path::{fqn_to_enum_root_path, fqn_to_message_root_path};
+use super::type_path::{fqn_to_enum_root_path, fqn_to_message_lazy_path, fqn_to_message_root_path};
 use crate::default_value::CustomDefault;
 use crate::descriptor::features::EnumType;
 use crate::error::{Error, Result};
 use crate::field_kind::{
     FieldKind, MessageFieldPlan, MessageMember, PlannedField, PlannedLayout, PlannedOneof,
-    PlannedPresence, RepeatedEncodingKind, StringCatalogMarker, WireTypeKind, bit_array_byte_len,
+    PlannedPresence, RepeatedEncodingKind, ResolvedChildParse, StringCatalogMarker, WireTypeKind,
+    bit_array_byte_len, lazy_kind_bit_const,
 };
 use crate::module_tree::nested_root_alias;
+use crate::resolved::Message as ResolvedMessage;
 use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
 use ::syn::{Item, Lifetime, Type, parse_quote};
 
-enum FieldEmit {
+pub(super) enum FieldEmit {
     Singular(Box<ScalarEmit>),
     Repeated(Box<RepeatedEmit>),
     Map(Box<MapEmit>),
@@ -29,13 +32,13 @@ enum FieldEmit {
 }
 
 /// Owned per-field facts needed for `quote!` (avoids borrowing `MessageFieldPlan`).
-struct ScalarEmit {
+pub(super) struct ScalarEmit {
     /// Struct / accessor ident — `title`, `r#type`.
-    name: Ident,
+    pub(super) name: Ident,
     /// Raw proto name — `"title"` (for `title_mut`, visit keys).
-    name_str: String,
+    pub(super) name_str: String,
     /// Companion const ident — `FIELD_TITLE`.
-    field_const: Ident,
+    pub(super) field_const: Ident,
     /// Proto field number — `1`.
     number: u32,
     /// `T` type arg — `::puroro_rt::ProtoInt32`, `ProtoString`, `ProtoEnum<Status, Open>`.
@@ -47,7 +50,7 @@ struct ScalarEmit {
     /// `InlineOrHeap<{ task::BIT_TITLE_SSO }>`.
     layout_ty: Option<Type>,
     /// Presence-bit const and index — `Some((BIT_TITLE, 0))`; `None` if Implicit / Message.
-    presence_bit: Option<(Ident, usize)>,
+    pub(super) presence_bit: Option<(Ident, usize)>,
     /// Value / SSO-heap bit — `Some((BIT_DONE_VALUE, 1))`, `Some((BIT_TITLE_SSO, 2))`;
     /// `None` if the payload is a normal `Inline` field.
     value_bit: Option<(Ident, usize)>,
@@ -56,26 +59,36 @@ struct ScalarEmit {
     /// `validate_required` — `LegacyRequired` scalars and inlined required messages.
     required: bool,
     /// Use `.optional()` instead of `.value()`. Enums always do (DESIGN §4.6).
-    optional_getter: bool,
+    pub(super) optional_getter: bool,
     /// `_mut` `DerefMut` target — `i32`, `::puroro::String<A>`, `Address<A>`.
-    mut_target: Type,
+    pub(super) mut_target: Type,
     /// IMPLICIT `.value()` return — `i32`, `&str`, `&[u8]`.
-    implicit_ty: Type,
+    pub(super) implicit_ty: Type,
     /// Payload inside `Optional<…>` — `i32`, `&'a str`, `Status`.
-    optional_ty: Type,
+    pub(super) optional_ty: Type,
     /// Non-type-zero `[default = …]` (`MaxRetriesDefault` + `HasDefault` items).
     custom_default: Option<(CustomDefault, Vec<Item>)>,
     /// `_mut` return: `DerefMut` vs `StringMut` / `BytesMut` (SSO).
     mut_style: SingularMutStyle,
+    /// `mod layout` associated type, when the slot differs by ingest.
+    pub(super) layout: Option<LayoutAssoc>,
+    /// Lazy getter for a singular string / bytes slot.
+    pub(super) len_access: Option<LenAccess>,
+    /// Lazy apply for a singular message. `None` when this is not a message.
+    pub(super) message_apply: Option<MessageApply>,
+    /// Eager type accepted by `set_*` when the field is a `LAZY` pin.
+    pub(super) set_eager: Option<Type>,
+    /// `BIT_*_LAZY_KIND` and its index, when this slot has a `WireOrSso` arm.
+    lazy_kind_const: Option<(Ident, usize)>,
 }
 
-struct RepeatedEmit {
+pub(super) struct RepeatedEmit {
     /// Struct / accessor ident — `tag_ids`, `labels`.
-    name: Ident,
+    pub(super) name: Ident,
     /// Raw proto name — `"tag_ids"`.
     name_str: String,
     /// Companion const ident — `FIELD_TAG_IDS`.
-    field_const: Ident,
+    pub(super) field_const: Ident,
     /// Proto field number — `6`.
     number: u32,
     /// Element marker — `::puroro_rt::ProtoInt32`, `ProtoString`, `ProtoMessage<Address<A>>`.
@@ -85,16 +98,20 @@ struct RepeatedEmit {
     /// Slice vs `RepeatedStringMut` / `RepeatedBytesMut`.
     style: RepeatedAccessorStyle,
     /// `as_slice` element — `i32`, `Address<A>`, `impl Deref<Target = str>`.
-    slice_elem_ty: Type,
+    pub(super) slice_elem_ty: Type,
+    /// Repeated string / bytes (`RepeatedReady` vs `RepeatedSpans`).
+    pub(super) layout: Option<LayoutAssoc>,
+    /// Lazy apply for a repeated message. `None` for non-messages.
+    pub(super) message_apply: Option<MessageApply>,
 }
 
-struct MapEmit {
+pub(super) struct MapEmit {
     /// Struct / accessor ident — `attrs`.
-    name: Ident,
+    pub(super) name: Ident,
     /// Raw proto name — `"attrs"`.
     name_str: String,
     /// Companion const ident — `FIELD_ATTRS`.
-    field_const: Ident,
+    pub(super) field_const: Ident,
     /// Proto field number — `10`.
     number: u32,
     /// Key marker — `::puroro_rt::ProtoString`, `ProtoInt32`.
@@ -102,11 +119,13 @@ struct MapEmit {
     /// Value marker — `::puroro_rt::ProtoInt32`, `ProtoMessage<Address<A>>`.
     value_marker: Type,
     /// `MapRef` / `MapMut` key — `str`, `i32`, `bool`.
-    key_view: Type,
+    pub(super) key_view: Type,
     /// `MapRef` value view — `i32`, `str`, `Address<A>`.
-    value_view: Type,
+    pub(super) value_view: Type,
     /// Pin `MutTarget` for string / bytes values — `::puroro::String<A>`, `Vec<u8, A>`.
     mut_target: Option<Type>,
+    /// `MapReady` vs `MapSpans`, plus a follow-parent value message when there is one.
+    pub(super) layouts: Vec<LayoutAssoc>,
 }
 
 #[derive(Clone, Copy)]
@@ -166,7 +185,7 @@ enum AccessorStyle {
 }
 
 impl FieldEmit {
-    fn name(&self) -> &Ident {
+    pub(super) fn name(&self) -> &Ident {
         match self {
             Self::Singular(f) => &f.name,
             Self::Repeated(f) => &f.name,
@@ -227,13 +246,32 @@ pub(super) fn render_items(
     let bits_ty = quote! {
         ::bitvec::array::BitArray<[u8; #bits_bytes], ::bitvec::order::Lsb0>
     };
-    let common_ty = if field_plan.discard_unknowns() {
-        quote! {
-            ::puroro_rt::MessageCommon<#bits_ty, A, ::puroro_rt::DiscardUnknowns>
-        }
+    let lazy_interior = field_plan.lazy_bit_count() > field_plan.bit_count();
+    let lazy_bytes = bit_array_byte_len(field_plan.lazy_bit_count());
+    let lazy_bits_ty = if lazy_interior {
+        quote! { ::puroro_rt::InteriorBitArray<#lazy_bytes> }
     } else {
-        quote! { ::puroro_rt::MessageCommon<#bits_ty, A> }
+        bits_ty.clone()
     };
+    let unknown_ty = if field_plan.discard_unknowns() {
+        quote! { ::puroro_rt::DiscardUnknowns }
+    } else {
+        quote! { ::puroro_rt::UnknownFields<A> }
+    };
+    // Struct is generic over `L`. Eager inherent methods monomorphize `L = Eager`.
+    let struct_common = quote! {
+        ::puroro_rt::MessageCommon<<L as #companion::Layout<A>>::Bits, A, #unknown_ty, L>
+    };
+    let common_ty = quote! {
+        ::puroro_rt::MessageCommon<
+            <::puroro_rt::Eager as #companion::Layout<A>>::Bits,
+            A,
+            #unknown_ty,
+            ::puroro_rt::Eager,
+        >
+    };
+    let impl_name = Ident::new(&format!("{name_str}Impl"), Span::call_site());
+    let lazy_alias = Ident::new(&format!("{name_str}Lazy"), Span::call_site());
 
     let bit_consts = render_bit_consts(&fields);
     let field_consts = render_field_consts(&fields);
@@ -249,26 +287,43 @@ pub(super) fn render_items(
     let visit_mut = render_visit_calls(&fields, VisitKind::Mut);
     let merge_arms = render_merge_arms(&fields, companion);
     let validate_body = render_validate(&fields);
-    let oneof_modules = render_oneof_modules(&fields, &bits_ty, field_plan.discard_unknowns())?;
+    let oneof_modules = render_oneof_modules(
+        &fields,
+        &bits_ty,
+        &lazy_bits_ty,
+        field_plan.discard_unknowns(),
+    )?;
+    let layout_assocs = collect_layout_assocs(&fields);
+    let layout_items =
+        layout::render_module(&layout_assocs, bits_ty.clone(), lazy_bits_ty, lazy_interior)?;
 
     let companion_items = bit_consts
         .into_iter()
         .chain(field_consts)
         .chain(defaults_module)
+        .chain(layout_items)
         .chain(oneof_modules)
         .collect();
 
-    let type_items = super::parse::parse_items(quote! {
+    let mut type_items = super::parse::parse_items(quote! {
         // @generated message body from protoc-gen-puroro.
 
-        pub struct #name<
-            A: ::allocator_api2::alloc::Allocator = ::allocator_api2::alloc::Global,
+        pub struct #impl_name<
+            A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone = ::allocator_api2::alloc::Global,
+            L: #companion::Layout<A> = ::puroro_rt::Eager,
         > {
-            _common: #common_ty,
+            _common: #struct_common,
             #(#struct_fields)*
         }
 
-        impl<A: ::allocator_api2::alloc::Allocator> #name<A> {
+        pub type #name<A = ::allocator_api2::alloc::Global> = #impl_name<A, ::puroro_rt::Eager>;
+
+        pub type #lazy_alias<A = ::allocator_api2::alloc::Global> =
+            #impl_name<A, ::puroro_rt::Lazy<A>>;
+
+        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone>
+            #impl_name<A, ::puroro_rt::Eager>
+        {
             #(#getters)*
 
             // Internal field walks for codec / Clone / Eq / Drop — not part of the
@@ -305,9 +360,14 @@ pub(super) fn render_items(
                 #(#visit_pair_mut)*
                 ::core::ops::ControlFlow::Continue(())
             }
+        }
 
+        impl<
+            A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
+            L: #companion::Layout<A>,
+        > #impl_name<A, L> {
             fn visit_fields_mut<
-                V: ::puroro_rt::FieldVisitorMut<#common_ty>,
+                V: ::puroro_rt::FieldVisitorMut<#struct_common>,
             >(
                 &mut self,
                 #[allow(unused)] v: &mut V,
@@ -317,11 +377,13 @@ pub(super) fn render_items(
             }
         }
 
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> #name<A> {
+        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone>
+            #impl_name<A, ::puroro_rt::Eager>
+        {
             pub fn new_in(alloc: A) -> Self {
                 Self {
                     _common: ::puroro_rt::MessageCommon::new_in(
-                        ::bitvec::array::BitArray::ZERO,
+                        <::puroro_rt::Eager as #companion::Layout<A>>::empty_bits(),
                         alloc.clone(),
                     ),
                     #(#new_in_fields)*
@@ -329,9 +391,19 @@ pub(super) fn render_items(
             }
 
             #(#mutators)*
+
+            /// Encodes `self` and rebuilds it as the lazy alias.
+            pub fn into_lazy(self) -> #lazy_alias<A> {
+                let alloc = self._common.alloc.clone();
+                let bytes = ::puroro::Message::encode_to_vec(&self);
+                let mut lazy = #lazy_alias::new_in(alloc);
+                ::puroro::Message::merge_from(&mut lazy, &mut bytes.as_slice())
+                    .expect("self-encoded message is a valid body");
+                lazy
+            }
         }
 
-        impl #name<::allocator_api2::alloc::Global> {
+        impl #impl_name<::allocator_api2::alloc::Global, ::puroro_rt::Eager> {
             pub fn new() -> Self {
                 <Self as ::core::default::Default>::default()
             }
@@ -367,7 +439,7 @@ pub(super) fn render_items(
             }
         }
 
-        impl<A: ::allocator_api2::alloc::Allocator> ::core::cmp::PartialEq
+        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::core::cmp::PartialEq
             for #name<A>
         {
             fn eq(&self, other: &Self) -> bool {
@@ -381,7 +453,7 @@ pub(super) fn render_items(
             }
         }
 
-        impl<A: ::allocator_api2::alloc::Allocator> ::core::fmt::Debug
+        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::core::fmt::Debug
             for #name<A>
         {
             fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
@@ -392,8 +464,10 @@ pub(super) fn render_items(
             }
         }
 
-        impl<A: ::allocator_api2::alloc::Allocator> ::core::ops::Drop
-            for #name<A>
+        impl<
+            A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
+            L: #companion::Layout<A>,
+        > ::core::ops::Drop for #impl_name<A, L>
         {
             fn drop(&mut self) {
                 let mut v = ::puroro_rt::FieldDeallocVisitor::new(&self._common);
@@ -402,7 +476,7 @@ pub(super) fn render_items(
             }
         }
 
-        impl<A: ::allocator_api2::alloc::Allocator> ::puroro_rt::DeallocateIn<A>
+        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::DeallocateIn<A>
             for #name<A>
         {
             #[inline]
@@ -413,7 +487,7 @@ pub(super) fn render_items(
 
         ::puroro_rt::impl_owned_slot_bounds!(#name);
 
-        impl<A: ::allocator_api2::alloc::Allocator> ::puroro_rt::MessageEncode
+        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::MessageEncode
             for #name<A>
         {
             fn encoded_len(&self, ctx: &mut ::puroro_rt::EncodeCtx) -> usize {
@@ -472,7 +546,7 @@ pub(super) fn render_items(
             }
         }
 
-        impl<A: ::allocator_api2::alloc::Allocator> ::puroro::Message for #name<A> {
+        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro::Message for #name<A> {
             type Alloc = A;
 
             fn new_in(alloc: A) -> Self
@@ -511,6 +585,15 @@ pub(super) fn render_items(
             }
         }
     })?;
+    type_items.extend(super::lazy::render_items(
+        &fields,
+        &impl_name,
+        name,
+        &lazy_alias,
+        name_str,
+        companion,
+        &validate_body,
+    )?);
 
     Ok(RenderedMessageItems {
         type_items,
@@ -564,20 +647,10 @@ fn emit_field(field: &PlannedField<'_>, companion: &Ident) -> Result<FieldEmit> 
         )));
     }
     Ok(match field.kind() {
-        FieldKind::Map { key, value } => FieldEmit::Map(Box::new(emit_map(
-            field.name(),
-            field.field_const(),
-            field.number(),
-            key,
-            value,
-        )?)),
-        FieldKind::Repeated { wire, encoding } => FieldEmit::Repeated(Box::new(emit_repeated(
-            field.name(),
-            field.field_const(),
-            field.number(),
-            wire,
-            *encoding,
-        )?)),
+        FieldKind::Map { .. } => FieldEmit::Map(Box::new(emit_map(field)?)),
+        FieldKind::Repeated { .. } => {
+            FieldEmit::Repeated(Box::new(emit_repeated(field, companion)?))
+        }
         FieldKind::Singular { .. } => FieldEmit::Singular(Box::new(emit_scalar(field, companion)?)),
     })
 }
@@ -638,6 +711,45 @@ fn emit_oneof_variant(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
     let is_bool = matches!(wire, WireTypeKind::Bool);
     let mut_style = SingularMutStyle::from_layout(wire, layout);
     let variant_pascal = to_pascal_case(field.name());
+    let mut marker = wire_marker_path(wire)?;
+    let mut mut_target = views.mut_target;
+    let mut layout_assoc = None;
+    let mut generic_layout = false;
+    let mut message_apply = None;
+    let len_slot = len_access(wire);
+    let mut lazy_kind = None;
+    if let Some(kind_bit) = field.lazy_kind_bit() {
+        let kind_ident = Ident::new(&lazy_kind_bit_const(field.name()), Span::call_site());
+        lazy_kind = Some((kind_ident.clone(), kind_bit));
+        let eager_layout = layout_ty
+            .clone()
+            .unwrap_or_else(|| parse_quote! { ::puroro_rt::Inline });
+        let lazy_layout: Type = parse_quote! { ::puroro_rt::WireOrSso<{ super::#kind_ident }> };
+        let assoc = assoc_ident(field.name(), "Len");
+        layout_assoc = Some(LayoutAssoc {
+            assoc,
+            kind: LayoutAssocKind::SingularLen {
+                marker: marker.clone(),
+                eager: eager_layout,
+                lazy: lazy_layout,
+            },
+        });
+        generic_layout = true;
+    }
+    if let WireTypeKind::Message(child) = wire {
+        let pin = resolve_child_pin(field.name(), child, field.child_parse())?;
+        message_apply = Some(pin.singular_apply());
+        if let ChildPin::Follow(assoc) = &pin {
+            layout_assoc = Some(assoc.as_ref().clone());
+            generic_layout = true;
+        }
+        if let Some(ty) = pin.oneof_marker() {
+            marker = ty;
+        }
+        if let ChildPin::Lazy { lazy, .. } = &pin {
+            mut_target = lazy.as_ref().clone();
+        }
+    }
     Ok(OneofVariantEmit {
         name: escape_ident(field.name()),
         name_str: field.name().to_owned(),
@@ -646,29 +758,38 @@ fn emit_oneof_variant(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
         field_alias: Ident::new(&format!("{variant_pascal}Field"), Span::call_site()),
         field_const: Ident::new(field.field_const(), Span::call_site()),
         number: field.number() as u32,
-        marker: wire_marker_path(wire)?,
+        marker,
         layout_ty,
         value_bit,
         is_message,
         is_bool,
         mut_style,
-        mut_target: views.mut_target,
+        mut_target,
         optional_ty: views.optional,
         custom_default: match custom_default {
             Some(custom) => Some((custom.clone(), defaults::render_marker_item(custom, wire)?)),
             None => None,
         },
+        len_access: len_slot,
+        message_apply,
+        layout: layout_assoc,
+        lazy_kind,
+        generic_layout,
     })
 }
 
-fn emit_repeated(
-    name: &str,
-    field_const: &str,
-    number: i32,
-    wire: &WireTypeKind<'_>,
-    encoding: RepeatedEncodingKind,
-) -> Result<RepeatedEmit> {
-    let encoding_ty = match encoding {
+fn emit_repeated(field: &PlannedField<'_>, companion: &Ident) -> Result<RepeatedEmit> {
+    let FieldKind::Repeated { wire, encoding } = field.kind() else {
+        return Err(Error::internal(format!(
+            "field `{}` is not repeated",
+            field.name()
+        )));
+    };
+    let name = field.name();
+    let field_const = field.field_const();
+    let number = field.number();
+    let _ = companion;
+    let encoding_ty: Type = match encoding {
         RepeatedEncodingKind::Packed => parse_quote! { ::puroro_rt::Packed },
         RepeatedEncodingKind::Expanded => parse_quote! { ::puroro_rt::Expanded },
     };
@@ -681,37 +802,110 @@ fn emit_repeated(
         WireTypeKind::Bytes { .. } => RepeatedAccessorStyle::Bytes,
         _ => RepeatedAccessorStyle::Slice,
     };
+    let mut marker = wire_marker_path(wire)?;
+    let mut slice_elem_ty = views.slice_elem;
+    let mut layout = None;
+    let mut message_apply = None;
+    if let WireTypeKind::Message(child) = wire {
+        // A message element is not a span list. Follow-parent only changes
+        // the element type; storage stays `RepeatedReady`.
+        let pin = resolve_child_pin(name, child, field.child_parse())?;
+        message_apply = Some(pin.repeated_apply());
+        if let ChildPin::Follow(assoc) = &pin {
+            layout = Some(assoc.as_ref().clone());
+        }
+        if let Some(ty) = pin.field_marker() {
+            marker = ty;
+        }
+        if let ChildPin::Lazy { lazy, .. } = &pin {
+            slice_elem_ty = lazy.as_ref().clone();
+        }
+    } else if len_access(wire).is_some() {
+        let assoc = assoc_ident(name, "Repeated");
+        let field_ident = Ident::new(field_const, Span::call_site());
+        layout = Some(LayoutAssoc {
+            assoc,
+            kind: LayoutAssocKind::Repeated {
+                marker: marker.clone(),
+                encoding: encoding_ty.clone(),
+                field_const: field_ident,
+            },
+        });
+    }
+
     Ok(RepeatedEmit {
         name: escape_ident(name),
         name_str: name.to_owned(),
         field_const: Ident::new(field_const, Span::call_site()),
         number: number as u32,
-        marker: wire_marker_path(wire)?,
+        marker,
         encoding_ty,
         style,
-        slice_elem_ty: views.slice_elem,
+        slice_elem_ty,
+        layout,
+        message_apply,
     })
 }
 
-fn emit_map(
-    name: &str,
-    field_const: &str,
-    number: i32,
-    key: &WireTypeKind<'_>,
-    value: &WireTypeKind<'_>,
-) -> Result<MapEmit> {
+fn emit_map(field: &PlannedField<'_>) -> Result<MapEmit> {
+    let FieldKind::Map { key, value } = field.kind() else {
+        return Err(Error::internal(format!(
+            "field `{}` is not a map",
+            field.name()
+        )));
+    };
+    let name = field.name();
+    let field_const = field.field_const();
+    let number = field.number();
     let key_view = map_key_view(key, name)?;
     let value_views = wire_views(value)?;
+    let mut value_marker = wire_marker_path(value)?;
+    let mut map_value_bound = value_marker.clone();
+    let mut value_view = value_views.map_value;
+    let mut layouts = Vec::new();
+    if let WireTypeKind::Message(child) = value {
+        let pin = resolve_child_pin(name, child, field.child_parse())?;
+        match &pin {
+            ChildPin::Follow(assoc) => {
+                let assoc_name = &assoc.assoc;
+                // The `Layout` bound names the assoc on `Self`. The field
+                // marker names it on the message's `L` parameter.
+                map_value_bound = parse_quote! { ::puroro_rt::ProtoMessage<Self::#assoc_name> };
+                layouts.push(assoc.as_ref().clone());
+            }
+            ChildPin::Lazy { lazy, .. } => {
+                value_view = lazy.as_ref().clone();
+            }
+            ChildPin::Eager { .. } => {}
+        }
+        if let Some(ty) = pin.field_marker() {
+            value_marker = ty;
+        }
+        if matches!(pin, ChildPin::Lazy { .. }) {
+            map_value_bound = value_marker.clone();
+        }
+    }
+    let map_assoc = assoc_ident(name, "Map");
+    let field_ident = Ident::new(field_const, Span::call_site());
+    layouts.push(LayoutAssoc {
+        assoc: map_assoc,
+        kind: LayoutAssocKind::Map {
+            key: wire_marker_path(key)?,
+            value: map_value_bound,
+            field_const: field_ident,
+        },
+    });
     Ok(MapEmit {
         name: escape_ident(name),
         name_str: name.to_owned(),
         field_const: Ident::new(field_const, Span::call_site()),
         number: number as u32,
         key_marker: wire_marker_path(key)?,
-        value_marker: wire_marker_path(value)?,
+        value_marker,
         key_view,
-        value_view: value_views.map_value,
+        value_view,
         mut_target: value_views.map_value_mut,
+        layouts,
     })
 }
 
@@ -797,7 +991,7 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
         PlannedPresence::Oneof => unreachable!("rejected above"),
     };
 
-    let (layout_ty, value_bit) = match layout {
+    let (mut layout_ty, value_bit) = match layout {
         PlannedLayout::Inline => (
             custom_default
                 .is_some()
@@ -829,12 +1023,64 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
 
     let views = wire_views(wire)?;
     let is_enum = matches!(wire, WireTypeKind::Enum { .. });
+    let mut marker = wire_marker_path(wire)?;
+    let mut mut_target = views.mut_target;
+    let mut set_eager = None;
+    let mut layout_assoc = None;
+    let mut message_apply_slot = None;
+    let mut lazy_kind_const = None;
+    let len_slot = len_access(wire);
+
+    if let Some(kind_bit) = field.lazy_kind_bit() {
+        let kind_ident = Ident::new(&lazy_kind_bit_const(name), Span::call_site());
+        lazy_kind_const = Some((kind_ident.clone(), kind_bit));
+        // These types are pasted into `mod layout`, whose parent is the companion.
+        let eager_layout: Type = match layout {
+            PlannedLayout::Inline => parse_quote! { ::puroro_rt::Inline },
+            PlannedLayout::InlineOrHeap { bit_const, .. } => {
+                let ident = Ident::new(bit_const, Span::call_site());
+                parse_quote! { ::puroro_rt::InlineOrHeap<{ super::#ident }> }
+            }
+            PlannedLayout::Boxed | PlannedLayout::BitPacked { .. } => {
+                return Err(Error::internal(format!(
+                    "field `{name}` has a lazy kind bit but is not a string or bytes slot"
+                )));
+            }
+        };
+        let lazy_layout: Type = parse_quote! { ::puroro_rt::WireOrSso<{ super::#kind_ident }> };
+        let assoc = assoc_ident(name, "Len");
+        layout_assoc = Some(LayoutAssoc {
+            assoc: assoc.clone(),
+            kind: LayoutAssocKind::SingularLen {
+                marker: marker.clone(),
+                eager: eager_layout,
+                lazy: lazy_layout,
+            },
+        });
+        layout_ty = Some(parse_quote! { L::#assoc });
+    }
+
+    if let WireTypeKind::Message(child) = wire {
+        let pin = resolve_child_pin(name, child, field.child_parse())?;
+        message_apply_slot = Some(pin.singular_apply());
+        if let ChildPin::Follow(assoc) = &pin {
+            layout_assoc = Some(assoc.as_ref().clone());
+        }
+        if let Some(ty) = pin.field_marker() {
+            marker = ty;
+        }
+        if let ChildPin::Lazy { eager, lazy } = &pin {
+            set_eager = Some(eager.as_ref().clone());
+            mut_target = lazy.as_ref().clone();
+        }
+    }
+
     Ok(ScalarEmit {
         name: escape_ident(name),
         name_str: name.to_owned(),
         field_const: Ident::new(field_const, Span::call_site()),
         number: number as u32,
-        marker: wire_marker_path(wire)?,
+        marker,
         presence_ty,
         layout_ty,
         presence_bit,
@@ -848,7 +1094,7 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
                     style,
                     AccessorStyle::Explicit | AccessorStyle::LegacyRequired
                 )),
-        mut_target: views.mut_target,
+        mut_target,
         implicit_ty: views.implicit,
         optional_ty: views.optional,
         custom_default: match custom_default {
@@ -856,7 +1102,113 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
             None => None,
         },
         mut_style: SingularMutStyle::from_layout(wire, layout),
+        layout: layout_assoc,
+        len_access: len_slot,
+        message_apply: message_apply_slot,
+        set_eager,
+        lazy_kind_const,
     })
+}
+
+fn len_access(wire: &WireTypeKind<'_>) -> Option<LenAccess> {
+    match wire {
+        WireTypeKind::String { utf8 } => match StringCatalogMarker::from_utf8(*utf8) {
+            StringCatalogMarker::ProtoString => Some(LenAccess::Str),
+            StringCatalogMarker::ProtoStringUnchecked => Some(LenAccess::Bytes),
+        },
+        WireTypeKind::Bytes { .. } => Some(LenAccess::Bytes),
+        _ => None,
+    }
+}
+
+fn assoc_ident(name: &str, suffix: &str) -> Ident {
+    Ident::new(
+        &format!("{}{suffix}", to_pascal_case(name)),
+        Span::call_site(),
+    )
+}
+
+fn child_type_pair(message: &ResolvedMessage<'_>) -> Result<(Type, Type)> {
+    let eager = fqn_to_message_root_path(message)?;
+    let lazy = fqn_to_message_lazy_path(message)?;
+    Ok((parse_quote! { #eager<A> }, parse_quote! { #lazy<A> }))
+}
+
+/// Nested message pin, resolved once for every singular / repeated / map / oneof use.
+enum ChildPin {
+    /// Child type is a `Layout` associated type and follows the parent alias.
+    Follow(Box<LayoutAssoc>),
+    /// Pinned to the lazy alias on both the eager and lazy parent.
+    Lazy { eager: Box<Type>, lazy: Box<Type> },
+    /// Pinned to the eager alias. The wire marker from `wire_marker_path` stays.
+    Eager { eager: Box<Type> },
+}
+
+fn resolve_child_pin(
+    field_name: &str,
+    child: &ResolvedMessage<'_>,
+    pin: ResolvedChildParse,
+) -> Result<ChildPin> {
+    let (eager, lazy) = child_type_pair(child)?;
+    Ok(match pin {
+        ResolvedChildParse::Follow => {
+            let assoc = assoc_ident(field_name, "Msg");
+            ChildPin::Follow(Box::new(LayoutAssoc {
+                assoc,
+                kind: LayoutAssocKind::Child { eager, lazy },
+            }))
+        }
+        ResolvedChildParse::Lazy => ChildPin::Lazy {
+            eager: Box::new(eager),
+            lazy: Box::new(lazy),
+        },
+        ResolvedChildParse::Eager => ChildPin::Eager {
+            eager: Box::new(eager),
+        },
+    })
+}
+
+impl ChildPin {
+    fn singular_apply(&self) -> MessageApply {
+        match self {
+            Self::Follow(_) | Self::Lazy { .. } => MessageApply::SharedSingular,
+            Self::Eager { .. } => MessageApply::EagerSingular,
+        }
+    }
+
+    fn repeated_apply(&self) -> MessageApply {
+        match self {
+            Self::Follow(_) | Self::Lazy { .. } => MessageApply::SharedRepeated,
+            Self::Eager { eager } => MessageApply::EagerRepeated(eager.clone()),
+        }
+    }
+
+    /// Marker on the message impl, where `L: Layout<A>` is already in scope.
+    /// `None` for an eager pin: keep the marker from `wire_marker_path`.
+    fn field_marker(&self) -> Option<Type> {
+        match self {
+            Self::Follow(assoc) => {
+                let name = &assoc.assoc;
+                Some(parse_quote! { ::puroro_rt::ProtoMessage<L::#name> })
+            }
+            Self::Lazy { lazy, .. } => Some(parse_quote! { ::puroro_rt::ProtoMessage<#lazy> }),
+            Self::Eager { .. } => None,
+        }
+    }
+
+    /// Marker inside a oneof module. The follow-parent path names `super::Layout`
+    /// because the type alias has no `L: Layout<A>` bound.
+    fn oneof_marker(&self) -> Option<Type> {
+        match self {
+            Self::Follow(assoc) => {
+                let name = &assoc.assoc;
+                Some(parse_quote! {
+                    ::puroro_rt::ProtoMessage<<L as super::Layout<A>>::#name>
+                })
+            }
+            other => other.field_marker(),
+        }
+    }
 }
 
 fn render_defaults_module(fields: &[FieldEmit]) -> Option<Item> {
@@ -901,6 +1253,11 @@ fn render_bit_consts(fields: &[FieldEmit]) -> Vec<Item> {
                     });
                 }
                 if let Some((ident, bit)) = &field.value_bit {
+                    items.push(parse_quote! {
+                        pub const #ident: usize = #bit;
+                    });
+                }
+                if let Some((ident, bit)) = &field.lazy_kind_const {
                     items.push(parse_quote! {
                         pub const #ident: usize = #bit;
                     });
@@ -966,10 +1323,21 @@ fn render_struct_fields(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStr
                     marker,
                     encoding_ty,
                     field_const,
+                    layout,
                     ..
                 } = field.as_ref();
+                let span_layout = layout.as_ref().and_then(|assoc| {
+                    matches!(assoc.kind, LayoutAssocKind::Repeated { .. }).then_some(&assoc.assoc)
+                });
+                let span_layout = span_layout.iter();
                 quote! {
-                    #name: ::puroro_rt::RepeatedField<#marker, #encoding_ty, { #companion::#field_const }, A>,
+                    #name: ::puroro_rt::RepeatedField<
+                        #marker,
+                        #encoding_ty,
+                        { #companion::#field_const },
+                        A
+                        #(, L::#span_layout)*
+                    >,
                 }
             }
             FieldEmit::Map(field) => {
@@ -980,8 +1348,20 @@ fn render_struct_fields(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStr
                     field_const,
                     ..
                 } = field.as_ref();
+                let map_assoc = field
+                    .layouts
+                    .iter()
+                    .find(|assoc| matches!(assoc.kind, LayoutAssocKind::Map { .. }))
+                    .map(|assoc| &assoc.assoc)
+                    .expect("map field has a Map layout assoc");
                 quote! {
-                    #name: ::puroro_rt::MapField<#key_marker, #value_marker, { #companion::#field_const }, A>,
+                    #name: ::puroro_rt::MapField<
+                        #key_marker,
+                        #value_marker,
+                        { #companion::#field_const },
+                        A,
+                        L::#map_assoc,
+                    >,
                 }
             }
             FieldEmit::Oneof(o) => {
@@ -991,16 +1371,44 @@ fn render_struct_fields(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStr
                     ..
                 } = o.as_ref();
                 quote! {
-                    #name: ::puroro_rt::OneofSlot<#companion::#storage_name<A>>,
+                    #name: ::puroro_rt::OneofSlot<#companion::#storage_name<A, L>>,
                 }
             }
         })
         .collect()
 }
 
+fn collect_layout_assocs(fields: &[FieldEmit]) -> Vec<LayoutAssoc> {
+    let mut out = Vec::new();
+    for field in fields {
+        match field {
+            FieldEmit::Singular(field) => {
+                if let Some(assoc) = &field.layout {
+                    out.push(assoc.clone());
+                }
+            }
+            FieldEmit::Repeated(field) => {
+                if let Some(assoc) = &field.layout {
+                    out.push(assoc.clone());
+                }
+            }
+            FieldEmit::Map(field) => out.extend(field.layouts.iter().cloned()),
+            FieldEmit::Oneof(field) => {
+                for variant in &field.variants {
+                    if let Some(assoc) = &variant.layout {
+                        out.push(assoc.clone());
+                    }
+                }
+            }
+        }
+    }
+    out
+}
+
 fn render_oneof_modules(
     fields: &[FieldEmit],
     bits_ty: &TokenStream,
+    lazy_bits_ty: &TokenStream,
     discard_unknowns: bool,
 ) -> Result<Vec<Item>> {
     let mut out = Vec::new();
@@ -1009,6 +1417,7 @@ fn render_oneof_modules(
             out.extend(oneof::render_module_and_exports(
                 o,
                 bits_ty,
+                lazy_bits_ty,
                 discard_unknowns,
             )?);
         }
@@ -1051,6 +1460,10 @@ fn wire_marker_path(wire: &WireTypeKind<'_>) -> Result<Type> {
             parse_quote! { ::puroro_rt::ProtoMessage<#path<A>> }
         }
     })
+}
+
+pub(super) fn new_in_field_tokens(fields: &[FieldEmit]) -> Vec<TokenStream> {
+    render_new_in_fields(fields)
 }
 
 fn render_new_in_fields(fields: &[FieldEmit]) -> Vec<TokenStream> {
@@ -1185,10 +1598,22 @@ fn render_singular_accessors(field: &ScalarEmit) -> (TokenStream, TokenStream) {
                 self.#name.bind(&self._common).get()
             }
         };
+        let set_method = if let Some(eager) = &field.set_eager {
+            let set_name = Ident::new(&format!("set_{}", field.name_str), Span::call_site());
+            quote! {
+                pub fn #set_name(&mut self, src: #eager) {
+                    *self.#name_mut() = src.into_lazy();
+                }
+            }
+        } else {
+            quote! {}
+        };
         let mutator = quote! {
             pub fn #name_mut(&mut self) -> &mut #mut_target {
                 self.#name.bind_mut(&mut self._common).get_mut()
             }
+
+            #set_method
 
             pub fn #clear_name(&mut self) {
                 self.#name.bind_mut(&mut self._common).clear();

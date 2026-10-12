@@ -17,6 +17,8 @@ use ::syn::{Attribute, Item};
 mod defaults;
 mod enumeration;
 mod ident;
+mod layout;
+mod lazy;
 mod message;
 mod oneof;
 mod parse;

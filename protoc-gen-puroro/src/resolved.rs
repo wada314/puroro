@@ -19,7 +19,7 @@ pub use resolve::{resolve, resolve_with};
 
 use crate::descriptor::features::{EnumType, RepeatedFieldEncoding, Utf8Validation};
 use crate::descriptor::{
-    BytesLayout, MessageLayout, ProtoFqn, StringLayout, Syntax, UnknownFieldsPolicy,
+    BytesLayout, ChildParse, MessageLayout, ProtoFqn, StringLayout, Syntax, UnknownFieldsPolicy,
 };
 use ::std::fmt;
 
@@ -81,6 +81,8 @@ pub struct Message<'a> {
     map_entry: bool,
     /// `(puroro.unknown_fields)` — Discard bakes `DiscardUnknowns`.
     unknown_fields: UnknownFieldsPolicy,
+    /// `(puroro.child_parse)` on this message. Default for its fields.
+    child_parse: ChildParse,
 }
 
 /// A field with a resolved [`TypeRef`].
@@ -103,6 +105,8 @@ pub struct Field<'a> {
     bytes_layout: Option<BytesLayout>,
     /// `(puroro.message_layout)`, if set.
     message_layout: Option<MessageLayout>,
+    /// `(puroro.child_parse)`, if set on the field.
+    child_parse: Option<ChildParse>,
     /// proto2 / editions `LEGACY_REQUIRED` (needed when inlining a message).
     legacy_required: bool,
 }
@@ -231,6 +235,11 @@ impl<'a> Message<'a> {
     pub fn discard_unknowns(&self) -> bool {
         self.unknown_fields.discard()
     }
+
+    /// `(puroro.child_parse)` on this message (`Unspecified` if absent).
+    pub fn child_parse(&self) -> ChildParse {
+        self.child_parse
+    }
 }
 
 impl<'a> Field<'a> {
@@ -277,6 +286,11 @@ impl<'a> Field<'a> {
     /// `(puroro.message_layout)`, if set on the descriptor.
     pub fn message_layout(&self) -> Option<MessageLayout> {
         self.message_layout
+    }
+
+    /// `(puroro.child_parse)`, if set on the field.
+    pub fn child_parse(&self) -> Option<ChildParse> {
+        self.child_parse
     }
 
     /// Whether this field is proto2 / editions `LEGACY_REQUIRED`.

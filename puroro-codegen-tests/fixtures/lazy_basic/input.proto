@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+import "puroro/options.proto";
+
+message Child {
+  int32 n = 1;
+}
+
+message Note {
+  int32 score = 1;
+  string title = 2;
+  Child child = 3;
+  Child pinned = 4 [(puroro.child_parse) = CHILD_PARSE_LAZY];
+  repeated string labels = 5;
+}

@@ -193,6 +193,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             oneofs,
             map_entry: desc.map_entry,
             unknown_fields: desc.unknown_fields,
+            child_parse: desc.child_parse,
         });
         self.messages_by_fqn.insert(fqn.clone(), message);
         self.pending.push(PendingFields {
@@ -318,6 +319,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             string_layout: field.string_layout,
             bytes_layout: field.bytes_layout,
             message_layout: field.message_layout,
+            child_parse: field.child_parse,
             legacy_required: features.field_presence == FieldPresence::LegacyRequired,
         })
     }

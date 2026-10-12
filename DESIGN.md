@@ -673,7 +673,7 @@ Every proto message emits both an eager type (`Task`) and a lazy type (`TaskLazy
 Resolution, for a singular message, a repeated message, a map value, or a oneof message variant:
 
 1. The field option `(puroro.child_parse)`, when it is `EAGER` or `LAZY`.
-2. Otherwise the enclosing message's `(puroro.child_parse)`, when that is set.
+2. Otherwise the enclosing message's `(puroro.message_child_parse)`, when that is set.
 3. Otherwise the child follows the parent layout.
 
 Unset and `UNSPECIFIED` are step 3. A message option is the default for fields **declared on that message**. It does not force every embedding of that type, in other parents, onto one layout. A child message uses its own option for its own fields.
@@ -682,7 +682,7 @@ Unset and `UNSPECIFIED` are step 3. A message option is the default for fields *
 
 A pin that disagrees with the parent layout is a concrete type on both aliases, not a `Layout` associated type. The sample's `assignee` is that case: field-level `LAZY`, so eager `Task` and `TaskLazy` both store `AddressLazy`, and `set_assignee` accepts eager `Address` via `into_lazy`. `origin`, `watchers`, and `postal` are step 3. The generator treats step 3 as the default and emits a pin only when the option says so.
 
-The extension is not in [`proto/puroro/options.proto`](proto/puroro/options.proto) yet. Add it when the generator reads it (next custom-option number `51404`), on both `FieldOptions` and `MessageOptions`. Until then the plugin ignores this choice and the sample's `assignee` pin is hand-written.
+Both extensions are field number `51404` in [`proto/puroro/options.proto`](proto/puroro/options.proto). Protobuf extension names are unique in a package, so the field option is `(puroro.child_parse)` and the message option is `(puroro.message_child_parse)`. The plugin reads that number. The sample's `assignee` pin stays hand-written; generated code emits a pin only when the option says so.
 
 ---
 

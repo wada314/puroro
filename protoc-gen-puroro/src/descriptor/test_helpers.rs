@@ -27,6 +27,7 @@ pub(crate) fn field(name: impl Into<String>, number: i32, type_: FieldType) -> F
         string_layout: None,
         bytes_layout: None,
         message_layout: None,
+        child_parse: None,
         features: FeatureSet::default(),
     }
 }
@@ -41,6 +42,7 @@ pub(crate) fn message(name: impl Into<String>) -> MessageDesc {
         oneofs: vec![],
         map_entry: false,
         unknown_fields: UnknownFieldsPolicy::Unspecified,
+        child_parse: super::ChildParse::Unspecified,
     }
 }
 

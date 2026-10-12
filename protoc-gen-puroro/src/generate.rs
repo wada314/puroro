@@ -188,9 +188,12 @@ mod tests {
     }
 
     #[test]
-    fn empty_companion_module_is_omitted() {
+    fn empty_message_companion_holds_layout() {
         let content = generate_lib(&empty_request_with_package("Empty", "example.v1"));
-        assert!(!content.contains("pub mod empty"));
+        assert!(content.contains("pub mod empty"));
+        assert!(content.contains("pub trait Layout"));
+        assert!(content.contains("pub type Empty<"));
+        assert!(content.contains("pub type EmptyLazy<"));
         assert!(!content.contains("pub use empty::Empty"));
     }
 

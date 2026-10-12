@@ -75,8 +75,8 @@ fn int32_key_entry_mut_and_round_trip() {
         *flags.entry_mut(1) = false;
     }
     let decoded: Holder = Holder::decode(&msg.encode_to_vec()[..]).expect("decode");
-    assert_eq!(decoded.flags().get(&1).copied(), Some(false));
-    assert_eq!(decoded.flags().get(&2).copied(), Some(false));
+    assert_eq!(decoded.flags().get(1).copied(), Some(false));
+    assert_eq!(decoded.flags().get(2).copied(), Some(false));
 }
 
 #[test]
@@ -85,8 +85,8 @@ fn bool_key_uint64_value_round_trip() {
     *msg.counters_mut().entry_mut(true) = 99;
     *msg.counters_mut().entry_mut(false) = 7;
     let decoded: Holder = Holder::decode(&msg.encode_to_vec()[..]).expect("decode");
-    assert_eq!(decoded.counters().get(&true).copied(), Some(99));
-    assert_eq!(decoded.counters().get(&false).copied(), Some(7));
+    assert_eq!(decoded.counters().get(true).copied(), Some(99));
+    assert_eq!(decoded.counters().get(false).copied(), Some(7));
 }
 
 #[test]
@@ -102,11 +102,11 @@ fn string_value_entry_mut_round_trip() {
     let mut msg = Holder::new();
     msg.labels_mut().entry_mut(1).push_str("hello");
     msg.labels_mut().entry_mut(2).push_str("world");
-    assert_eq!(msg.labels().get(&1), Some("hello"));
+    assert_eq!(msg.labels().get(1), Some("hello"));
 
     let decoded: Holder = Holder::decode(&msg.encode_to_vec()[..]).expect("decode");
-    assert_eq!(decoded.labels().get(&1), Some("hello"));
-    assert_eq!(decoded.labels().get(&2), Some("world"));
+    assert_eq!(decoded.labels().get(1), Some("hello"));
+    assert_eq!(decoded.labels().get(2), Some("world"));
 }
 
 #[test]
@@ -114,7 +114,7 @@ fn bytes_value_entry_mut_round_trip() {
     let mut msg = Holder::new();
     msg.blobs_mut().entry_mut(7).extend_from_slice(b"abc");
     let decoded: Holder = Holder::decode(&msg.encode_to_vec()[..]).expect("decode");
-    assert_eq!(decoded.blobs().get(&7), Some(b"abc".as_slice()));
+    assert_eq!(decoded.blobs().get(7), Some(b"abc".as_slice()));
 }
 
 #[test]
@@ -123,8 +123,8 @@ fn enum_value_entry_mut_round_trip() {
     *msg.kinds_mut().entry_mut(1) = Kind::A;
     *msg.kinds_mut().entry_mut(2) = Kind::B;
     let decoded: Holder = Holder::decode(&msg.encode_to_vec()[..]).expect("decode");
-    assert_eq!(decoded.kinds().get(&1).copied(), Some(Kind::A));
-    assert_eq!(decoded.kinds().get(&2).copied(), Some(Kind::B));
+    assert_eq!(decoded.kinds().get(1).copied(), Some(Kind::A));
+    assert_eq!(decoded.kinds().get(2).copied(), Some(Kind::B));
 }
 
 #[test]
@@ -136,12 +136,12 @@ fn message_value_entry_mut_round_trip() {
         peer.name_mut().push_str("alice");
         *peer.age_mut() = 10;
     }
-    assert_eq!(msg.peers().get(&9).unwrap().name().get(), "alice");
-    assert_eq!(msg.peers().get(&9).unwrap().age().get(), 10);
+    assert_eq!(msg.peers().get(9).unwrap().name().get(), "alice");
+    assert_eq!(msg.peers().get(9).unwrap().age().get(), 10);
 
     let decoded: Holder = Holder::decode(&msg.encode_to_vec()[..]).expect("decode");
-    assert_eq!(decoded.peers().get(&9).unwrap().name().get(), "alice");
-    assert_eq!(decoded.peers().get(&9).unwrap().age().get(), 10);
+    assert_eq!(decoded.peers().get(9).unwrap().name().get(), "alice");
+    assert_eq!(decoded.peers().get(9).unwrap().age().get(), 10);
     let _: Peer = Peer::new();
 }
 
@@ -170,7 +170,7 @@ fn decode_merge_duplicate_message_value_replaces_entire_entry() {
 
     let decoded: Holder = Holder::decode(&bytes[..]).expect("decode");
     let peers = decoded.peers();
-    let peer = peers.get(&9).expect("peer present");
+    let peer = peers.get(9).expect("peer present");
     assert!(
         !peer.name().is_set(),
         "map last-wins replaces the value; field-merge would keep name=alice"

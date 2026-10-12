@@ -30,7 +30,7 @@ use crate::encode::field_number_const;
 use crate::fields::shared::FieldDeallocate;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{
-    DefaultIn, MessageBindingMut, MessageCommon, MessageCommonAlloc, MessageCommonSharedBits,
+    DefaultIn, MessageBindingMut, MessageCommonAlloc, MessageCommonSharedBits,
     field_presence::{
         Explicit, FieldPresence, Implicit, LegacyRequired, Message, Oneof, RequiredFieldPresence,
     },
@@ -44,7 +44,7 @@ use crate::fields::shared::{
     },
 };
 use crate::fields::wire::encode_type::{encode_field, encoded_len_field};
-use crate::fields::wire::len::{ProtoBytes, ProtoString};
+use crate::fields::wire::len::{BytesLikeLenCodec, LenScalar, ProtoString};
 use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::proto_ref_ops::{ProtoRefDebug, ProtoRefEq};
 use crate::fields::wire::singular_type::SingularType;
@@ -299,7 +299,7 @@ where
     }
 
     /// proto2 / editions `required` message — pointer presence, no bit.
-    pub fn validate_required<Pb>(&self, _common: &MessageCommon<Pb, A>) -> Result<(), DecodeError> {
+    pub fn validate_required<Cx>(&self, _common: &Cx) -> Result<(), DecodeError> {
         if self.is_present() {
             Ok(())
         } else {
@@ -686,14 +686,15 @@ where
     }
 }
 
-impl<P, const FIELD: u32, A, const KIND: usize, D>
-    SingularField<ProtoBytes, P, FIELD, A, WireOrSso<KIND>, D>
+impl<P, const FIELD: u32, A, const KIND: usize, D, C>
+    SingularField<LenScalar<C>, P, FIELD, A, WireOrSso<KIND>, D>
 where
     P: FieldPresence,
     A: Allocator + Clone,
-    <WireOrSso<KIND> as ValueLayout<ProtoBytes, A>>::Slot: AddressableSlot,
-    P::ValueSlot<<WireOrSso<KIND> as ValueLayout<ProtoBytes, A>>::Slot>:
-        ValueSlot<<WireOrSso<KIND> as ValueLayout<ProtoBytes, A>>::Slot, A>,
+    C: BytesLikeLenCodec,
+    <WireOrSso<KIND> as ValueLayout<LenScalar<C>, A>>::Slot: AddressableSlot,
+    P::ValueSlot<<WireOrSso<KIND> as ValueLayout<LenScalar<C>, A>>::Slot>:
+        ValueSlot<<WireOrSso<KIND> as ValueLayout<LenScalar<C>, A>>::Slot, A>,
 {
     /// Copy a bytes payload into Inline / Heap.
     pub fn try_bytes<'a, Cx>(
@@ -708,7 +709,7 @@ where
         if !P::is_set(common, || {
             match (*self.value).with(P::slot_init_view(), common).get() {
                 Some(slot) => {
-                    <WireOrSso<KIND> as ValueLayout<ProtoBytes, A>>::is_proto_empty(slot, common)
+                    <WireOrSso<KIND> as ValueLayout<LenScalar<C>, A>>::is_proto_empty(slot, common)
                 }
                 None => true,
             }
