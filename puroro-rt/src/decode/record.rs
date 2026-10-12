@@ -595,4 +595,71 @@ mod tests {
         assert_eq!(recs.len(), 1);
         assert_eq!(recs[0].value, len_bytes(b"hello"));
     }
+
+    #[test]
+    fn overlong_varint_across_chunks() {
+        let mut s = RecordScanner::new();
+        assert!(s.push(&[0x80; 6]).unwrap().is_empty());
+        assert_eq!(s.push(&[0x80; 4]).err(), Some(DecodeError::InvalidVarint));
+        // The failing chunk is not consumed.
+        assert_eq!(s.leftover(), &[0x80; 6]);
+    }
+
+    #[test]
+    fn tag_above_u32_across_chunks() {
+        // 2^32 as a tag varint: five bytes, value does not fit in `u32`.
+        let mut s = RecordScanner::new();
+        assert!(s.push(&[0x80, 0x80]).unwrap().is_empty());
+        assert_eq!(
+            s.push(&[0x80, 0x80, 0x10]).err(),
+            Some(DecodeError::InvalidVarint)
+        );
+        assert_eq!(s.leftover(), &[0x80, 0x80]);
+    }
+
+    #[test]
+    fn field_number_zero_and_unknown_wire_type() {
+        let mut s = RecordScanner::new();
+        assert_eq!(s.push(&[0x00]).err(), Some(DecodeError::InvalidTag));
+        assert!(s.leftover().is_empty());
+        // Field 1, wire type 7.
+        assert_eq!(s.push(&[0x0f]).err(), Some(DecodeError::InvalidTag));
+        assert!(s.leftover().is_empty());
+    }
+
+    #[test]
+    fn invalid_tag_does_not_consume_earlier_record() {
+        let mut wire = Vec::new();
+        encode_varint_field(field(1), Varint::from_uint64(1), &mut wire);
+        wire.push(0x0f);
+        let mut s = RecordScanner::new();
+        assert_eq!(s.push(&wire).err(), Some(DecodeError::InvalidTag));
+        assert!(s.leftover().is_empty());
+    }
+
+    #[test]
+    fn two_chunks_split_len_prefix() {
+        let content = vec![0xab; 128];
+        let wire = encode_len_field(4, &content);
+        // tag, then the two-byte length 128 (`0x80 0x01`). Split inside that length.
+        assert_eq!(&wire[..3], &[0x22, 0x80, 0x01]);
+        let mut s = RecordScanner::new();
+        assert!(s.push(&wire[..2]).unwrap().is_empty());
+        assert!(s.needs_more());
+        let recs = s.push(&wire[2..]).unwrap();
+        s.finish().unwrap();
+        assert_eq!(recs.len(), 1);
+        assert_eq!(recs[0].value, len_bytes(&content));
+    }
+
+    #[test]
+    fn two_chunks_complete_fixed32() {
+        let wire = encode_fixed32_field(2, 0xAABBCCDD);
+        let mut s = RecordScanner::new();
+        assert!(s.push(&wire[..3]).unwrap().is_empty());
+        let recs = s.push(&wire[3..]).unwrap();
+        s.finish().unwrap();
+        assert_eq!(recs.len(), 1);
+        assert_eq!(recs[0].value, FieldValue::from_fixed32(0xAABBCCDD));
+    }
 }

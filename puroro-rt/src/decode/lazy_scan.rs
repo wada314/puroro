@@ -150,18 +150,20 @@ impl<A: Allocator + Clone> LazyScan<A> {
         }
     }
 
-    /// Append `chunk` to the island buffer and parse complete records.
+    /// Parse `chunk` and, on success, append it to the island buffer.
     ///
+    /// A scan error leaves `_wire`, the leftover, and the finished flag as they
+    /// were, so a rejected chunk cannot sit in the buffer ahead of the scanner.
     /// Returns the origin of `leftover || chunk` in `_wire`, plus the records.
     pub fn push(
         &mut self,
         chunk: &[u8],
     ) -> Result<(usize, AllocVec<ScannedRecord<A>, A>), DecodeError> {
-        self.finished = false;
         debug_assert!(self.wire.as_bytes().ends_with(self.scanner.leftover()));
         let origin = self.wire.len() - self.scanner.leftover().len();
-        self.wire.append(chunk);
         let records = self.scanner.push(chunk)?;
+        self.finished = false;
+        self.wire.append(chunk);
         debug_assert!(self.wire.as_bytes().ends_with(self.scanner.leftover()));
         Ok((origin, records))
     }

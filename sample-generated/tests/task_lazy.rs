@@ -1,7 +1,11 @@
 //! `TaskLazy` ingest: scanner, catalog merge, WireOrSso, nested lazy children.
 
-use ::puroro::{BytesMut, DecodeError, MapMut, MapRef, Message, RepeatedStringMut, StringMut};
+use ::puroro::{
+    BytesMut, DecodeError, MapMut, MapRef, Message, RECURSION_LIMIT, RepeatedStringMut, ScopedBuf,
+    StringMut,
+};
 use ::puroro_rt::INLINE_CAP;
+use ::puroro_rt::MessageMerge;
 use ::puroro_rt::Varint;
 use ::puroro_rt::encode::{encode_varint_field, field_number_const};
 use ::puroro_sample_generated::address::FIELD_STREET;
@@ -1024,4 +1028,158 @@ fn lazy_partial_eq_follows_eager_fields() {
         PointLazy::decode(&points[..]).unwrap(),
         PointLazy::decode(&point[..]).unwrap()
     );
+}
+
+#[test]
+fn packed_inner_varint_truncated() {
+    // Outer LEN is closed (one payload byte) but that byte continues a varint.
+    let mut bytes = Vec::new();
+    encode_u64_varint(u64::from(FIELD_TAG_IDS) << 3 | 2, &mut bytes);
+    encode_u64_varint(1, &mut bytes);
+    bytes.push(0x80);
+
+    assert_eq!(
+        TaskLazy::decode(&bytes[..]).err(),
+        Some(DecodeError::UnexpectedEof)
+    );
+}
+
+#[test]
+fn nested_len_with_truncated_child() {
+    // Assignee LEN is closed. Its body is only the street tag, so the child
+    // record is incomplete when the child is scanned.
+    let mut child = Vec::new();
+    encode_u64_varint(u64::from(FIELD_STREET) << 3 | 2, &mut child);
+    let mut bytes = Vec::new();
+    encode_len_bytes(FIELD_ASSIGNEE, &child, &mut bytes);
+
+    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let addr = lazy.assignee().unwrap().expect("assignee present");
+    assert_eq!(addr.street().err(), Some(DecodeError::TruncatedMessage));
+}
+
+#[test]
+fn attributes_rejects_truncated_and_mistyped_entry() {
+    let mut short_key = Vec::new();
+    // key tag (field 1, LEN), length 5, one content byte.
+    short_key.extend_from_slice(&[0x0a, 0x05, b'x']);
+    let mut truncated = Vec::new();
+    encode_len_bytes(FIELD_ATTRIBUTES, &short_key, &mut truncated);
+    let lazy = TaskLazy::decode(&truncated[..]).unwrap();
+    assert_eq!(lazy.attributes().err(), Some(DecodeError::TruncatedMessage));
+
+    let mut varint_key = Vec::new();
+    // key tag (field 1, varint) — string keys are LEN.
+    varint_key.extend_from_slice(&[0x08, 0x01]);
+    let mut mistyped = Vec::new();
+    encode_len_bytes(FIELD_ATTRIBUTES, &varint_key, &mut mistyped);
+    let lazy = TaskLazy::decode(&mistyped[..]).unwrap();
+    assert_eq!(lazy.attributes().err(), Some(DecodeError::InvalidTag));
+}
+
+#[test]
+fn score_rejects_non_varint_wire() {
+    let mut fixed = Vec::new();
+    encode_u64_varint(u64::from(FIELD_SCORE) << 3 | 5, &mut fixed);
+    fixed.extend_from_slice(&1u32.to_le_bytes());
+    assert_eq!(
+        TaskLazy::decode(&fixed[..]).err(),
+        Some(DecodeError::InvalidTag)
+    );
+
+    let mut len = Vec::new();
+    encode_len_bytes(FIELD_SCORE, &[1], &mut len);
+    assert_eq!(
+        TaskLazy::decode(&len[..]).err(),
+        Some(DecodeError::InvalidTag)
+    );
+}
+
+#[test]
+fn rejected_chunk_leaves_prior_ingest() {
+    let mut first = Vec::new();
+    encode_varint_field(
+        field_number_const::<FIELD_SCORE>(),
+        Varint::from_int32(4),
+        &mut first,
+    );
+    let mut second = Vec::new();
+    encode_varint_field(
+        field_number_const::<FIELD_SCORE>(),
+        Varint::from_int32(9),
+        &mut second,
+    );
+    second.push(0x0f);
+
+    let mut lazy = TaskLazy::new();
+    lazy.push(&first).unwrap();
+    lazy.finish().unwrap();
+    assert_eq!(lazy.score().unwrap(), 4);
+
+    assert_eq!(lazy.push(&second).err(), Some(DecodeError::InvalidTag));
+    assert_eq!(lazy.score().unwrap(), 4);
+    assert_eq!(lazy.encode_to_vec().unwrap(), first);
+
+    let mut third = Vec::new();
+    encode_varint_field(
+        field_number_const::<FIELD_SCORE>(),
+        Varint::from_int32(9),
+        &mut third,
+    );
+    lazy.push(&third).unwrap();
+    assert_eq!(lazy.score().err(), Some(DecodeError::UnfinishedMessage));
+    lazy.finish().unwrap();
+    assert_eq!(lazy.score().unwrap(), 9);
+    let mut expected = first;
+    expected.extend_from_slice(&third);
+    assert_eq!(lazy.encode_to_vec().unwrap(), expected);
+}
+
+#[test]
+fn encode_before_finish_is_unfinished() {
+    let mut bytes = Vec::new();
+    encode_varint_field(
+        field_number_const::<FIELD_SCORE>(),
+        Varint::from_int32(4),
+        &mut bytes,
+    );
+    let mut lazy = TaskLazy::new();
+    lazy.push(&bytes).unwrap();
+    assert_eq!(
+        lazy.encoded_len().err(),
+        Some(DecodeError::UnfinishedMessage)
+    );
+    let mut out = Vec::new();
+    assert_eq!(
+        lazy.encode(&mut out).err(),
+        Some(DecodeError::UnfinishedMessage)
+    );
+    assert!(out.is_empty());
+}
+
+#[test]
+fn merge_from_at_recursion_limit_is_rejected() {
+    let mut bytes = Vec::new();
+    encode_varint_field(
+        field_number_const::<FIELD_SCORE>(),
+        Varint::from_int32(9),
+        &mut bytes,
+    );
+    let mut lazy = TaskLazy::new();
+    {
+        let mut cursor = bytes.as_slice();
+        let mut scoped = ScopedBuf::new(&mut cursor);
+        assert_eq!(
+            MessageMerge::merge_from_with_depth(&mut lazy, &mut scoped, RECURSION_LIMIT),
+            Err(DecodeError::RecursionLimitExceeded),
+        );
+    }
+    assert_eq!(lazy.score().unwrap(), 0);
+
+    {
+        let mut cursor = bytes.as_slice();
+        let mut scoped = ScopedBuf::new(&mut cursor);
+        MessageMerge::merge_from_with_depth(&mut lazy, &mut scoped, RECURSION_LIMIT - 1).unwrap();
+    }
+    assert_eq!(lazy.score().unwrap(), 9);
 }
