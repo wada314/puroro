@@ -84,29 +84,47 @@ fn render_inherent(
     eager_alias: &Ident,
     companion: &Ident,
 ) -> TokenStream {
+    let reads = lazy_read_methods(getters);
+    let ingest = lazy_ingest_methods(new_fields, eager_alias, companion);
     quote! {
         impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> #lazy_ty {
-            #(#getters)*
+            #reads
+            #ingest
+        }
+    }
+}
 
-            pub fn encoded_len(&self) -> ::core::result::Result<usize, ::puroro::DecodeError> {
-                self._common.lazy.scan.encoded_len()
-            }
+fn lazy_read_methods(getters: &[TokenStream]) -> TokenStream {
+    quote! {
+        #(#getters)*
 
-            pub fn encode<B: ::bytes::BufMut>(
-                &self,
-                buf: &mut B,
-            ) -> ::core::result::Result<(), ::puroro::DecodeError> {
-                self._common.lazy.scan.encode(buf)
-            }
+        pub fn encoded_len(&self) -> ::core::result::Result<usize, ::puroro::DecodeError> {
+            self._common.lazy.scan.encoded_len()
+        }
 
-            pub fn encode_to_vec(
-                &self,
-            ) -> ::core::result::Result<::std::vec::Vec<u8>, ::puroro::DecodeError> {
-                let mut out = ::std::vec::Vec::with_capacity(self.encoded_len()?);
-                self.encode(&mut out)?;
-                ::core::result::Result::Ok(out)
-            }
+        pub fn encode<B: ::bytes::BufMut>(
+            &self,
+            buf: &mut B,
+        ) -> ::core::result::Result<(), ::puroro::DecodeError> {
+            self._common.lazy.scan.encode(buf)
+        }
 
+        pub fn encode_to_vec(
+            &self,
+        ) -> ::core::result::Result<::std::vec::Vec<u8>, ::puroro::DecodeError> {
+            let mut out = ::std::vec::Vec::with_capacity(self.encoded_len()?);
+            self.encode(&mut out)?;
+            ::core::result::Result::Ok(out)
+        }
+    }
+}
+
+fn lazy_ingest_methods(
+    new_fields: &[TokenStream],
+    eager_alias: &Ident,
+    companion: &Ident,
+) -> TokenStream {
+    quote! {
             pub fn new_in(alloc: A) -> Self {
                 Self {
                     _common: ::puroro_rt::LazyMessageCommon::new_in(
@@ -165,7 +183,6 @@ fn render_inherent(
                 })?;
                 ::core::result::Result::Ok(eager)
             }
-        }
     }
 }
 
@@ -477,27 +494,21 @@ fn repeated_getter(field: &RepeatedEmit, companion: &Ident) -> TokenStream {
     let name = &field.name;
     let elem = lazy_child_view(field.layout.as_ref(), &field.slice_elem_ty, companion);
     let ensured = scan_guard();
-    if is_repeated_spans(field.layout.as_ref()) {
+    let read = if is_repeated_spans(field.layout.as_ref()) {
         quote! {
-            pub fn #name(
-                &self,
-            ) -> ::core::result::Result<&[#elem], ::puroro::DecodeError> {
-                #ensured
-                ::core::result::Result::Ok(
-                    self.#name
-                        .bind(self._common.lazy.scan.wire(), &self._common)?
-                        .as_slice(),
-                )
-            }
+            self.#name
+                .bind(self._common.lazy.scan.wire(), &self._common)?
+                .as_slice()
         }
     } else {
-        quote! {
-            pub fn #name(
-                &self,
-            ) -> ::core::result::Result<&[#elem], ::puroro::DecodeError> {
-                #ensured
-                ::core::result::Result::Ok(self.#name.bind(&self._common).as_slice())
-            }
+        quote! { self.#name.bind(&self._common).as_slice() }
+    };
+    quote! {
+        pub fn #name(
+            &self,
+        ) -> ::core::result::Result<&[#elem], ::puroro::DecodeError> {
+            #ensured
+            ::core::result::Result::Ok(#read)
         }
     }
 }
@@ -546,6 +557,11 @@ fn oneof_getters(field: &OneofEmit, companion: &Ident) -> Vec<TokenStream> {
     for variant in &field.variants {
         let vname = &variant.name;
         let field_const = &variant.field_const;
+        let variant_of = quote! {
+            self.#name
+                .bind(&self._common)
+                .variant_of::<{ #companion::#field_const }>()
+        };
         let body = if let Some(access) = variant.len_access {
             let read = len_read(access, quote! { f });
             optional_method(
@@ -553,12 +569,7 @@ fn oneof_getters(field: &OneofEmit, companion: &Ident) -> Vec<TokenStream> {
                 &variant.optional_ty,
                 quote! {
                     #ensured
-                    match self
-                        .#name
-                        .bind(&self._common)
-                        .variant_of::<{ #companion::#field_const }>()
-                        .as_field()
-                    {
+                    match #variant_of.as_field() {
                         ::core::option::Option::Some(f) => #read,
                         ::core::option::Option::None => {
                             ::core::result::Result::Ok(::puroro::Optional::new(
@@ -570,16 +581,7 @@ fn oneof_getters(field: &OneofEmit, companion: &Ident) -> Vec<TokenStream> {
             )
         } else if variant.message_apply.is_some() {
             let view = lazy_child_view(variant.layout.as_ref(), &variant.mut_target, companion);
-            message_method(
-                vname,
-                &view,
-                quote! {
-                    self.#name
-                        .bind(&self._common)
-                        .variant_of::<{ #companion::#field_const }>()
-                        .get()
-                },
-            )
+            message_method(vname, &view, quote! { #variant_of.get() })
         } else {
             let optional_ty = &variant.optional_ty;
             quote! {
@@ -590,12 +592,7 @@ fn oneof_getters(field: &OneofEmit, companion: &Ident) -> Vec<TokenStream> {
                     ::puroro::DecodeError,
                 > {
                     #ensured
-                    ::core::result::Result::Ok(
-                        self.#name
-                            .bind(&self._common)
-                            .variant_of::<{ #companion::#field_const }>()
-                            .optional(),
-                    )
+                    ::core::result::Result::Ok(#variant_of.optional())
                 }
             }
         };

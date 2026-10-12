@@ -648,9 +648,7 @@ fn emit_field(field: &PlannedField<'_>, companion: &Ident) -> Result<FieldEmit> 
     }
     Ok(match field.kind() {
         FieldKind::Map { .. } => FieldEmit::Map(Box::new(emit_map(field)?)),
-        FieldKind::Repeated { .. } => {
-            FieldEmit::Repeated(Box::new(emit_repeated(field, companion)?))
-        }
+        FieldKind::Repeated { .. } => FieldEmit::Repeated(Box::new(emit_repeated(field)?)),
         FieldKind::Singular { .. } => FieldEmit::Singular(Box::new(emit_scalar(field, companion)?)),
     })
 }
@@ -714,7 +712,6 @@ fn emit_oneof_variant(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
     let mut marker = wire_marker_path(wire)?;
     let mut mut_target = views.mut_target;
     let mut layout_assoc = None;
-    let mut generic_layout = false;
     let mut message_apply = None;
     let len_slot = len_access(wire);
     let mut lazy_kind = None;
@@ -724,32 +721,28 @@ fn emit_oneof_variant(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
         let eager_layout = layout_ty
             .clone()
             .unwrap_or_else(|| parse_quote! { ::puroro_rt::Inline });
-        let lazy_layout: Type = parse_quote! { ::puroro_rt::WireOrSso<{ super::#kind_ident }> };
-        let assoc = assoc_ident(field.name(), "Len");
-        layout_assoc = Some(LayoutAssoc {
-            assoc,
-            kind: LayoutAssocKind::SingularLen {
-                marker: marker.clone(),
-                eager: eager_layout,
-                lazy: lazy_layout,
-            },
-        });
-        generic_layout = true;
+        layout_assoc = Some(wire_or_sso_assoc(
+            field.name(),
+            &marker,
+            &kind_ident,
+            eager_layout,
+        ));
     }
     if let WireTypeKind::Message(child) = wire {
         let pin = resolve_child_pin(field.name(), child, field.child_parse())?;
         message_apply = Some(pin.singular_apply());
-        if let ChildPin::Follow(assoc) = &pin {
-            layout_assoc = Some(assoc.as_ref().clone());
-            generic_layout = true;
+        if let Some(assoc) = pin.follow() {
+            layout_assoc = Some(assoc.clone());
         }
         if let Some(ty) = pin.oneof_marker() {
             marker = ty;
         }
-        if let ChildPin::Lazy { lazy, .. } = &pin {
-            mut_target = lazy.as_ref().clone();
+        if let Some((_, lazy)) = pin.lazy_pin() {
+            mut_target = lazy.clone();
         }
     }
+    // A len slot or a follow-parent child mentions `Layout`. A concrete pin does not.
+    let generic_layout = layout_assoc.is_some();
     Ok(OneofVariantEmit {
         name: escape_ident(field.name()),
         name_str: field.name().to_owned(),
@@ -778,7 +771,7 @@ fn emit_oneof_variant(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
     })
 }
 
-fn emit_repeated(field: &PlannedField<'_>, companion: &Ident) -> Result<RepeatedEmit> {
+fn emit_repeated(field: &PlannedField<'_>) -> Result<RepeatedEmit> {
     let FieldKind::Repeated { wire, encoding } = field.kind() else {
         return Err(Error::internal(format!(
             "field `{}` is not repeated",
@@ -788,7 +781,6 @@ fn emit_repeated(field: &PlannedField<'_>, companion: &Ident) -> Result<Repeated
     let name = field.name();
     let field_const = field.field_const();
     let number = field.number();
-    let _ = companion;
     let encoding_ty: Type = match encoding {
         RepeatedEncodingKind::Packed => parse_quote! { ::puroro_rt::Packed },
         RepeatedEncodingKind::Expanded => parse_quote! { ::puroro_rt::Expanded },
@@ -811,14 +803,14 @@ fn emit_repeated(field: &PlannedField<'_>, companion: &Ident) -> Result<Repeated
         // the element type; storage stays `RepeatedReady`.
         let pin = resolve_child_pin(name, child, field.child_parse())?;
         message_apply = Some(pin.repeated_apply());
-        if let ChildPin::Follow(assoc) = &pin {
-            layout = Some(assoc.as_ref().clone());
+        if let Some(assoc) = pin.follow() {
+            layout = Some(assoc.clone());
         }
         if let Some(ty) = pin.field_marker() {
             marker = ty;
         }
-        if let ChildPin::Lazy { lazy, .. } = &pin {
-            slice_elem_ty = lazy.as_ref().clone();
+        if let Some((_, lazy)) = pin.lazy_pin() {
+            slice_elem_ty = lazy.clone();
         }
     } else if len_access(wire).is_some() {
         let assoc = assoc_ident(name, "Repeated");
@@ -865,23 +857,20 @@ fn emit_map(field: &PlannedField<'_>) -> Result<MapEmit> {
     let mut layouts = Vec::new();
     if let WireTypeKind::Message(child) = value {
         let pin = resolve_child_pin(name, child, field.child_parse())?;
-        match &pin {
-            ChildPin::Follow(assoc) => {
-                let assoc_name = &assoc.assoc;
-                // The `Layout` bound names the assoc on `Self`. The field
-                // marker names it on the message's `L` parameter.
-                map_value_bound = parse_quote! { ::puroro_rt::ProtoMessage<Self::#assoc_name> };
-                layouts.push(assoc.as_ref().clone());
-            }
-            ChildPin::Lazy { lazy, .. } => {
-                value_view = lazy.as_ref().clone();
-            }
-            ChildPin::Eager { .. } => {}
+        if let Some(assoc) = pin.follow() {
+            let assoc_name = &assoc.assoc;
+            // The `Layout` bound names the assoc on `Self`. The field
+            // marker names it on the message's `L` parameter.
+            map_value_bound = parse_quote! { ::puroro_rt::ProtoMessage<Self::#assoc_name> };
+            layouts.push(assoc.clone());
+        }
+        if let Some((_, lazy)) = pin.lazy_pin() {
+            value_view = lazy.clone();
         }
         if let Some(ty) = pin.field_marker() {
             value_marker = ty;
         }
-        if matches!(pin, ChildPin::Lazy { .. }) {
+        if pin.lazy_pin().is_some() {
             map_value_bound = value_marker.clone();
         }
     }
@@ -1034,44 +1023,26 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
     if let Some(kind_bit) = field.lazy_kind_bit() {
         let kind_ident = Ident::new(&lazy_kind_bit_const(name), Span::call_site());
         lazy_kind_const = Some((kind_ident.clone(), kind_bit));
-        // These types are pasted into `mod layout`, whose parent is the companion.
-        let eager_layout: Type = match layout {
-            PlannedLayout::Inline => parse_quote! { ::puroro_rt::Inline },
-            PlannedLayout::InlineOrHeap { bit_const, .. } => {
-                let ident = Ident::new(bit_const, Span::call_site());
-                parse_quote! { ::puroro_rt::InlineOrHeap<{ super::#ident }> }
-            }
-            PlannedLayout::Boxed | PlannedLayout::BitPacked { .. } => {
-                return Err(Error::internal(format!(
-                    "field `{name}` has a lazy kind bit but is not a string or bytes slot"
-                )));
-            }
-        };
-        let lazy_layout: Type = parse_quote! { ::puroro_rt::WireOrSso<{ super::#kind_ident }> };
-        let assoc = assoc_ident(name, "Len");
-        layout_assoc = Some(LayoutAssoc {
-            assoc: assoc.clone(),
-            kind: LayoutAssocKind::SingularLen {
-                marker: marker.clone(),
-                eager: eager_layout,
-                lazy: lazy_layout,
-            },
-        });
-        layout_ty = Some(parse_quote! { L::#assoc });
+        // `mod layout` sits under the companion, so the eager arm uses `super::`.
+        let eager_layout = singular_len_eager(name, layout)?;
+        let assoc = wire_or_sso_assoc(name, &marker, &kind_ident, eager_layout);
+        let assoc_name = assoc.assoc.clone();
+        layout_assoc = Some(assoc);
+        layout_ty = Some(parse_quote! { L::#assoc_name });
     }
 
     if let WireTypeKind::Message(child) = wire {
         let pin = resolve_child_pin(name, child, field.child_parse())?;
         message_apply_slot = Some(pin.singular_apply());
-        if let ChildPin::Follow(assoc) = &pin {
-            layout_assoc = Some(assoc.as_ref().clone());
+        if let Some(assoc) = pin.follow() {
+            layout_assoc = Some(assoc.clone());
         }
         if let Some(ty) = pin.field_marker() {
             marker = ty;
         }
-        if let ChildPin::Lazy { eager, lazy } = &pin {
-            set_eager = Some(eager.as_ref().clone());
-            mut_target = lazy.as_ref().clone();
+        if let Some((eager, lazy)) = pin.lazy_pin() {
+            set_eager = Some(eager.clone());
+            mut_target = lazy.clone();
         }
     }
 
@@ -1118,6 +1089,36 @@ fn len_access(wire: &WireTypeKind<'_>) -> Option<LenAccess> {
         },
         WireTypeKind::Bytes { .. } => Some(LenAccess::Bytes),
         _ => None,
+    }
+}
+
+/// `Inline` or `InlineOrHeap<{ super::BIT_* }>`, the eager arm of a `WireOrSso` slot.
+fn singular_len_eager(field_name: &str, layout: &PlannedLayout) -> Result<Type> {
+    match layout {
+        PlannedLayout::Inline => Ok(parse_quote! { ::puroro_rt::Inline }),
+        PlannedLayout::InlineOrHeap { bit_const, .. } => {
+            let ident = Ident::new(bit_const, Span::call_site());
+            Ok(parse_quote! { ::puroro_rt::InlineOrHeap<{ super::#ident }> })
+        }
+        PlannedLayout::Boxed | PlannedLayout::BitPacked { .. } => Err(Error::internal(format!(
+            "field `{field_name}` has a lazy kind bit but is not a string or bytes slot"
+        ))),
+    }
+}
+
+fn wire_or_sso_assoc(
+    field_name: &str,
+    marker: &Type,
+    kind_ident: &Ident,
+    eager: Type,
+) -> LayoutAssoc {
+    LayoutAssoc {
+        assoc: assoc_ident(field_name, "Len"),
+        kind: LayoutAssocKind::SingularLen {
+            marker: marker.clone(),
+            eager,
+            lazy: parse_quote! { ::puroro_rt::WireOrSso<{ super::#kind_ident }> },
+        },
     }
 }
 
@@ -1207,6 +1208,21 @@ impl ChildPin {
                 })
             }
             other => other.field_marker(),
+        }
+    }
+
+    fn follow(&self) -> Option<&LayoutAssoc> {
+        match self {
+            Self::Follow(assoc) => Some(assoc),
+            Self::Lazy { .. } | Self::Eager { .. } => None,
+        }
+    }
+
+    /// Eager and lazy aliases when the field is pinned to the lazy child.
+    fn lazy_pin(&self) -> Option<(&Type, &Type)> {
+        match self {
+            Self::Lazy { eager, lazy } => Some((eager.as_ref(), lazy.as_ref())),
+            Self::Follow(_) | Self::Eager { .. } => None,
         }
     }
 }
