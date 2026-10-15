@@ -10,6 +10,8 @@ Please check [the `readme` of this repository](https://github.com/wada314/puroro
 # Table of contents
 
 1. Basic usage (this page)
+2. [Generated code reference](crate::generated_code) — types and methods
+   emitted for each `.proto` construct
 
 # Simple example
 

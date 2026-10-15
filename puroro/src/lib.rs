@@ -17,6 +17,7 @@
 
 pub mod bytes;
 pub mod doc_samples;
+pub mod generated_code;
 mod error;
 pub mod internal;
 pub mod message;
