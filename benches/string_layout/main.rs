@@ -353,6 +353,24 @@ fn bench_decode(c: &mut Criterion) {
     group.finish();
 }
 
+fn bench_decode_keep(c: &mut Criterion) {
+    let mut group = c.benchmark_group("string_layout/decode_keep");
+    configure(&mut group);
+    for work in WORKLOADS {
+        let bytes = SsoShort::sample(work.values).encode_to_vec();
+        group.throughput(Throughput::Bytes(bytes.len() as u64));
+        group.bench_function(BenchmarkId::new("sso", work.name), |b| {
+            let bytes = bytes.as_slice();
+            b.iter_with_large_drop(|| SsoShort::decode(black_box(bytes)).unwrap())
+        });
+        group.bench_function(BenchmarkId::new("heap", work.name), |b| {
+            let bytes = bytes.as_slice();
+            b.iter_with_large_drop(|| HeapShort::decode(black_box(bytes)).unwrap())
+        });
+    }
+    group.finish();
+}
+
 fn bench_set(c: &mut Criterion) {
     let mut group = c.benchmark_group("string_layout/set");
     configure(&mut group);
@@ -370,7 +388,13 @@ fn bench_set(c: &mut Criterion) {
     group.finish();
 }
 
-criterion_group!(benches, bench_encode, bench_decode, bench_set);
+criterion_group!(
+    benches,
+    bench_encode,
+    bench_decode,
+    bench_decode_keep,
+    bench_set
+);
 
 fn main() {
     assert!(
