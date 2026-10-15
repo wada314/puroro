@@ -266,6 +266,34 @@ pub enum ChildParse {
     Lazy = 2,
 }
 
+/// Field number of `(puroro.enum_repr)` on `google.protobuf.EnumOptions`.
+///
+/// Matches `proto/puroro/options.proto`.
+pub const ENUM_REPR_OPTION_NUMBER: u32 = 51405;
+
+/// `(puroro.enum_repr)` — Rust representation of a generated protobuf enum.
+///
+/// [`Unspecified`](Self::Unspecified) (and an absent option) uses the generator
+/// default, a newtype-over-`i32`. [`Newtype`](Self::Newtype) pins that.
+/// [`RustEnum`](Self::RustEnum) emits a native Rust `enum`. That form rejects
+/// duplicate wire numbers at codegen time.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, TryFrom)]
+#[try_from(repr)]
+#[repr(i32)]
+pub enum EnumRepr {
+    #[default]
+    Unspecified = 0,
+    Newtype = 1,
+    RustEnum = 2,
+}
+
+impl EnumRepr {
+    /// Whether codegen should emit a native Rust `enum`.
+    pub fn is_rust_enum(self) -> bool {
+        matches!(self, Self::RustEnum)
+    }
+}
+
 /// A oneof declaration (`OneofDescriptorProto` subset).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct OneofDesc {
@@ -279,6 +307,8 @@ pub struct EnumDesc {
     pub values: Vec<EnumValueDesc>,
     /// Enum-level `options.features` (`FeatureSet`), if any fields were set.
     pub features: FeatureSet,
+    /// `(puroro.enum_repr)`, if set on the descriptor.
+    pub enum_repr: EnumRepr,
 }
 
 /// An enum value (`EnumValueDescriptorProto` subset).

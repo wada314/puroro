@@ -247,6 +247,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             fqn: fqn.clone(),
             parent,
             openness: EnumType::resolve(file, &desc.features, self.proto2_utf8),
+            enum_repr: desc.enum_repr,
             values,
         });
         self.enums_by_fqn.insert(fqn, enum_ty);

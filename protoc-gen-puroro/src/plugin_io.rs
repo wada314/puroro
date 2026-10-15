@@ -6,10 +6,10 @@
 use crate::descriptor::features::FeatureSet;
 use crate::descriptor::{
     BYTES_LAYOUT_OPTION_NUMBER, BytesLayout, CHILD_PARSE_OPTION_NUMBER, ChildParse, CodegenMeta,
-    CodegenRequest, Edition, EnumDesc, EnumValueDesc, FieldDesc, FieldLabel, FieldType,
-    MESSAGE_LAYOUT_OPTION_NUMBER, MessageDesc, MessageLayout, OneofDesc, ProtoFile, ProtoFqn,
-    STRING_LAYOUT_OPTION_NUMBER, StringLayout, Syntax, UNKNOWN_FIELDS_OPTION_NUMBER,
-    UnknownFieldsPolicy,
+    CodegenRequest, ENUM_REPR_OPTION_NUMBER, Edition, EnumDesc, EnumRepr, EnumValueDesc, FieldDesc,
+    FieldLabel, FieldType, MESSAGE_LAYOUT_OPTION_NUMBER, MessageDesc, MessageLayout, OneofDesc,
+    ProtoFile, ProtoFqn, STRING_LAYOUT_OPTION_NUMBER, StringLayout, Syntax,
+    UNKNOWN_FIELDS_OPTION_NUMBER, UnknownFieldsPolicy,
 };
 use crate::error::{Error, Result};
 use ::protobuf_core::{
@@ -479,6 +479,7 @@ fn decode_enum(bytes: &[u8]) -> Result<EnumDesc> {
         let mut name = String::new();
         let mut values = Vec::new();
         let mut features = FeatureSet::default();
+        let mut enum_repr = EnumRepr::Unspecified;
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
             match field.field_number.as_u32() {
@@ -487,7 +488,11 @@ fn decode_enum(bytes: &[u8]) -> Result<EnumDesc> {
                 // repeated EnumValueDescriptorProto value = 2;
                 2 => values.push(decode_enum_value(expect_len(&field)?)?),
                 // optional EnumOptions options = 3;
-                3 => features = decode_options_features("EnumOptions", 7, expect_len(&field)?)?,
+                3 => {
+                    let decoded = decode_enum_options(expect_len(&field)?)?;
+                    features = decoded.features;
+                    enum_repr = decoded.enum_repr;
+                }
                 _ => {}
             }
         }
@@ -495,6 +500,36 @@ fn decode_enum(bytes: &[u8]) -> Result<EnumDesc> {
             name,
             values,
             features,
+            enum_repr,
+        })
+    })
+}
+
+struct DecodedEnumOptions {
+    features: FeatureSet,
+    enum_repr: EnumRepr,
+}
+
+/// `EnumOptions`: `features` (7) and `(puroro.enum_repr)` (51405).
+fn decode_enum_options(bytes: &[u8]) -> Result<DecodedEnumOptions> {
+    with_decoding_context("EnumOptions", || {
+        let mut features = FeatureSet::default();
+        let mut enum_repr = EnumRepr::Unspecified;
+        for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
+            let field = field?;
+            match field.field_number.as_u32() {
+                // optional FeatureSet features = 7;
+                7 => features = decode_feature_set(expect_len(&field)?)?,
+                // extend EnumOptions { optional EnumRepr enum_repr = 51405; }
+                ENUM_REPR_OPTION_NUMBER => {
+                    enum_repr = expect_enum(&field)?;
+                }
+                _ => {}
+            }
+        }
+        Ok(DecodedEnumOptions {
+            features,
+            enum_repr,
         })
     })
 }
@@ -933,6 +968,31 @@ mod tests {
         assert_eq!(
             decoded.proto_files[0].enums[0].features.enum_type,
             Some(EnumType::Closed)
+        );
+    }
+
+    #[test]
+    fn decode_enum_options_enum_repr_extension() {
+        use crate::descriptor::{ENUM_REPR_OPTION_NUMBER, EnumRepr};
+
+        // EnumOptions { (puroro.enum_repr) = ENUM_REPR_RUST_ENUM }
+        let enum_options = encode_varint_field(ENUM_REPR_OPTION_NUMBER, EnumRepr::RustEnum as i32);
+        let mut enum_desc = Vec::new();
+        enum_desc.extend(encode_string_field(1, "Status"));
+        enum_desc.extend(encode_message_field(3, &enum_options));
+
+        let mut file = Vec::new();
+        file.extend(encode_string_field(1, "t.proto"));
+        file.extend(encode_message_field(5, &enum_desc));
+
+        let mut request = Vec::new();
+        request.extend(encode_string_field(1, "t.proto"));
+        request.extend(encode_message_field(15, &file));
+
+        let decoded = decode_request(&request).unwrap();
+        assert_eq!(
+            decoded.proto_files[0].enums[0].enum_repr,
+            EnumRepr::RustEnum
         );
     }
 
