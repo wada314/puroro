@@ -1,4 +1,28 @@
 
+# unreleased
+- Moved `protoc-plugin-by-closure` to a separated repository.
+
+# v 0.14.1
+- Upgraded crate dependencies (`thiserror` 2, `itertools` 0.14, `protoc-bin-vendored` 3.1, and others).
+- `puroro-codegen` is 0.14.2 in this release.
+
+# v 0.14.0
+- Introduced puroro-specific `String` and `Bytes` types with a small-buffer optimization.
+- Boxed the message view inside the owned message struct.
+- Added `FOO_FIELD_NUMBER` constants on each generated message.
+- Ported some improvements from the `alloc` branch.
+
+# v 0.13.0
+- Message field getters return the view type (`&FooView`) instead of the owned message.
+- Implemented `ToOwned` for view types (`FooView` → `Foo`).
+- Updated the build system.
+
+# v 0.12.0
+- Introduced the message view type (`Foo` / `FooView`, similar to `Vec<T>` / `[T]`). Getter methods live on `FooView`; mutating methods live on `Foo`.
+- Removed deprecated packages and the separated doc-samples crate.
+- Changed deserialization to use `ScopedIter`.
+- Fixed build script errors on WSL2.
+
 # v 0.11.0
 - Re-organized packages
 - Added some configurable options for code generation

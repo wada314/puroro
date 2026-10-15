@@ -1,5 +1,14 @@
 # Design discussion: Message ref type
 
+**Status (as of v0.14):** Solution B (a dedicated view type) is what the
+current code generator implements. Each message `Foo` owns a boxed `FooView`,
+implements `Deref<Target = FooView>`, and puts mutating methods on `Foo`
+while getters live on `FooView`. Nested message getters return
+`Option<&BarView>` rather than `Option<&Bar>`. The other solutions below
+were not adopted; this document is kept as design history.
+
+---
+
 ## Example
 
 For the following proto3 message:
