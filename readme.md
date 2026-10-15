@@ -5,7 +5,9 @@ This project is licensed under Apache 2.0 license.
 
 This is not an officially supported Google product.
 
-See the [crate documentation](https://docs.rs/puroro/) for API details.
+See the [crate documentation](https://docs.rs/puroro/) for API details, and
+the [Generated Code Guide](./doc/generated-code.md) for the Rust interface
+emitted from `.proto` files.
 
 ## important notes
 
@@ -78,8 +80,10 @@ Each generated message `Foo` is split into an owned struct `Foo` and an
 immutable view `FooView`, similar to `Vec<T>` and `[T]`. Getters such as
 `foo()` / `has_foo()` live on `FooView` (and are available on `Foo` via
 `Deref`). Mutators such as `foo_mut()` / `clear_foo()` live on `Foo`.
-See the [crate documentation](https://docs.rs/puroro/) for serialize /
-deserialize examples.
+See the [Generated Code Guide](./doc/generated-code.md) for the full mapping
+from `.proto` constructs to generated Rust types and methods, and the
+[crate documentation](https://docs.rs/puroro/) for serialize / deserialize
+examples.
 
 # subcrates
 - puroro -- The crate that the library user need to import
