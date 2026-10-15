@@ -1,5 +1,7 @@
 # Plan: Unify repeated fields via `RepeatedElement`
 
+**Status (2026-10).** Implemented. Current names: `RepeatedElement` / `RepeatedElementMerge` / `PackableRepeatedElement` + `RepeatedField<T, E, FIELD, A, L>` (`Packed` / `Expanded`). Markers are allocator-free (`ProtoInt32`, not `ProtoInt32<A>`). There is no `RepeatedItems` / `ProtoType` / `repeated_items.rs`. Treat this file as history of the unification; live API is [IMPLEMENTATION.md](../../IMPLEMENTATION.md) and [`repeated_element.rs`](../../puroro-rt/src/fields/wire/repeated_element.rs).
+
 ## Goal
 
 Align repeated fields with the singular catalog shape (`T: ProtoType` + one field wrapper), without forcing repeated message storage through `UnmanagedBox` (double indirection).

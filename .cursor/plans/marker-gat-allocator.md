@@ -1,5 +1,7 @@
 # Plan: Allocator on fields, GATs on markers
 
+**Status (2026-10).** Implemented. Markers are allocator-free; `A` lives on field wrappers. The plan's `ProtoType` trait split into `EncodeType` + `SingularType` + `PayloadAccess` (`encode_type.rs`, `singular_type.rs`). There is no `proto_type.rs`. Success-criteria checkmarks below still hold; use current trait names when editing code.
+
 ## Goal
 
 Markers (`ProtoInt32`, `ProtoBool`, `ProtoString`, …) become **allocator-free** type identity. Physical storage / views are **GATs** parametrised by `A`. The allocator type lives on **field wrappers** (`SingularField` / `RepeatedField`).

@@ -46,7 +46,7 @@ packed fields show up in numbers.
 
   ```rust
   pub type Task<A = Global> = TaskImpl<A, Eager>;
-  pub type TaskLazy<A = Global> = TaskImpl<A, Lazy>;
+  pub type TaskLazy<A = Global> = TaskImpl<A, Lazy<A>>;
   ```
 
   Do **not** introduce `TaskImpl` until both handwritten types exist and
