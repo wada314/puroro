@@ -7,7 +7,7 @@ use ::bytes::{Buf, BufMut};
 use ::puroro::{DecodeBuf, DecodeError, Message};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    Boxed, EncodeCtx, Explicit, FieldDeallocate, FieldEncode, Implicit, InlineOrHeap,
+    Boxed, EncodeCtx, Explicit, FieldDeallocate, FieldEncode, Implicit, Inline, InlineOrHeap,
     Message as MessagePresence, MessageCommon, MessageEncode, MessageMerge, Packed, ProtoBytes,
     ProtoInt32, ProtoMessage, ProtoString, ProtoUInt64, RepeatedField, SingularField,
 };
@@ -221,6 +221,9 @@ impl<A: Allocator + Clone> Message for FlatScalars<A> {
 // ---------------------------------------------------------------------------
 
 /// Self-referential optional child (field 1) plus a leaf `value`.
+///
+/// Children are [`Boxed`]: a self-recursive inline child cannot have a finite
+/// layout. One-level inline vs boxed is [`WrapInline`] / [`Wrap`].
 pub struct Nest<A: Allocator + Clone = Global> {
     _common: MessageCommon<BitArray<[u8; 1], Lsb0>, A>,
     child: SingularField<ProtoMessage<Nest<A>>, MessagePresence, 1, A, Boxed>,
@@ -358,6 +361,291 @@ impl<A: Allocator + Clone> Message for Nest<A> {
         Ok(())
     }
 }
+
+// ---------------------------------------------------------------------------
+// One-level wrap — boxed vs inline child (self-recursive inline is unsized)
+// ---------------------------------------------------------------------------
+
+/// Tiny nested body used as the child of [`Wrap`] / [`WrapInline`].
+pub struct Leaf<A: Allocator + Clone = Global> {
+    _common: MessageCommon<BitArray<[u8; 1], Lsb0>, A>,
+    value: SingularField<ProtoInt32, Implicit, 1, A>,
+}
+
+impl Leaf<Global> {
+    pub fn new() -> Self {
+        Self::new_in(Global)
+    }
+}
+
+impl Default for Leaf<Global> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<A: Allocator + Clone> Leaf<A> {
+    pub fn new_in(alloc: A) -> Self {
+        Self {
+            _common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
+            value: SingularField::new_in(alloc),
+        }
+    }
+
+    pub fn sample_in(alloc: A, value: i32) -> Self {
+        let mut m = Self::new_in(alloc);
+        *m.value.bind_mut(&mut m._common).value_mut() = value;
+        m
+    }
+}
+
+impl<A: Allocator + Clone> Drop for Leaf<A> {
+    fn drop(&mut self) {
+        drop_fields!(self, value);
+    }
+}
+
+impl<A: Allocator + Clone> ::unmanaged::DeallocateIn<A> for Leaf<A> {
+    #[inline]
+    unsafe fn deallocate_in(self, _alloc: &A) {
+        drop(self);
+    }
+}
+
+impl<A: Allocator + Clone> ::puroro_rt::DeallocateBound<A> for Leaf<A> {
+    #[inline]
+    fn deallocate_bound<Cx: ::puroro_rt::MessageBindingMut<A>>(self, common: &Cx) {
+        unsafe { ::unmanaged::DeallocateIn::deallocate_in(self, common.alloc()) }
+    }
+}
+
+impl<A: Allocator + Clone> MessageEncode for Leaf<A> {
+    fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
+        let c = &self._common;
+        self.value.encoded_len(c, ctx) + c.unknown_fields.len()
+    }
+
+    fn encode_raw<B: BufMut>(&self, ctx: &mut EncodeCtx, buf: &mut B) {
+        let c = &self._common;
+        self.value.encode_raw(c, ctx, buf);
+        buf.put_slice(&c.unknown_fields);
+    }
+}
+
+impl<A: Allocator + Clone> MessageMerge for Leaf<A> {
+    fn merge_from_with_depth<B: DecodeBuf>(
+        &mut self,
+        buf: &mut B,
+        depth: usize,
+    ) -> Result<(), DecodeError> {
+        if depth >= ::puroro::RECURSION_LIMIT {
+            return Err(DecodeError::RecursionLimitExceeded);
+        }
+        while buf.has_remaining() {
+            let (field_number, wire_type) = decode_tag(buf)?;
+            match field_number.as_u32() {
+                1 => self
+                    .value
+                    .bind_mut(&mut self._common)
+                    .merge(wire_type, buf, depth)?,
+                _ => skip_field_and_save(
+                    field_number,
+                    wire_type,
+                    buf,
+                    &mut self._common.unknown_fields,
+                    self._common.alloc.clone(),
+                )?,
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for Leaf<A> {
+    #[inline]
+    fn default_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+}
+
+impl<A: Allocator + Clone> Message for Leaf<A> {
+    type Alloc = A;
+
+    fn new_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+
+    fn encode<B: BufMut>(&self, buf: &mut B) {
+        ::puroro_rt::encode_message(self, buf)
+    }
+
+    fn encode_to_vec(&self) -> Vec<u8> {
+        ::puroro_rt::encode_message_to_vec(self)
+    }
+
+    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+        ::puroro_rt::merge_message(self, buf)
+    }
+
+    fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
+        self._common.iter_unknown_fields()
+    }
+
+    fn validate(&self) -> Result<(), DecodeError> {
+        Ok(())
+    }
+}
+
+/// One-level parent: boxed [`Leaf`] child (field 1) plus `extra` (field 2).
+pub struct Wrap<A: Allocator + Clone = Global> {
+    _common: MessageCommon<BitArray<[u8; 1], Lsb0>, A>,
+    child: SingularField<ProtoMessage<Leaf<A>>, MessagePresence, 1, A, Boxed>,
+    extra: SingularField<ProtoInt32, Implicit, 2, A>,
+}
+
+/// Same wire as [`Wrap`], with the child stored inline.
+pub struct WrapInline<A: Allocator + Clone = Global> {
+    _common: MessageCommon<BitArray<[u8; 1], Lsb0>, A>,
+    child: SingularField<ProtoMessage<Leaf<A>>, MessagePresence, 1, A, Inline>,
+    extra: SingularField<ProtoInt32, Implicit, 2, A>,
+}
+
+macro_rules! impl_wrap_message {
+    ($ty:ident) => {
+        impl $ty<Global> {
+            pub fn new() -> Self {
+                Self::new_in(Global)
+            }
+
+            pub fn sample() -> Self {
+                Self::sample_in(Global)
+            }
+        }
+
+        impl Default for $ty<Global> {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+
+        impl<A: Allocator + Clone> $ty<A> {
+            pub fn new_in(alloc: A) -> Self {
+                Self {
+                    _common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
+                    child: SingularField::new_in(alloc.clone()),
+                    extra: SingularField::new_in(alloc),
+                }
+            }
+
+            pub fn sample_in(alloc: A) -> Self {
+                let mut m = Self::new_in(alloc.clone());
+                *m.extra.bind_mut(&mut m._common).value_mut() = 99;
+                *m.child.bind_mut(&mut m._common).get_mut() = Leaf::sample_in(alloc, 7);
+                m
+            }
+        }
+
+        impl<A: Allocator + Clone> Drop for $ty<A> {
+            fn drop(&mut self) {
+                drop_fields!(self, child, extra);
+            }
+        }
+
+        impl<A: Allocator + Clone> ::unmanaged::DeallocateIn<A> for $ty<A> {
+            #[inline]
+            unsafe fn deallocate_in(self, _alloc: &A) {
+                drop(self);
+            }
+        }
+
+        impl<A: Allocator + Clone> MessageEncode for $ty<A> {
+            fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
+                let c = &self._common;
+                self.child.encoded_len(c, ctx)
+                    + self.extra.encoded_len(c, ctx)
+                    + c.unknown_fields.len()
+            }
+
+            fn encode_raw<B: BufMut>(&self, ctx: &mut EncodeCtx, buf: &mut B) {
+                let c = &self._common;
+                self.child.encode_raw(c, ctx, buf);
+                self.extra.encode_raw(c, ctx, buf);
+                buf.put_slice(&c.unknown_fields);
+            }
+        }
+
+        impl<A: Allocator + Clone> MessageMerge for $ty<A> {
+            fn merge_from_with_depth<B: DecodeBuf>(
+                &mut self,
+                buf: &mut B,
+                depth: usize,
+            ) -> Result<(), DecodeError> {
+                if depth >= ::puroro::RECURSION_LIMIT {
+                    return Err(DecodeError::RecursionLimitExceeded);
+                }
+                while buf.has_remaining() {
+                    let (field_number, wire_type) = decode_tag(buf)?;
+                    match field_number.as_u32() {
+                        1 => self
+                            .child
+                            .bind_mut(&mut self._common)
+                            .merge(wire_type, buf, depth)?,
+                        2 => self
+                            .extra
+                            .bind_mut(&mut self._common)
+                            .merge(wire_type, buf, depth)?,
+                        _ => skip_field_and_save(
+                            field_number,
+                            wire_type,
+                            buf,
+                            &mut self._common.unknown_fields,
+                            self._common.alloc.clone(),
+                        )?,
+                    }
+                }
+                Ok(())
+            }
+        }
+
+        impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for $ty<A> {
+            #[inline]
+            fn default_in(alloc: A) -> Self {
+                Self::new_in(alloc)
+            }
+        }
+
+        impl<A: Allocator + Clone> Message for $ty<A> {
+            type Alloc = A;
+
+            fn new_in(alloc: A) -> Self {
+                Self::new_in(alloc)
+            }
+
+            fn encode<B: BufMut>(&self, buf: &mut B) {
+                ::puroro_rt::encode_message(self, buf)
+            }
+
+            fn encode_to_vec(&self) -> Vec<u8> {
+                ::puroro_rt::encode_message_to_vec(self)
+            }
+
+            fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+                ::puroro_rt::merge_message(self, buf)
+            }
+
+            fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
+                self._common.iter_unknown_fields()
+            }
+
+            fn validate(&self) -> Result<(), DecodeError> {
+                Ok(())
+            }
+        }
+    };
+}
+
+impl_wrap_message!(Wrap);
+impl_wrap_message!(WrapInline);
 
 // ---------------------------------------------------------------------------
 // Packed repeated — large packed varint payload

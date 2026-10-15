@@ -6,6 +6,8 @@
 //! - `map<string, int32>` encode / decode / lookup (eager and lazy)
 //! - unknown-field preserve (`Point`) vs discard (`Marker`)
 //! - `encode_to_vec` (length + alloc + write) vs `encode` into a reused buffer
+//! - `decode` includes `Drop`; `decode_keep` uses [`keep::iter_keep`] so only parse is timed
+//! - oneof `notification` encode / decode / `case` / variant switch
 //!
 //! `assignee` is pinned lazy (`AddressLazy`) on both aliases; `watchers` /
 //! `origin` follow the parent layout.
@@ -16,16 +18,22 @@
 //! cargo bench -p puroro --bench generated -- --test
 //! ```
 
+#[path = "../keep.rs"]
+mod keep;
 mod payloads;
 
 use ::allocator_api2::alloc::Global;
 use ::criterion::{black_box, criterion_group, BatchSize, BenchmarkId, Criterion, Throughput};
-use ::puroro::Message;
+use ::puroro::{Message, StringMut};
 use ::puroro_sample_generated::{Marker, Point, Task, TaskLazy};
 
+use keep::iter_keep;
+
 use payloads::{
-    lookup_map, lookup_map_lazy, map_heavy_task, read_all, read_all_lazy, read_one, read_one_lazy,
-    typical_task, MAP_BYTES, MAP_LEN, TYPICAL_BYTES, UNKNOWN_BYTES, UNKNOWN_LEN,
+    lookup_map, lookup_map_lazy, map_heavy_task, oneof_email_task, oneof_postal_task,
+    oneof_webhook_task, read_all, read_all_lazy, read_one, read_one_lazy, read_oneof_case,
+    switch_oneof, typical_task, MAP_BYTES, MAP_LEN, ONEOF_EMAIL_BYTES, ONEOF_POSTAL_BYTES,
+    ONEOF_WEBHOOK_BYTES, TYPICAL_BYTES, UNKNOWN_BYTES, UNKNOWN_LEN,
 };
 
 fn bench_task(c: &mut Criterion) {
@@ -37,6 +45,9 @@ fn bench_task(c: &mut Criterion) {
 
     group.bench_function("decode", |b| {
         b.iter(|| Task::<Global>::decode(black_box(bytes)).unwrap())
+    });
+    group.bench_function("decode_keep", |b| {
+        iter_keep(b, || Task::<Global>::decode(black_box(bytes)).unwrap())
     });
     group.bench_function("decode_read_one", |b| {
         b.iter(|| {
@@ -72,6 +83,9 @@ fn bench_task_lazy(c: &mut Criterion) {
 
     group.bench_function("decode", |b| {
         b.iter(|| TaskLazy::<Global>::decode(black_box(bytes)).unwrap())
+    });
+    group.bench_function("decode_keep", |b| {
+        iter_keep(b, || TaskLazy::<Global>::decode(black_box(bytes)).unwrap())
     });
     group.bench_function("decode_read_one", |b| {
         b.iter(|| {
@@ -157,12 +171,64 @@ fn bench_unknown(c: &mut Criterion) {
     group.finish();
 }
 
+fn bench_oneof(c: &mut Criterion) {
+    let mut group = c.benchmark_group("oneof");
+    let email_bytes = ONEOF_EMAIL_BYTES.as_slice();
+    let webhook_bytes = ONEOF_WEBHOOK_BYTES.as_slice();
+    let postal_bytes = ONEOF_POSTAL_BYTES.as_slice();
+    let email = oneof_email_task();
+    let webhook = oneof_webhook_task();
+    let postal = oneof_postal_task();
+    let decoded_email = Task::<Global>::decode(email_bytes).expect("oneof email decode");
+
+    group.throughput(Throughput::Bytes(email_bytes.len() as u64));
+    group.bench_function(BenchmarkId::new("decode", "email"), |b| {
+        b.iter(|| Task::<Global>::decode(black_box(email_bytes)).unwrap())
+    });
+    group.bench_function(BenchmarkId::new("decode_keep", "email"), |b| {
+        iter_keep(b, || {
+            Task::<Global>::decode(black_box(email_bytes)).unwrap()
+        })
+    });
+    group.bench_function(BenchmarkId::new("encode", "email"), |b| {
+        b.iter(|| black_box(&email).encode_to_vec())
+    });
+
+    group.throughput(Throughput::Bytes(webhook_bytes.len() as u64));
+    group.bench_function(BenchmarkId::new("decode", "webhook"), |b| {
+        b.iter(|| Task::<Global>::decode(black_box(webhook_bytes)).unwrap())
+    });
+    group.bench_function(BenchmarkId::new("encode", "webhook"), |b| {
+        b.iter(|| black_box(&webhook).encode_to_vec())
+    });
+
+    group.throughput(Throughput::Bytes(postal_bytes.len() as u64));
+    group.bench_function(BenchmarkId::new("decode", "postal"), |b| {
+        b.iter(|| Task::<Global>::decode(black_box(postal_bytes)).unwrap())
+    });
+    group.bench_function(BenchmarkId::new("encode", "postal"), |b| {
+        b.iter(|| black_box(&postal).encode_to_vec())
+    });
+
+    group.throughput(Throughput::Elements(1));
+    group.bench_function("read_case", |b| {
+        b.iter(|| read_oneof_case(black_box(&decoded_email)))
+    });
+    group.bench_function("switch", |b| {
+        let mut task = Task::new();
+        task.owner_id_mut().set("user-1");
+        b.iter(|| switch_oneof(black_box(&mut task)))
+    });
+    group.finish();
+}
+
 criterion_group!(
     benches,
     bench_task,
     bench_task_lazy,
     bench_map,
-    bench_unknown
+    bench_unknown,
+    bench_oneof
 );
 
 fn main() {
