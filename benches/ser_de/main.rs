@@ -4,7 +4,7 @@
 //! `visit_fields` dispatch. `encode` is `encode_to_vec` (length + alloc +
 //! write). `encode_reuse` writes into a pre-sized buffer so small messages
 //! are not dominated by `Vec` allocation. `decode` includes `Drop`;
-//! `decode_keep` uses [`iter_with_large_drop`] so only parse is timed.
+//! `decode_keep` uses [`keep::iter_keep`] so only parse is timed.
 //!
 //! `nested` is a boxed self-recursive chain (inline self-recursion is
 //! unsized). `wrap` / `wrap_inline` compare one-level boxed vs inline child.
@@ -15,12 +15,15 @@
 //! cargo bench -p puroro --bench ser_de -- --test   # smoke only
 //! ```
 
+#[path = "../keep.rs"]
+mod keep;
 mod messages;
 mod payloads;
 
 use ::criterion::{black_box, criterion_group, BenchmarkId, Criterion, Throughput};
 use ::puroro::Message;
 
+use keep::iter_keep;
 use messages::{FlatScalars, Nest, PackedInts, ShortStrings, StringHeavy, Wrap, WrapInline};
 use payloads::{
     FLAT_BYTES, NEST_BYTES, NEST_DEPTH, PACKED_BYTES, PACKED_LEN, SHORT_STRINGS_BYTES,
@@ -214,34 +217,34 @@ fn bench_decode_keep(c: &mut Criterion) {
     group.throughput(Throughput::Bytes(FLAT_BYTES.len() as u64));
     group.bench_function(BenchmarkId::new("flat_scalars", FLAT_BYTES.len()), |b| {
         let bytes = FLAT_BYTES.as_slice();
-        b.iter_with_large_drop(|| FlatScalars::decode(black_box(bytes)).unwrap())
+        iter_keep(b, || FlatScalars::decode(black_box(bytes)).unwrap())
     });
 
     group.throughput(Throughput::Bytes(NEST_BYTES.len() as u64));
     group.bench_function(BenchmarkId::new("nested", NEST_BYTES.len()), |b| {
         let bytes = NEST_BYTES.as_slice();
-        b.iter_with_large_drop(|| Nest::decode(black_box(bytes)).unwrap())
+        iter_keep(b, || Nest::decode(black_box(bytes)).unwrap())
     });
     group.throughput(Throughput::Bytes(WRAP_BYTES.len() as u64));
     group.bench_function(BenchmarkId::new("wrap", WRAP_BYTES.len()), |b| {
         let bytes = WRAP_BYTES.as_slice();
-        b.iter_with_large_drop(|| Wrap::decode(black_box(bytes)).unwrap())
+        iter_keep(b, || Wrap::decode(black_box(bytes)).unwrap())
     });
     group.bench_function(BenchmarkId::new("wrap_inline", WRAP_BYTES.len()), |b| {
         let bytes = WRAP_BYTES.as_slice();
-        b.iter_with_large_drop(|| WrapInline::decode(black_box(bytes)).unwrap())
+        iter_keep(b, || WrapInline::decode(black_box(bytes)).unwrap())
     });
 
     group.throughput(Throughput::Bytes(PACKED_BYTES.len() as u64));
     group.bench_function(BenchmarkId::new("packed_ints", PACKED_BYTES.len()), |b| {
         let bytes = PACKED_BYTES.as_slice();
-        b.iter_with_large_drop(|| PackedInts::decode(black_box(bytes)).unwrap())
+        iter_keep(b, || PackedInts::decode(black_box(bytes)).unwrap())
     });
 
     group.throughput(Throughput::Bytes(STRINGS_BYTES.len() as u64));
     group.bench_function(BenchmarkId::new("strings", STRINGS_BYTES.len()), |b| {
         let bytes = STRINGS_BYTES.as_slice();
-        b.iter_with_large_drop(|| StringHeavy::decode(black_box(bytes)).unwrap())
+        iter_keep(b, || StringHeavy::decode(black_box(bytes)).unwrap())
     });
 
     group.throughput(Throughput::Bytes(SHORT_STRINGS_BYTES.len() as u64));
@@ -249,7 +252,7 @@ fn bench_decode_keep(c: &mut Criterion) {
         BenchmarkId::new("short_strings", SHORT_STRINGS_BYTES.len()),
         |b| {
             let bytes = SHORT_STRINGS_BYTES.as_slice();
-            b.iter_with_large_drop(|| ShortStrings::decode(black_box(bytes)).unwrap())
+            iter_keep(b, || ShortStrings::decode(black_box(bytes)).unwrap())
         },
     );
     group.finish();

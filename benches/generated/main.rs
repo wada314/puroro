@@ -6,7 +6,7 @@
 //! - `map<string, int32>` encode / decode / lookup (eager and lazy)
 //! - unknown-field preserve (`Point`) vs discard (`Marker`)
 //! - `encode_to_vec` (length + alloc + write) vs `encode` into a reused buffer
-//! - `decode` includes `Drop`; `decode_keep` times parse only
+//! - `decode` includes `Drop`; `decode_keep` uses [`keep::iter_keep`] so only parse is timed
 //! - oneof `notification` encode / decode / `case` / variant switch
 //!
 //! `assignee` is pinned lazy (`AddressLazy`) on both aliases; `watchers` /
@@ -18,12 +18,16 @@
 //! cargo bench -p puroro --bench generated -- --test
 //! ```
 
+#[path = "../keep.rs"]
+mod keep;
 mod payloads;
 
 use ::allocator_api2::alloc::Global;
 use ::criterion::{black_box, criterion_group, BatchSize, BenchmarkId, Criterion, Throughput};
 use ::puroro::{Message, StringMut};
 use ::puroro_sample_generated::{Marker, Point, Task, TaskLazy};
+
+use keep::iter_keep;
 
 use payloads::{
     lookup_map, lookup_map_lazy, map_heavy_task, oneof_email_task, oneof_postal_task,
@@ -43,7 +47,7 @@ fn bench_task(c: &mut Criterion) {
         b.iter(|| Task::<Global>::decode(black_box(bytes)).unwrap())
     });
     group.bench_function("decode_keep", |b| {
-        b.iter_with_large_drop(|| Task::<Global>::decode(black_box(bytes)).unwrap())
+        iter_keep(b, || Task::<Global>::decode(black_box(bytes)).unwrap())
     });
     group.bench_function("decode_read_one", |b| {
         b.iter(|| {
@@ -81,7 +85,7 @@ fn bench_task_lazy(c: &mut Criterion) {
         b.iter(|| TaskLazy::<Global>::decode(black_box(bytes)).unwrap())
     });
     group.bench_function("decode_keep", |b| {
-        b.iter_with_large_drop(|| TaskLazy::<Global>::decode(black_box(bytes)).unwrap())
+        iter_keep(b, || TaskLazy::<Global>::decode(black_box(bytes)).unwrap())
     });
     group.bench_function("decode_read_one", |b| {
         b.iter(|| {
@@ -182,7 +186,9 @@ fn bench_oneof(c: &mut Criterion) {
         b.iter(|| Task::<Global>::decode(black_box(email_bytes)).unwrap())
     });
     group.bench_function(BenchmarkId::new("decode_keep", "email"), |b| {
-        b.iter_with_large_drop(|| Task::<Global>::decode(black_box(email_bytes)).unwrap())
+        iter_keep(b, || {
+            Task::<Global>::decode(black_box(email_bytes)).unwrap()
+        })
     });
     group.bench_function(BenchmarkId::new("encode", "email"), |b| {
         b.iter(|| black_box(&email).encode_to_vec())
