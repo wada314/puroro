@@ -295,16 +295,63 @@ For a non-repeated, non-message field `foo`:
 | `foo_mut()` | `Foo` | `&mut T`, creating / marking the field as set |
 | `clear_foo()` | `Foo` | Unsets the field. After this, `has_foo()` is `false` and `foo()` returns the default |
 
-Calling `foo_mut()` sets presence even if you leave the default value (for
-example `0` or `""`).
-
-proto2 `[default = ...]` is honored: `foo()` returns that value when the
-field is unset. proto3 does not allow custom defaults; the language default
-is used (`0`, `false`, `""`, first enum value, and so on).
+Calling `foo_mut()` on an unset field sets presence and fills the storage
+with the field default (see below). Leaving that value in place still
+counts as set.
 
 For a message field the getter is already `Option<&BarView>`, so `foo()` and
 `foo_opt()` return the same `Option`. `foo_mut()` inserts `Bar::default()`
-if the field was empty.
+if the field was empty. Message fields cannot have a proto2 `[default = …]`
+option.
+
+## Field default values
+
+Every scalar / enum field has a **field default** used when the field is
+unset. If the `.proto` does not set `[default = …]`, that is the language
+default:
+
+| Proto type | Language default |
+| --- | --- |
+| numeric (`int32`, `float`, …) | `0` / `0.0` |
+| `bool` | `false` |
+| `string` / `bytes` | empty |
+| enum | the **first listed** value (not necessarily the `0` value) |
+
+proto3 does not allow `[default = …]`. proto2 `optional` / `required` fields
+may set it explicitly:
+
+```protobuf
+optional int32 page_size = 1 [default = 10];
+```
+
+Then the field default is `10`, not `0`. The table below is for that field.
+“Unset” is a brand-new message, or the state after `clear_page_size()`.
+
+| Code path | Unset | `page_size_mut()` only | `*page_size_mut() = 10` | `*page_size_mut() = 0` | `*page_size_mut() = 20` |
+| --- | --- | --- | --- | --- | --- |
+| `page_size()` | `10` (field default) | `10` (stored) | `10` (stored) | `0` (stored) | `20` (stored) |
+| `page_size_opt()` | `None` | `Some(10)` | `Some(10)` | `Some(0)` | `Some(20)` |
+| `has_page_size()` | `false` | `true` | `true` | `true` | `true` |
+| `to_bytes()` | omitted | encodes `10` | encodes `10` | encodes `0` | encodes `20` |
+
+`clear_page_size()` always returns the field to the **Unset** column, regardless
+of the previous stored value.
+
+Notes:
+
+- `page_size()` never tells you whether the value came from the field
+  default or from storage. Use `has_page_size()` / `page_size_opt()` for
+  that. Unset-with-default-`10` and set-to-`10` both make `page_size()`
+  return `10`, but only the latter is serialized.
+- `page_size_mut()` on an unset field writes the field default (`10`) into
+  storage and sets presence **before** returning `&mut i32`. Assigning `0`
+  afterwards is a real set-to-zero, not “back to unset”.
+- Oneof arms use the same per-field table (`g1_int32()` / `g1_int32_opt()` /
+  `has_g1_int32()`). The oneof getter `group_one()` returns `None` when
+  nothing is selected; it does **not** wrap the field default in
+  `Some(GroupOneCase::…)`.
+- Repeated fields have no `[default = …]`. Their “empty” state is an empty
+  vector; `foo()` is empty and `foo_mut()` returns that vector.
 
 ## Presence: proto3 implicit (unlabeled) fields
 
