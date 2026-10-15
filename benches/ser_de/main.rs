@@ -3,7 +3,11 @@
 //! Isolates [`puroro_rt`] field-catalog encode / decode without generated
 //! `visit_fields` dispatch. `encode` is `encode_to_vec` (length + alloc +
 //! write). `encode_reuse` writes into a pre-sized buffer so small messages
-//! are not dominated by `Vec` allocation.
+//! are not dominated by `Vec` allocation. `decode` includes `Drop`;
+//! `decode_keep` uses [`iter_with_large_drop`] so only parse is timed.
+//!
+//! `nested` is a boxed self-recursive chain (inline self-recursion is
+//! unsized). `wrap` / `wrap_inline` compare one-level boxed vs inline child.
 //!
 //! Run:
 //! ```text
@@ -17,10 +21,10 @@ mod payloads;
 use ::criterion::{black_box, criterion_group, BenchmarkId, Criterion, Throughput};
 use ::puroro::Message;
 
-use messages::{FlatScalars, Nest, PackedInts, ShortStrings, StringHeavy};
+use messages::{FlatScalars, Nest, PackedInts, ShortStrings, StringHeavy, Wrap, WrapInline};
 use payloads::{
     FLAT_BYTES, NEST_BYTES, NEST_DEPTH, PACKED_BYTES, PACKED_LEN, SHORT_STRINGS_BYTES,
-    STRINGS_BYTES,
+    STRINGS_BYTES, WRAP_BYTES,
 };
 
 fn bench_encode(c: &mut Criterion) {
@@ -36,6 +40,18 @@ fn bench_encode(c: &mut Criterion) {
     group.throughput(Throughput::Bytes(NEST_BYTES.len() as u64));
     group.bench_function(BenchmarkId::new("nested", NEST_BYTES.len()), |b| {
         b.iter(|| black_box(&nest).encode_to_vec())
+    });
+
+    let wrap = Wrap::sample();
+    group.throughput(Throughput::Bytes(WRAP_BYTES.len() as u64));
+    group.bench_function(BenchmarkId::new("wrap", WRAP_BYTES.len()), |b| {
+        b.iter(|| black_box(&wrap).encode_to_vec())
+    });
+
+    let wrap_inline = WrapInline::sample();
+    group.throughput(Throughput::Bytes(WRAP_BYTES.len() as u64));
+    group.bench_function(BenchmarkId::new("wrap_inline", WRAP_BYTES.len()), |b| {
+        b.iter(|| black_box(&wrap_inline).encode_to_vec())
     });
 
     let packed = PackedInts::sample(PACKED_LEN);
@@ -80,6 +96,28 @@ fn bench_encode_reuse(c: &mut Criterion) {
         b.iter(|| {
             buf.clear();
             black_box(&nest).encode(&mut buf);
+            black_box(buf.len())
+        })
+    });
+
+    let wrap = Wrap::sample();
+    group.throughput(Throughput::Bytes(WRAP_BYTES.len() as u64));
+    group.bench_function(BenchmarkId::new("wrap", WRAP_BYTES.len()), |b| {
+        let mut buf = Vec::with_capacity(WRAP_BYTES.len());
+        b.iter(|| {
+            buf.clear();
+            black_box(&wrap).encode(&mut buf);
+            black_box(buf.len())
+        })
+    });
+
+    let wrap_inline = WrapInline::sample();
+    group.throughput(Throughput::Bytes(WRAP_BYTES.len() as u64));
+    group.bench_function(BenchmarkId::new("wrap_inline", WRAP_BYTES.len()), |b| {
+        let mut buf = Vec::with_capacity(WRAP_BYTES.len());
+        b.iter(|| {
+            buf.clear();
+            black_box(&wrap_inline).encode(&mut buf);
             black_box(buf.len())
         })
     });
@@ -136,6 +174,15 @@ fn bench_decode(c: &mut Criterion) {
         let bytes = NEST_BYTES.as_slice();
         b.iter(|| Nest::decode(black_box(bytes)).unwrap())
     });
+    group.throughput(Throughput::Bytes(WRAP_BYTES.len() as u64));
+    group.bench_function(BenchmarkId::new("wrap", WRAP_BYTES.len()), |b| {
+        let bytes = WRAP_BYTES.as_slice();
+        b.iter(|| Wrap::decode(black_box(bytes)).unwrap())
+    });
+    group.bench_function(BenchmarkId::new("wrap_inline", WRAP_BYTES.len()), |b| {
+        let bytes = WRAP_BYTES.as_slice();
+        b.iter(|| WrapInline::decode(black_box(bytes)).unwrap())
+    });
 
     group.throughput(Throughput::Bytes(PACKED_BYTES.len() as u64));
     group.bench_function(BenchmarkId::new("packed_ints", PACKED_BYTES.len()), |b| {
@@ -160,7 +207,61 @@ fn bench_decode(c: &mut Criterion) {
     group.finish();
 }
 
-criterion_group!(benches, bench_encode, bench_encode_reuse, bench_decode);
+/// Same workloads as [`bench_decode`], but drop happens after the timed window.
+fn bench_decode_keep(c: &mut Criterion) {
+    let mut group = c.benchmark_group("decode_keep");
+
+    group.throughput(Throughput::Bytes(FLAT_BYTES.len() as u64));
+    group.bench_function(BenchmarkId::new("flat_scalars", FLAT_BYTES.len()), |b| {
+        let bytes = FLAT_BYTES.as_slice();
+        b.iter_with_large_drop(|| FlatScalars::decode(black_box(bytes)).unwrap())
+    });
+
+    group.throughput(Throughput::Bytes(NEST_BYTES.len() as u64));
+    group.bench_function(BenchmarkId::new("nested", NEST_BYTES.len()), |b| {
+        let bytes = NEST_BYTES.as_slice();
+        b.iter_with_large_drop(|| Nest::decode(black_box(bytes)).unwrap())
+    });
+    group.throughput(Throughput::Bytes(WRAP_BYTES.len() as u64));
+    group.bench_function(BenchmarkId::new("wrap", WRAP_BYTES.len()), |b| {
+        let bytes = WRAP_BYTES.as_slice();
+        b.iter_with_large_drop(|| Wrap::decode(black_box(bytes)).unwrap())
+    });
+    group.bench_function(BenchmarkId::new("wrap_inline", WRAP_BYTES.len()), |b| {
+        let bytes = WRAP_BYTES.as_slice();
+        b.iter_with_large_drop(|| WrapInline::decode(black_box(bytes)).unwrap())
+    });
+
+    group.throughput(Throughput::Bytes(PACKED_BYTES.len() as u64));
+    group.bench_function(BenchmarkId::new("packed_ints", PACKED_BYTES.len()), |b| {
+        let bytes = PACKED_BYTES.as_slice();
+        b.iter_with_large_drop(|| PackedInts::decode(black_box(bytes)).unwrap())
+    });
+
+    group.throughput(Throughput::Bytes(STRINGS_BYTES.len() as u64));
+    group.bench_function(BenchmarkId::new("strings", STRINGS_BYTES.len()), |b| {
+        let bytes = STRINGS_BYTES.as_slice();
+        b.iter_with_large_drop(|| StringHeavy::decode(black_box(bytes)).unwrap())
+    });
+
+    group.throughput(Throughput::Bytes(SHORT_STRINGS_BYTES.len() as u64));
+    group.bench_function(
+        BenchmarkId::new("short_strings", SHORT_STRINGS_BYTES.len()),
+        |b| {
+            let bytes = SHORT_STRINGS_BYTES.as_slice();
+            b.iter_with_large_drop(|| ShortStrings::decode(black_box(bytes)).unwrap())
+        },
+    );
+    group.finish();
+}
+
+criterion_group!(
+    benches,
+    bench_encode,
+    bench_encode_reuse,
+    bench_decode,
+    bench_decode_keep
+);
 
 fn main() {
     payloads::assert_roundtrips();

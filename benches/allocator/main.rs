@@ -25,10 +25,10 @@ use ::bumpalo::Bump;
 use ::criterion::{BenchmarkId, Criterion, Throughput, black_box, criterion_group};
 use ::puroro::Message;
 
-use messages::{FlatScalars, Nest, PackedInts, ShortStrings, StringHeavy};
+use messages::{FlatScalars, Nest, PackedInts, ShortStrings, StringHeavy, Wrap, WrapInline};
 use payloads::{
     FLAT_BYTES, NEST_BYTES, NEST_DEPTH, PACKED_BYTES, PACKED_LEN, SHORT_STRINGS_BYTES,
-    STRINGS_BYTES,
+    STRINGS_BYTES, WRAP_BYTES,
 };
 
 fn decode_in<M>(alloc: M::Alloc, bytes: &[u8]) -> M
@@ -74,6 +74,39 @@ fn bench_decode_alloc(c: &mut Criterion) {
             b.iter(|| {
                 {
                     let msg = decode_in::<Nest<_>>(&bump, black_box(bytes));
+                    black_box(&msg);
+                }
+                bump.reset();
+            })
+        });
+    }
+
+    let bytes = WRAP_BYTES.as_slice();
+    group.throughput(Throughput::Bytes(bytes.len() as u64));
+    group.bench_function(BenchmarkId::new("wrap", "global"), |b| {
+        b.iter(|| decode_in::<Wrap<Global>>(Global, black_box(bytes)))
+    });
+    {
+        let mut bump = Bump::new();
+        group.bench_function(BenchmarkId::new("wrap", "bump"), |b| {
+            b.iter(|| {
+                {
+                    let msg = decode_in::<Wrap<_>>(&bump, black_box(bytes));
+                    black_box(&msg);
+                }
+                bump.reset();
+            })
+        });
+    }
+    group.bench_function(BenchmarkId::new("wrap_inline", "global"), |b| {
+        b.iter(|| decode_in::<WrapInline<Global>>(Global, black_box(bytes)))
+    });
+    {
+        let mut bump = Bump::new();
+        group.bench_function(BenchmarkId::new("wrap_inline", "bump"), |b| {
+            b.iter(|| {
+                {
+                    let msg = decode_in::<WrapInline<_>>(&bump, black_box(bytes));
                     black_box(&msg);
                 }
                 bump.reset();
@@ -175,6 +208,38 @@ fn bench_construct_alloc(c: &mut Criterion) {
         });
     }
 
+    group.throughput(Throughput::Elements(1));
+    group.bench_function(BenchmarkId::new("wrap", "global"), |b| {
+        b.iter(|| Wrap::sample_in(Global))
+    });
+    {
+        let mut bump = Bump::new();
+        group.bench_function(BenchmarkId::new("wrap", "bump"), |b| {
+            b.iter(|| {
+                {
+                    let msg = Wrap::sample_in(&bump);
+                    black_box(&msg);
+                }
+                bump.reset();
+            })
+        });
+    }
+    group.bench_function(BenchmarkId::new("wrap_inline", "global"), |b| {
+        b.iter(|| WrapInline::sample_in(Global))
+    });
+    {
+        let mut bump = Bump::new();
+        group.bench_function(BenchmarkId::new("wrap_inline", "bump"), |b| {
+            b.iter(|| {
+                {
+                    let msg = WrapInline::sample_in(&bump);
+                    black_box(&msg);
+                }
+                bump.reset();
+            })
+        });
+    }
+
     group.throughput(Throughput::Elements(PACKED_LEN as u64));
     group.bench_function(BenchmarkId::new("packed_ints", "global"), |b| {
         b.iter(|| PackedInts::sample_in(Global, PACKED_LEN))
@@ -237,6 +302,14 @@ fn assert_bump_roundtrips() {
     assert_eq!(
         decode_in::<Nest<_>>(&bump, NEST_BYTES.as_slice()).encode_to_vec(),
         *NEST_BYTES
+    );
+    assert_eq!(
+        decode_in::<Wrap<_>>(&bump, WRAP_BYTES.as_slice()).encode_to_vec(),
+        *WRAP_BYTES
+    );
+    assert_eq!(
+        decode_in::<WrapInline<_>>(&bump, WRAP_BYTES.as_slice()).encode_to_vec(),
+        *WRAP_BYTES
     );
     assert_eq!(
         decode_in::<PackedInts<_>>(&bump, PACKED_BYTES.as_slice()).encode_to_vec(),
