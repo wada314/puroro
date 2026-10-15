@@ -19,7 +19,8 @@ pub use resolve::{resolve, resolve_with};
 
 use crate::descriptor::features::{EnumType, RepeatedFieldEncoding, Utf8Validation};
 use crate::descriptor::{
-    BytesLayout, ChildParse, MessageLayout, ProtoFqn, StringLayout, Syntax, UnknownFieldsPolicy,
+    BytesLayout, ChildParse, EnumRepr, MessageLayout, ProtoFqn, StringLayout, Syntax,
+    UnknownFieldsPolicy,
 };
 use ::std::fmt;
 
@@ -147,6 +148,8 @@ pub struct Enum<'a> {
     parent: Option<&'a Message<'a>>,
     /// Open vs closed (`features.enum_type`, or proto2/proto3 defaults).
     openness: EnumType,
+    /// `(puroro.enum_repr)` — newtype (default) vs native Rust `enum`.
+    enum_repr: EnumRepr,
     values: Vec<EnumValue>,
 }
 
@@ -323,6 +326,10 @@ impl<'a> Enum<'a> {
         self.openness
     }
 
+    pub fn enum_repr(&self) -> EnumRepr {
+        self.enum_repr
+    }
+
     pub fn values(&self) -> impl Iterator<Item = &EnumValue> + '_ {
         self.values.iter()
     }
@@ -387,6 +394,7 @@ impl fmt::Debug for Enum<'_> {
             .field("fqn", &self.fqn)
             .field("parent", &self.parent().map(|m| m.fqn()))
             .field("openness", &self.openness)
+            .field("enum_repr", &self.enum_repr)
             .field("values", &self.values)
             .finish()
     }

@@ -68,12 +68,30 @@ enum ChildParse {
   CHILD_PARSE_LAZY = 2;
 }
 
+// Rust representation of a generated protobuf enum.
+//
+// Unset and `ENUM_REPR_UNSPECIFIED` emit the default newtype-over-`i32`
+// (official protobuf Rust). `ENUM_REPR_NEWTYPE` pins that.
+// `ENUM_REPR_RUST_ENUM` emits a native Rust `enum`. That form cannot
+// represent two names that share a wire number: if the proto actually
+// aliases a number, codegen fails. `allow_alias = true` with no duplicate
+// numbers is fine.
+enum EnumRepr {
+  ENUM_REPR_UNSPECIFIED = 0;
+  ENUM_REPR_NEWTYPE = 1;
+  ENUM_REPR_RUST_ENUM = 2;
+}
+
 extend google.protobuf.FieldOptions {
   // Custom-option numbers 50000–99999 are for internal use.
   optional StringLayout string_layout = 51400;
   optional BytesLayout bytes_layout = 51401;
   optional MessageLayout message_layout = 51402;
   optional ChildParse child_parse = 51404;
+}
+
+extend google.protobuf.EnumOptions {
+  optional EnumRepr enum_repr = 51405;
 }
 
 extend google.protobuf.MessageOptions {

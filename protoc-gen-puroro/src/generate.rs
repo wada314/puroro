@@ -105,8 +105,9 @@ mod tests {
     use crate::descriptor::features::Utf8Validation;
     use crate::descriptor::test_helpers as desc;
     use crate::descriptor::{
-        BytesLayout, CodegenRequest, Edition, FeatureSet, FieldDesc, FieldLabel, FieldType,
-        MessageDesc, MessageLayout, ProtoFile, ProtoFqn, StringLayout, Syntax, UnknownFieldsPolicy,
+        BytesLayout, CodegenRequest, Edition, EnumDesc, EnumRepr, FeatureSet, FieldDesc,
+        FieldLabel, FieldType, MessageDesc, MessageLayout, ProtoFile, ProtoFqn, StringLayout,
+        Syntax, UnknownFieldsPolicy,
     };
     use crate::plugin_io::decode_request;
     use ::protobuf_core::{AsRefExtProtobuf, Field, FieldNumber, FieldValue, WriteExtProtobuf};
@@ -225,6 +226,67 @@ mod tests {
         });
         let err = generate(&request).unwrap_err();
         assert!(err.to_string().contains("must define 0 as its first value"));
+    }
+
+    #[test]
+    fn rust_enum_repr_emits_native_enum() {
+        let mut request = empty_request("Holder");
+        request.proto_files[0].enums.push(EnumDesc {
+            enum_repr: EnumRepr::RustEnum,
+            ..desc::enumeration(
+                "Status",
+                vec![
+                    desc::enum_value("STATUS_UNSPECIFIED", 0),
+                    desc::enum_value("STATUS_PENDING", 1),
+                ],
+            )
+        });
+        request.proto_files[0].messages[0].fields.push(FieldDesc {
+            type_name: Some(ProtoFqn::parse(".Status")),
+            ..desc::field("status", 1, FieldType::Enum)
+        });
+        let content = generate_lib(&request);
+        assert!(
+            content.contains("pub enum Status"),
+            "rust_enum must emit a native enum: {content}"
+        );
+        assert!(
+            content.contains("_Unknown"),
+            "open rust_enum must keep unknown values: {content}"
+        );
+        assert!(
+            !content.contains("repr(transparent)"),
+            "rust_enum must not emit the newtype: {content}"
+        );
+    }
+
+    #[test]
+    fn rust_enum_repr_rejects_aliased_numbers() {
+        let mut request = empty_request("Holder");
+        request.proto_files[0].enums.push(EnumDesc {
+            enum_repr: EnumRepr::RustEnum,
+            ..desc::enumeration(
+                "Code",
+                vec![
+                    desc::enum_value("CODE_UNSPECIFIED", 0),
+                    desc::enum_value("CODE_OK", 1),
+                    desc::enum_value("CODE_SUCCESS", 1),
+                ],
+            )
+        });
+        request.proto_files[0].messages[0].fields.push(FieldDesc {
+            type_name: Some(ProtoFqn::parse(".Code")),
+            ..desc::field("code", 1, FieldType::Enum)
+        });
+        let err = generate(&request).unwrap_err();
+        let message = err.to_string();
+        assert!(
+            message.contains("cannot generate a Rust enum for `Code`"),
+            "{message}"
+        );
+        assert!(message.contains("CODE_OK"), "{message}");
+        assert!(message.contains("CODE_SUCCESS"), "{message}");
+        assert!(message.contains("number 1"), "{message}");
     }
 
     #[test]

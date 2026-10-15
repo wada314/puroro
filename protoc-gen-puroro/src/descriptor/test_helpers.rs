@@ -8,8 +8,8 @@
 //! ```
 
 use super::{
-    CodegenMeta, CodegenRequest, EnumDesc, EnumValueDesc, FeatureSet, FieldDesc, FieldLabel,
-    FieldType, MessageDesc, OneofDesc, ProtoFile, Syntax, UnknownFieldsPolicy,
+    CodegenMeta, CodegenRequest, EnumDesc, EnumRepr, EnumValueDesc, FeatureSet, FieldDesc,
+    FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile, Syntax, UnknownFieldsPolicy,
 };
 
 /// Optional field with empty options (`label = Optional`, no type name / oneof).
@@ -52,6 +52,7 @@ pub(crate) fn enumeration(name: impl Into<String>, values: Vec<EnumValueDesc>) -
         name: name.into(),
         values,
         features: FeatureSet::default(),
+        enum_repr: EnumRepr::Unspecified,
     }
 }
 

@@ -730,7 +730,7 @@ EXPLICIT presence: `is_set()` tracks the presence bit; `get()` returns `Priority
 
 #### Generated enum type
 
-Both open and closed enums produce a **newtype-over-`i32`** — not a Rust `enum`. Openness is a **type-level** distinction:
+The default is a **newtype-over-`i32`** — the same shape as official protobuf Rust. Openness is a **type-level** distinction:
 
 - Markers [`Open`](puroro-rt/src/fields/wire/numerical.rs) / [`Closed`](puroro-rt/src/fields/wire/numerical.rs)
 - Traits [`OpenEnum`](puroro-rt/src/fields/wire/numerical.rs) (`From<i32>`) / [`ClosedEnum`](puroro-rt/src/fields/wire/numerical.rs) (`TryFrom<i32>`)
@@ -761,6 +761,8 @@ impl ClosedEnum for Priority {}
 ```
 
 Alias names with the same integer all map to the same `Self(v)`; equality is by wire value.
+
+To opt into a native Rust `enum` (exhaustive `match` on known names), set `(puroro.enum_repr) = ENUM_REPR_RUST_ENUM` on the enum. Open rust-enums add `_Unknown(i32)` so unknown wire values stay representable; closed rust-enums stay a closed set of unit variants. That form **cannot** host two names that share a number: if the proto actually aliases a value, codegen fails with a diagnostic. `allow_alias = true` with no duplicate numbers is fine. Unset / `ENUM_REPR_UNSPECIFIED` / `ENUM_REPR_NEWTYPE` keep the default newtype.
 
 ---
 

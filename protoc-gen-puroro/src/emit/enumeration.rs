@@ -1,4 +1,4 @@
-//! Emit a protobuf enum as a newtype-over-`i32` (open or closed).
+//! Emit a protobuf enum as a newtype-over-`i32`, or a native Rust `enum`.
 
 use super::ident::{escape_ident, is_simple_ident};
 use crate::case::to_upper_snake;
@@ -7,7 +7,7 @@ use crate::error::{Error, Result};
 use crate::resolved::Enum;
 use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
-use ::std::collections::BTreeSet;
+use ::std::collections::{BTreeMap, BTreeSet};
 use ::syn::Item;
 
 /// Render an enum into its parent package or message module.
@@ -15,7 +15,19 @@ use ::syn::Item;
 /// Defaults / `Default` / `HasDefault` use the **first defined** enumerator
 /// (proto2 / proto3 / editions language guides). Open enums additionally require
 /// that first value to be `0`.
+///
+/// `(puroro.enum_repr) = ENUM_REPR_RUST_ENUM` emits a native Rust `enum`.
+/// That form rejects duplicate wire numbers.
 pub(super) fn render_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
+    validate_enum(e)?;
+    if e.enum_repr().is_rust_enum() {
+        render_rust_enum(e)
+    } else {
+        render_newtype_enum(e)
+    }
+}
+
+fn validate_enum(e: &Enum<'_>) -> Result<()> {
     if !is_simple_ident(e.name()) {
         return Err(Error::Codegen(format!(
             "cannot use enum name `{}` as a Rust identifier",
@@ -45,6 +57,14 @@ pub(super) fn render_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
             first.number()
         )));
     }
+    Ok(())
+}
+
+fn render_newtype_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
+    let first = e
+        .values()
+        .next()
+        .expect("validate_enum requires at least one value");
 
     let name = escape_ident(e.name());
     let default_const = variant_const_ident(e.name(), first.name())?;
@@ -144,6 +164,180 @@ pub(super) fn render_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
             const DEFAULT: #name = #default_path;
         }
     })
+}
+
+fn render_rust_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
+    reject_duplicate_numbers(e)?;
+
+    let first = e
+        .values()
+        .next()
+        .expect("validate_enum requires at least one value");
+
+    let name = escape_ident(e.name());
+    let unknown_ident = Ident::new("_Unknown", Span::call_site());
+    let mut variant_idents = Vec::new();
+    let mut variant_numbers = Vec::new();
+    for v in e.values() {
+        let ident = variant_const_ident(e.name(), v.name())?;
+        if ident == unknown_ident {
+            return Err(Error::Codegen(format!(
+                "cannot generate a Rust enum for `{}`: value `{}` collides with the \
+                 generated unknown-value variant `_Unknown`",
+                e.name(),
+                v.name()
+            )));
+        }
+        variant_idents.push(ident);
+        variant_numbers.push(v.number());
+    }
+    let default_ident = variant_const_ident(e.name(), first.name())?;
+    let default_self = quote! { Self::#default_ident };
+    let default_path = quote! { #name::#default_ident };
+
+    let variants = match e.openness() {
+        EnumType::Open => quote! {
+            #(#variant_idents,)*
+            #unknown_ident(i32),
+        },
+        EnumType::Closed => quote! {
+            #(#variant_idents,)*
+        },
+    };
+
+    let to_wire = match e.openness() {
+        EnumType::Open => quote! {
+            match self {
+                #(Self::#variant_idents => #variant_numbers,)*
+                Self::#unknown_ident(n) => n,
+            }
+        },
+        EnumType::Closed => quote! {
+            match self {
+                #(Self::#variant_idents => #variant_numbers,)*
+            }
+        },
+    };
+
+    let convert_impls = match e.openness() {
+        EnumType::Open => quote! {
+            impl ::core::convert::From<i32> for #name {
+                fn from(value: i32) -> Self {
+                    match value {
+                        #(#variant_numbers => Self::#variant_idents,)*
+                        other => Self::#unknown_ident(other),
+                    }
+                }
+            }
+
+            impl ::core::convert::TryFrom<#name> for i32 {
+                type Error = i32;
+
+                fn try_from(value: #name) -> ::core::result::Result<Self, Self::Error> {
+                    match value {
+                        #(#name::#variant_idents => ::core::result::Result::Ok(#variant_numbers),)*
+                        #name::#unknown_ident(other) => ::core::result::Result::Err(other),
+                    }
+                }
+            }
+
+            impl ::core::cmp::PartialEq for #name {
+                fn eq(&self, other: &Self) -> bool {
+                    ::puroro_rt::ProtoEnumStorage::to_wire(*self)
+                        == ::puroro_rt::ProtoEnumStorage::to_wire(*other)
+                }
+            }
+
+            impl ::core::cmp::Eq for #name {}
+
+            impl ::core::hash::Hash for #name {
+                fn hash<H: ::core::hash::Hasher>(&self, state: &mut H) {
+                    ::core::hash::Hash::hash(
+                        &::puroro_rt::ProtoEnumStorage::to_wire(*self),
+                        state,
+                    );
+                }
+            }
+
+            impl ::puroro_rt::OpenEnum for #name {}
+        },
+        EnumType::Closed => quote! {
+            impl ::core::convert::TryFrom<i32> for #name {
+                type Error = i32;
+
+                fn try_from(value: i32) -> ::core::result::Result<Self, Self::Error> {
+                    match value {
+                        #(#variant_numbers => ::core::result::Result::Ok(Self::#variant_idents),)*
+                        other => ::core::result::Result::Err(other),
+                    }
+                }
+            }
+
+            impl ::core::convert::From<#name> for i32 {
+                fn from(value: #name) -> Self {
+                    match value {
+                        #(#name::#variant_idents => #variant_numbers,)*
+                    }
+                }
+            }
+
+            impl ::puroro_rt::ClosedEnum for #name {}
+        },
+    };
+
+    let derives = match e.openness() {
+        EnumType::Open => quote! {
+            #[derive(Clone, Copy, Debug)]
+        },
+        EnumType::Closed => quote! {
+            #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+        },
+    };
+
+    super::parse::parse_items(quote! {
+        #derives
+        #[allow(non_camel_case_types)]
+        pub enum #name {
+            #variants
+        }
+
+        impl ::core::default::Default for #name {
+            fn default() -> Self {
+                #default_self
+            }
+        }
+
+        #convert_impls
+
+        impl ::puroro_rt::ProtoEnumStorage for #name {
+            fn to_wire(self) -> i32 {
+                #to_wire
+            }
+        }
+
+        ::puroro_rt::impl_copy_slot_bounds!(#name);
+
+        impl ::puroro::HasDefault<#name> for ::puroro_rt::ProtoDefault {
+            const DEFAULT: #name = #default_path;
+        }
+    })
+}
+
+fn reject_duplicate_numbers(e: &Enum<'_>) -> Result<()> {
+    let mut seen = BTreeMap::new();
+    for v in e.values() {
+        if let Some(prev) = seen.insert(v.number(), v.name()) {
+            return Err(Error::Codegen(format!(
+                "cannot generate a Rust enum for `{}`: `{}` and `{}` both use number {}; \
+                 drop `(puroro.enum_repr) = ENUM_REPR_RUST_ENUM` or remove the alias",
+                e.name(),
+                prev,
+                v.name(),
+                v.number()
+            )));
+        }
+    }
+    Ok(())
 }
 
 /// Sorted unique numbers → `lo..=hi` runs and singleton `n`, joined by `|`.
