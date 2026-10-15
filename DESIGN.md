@@ -50,6 +50,7 @@ The puroro project comprises several crates and tools with distinct roles:
 | Component | Role |
 |---|---|
 | **`protobuf-core`** (git submodule) | Wire-format **primitives** — `Varint`, `Tag`, `WireType`, field I/O traits, varint read/write. Used by `puroro` and `puroro-rt`; **generated code does not import it directly**. |
+| **`unmanaged`** (git submodule) | Allocator-aware containers that panic on implicit `Drop` (`UnmanagedBox` / `UnmanagedVec` / `UnmanagedString`) plus `DeallocateIn` / `DefaultIn` / `CloneIn`. Generated `Drop` and catalog teardown call `deallocate` explicitly. |
 | **`puroro`** | **Stable user-facing runtime API** — `Message`, `Optional`, `HasDefault`, `DecodeError`, `WireType`, `UnknownField` / `UnknownPayload`. Library users depend on this crate; generated message code imports it for traits, accessor return types, and error handling. |
 | **`puroro-rt`** | **Generated-code runtime** — composable field catalog (`fields::*`, `MessageCommon`), wire encode/decode helpers (`encode` / `decode` modules), `ProtoDefault`, and allocator-aware string/bytes utilities. Generated crates depend on it **internally**; library users of generated messages must not need to name or import it (see [§4](#public-signatures-must-not-surface-puroro-rt)). Semver is looser than `puroro`. See [IMPLEMENTATION.md §4](IMPLEMENTATION.md#4-shared-infrastructure). |
 | **Code generator** (`protoc-gen-puroro`) | `protoc` plugin that reads `.proto` input and emits Rust implementing the API in this document. **Primary execution path:** `--puroro_out=…`. Other invocation styles (standalone CLI, `build.rs` wrapper, etc.) are permitted but not required. External crates use leading-`::` paths (`::puroro::…`, `::puroro_rt::…`); names inside the generated module forest use `self::_root::…` ([Path qualification](#path-qualification)). **Implementation status** (pipeline vs field emission): [IMPLEMENTATION.md §3](IMPLEMENTATION.md#3-implementation-status). |
@@ -66,7 +67,7 @@ The puroro project comprises several crates and tools with distinct roles:
 | Feature | Design intent | Implementation status |
 |---|---|---|
 | `utf8_validation` (`VERIFY` / `NONE`) | Generated decode paths honour the per-field Editions setting. `NONE` uses bytes views (`&[u8]`), not `&str`. | **Done** — `ProtoString` (`VERIFY`, `&str`) vs `ProtoStringUnchecked` (`NONE`, `&[u8]`). proto2 default is `NONE`; overlay with `proto2_utf8=verify`. |
-| Recursion limit | Nested-message `merge_from` enforces a depth limit; excess depth → `DecodeError::RecursionLimitExceeded`. | **Done** — `Message::merge_from_with_depth` + `RECURSION_LIMIT` (100); nested catalog paths pass `depth + 1`. |
+| Recursion limit | Nested-message `merge_from` enforces a depth limit; excess depth → `DecodeError::RecursionLimitExceeded`. | **Done** — `puroro_rt::MessageMerge::merge_from_with_depth` + `RECURSION_LIMIT` (100); user `Message::merge_from` wraps `merge_message` at depth 0. Nested catalog paths pass `depth + 1`. |
 | Deprecated groups (`SGroup` / `EGroup`) | Never generated; not preserved on decode. | Decoder may return `DecodeError::InvalidTag`, skip, or panic — round-trip fidelity for groups is **not** a goal. |
 
 ---
@@ -75,7 +76,7 @@ The puroro project comprises several crates and tools with distinct roles:
 
 - **Protobuf spec compliance.** Support the canonical wire format (varints, I32, I64, LEN records, packed repeated, oneofs, unknown fields) for proto2, proto3, and editions. Deprecated group wire types (`SGroup` / `EGroup`) are never generated; the decoder does not preserve them (see [§0](#0-project-architecture)).
 - **Allocator support.** Every generated message is generic over `A: Allocator + Clone` using the `allocator-api2` crate ([why `Clone` is on the struct](#why-a-clone-is-a-struct-bound)). Arena allocators (e.g. `bumpalo`) and custom pools are first-class citizens.
-- **Performance-oriented interface.** Accessors return borrowed references (`&str`, `&[u8]`, `&[T]`), never freshly allocated containers. The `encode_to_vec` / `encode_to_bytes` convenience methods allocate, but `encode_raw` does not.
+- **Performance-oriented interface.** Accessors return borrowed references (`&str`, `&[u8]`, `&[T]`), never freshly allocated containers. The `encode_to_vec` / `encode_to_bytes` convenience methods allocate; `Message::encode` writes into a caller-owned buffer. Wire-body sizing / writing (`encoded_len` / `encode_raw` with `EncodeCtx`) lives on `puroro_rt::MessageEncode`, not on `Message`.
 - **Rust idioms.** Private fields accessed via generated accessor methods; `Optional<T, impl HasDefault<T>>` for explicit-presence scalar, string, and enum fields; singular nested messages return `Option<&M>` / `&mut M` (inlined children are a full `M` with their own `MessageCommon`); no `unsafe` in user-visible APIs.
 - **`puroro` for users, `puroro-rt` for generators.** Library users of generated messages depend on the generated crate and **`puroro` only**. Generated code may use `puroro-rt` internally, but **must not surface `puroro-rt` types in public signatures** (see [§4](#public-signatures-must-not-surface-puroro-rt)).
 - **Implementation flexibility.** The public interface described here must remain stable even if internal storage representations change. Eager messages use per-message common bits (see [IMPLEMENTATION.md §10](IMPLEMENTATION.md#10-common-bit-indices)); the accessor API is unchanged if storage layout evolves.
@@ -126,7 +127,7 @@ pub trait HasDefault<T: Copy> {
 pub struct Optional<T: Copy, D: HasDefault<T>> { … }
 
 impl<T: Copy, D: HasDefault<T>> Optional<T, D> {
-    pub fn new(value: Option<T>, _tag: D) -> Self;
+    pub fn new(value: Option<T>) -> Self;
 
     /// Value or proto-declared default; always returns something meaningful.
     pub fn get(&self) -> T;
@@ -170,27 +171,26 @@ The concrete `D` type is the field wrapper's default marker (`ProtoDefault`, or 
 
 Implemented by **every** generated message (C++ `MessageLite`-like surface: codec + shared infrastructure). Field accessors stay as inherent methods so proto field names do not collide with these helpers.
 
+The user-facing trait is slimmer than the generated catalog traits. Wire-body sizing / writing lives on [`puroro_rt::MessageEncode`](puroro-rt/src/message_encode.rs) (`encoded_len` / `encode_raw` with [`EncodeCtx`](puroro-rt/src/message_encode.rs)). Depth-aware merge lives on [`puroro_rt::MessageMerge`](puroro-rt/src/message_merge.rs) (`merge_from_with_depth` over [`DecodeBuf`](src/scoped_buf.rs) / [`ScopedBuf`](src/scoped_buf.rs)). Generated `Message` impls are thin wrappers: `encode` → `encode_message`, `encode_to_vec` → `encode_message_to_vec`, `merge_from` → `merge_message` (depth 0).
+
 ```rust
 pub trait Message: Sized {
-    type Alloc: Allocator + Clone;
-    fn new_in(alloc: Self::Alloc) -> Self;
+    type Alloc: Allocator; // Clone is required on new_in / merge_from, not on the associated type
+    fn new_in(alloc: Self::Alloc) -> Self
+    where
+        Self::Alloc: Clone;
 
-    // Codec (required)
-    fn encoded_len(&self) -> usize;
-    fn encode_raw<B: bytes::BufMut>(&self, buf: &mut B);
-    fn merge_from_with_depth<B: bytes::Buf>(
-        &mut self,
-        buf: &mut B,
-        depth: usize,
-    ) -> Result<(), DecodeError>;
-
-    // Codec (provided)
-    fn merge_from<B: bytes::Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError>; // depth = 0
+    // Codec (required on generated impls; encode_to_bytes / decode are provided)
+    fn encode<B: bytes::BufMut>(&self, buf: &mut B);
     fn encode_to_vec(&self) -> Vec<u8>;
-    fn encode_to_bytes(&self) -> bytes::Bytes;
+    fn merge_from<B: bytes::Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError>
+    where
+        Self::Alloc: Clone;
+    fn encode_to_bytes(&self) -> bytes::Bytes; // provided: Bytes::from(encode_to_vec())
     fn decode<B: bytes::Buf>(buf: B) -> Result<Self, DecodeError>
     where
-        Self: Default;
+        Self: Default,
+        Self::Alloc: Clone;
 
     // Infrastructure (required)
     fn unknown_fields(&self) -> impl Iterator<Item = UnknownField<'_>> + '_;
@@ -198,13 +198,13 @@ pub trait Message: Sized {
 }
 ```
 
-`encode_raw` / `merge_from` / `merge_from_with_depth` are generic over `BufMut` / `Buf` so the compiler can monomorphise; the trait is **non-object-safe** by design. Generated `impl`s implement `merge_from_with_depth`; `merge_from` is the depth-0 default.
+`encode` / `merge_from` are generic over `BufMut` / `Buf` so the compiler can monomorphise; the trait is **non-object-safe** by design.
 
 **Merge semantics** (identical across proto2, proto3, editions): singular scalar — last wins; singular message — recursive merge; repeated — append; unknown fields — accumulated for round-trip.
 
-**Non-deterministic field order.** The encoder may emit known fields in any order. Two encodes of the same logical message are not guaranteed to produce identical bytes; compare with `PartialEq`, not with `encode_raw` output equality. See [IMPLEMENTATION.md §12](IMPLEMENTATION.md#12-message-level-wire-io).
+**Non-deterministic field order.** The encoder may emit known fields in any order. Two encodes of the same logical message are not guaranteed to produce identical bytes; compare with `PartialEq`, not with encode output equality. See [IMPLEMENTATION.md §12](IMPLEMENTATION.md#12-message-level-wire-io).
 
-**Name conflicts.** If a proto field is named `validate`, `unknown_fields`, `encoded_len`, etc., the inherent field getter wins; use `Message::validate(&msg)` (UFCS).
+**Name conflicts.** If a proto field is named `validate`, `unknown_fields`, `encode`, `encode_to_vec`, etc., the inherent field getter wins; use `Message::validate(&msg)` (UFCS). Lazy aliases also have inherent helpers such as `encoded_len() -> Result<usize, DecodeError>` and `has_*()`; those collide the same way and are not `Message` trait items.
 
 **Allocator.** `Alloc` is the message's single allocator type. Nested message fields construct children with `Message::new_in` under the bound `M: Message<Alloc = A>` (same `A` as the parent). An inherent `new()` for `Global` may still be emitted on the concrete type. `decode` requires `Self: Default` (typically `A: Default`); otherwise use `new_in(alloc)` then `merge_from`.
 
@@ -328,7 +328,7 @@ The normative generated API is the concrete message struct's inherent `impl` blo
 | Singular string (`utf8_validation=NONE`) | same views as bytes (`&[u8]`) | `*_mut()` → `impl BytesMut<A>` | `clear_*()` |
 | Singular bytes (default SSO) | `Optional<&[u8], …>` or `&[u8]` | `*_mut()` → `impl BytesMut<A>` | `clear_*()` |
 | IMPLICIT open enum (`status`) | `Optional` (`is_set` when non-zero) | `*_mut()` → `impl DerefMut<Target = E>` | `clear_*()` |
-| Nested message (`assignee`, `origin`) | `Option<&Address<A>>` / `Option<&Point<A>>` | `*_mut()` → `&mut Address` / `&mut Point` (creates if absent) | `clear_*()` (+ `set_*` move-replace) |
+| Nested message (`assignee`, `origin`) | `Option<&Child>` (`Child` follows `(puroro.child_parse)` / parent layout: sample `assignee` → `AddressLazy<A>`, `origin` → `Point<A>`) | `*_mut()` → `&mut Child` (creates if absent) | `clear_*()` (+ `set_*` move-replace) |
 | Repeated packable | `&[T]` | `*_mut()` → `impl DerefMut<Target = Vec<T, A>>` (`allocator_api2`) | `clear_*()` |
 | Repeated message (`watchers`) | `&[Address<A>]` | `impl DerefMut<Target = Vec<Address<A>, A>>` (`push(addr)`) | `clear_*()` |
 | Repeated string (VERIFY) / bytes | `&[impl Deref<Target = str>]` / `&[impl Deref<Target = [u8]>]` | `*_mut()` → `impl RepeatedStringMut<A>` / `impl RepeatedBytesMut<A>` (`push` then fill) | `clear_*()` |
@@ -337,7 +337,7 @@ The normative generated API is the concrete message struct's inherent `impl` blo
 | Map (message value) | [`MapRef`](src/map.rs) (`get` → `Option<&M>`) | [`MapMut`](src/map.rs) (`entry_mut` → `&mut M`) | `clear_*()` |
 | Oneof group | `impl OneofView` (`case()` / `as_ref()`); `postal()` → `Option<&Address<A>>` | `impl OneofViewMut` + per-variant `*_mut()` (`postal_mut()` → `&mut Address<A>`) | `clear_notification()` |
 
-Presence for EXPLICIT fields is checked with `field().is_set()` / `field().get()` — there are **no** generated `has_*`, `*_raw`, or `push_*` helpers. Nested messages use `set_*` as `copy_from` into the view (the slot is not an `M` place). Mutation is otherwise via `_mut` (+ `clear_*`); see also [§5.1 Mutation API](#51-chosen-design-single-type-parameter).
+Presence for EXPLICIT fields on the **eager** path is checked with `field().is_set()` / `field().get()` — there are **no** generated eager `has_*`, `*_raw`, or `push_*` helpers. The lazy alias does generate `has_*()` for wire presence without semantic decode ([§8](#tasklaya--lazy-parse-timing)). Nested messages use `set_*` as move-replace of the slot (`set_assignee` accepts eager `Address` and converts via `into_lazy` when the child is pinned lazy). Mutation is otherwise via `_mut` (+ `clear_*`); see also [§5.1 Mutation API](#51-chosen-design-single-type-parameter).
 
 ```rust
 // EXPLICIT string — `push_str` needs `use puroro::StringMut`
@@ -484,7 +484,7 @@ Singular `bool` uses the same accessor shape; storage is bit-packed into the mes
 
 #### Explicit presence (`features.field_presence = EXPLICIT`, edition 2024 default)
 
-Equivalent to proto2 `optional`. Presence is tracked independently of value. The **`Optional` accessor is the primary read API**; mutation uses `_mut` / `clear_*` (no generated `has_*`, `*_raw`, or `set_*`):
+Equivalent to proto2 `optional`. Presence is tracked independently of value. The **`Optional` accessor is the primary read API**; mutation uses `_mut` / `clear_*` (no generated eager `has_*`, `*_raw`, or `set_*`; lazy `has_*` is [§8](#tasklaya--lazy-parse-timing)):
 
 | Method | Return type | Description |
 |---|---|---|
@@ -655,12 +655,14 @@ String and message fields cannot be packed; they always use one LEN record per e
 Message fields are optional in the generated struct (`None` = not present). Singular getters return `Option<&M>` / `&mut M`. An inlined child is a full `M` with its own `MessageCommon` (bits, allocator, unknowns). Boxed children store `UnmanagedBox<M>`. Sample `set_assignee` / `set_origin` move-replace the slot.
 
 ```rust
-pub fn assignee(&self) -> Option<&Address<A>>;
+// Sample pins assignee lazy on both aliases (`(puroro.child_parse) = LAZY`).
+pub fn assignee(&self) -> Option<&AddressLazy<A>>;
 
 /// Creates a default value if absent.
-pub fn assignee_mut(&mut self) -> &mut Address<A>;
+pub fn assignee_mut(&mut self) -> &mut AddressLazy<A>;
 
-pub fn set_assignee(&mut self, src: Address<A>); // move-replace the slot
+pub fn set_assignee(&mut self, src: Address<A>); // eager → into_lazy, then move-replace
+pub fn set_assignee_lazy(&mut self, src: AddressLazy<A>);
 
 pub fn clear_assignee(&mut self);
 ```
@@ -683,7 +685,7 @@ Unset and `UNSPECIFIED` are step 3. A message option is the default for fields *
 
 A pin that disagrees with the parent layout is a concrete type on both aliases, not a `Layout` associated type. The sample's `assignee` is that case: field-level `LAZY`, so eager `Task` and `TaskLazy` both store `AddressLazy`, and `set_assignee` accepts eager `Address` via `into_lazy`. `origin`, `watchers`, and `postal` are step 3. The generator treats step 3 as the default and emits a pin only when the option says so.
 
-Both extensions are field number `51404` in [`proto/puroro/options.proto`](proto/puroro/options.proto). Protobuf extension names are unique in a package, so the field option is `(puroro.child_parse)` and the message option is `(puroro.message_child_parse)`. The plugin reads that number. The sample's `assignee` pin stays hand-written; generated code emits a pin only when the option says so.
+Both extensions are field number `51404` in [`proto/puroro/options.proto`](proto/puroro/options.proto). Protobuf extension names are unique in a package, so the field option is `(puroro.child_parse)` and the message option is `(puroro.message_child_parse)`. The plugin reads that number and emits a pin when the option is `EAGER` or `LAZY`. The sample still comments the `assignee` pin as a stand-in for that option; it is not sample-only.
 
 ---
 
@@ -1074,12 +1076,16 @@ Varint and LEN singular fields share one runtime type, [`SingularField`](puroro-
 
 ```rust
 impl<A: Allocator + Clone> Message for Task<A> {
-    fn merge_from_with_depth<B: Buf>(
+    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError>;
+    // generated: forwards to puroro_rt::merge_message (ScopedBuf, depth 0)
+}
+
+impl<A: Allocator + Clone> MessageMerge for Task<A> {
+    fn merge_from_with_depth<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
         depth: usize,
     ) -> Result<(), DecodeError>;
-    // merge_from → merge_from_with_depth(…, 0)  (provided default)
 }
 ```
 

@@ -1,5 +1,7 @@
 # Plan: Bool value bit via `ValueLayout` (`BitPacked`)
 
+**Status (2026-10).** Implemented. `ProtoBool` is allocator-free (`numerical.rs`); generated default is `SingularField<ProtoBool, …, A, BitPacked<{ BIT }>>`. The "Before/After" snippets still show `ProtoBool<A>` from the pre-GAT spelling.
+
 ## Goal
 
 Move singular/oneof bool **value** bit index off `ProtoBool` onto a field **value-layout** axis, orthogonal to presence (`P`).
