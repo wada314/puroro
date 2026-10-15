@@ -6,7 +6,9 @@ use ::allocator_api2::alloc::Global;
 use ::puroro::{BytesMut, MapMut, MapRef, Message, OneofView, RepeatedStringMut, StringMut};
 use ::puroro_rt::encode::encode_varint_field;
 use ::puroro_rt::{FieldNumber, Varint};
-use ::puroro_sample_generated::{Address, Marker, Point, Priority, Status, Task};
+use ::puroro_sample_generated::{
+    Address, AddressLazy, Marker, Point, PointLazy, Priority, Status, Task, TaskLazy,
+};
 
 /// Map entries in the map-heavy `Task` payload.
 pub const MAP_LEN: usize = 64;
@@ -94,9 +96,30 @@ fn touch_address(addr: &Address) -> usize {
         + addr.latitude().get().to_bits() as usize
 }
 
+/// `assignee` is pinned lazy (`AddressLazy`) on both eager and lazy `Task`.
+fn touch_address_lazy(addr: &AddressLazy) -> usize {
+    addr.street().expect("street").get().len()
+        + addr.city().expect("city").get().len()
+        + addr.postal_code().expect("postal_code").get() as usize
+        + addr.latitude().expect("latitude").get().to_bits() as usize
+}
+
+fn touch_point(point: &Point) -> usize {
+    (point.x() as usize).wrapping_add(point.y() as usize)
+}
+
+fn touch_point_lazy(point: &PointLazy) -> usize {
+    (point.x().expect("x") as usize).wrapping_add(point.y().expect("y") as usize)
+}
+
 /// Sparse access: one explicit string (the lazy-path contrast).
 pub fn read_one(task: &Task) -> usize {
     task.title().get().len()
+}
+
+/// Same getter as [`read_one`], on the lazy alias (materialises that string).
+pub fn read_one_lazy(task: &TaskLazy) -> usize {
+    task.title().expect("title").get().len()
 }
 
 /// Touch every generated getter on the typical `Task`.
@@ -113,7 +136,7 @@ pub fn read_all(task: &Task) -> usize {
     n = n.wrapping_add(task.status().is_set() as usize);
     n = n.wrapping_add(task.priority().is_set() as usize);
     if let Some(assignee) = task.assignee() {
-        n = n.wrapping_add(touch_address(assignee));
+        n = n.wrapping_add(touch_address_lazy(assignee));
     }
     n = n.wrapping_add(task.done() as usize);
     n = n.wrapping_add(task.flag().is_set() as usize);
@@ -124,11 +147,49 @@ pub fn read_all(task: &Task) -> usize {
     n = n.wrapping_add(task.attributes().len());
     n = n.wrapping_add(task.attributes().get("region").copied().unwrap_or(0) as usize);
     if let Some(origin) = task.origin() {
-        n = n.wrapping_add(origin.x() as usize);
-        n = n.wrapping_add(origin.y() as usize);
+        n = n.wrapping_add(touch_point(origin));
     }
     n = n.wrapping_add(task.email_address().get().len());
     n = n.wrapping_add(task.notification().case().is_some() as usize);
+    n
+}
+
+/// Touch the same fields as [`read_all`] on [`TaskLazy`] (materialises LEN slots).
+pub fn read_all_lazy(task: &TaskLazy) -> usize {
+    let mut n = 0usize;
+    n = n.wrapping_add(task.title().expect("title").get().len());
+    n = n.wrapping_add(task.score().expect("score") as usize);
+    n = n.wrapping_add(task.max_retries().expect("max_retries").get() as usize);
+    n = n.wrapping_add(task.owner_id().expect("owner_id").get().len());
+    n = n.wrapping_add(task.payload().expect("payload").get().len());
+    n = n.wrapping_add(
+        task.tag_ids()
+            .expect("tag_ids")
+            .iter()
+            .copied()
+            .sum::<i32>() as usize,
+    );
+    n = n.wrapping_add(task.scores().expect("scores").len());
+    n = n.wrapping_add(task.labels().expect("labels").iter().map(|s| s.len()).sum());
+    n = n.wrapping_add(task.status().expect("status").is_set() as usize);
+    n = n.wrapping_add(task.priority().expect("priority").is_set() as usize);
+    if let Some(assignee) = task.assignee().expect("assignee") {
+        n = n.wrapping_add(touch_address_lazy(assignee));
+    }
+    n = n.wrapping_add(task.done().expect("done") as usize);
+    n = n.wrapping_add(task.flag().expect("flag").is_set() as usize);
+    for watcher in task.watchers().expect("watchers") {
+        n = n.wrapping_add(touch_address_lazy(watcher));
+    }
+    n = n.wrapping_add(task.votes().expect("votes").len());
+    let attributes = task.attributes().expect("attributes");
+    n = n.wrapping_add(attributes.len());
+    n = n.wrapping_add(attributes.get("region").copied().unwrap_or(0) as usize);
+    if let Some(origin) = task.origin().expect("origin") {
+        n = n.wrapping_add(touch_point_lazy(origin));
+    }
+    n = n.wrapping_add(task.email_address().expect("email_address").get().len());
+    n = n.wrapping_add(task.notification().expect("notification").is_some() as usize);
     n
 }
 
@@ -139,17 +200,38 @@ pub fn lookup_map(task: &Task) -> i32 {
         .sum()
 }
 
+pub fn lookup_map_lazy(task: &TaskLazy) -> i32 {
+    let attributes = task.attributes().expect("attributes");
+    MAP_KEYS
+        .iter()
+        .map(|key| attributes.get(key.as_str()).copied().unwrap_or(0))
+        .sum()
+}
+
 pub fn assert_payloads() {
     let typical = typical_task();
     typical.validate().expect("typical validate");
     let decoded = Task::<Global>::decode(TYPICAL_BYTES.as_slice()).expect("typical decode");
-    assert_eq!(decoded.encode_to_vec(), *TYPICAL_BYTES);
+    // Map encode order is hash iteration, so wire bytes are not stable.
+    assert_eq!(decoded, typical);
     assert_eq!(read_all(&decoded), read_all(&typical));
     assert_eq!(read_one(&decoded), "Write docs".len());
+
+    let lazy = TaskLazy::<Global>::decode(TYPICAL_BYTES.as_slice()).expect("typical lazy decode");
+    let lazy_bytes = lazy.encode_to_vec().expect("lazy encode");
+    let from_lazy_wire = Task::<Global>::decode(lazy_bytes.as_slice()).expect("decode lazy encode");
+    assert_eq!(from_lazy_wire, typical);
+    assert_eq!(read_all_lazy(&lazy), read_all(&typical));
+    assert_eq!(read_one_lazy(&lazy), "Write docs".len());
+    assert_eq!(lazy.into_eager().expect("into_eager"), typical);
 
     let map = Task::<Global>::decode(MAP_BYTES.as_slice()).expect("map decode");
     assert_eq!(map.attributes().len(), MAP_LEN);
     assert_eq!(lookup_map(&map), (0..MAP_LEN as i32).sum::<i32>());
+
+    let map_lazy = TaskLazy::<Global>::decode(MAP_BYTES.as_slice()).expect("map lazy decode");
+    assert_eq!(map_lazy.attributes().expect("map lazy len").len(), MAP_LEN);
+    assert_eq!(lookup_map_lazy(&map_lazy), (0..MAP_LEN as i32).sum::<i32>());
 
     let preserved = Point::<Global>::decode(UNKNOWN_BYTES.as_slice()).expect("point decode");
     assert_eq!(preserved.x(), 3);

@@ -1,15 +1,20 @@
-//! Serialize / deserialize microbenchmarks.
+//! Serialize / deserialize microbenchmarks (hand-written catalog messages).
+//!
+//! Isolates [`puroro_rt`] field-catalog encode / decode without generated
+//! `visit_fields` dispatch. `encode` is `encode_to_vec` (length + alloc +
+//! write). `encode_reuse` writes into a pre-sized buffer so small messages
+//! are not dominated by `Vec` allocation.
 //!
 //! Run:
 //! ```text
-//! cargo bench -p puroro
-//! cargo bench -p puroro -- --test   # smoke only
+//! cargo bench -p puroro --bench ser_de
+//! cargo bench -p puroro --bench ser_de -- --test   # smoke only
 //! ```
 
 mod messages;
 mod payloads;
 
-use ::criterion::{BenchmarkId, Criterion, Throughput, black_box, criterion_group};
+use ::criterion::{black_box, criterion_group, BenchmarkId, Criterion, Throughput};
 use ::puroro::Message;
 
 use messages::{FlatScalars, Nest, PackedInts, ShortStrings, StringHeavy};
@@ -54,6 +59,69 @@ fn bench_encode(c: &mut Criterion) {
     group.finish();
 }
 
+fn bench_encode_reuse(c: &mut Criterion) {
+    let mut group = c.benchmark_group("encode_reuse");
+
+    let flat = FlatScalars::sample();
+    group.throughput(Throughput::Bytes(FLAT_BYTES.len() as u64));
+    group.bench_function(BenchmarkId::new("flat_scalars", FLAT_BYTES.len()), |b| {
+        let mut buf = Vec::with_capacity(FLAT_BYTES.len());
+        b.iter(|| {
+            buf.clear();
+            black_box(&flat).encode(&mut buf);
+            black_box(buf.len())
+        })
+    });
+
+    let nest = Nest::sample(NEST_DEPTH);
+    group.throughput(Throughput::Bytes(NEST_BYTES.len() as u64));
+    group.bench_function(BenchmarkId::new("nested", NEST_BYTES.len()), |b| {
+        let mut buf = Vec::with_capacity(NEST_BYTES.len());
+        b.iter(|| {
+            buf.clear();
+            black_box(&nest).encode(&mut buf);
+            black_box(buf.len())
+        })
+    });
+
+    let packed = PackedInts::sample(PACKED_LEN);
+    group.throughput(Throughput::Bytes(PACKED_BYTES.len() as u64));
+    group.bench_function(BenchmarkId::new("packed_ints", PACKED_BYTES.len()), |b| {
+        let mut buf = Vec::with_capacity(PACKED_BYTES.len());
+        b.iter(|| {
+            buf.clear();
+            black_box(&packed).encode(&mut buf);
+            black_box(buf.len())
+        })
+    });
+
+    let strings = StringHeavy::sample();
+    group.throughput(Throughput::Bytes(STRINGS_BYTES.len() as u64));
+    group.bench_function(BenchmarkId::new("strings", STRINGS_BYTES.len()), |b| {
+        let mut buf = Vec::with_capacity(STRINGS_BYTES.len());
+        b.iter(|| {
+            buf.clear();
+            black_box(&strings).encode(&mut buf);
+            black_box(buf.len())
+        })
+    });
+
+    let short = ShortStrings::sample();
+    group.throughput(Throughput::Bytes(SHORT_STRINGS_BYTES.len() as u64));
+    group.bench_function(
+        BenchmarkId::new("short_strings", SHORT_STRINGS_BYTES.len()),
+        |b| {
+            let mut buf = Vec::with_capacity(SHORT_STRINGS_BYTES.len());
+            b.iter(|| {
+                buf.clear();
+                black_box(&short).encode(&mut buf);
+                black_box(buf.len())
+            })
+        },
+    );
+    group.finish();
+}
+
 fn bench_decode(c: &mut Criterion) {
     let mut group = c.benchmark_group("decode");
 
@@ -92,7 +160,7 @@ fn bench_decode(c: &mut Criterion) {
     group.finish();
 }
 
-criterion_group!(benches, bench_encode, bench_decode);
+criterion_group!(benches, bench_encode, bench_encode_reuse, bench_decode);
 
 fn main() {
     payloads::assert_roundtrips();
