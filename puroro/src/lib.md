@@ -23,26 +23,46 @@ message Book {
 }
 ```
 
-A struct like this is output:
+A pair of types like this is generated:
 ```rust
 mod library {
-/// A mutable message type
+use std::ops::Deref;
+
+/// A mutable message type.
 #[derive(Default)]
 pub struct Book { /* ... */ }
 
-/// An immutable message type view, deref-ed from the `Book` struct.
+/// An immutable message view, analogous to `[T]` for `Vec<T>`.
 pub struct BookView { /* ... */ }
 
-# use std::ops::Deref;
 impl Deref for Book {
     type Target = BookView;
-    fn deref(&self) -> &BookView { 
-        /* ... */ 
+    fn deref(&self) -> &BookView {
+        // ...
 #       todo!()
     }
 }
 
 impl Book {
+    pub fn title_mut(&mut self) -> &mut ::puroro::String {
+        // ...
+#       todo!()
+    }
+    pub fn clear_title(&mut self) {
+        // ...
+#       todo!()
+    }
+    pub fn num_pages_mut(&mut self) -> &mut u32 {
+        // ...
+#       todo!()
+    }
+    pub fn clear_num_pages(&mut self) {
+        // ...
+#       todo!()
+    }
+}
+
+impl BookView {
     pub fn title(&self) -> &str {
         // ...
 #       todo!()
@@ -68,33 +88,24 @@ impl Book {
 #       todo!()
     }
 }
-impl BookView {
-    pub fn title_mut(&mut self) -> &mut ::puroro::String {
-        // ...
-#       todo!()
-    }
-    pub fn clear_title(&mut self) {
-        // ...
-#       todo!()
-    }
-    pub fn num_pages_mut(&mut self) -> &mut u32 {
-        // ...
-#       todo!()
-    }
-    pub fn clear_num_pages(&mut self) {
-        // ...
-#       todo!()
-    }
-}
 } // mod library
 ```
 
-The `Book` struct and `BookView` struct's relationship is similar to
-`Vec<T>` and `[T]`. The latter works as an immutable reference type for the former,
-and the latter can be `Deref`-ed from the former.
+The `Book` / `BookView` relationship is similar to `Vec<T>` / `[T]`.
+`Book` implements `Deref<Target = BookView>`, so the getter
+methods defined on `BookView` can be called on a `Book` value as well.
+Mutating methods (`*_mut`, `clear_*`) live only on the owned `Book` type.
+
+Nested message fields follow the same pattern: a getter such as `author()`
+returns `Option<&AuthorView>`, while `author_mut()` returns `&mut Author`.
 
 The `Book` struct also implements [`Clone`], [`Default`], [`PartialEq`] and
-[`Debug`](std::fmt::Debug) standard library traits.
+[`Debug`](std::fmt::Debug). `BookView` implements `ToOwned<Owned = Book>`,
+[`PartialEq`] and [`Debug`](std::fmt::Debug).
+
+String fields use [`crate::String`] (re-exported as `puroro::String`) instead of
+`std::string::String`. It derefs to `str` and implements `From<&str>`, so
+assignment with `.into()` works as shown below.
 
 Let's assume the generated code is in `doc_samples` module,
 then you can use the generated protobuf like this:
@@ -125,7 +136,7 @@ use doc_samples::library::Book;
 let input1 = vec![0x10, 0x82, 0x01]; // encoded `num_pages: 130`
 let input2 = vec![0x0a, 0x02, 0x59, 0x6f]; // encoded `title: "Yo"`
 
-// You can use `from_bytes()` method to deserialize a message
+// You can use `from_bytes_iter()` method to deserialize a message
 // from an input buffer.
 let mut book = Book::from_bytes_iter(input1.bytes()).unwrap();
 assert_eq!(130, book.num_pages());

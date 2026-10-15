@@ -5,7 +5,7 @@ This project is licensed under Apache 2.0 license.
 
 This is not an officially supported Google product.
 
-See [puroro/src/lib.rs](https://docs.rs/puroro/) for more documents.
+See the [crate documentation](https://docs.rs/puroro/) for API details.
 
 ## important notes
 
@@ -49,11 +49,11 @@ Then edit the `Cargo.toml` to add the dependency to `puroro` library crates:
 
 ```toml
 [dependencies]
-puroro = "*"
+puroro = "0.14"
 
 [build-dependencies]
-puroro-codegen = "*"
-protoc-bin-vendored = "3.0.0"
+puroro-codegen = "0.14"
+protoc-bin-vendored = "3.1.0"
 ```
 
 As a last step, create a file `build.rs` under the crate root directory.
@@ -66,20 +66,30 @@ Once you have finished these steps, the directory should be like this:
         │   └ (empty)
         ├ protos/
         │   └ test1.proto
-        ├ cargo.toml
+        ├ Cargo.toml
         ├ build.rs
-        ├ (some other generated files)
+        └ (some other generated files)
 
 Then run `cargo build` command. If it successfully runs, then the generated
 `.rs` files will be generated under `src/` directory and you can use it from
 your own crate. Congraturations!
 
+Each generated message `Foo` is split into an owned struct `Foo` and an
+immutable view `FooView`, similar to `Vec<T>` and `[T]`. Getters such as
+`foo()` / `has_foo()` live on `FooView` (and are available on `Foo` via
+`Deref`). Mutators such as `foo_mut()` / `clear_foo()` live on `Foo`.
+See the [crate documentation](https://docs.rs/puroro/) for serialize /
+deserialize examples.
+
 # subcrates
 - puroro -- The crate that the library user need to import
-- codegen -- Generate rust code from the given .proto files info
+- codegen -- Generate rust code from the given .proto files info. Also
+provides the `puroro-plugin` protoc plugin binary.
 - inline -- Provides a proc macro to directly write proto code in rust code.
 Currently only used by testing purpose, not published.
 - tests -- Test cases
+- update-puroro-doc-samples / update-puroro-protobuf -- Internal helpers to
+regenerate bundled generated code. Not published.
 
 # TODOs
 - proto2

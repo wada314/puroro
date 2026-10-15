@@ -43,7 +43,7 @@ pub struct CodegenOptions {
     pub root_file_name: Option<String>,
 
     /// If specified, overwrites the puroro library path referenced by the
-    /// generated code. Defaults by `"::puroro"`.
+    /// generated code. Defaults to `"::puroro"`.
     pub puroro_library_path: Option<String>,
 }
 

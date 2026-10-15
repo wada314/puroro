@@ -14,6 +14,10 @@
 
 use ::std::ops::Index;
 
+/// Read-only view of a `repeated` field, returned by generated getters such as `foo()`.
+///
+/// Mutable access goes through the matching `foo_mut()` method on the owned message,
+/// which returns a `Vec`-like collection.
 pub trait RepeatedFieldView<'a>:
     Index<usize, Output = <Self as RepeatedFieldView<'a>>::Item>
     + IntoIterator<Item = &'a <Self as RepeatedFieldView<'a>>::Item>
