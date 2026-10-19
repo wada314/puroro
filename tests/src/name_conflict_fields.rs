@@ -79,8 +79,9 @@ impl self::_pinternal::MessageInternal for Conflict {
         #[allow(unused)]
         use ::std::vec::Vec;
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_scoped_iter(iter.by_ref())? {
+        while let Some((number, field_data)) = FieldData::from_bytes_scoped_iter(
+            iter.by_ref(),
+        )? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
@@ -228,8 +229,9 @@ impl self::_pinternal::MessageInternal for ConflictFields {
         #[allow(unused)]
         use ::std::vec::Vec;
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_scoped_iter(iter.by_ref())? {
+        while let Some((number, field_data)) = FieldData::from_bytes_scoped_iter(
+            iter.by_ref(),
+        )? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
@@ -323,8 +325,8 @@ pub mod _view {
         pub(crate) use super::_root::_pinternal::*;
     }
     pub struct ConflictView {
-        pub(super) fields: self::_root::name_conflict_fields::_fields::ConflictFields::<
-            self::_pinternal::OptionalNumericalField::<
+        pub(super) fields: self::_root::name_conflict_fields::_fields::ConflictFields<
+            self::_pinternal::OptionalNumericalField<
                 i32,
                 self::_pinternal::tags::Int32,
                 0usize,
@@ -341,9 +343,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn this_is_original_message_field_opt(
-            &self,
-        ) -> ::std::option::Option::<i32> {
+        pub fn this_is_original_message_field_opt(&self) -> ::std::option::Option<i32> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.this_is_original_message_field,
@@ -382,7 +382,7 @@ pub mod _view {
     impl self::_pinternal::MessageViewInternal for self::ConflictView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
             use self::_pinternal::SharedItems as _;
-            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let mut shared: self::_pinternal::SharedItemsImpl<1usize> = ::std::default::Default::default();
             let fields = self::_root::name_conflict_fields::_fields::ConflictFields {
                 this_is_original_message_field: self::_pinternal::FieldType::new(
                     shared.bitfield_mut(),
@@ -442,8 +442,8 @@ pub mod _view {
         }
     }
     pub struct ConflictFieldsView {
-        pub(super) fields: self::_root::name_conflict_fields::_fields::ConflictFieldsFields::<
-            self::_pinternal::OptionalNumericalField::<
+        pub(super) fields: self::_root::name_conflict_fields::_fields::ConflictFieldsFields<
+            self::_pinternal::OptionalNumericalField<
                 i32,
                 self::_pinternal::tags::Int32,
                 0usize,
@@ -460,7 +460,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn this_is_fields_message_field_opt(&self) -> ::std::option::Option::<i32> {
+        pub fn this_is_fields_message_field_opt(&self) -> ::std::option::Option<i32> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.this_is_fields_message_field,
@@ -499,7 +499,7 @@ pub mod _view {
     impl self::_pinternal::MessageViewInternal for self::ConflictFieldsView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
             use self::_pinternal::SharedItems as _;
-            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let mut shared: self::_pinternal::SharedItemsImpl<1usize> = ::std::default::Default::default();
             let fields = self::_root::name_conflict_fields::_fields::ConflictFieldsFields {
                 this_is_fields_message_field: self::_pinternal::FieldType::new(
                     shared.bitfield_mut(),

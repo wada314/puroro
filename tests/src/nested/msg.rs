@@ -75,8 +75,9 @@ impl self::_pinternal::MessageInternal for Submsg {
         #[allow(unused)]
         use ::std::vec::Vec;
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_scoped_iter(iter.by_ref())? {
+        while let Some((number, field_data)) = FieldData::from_bytes_scoped_iter(
+            iter.by_ref(),
+        )? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
@@ -167,11 +168,8 @@ pub mod _view {
         pub(crate) use super::_root::_pinternal::*;
     }
     pub struct SubmsgView {
-        pub(super) fields: self::_root::nested::msg::_fields::SubmsgFields::<
-            self::_pinternal::SingularNumericalField::<
-                i32,
-                self::_pinternal::tags::Int32,
-            >,
+        pub(super) fields: self::_root::nested::msg::_fields::SubmsgFields<
+            self::_pinternal::SingularNumericalField<i32, self::_pinternal::tags::Int32>,
         >,
         pub(super) shared: self::_pinternal::SharedItemsImpl<0usize>,
     }
@@ -184,7 +182,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn item_inner_opt(&self) -> ::std::option::Option::<i32> {
+        pub fn item_inner_opt(&self) -> ::std::option::Option<i32> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.item_inner,
@@ -223,7 +221,7 @@ pub mod _view {
     impl self::_pinternal::MessageViewInternal for self::SubmsgView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
             use self::_pinternal::SharedItems as _;
-            let mut shared: self::_pinternal::SharedItemsImpl::<0usize> = ::std::default::Default::default();
+            let mut shared: self::_pinternal::SharedItemsImpl<0usize> = ::std::default::Default::default();
             let fields = self::_root::nested::msg::_fields::SubmsgFields {
                 item_inner: self::_pinternal::FieldType::new(shared.bitfield_mut()),
             };
@@ -314,7 +312,7 @@ impl ::std::default::Default for Enum {
         Self::MyValue
     }
 }
-impl ::std::convert::From::<Enum> for i32 {
+impl ::std::convert::From<Enum> for i32 {
     fn from(val: Enum) -> i32 {
         match val {
             Enum::MyValue => 0i32,
@@ -322,7 +320,7 @@ impl ::std::convert::From::<Enum> for i32 {
         }
     }
 }
-impl ::std::convert::From::<i32> for Enum {
+impl ::std::convert::From<i32> for Enum {
     fn from(val: i32) -> Self {
         match val {
             0i32 => self::Enum::MyValue,

@@ -87,8 +87,9 @@ impl self::_pinternal::MessageInternal for Message {
         #[allow(unused)]
         use ::std::vec::Vec;
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_scoped_iter(iter.by_ref())? {
+        while let Some((number, field_data)) = FieldData::from_bytes_scoped_iter(
+            iter.by_ref(),
+        )? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
@@ -183,9 +184,9 @@ pub mod _view {
         pub(crate) use super::_root::_pinternal::*;
     }
     pub struct MessageView {
-        pub(super) fields: self::_root::name_conflict_case::_fields::MessageFields::<
-            self::_root::name_conflict_case::message::Conflict::<
-                self::_pinternal::NumericalField::<i32, self::_pinternal::tags::Int32>,
+        pub(super) fields: self::_root::name_conflict_case::_fields::MessageFields<
+            self::_root::name_conflict_case::message::Conflict<
+                self::_pinternal::NumericalField<i32, self::_pinternal::tags::Int32>,
             >,
         >,
         pub(super) shared: self::_pinternal::SharedItemsImpl<1usize>,
@@ -194,7 +195,7 @@ pub mod _view {
         pub fn conflict(
             &self,
         ) -> ::std::option::Option<
-            self::_root::name_conflict_case::message::_case::ConflictCase::<i32>,
+            self::_root::name_conflict_case::message::_case::ConflictCase<i32>,
         > {
             use self::_pinternal::{SharedItems as _, OneofUnion as _};
             self.fields.conflict.case_ref(self.shared.bitfield())
@@ -203,7 +204,7 @@ pub mod _view {
             use self::_pinternal::SharedItems as _;
             self.fields.conflict.this_is_oneof_field(self.shared.bitfield())
         }
-        pub fn this_is_oneof_field_opt(&self) -> ::std::option::Option::<i32> {
+        pub fn this_is_oneof_field_opt(&self) -> ::std::option::Option<i32> {
             use self::_pinternal::SharedItems as _;
             self.fields.conflict.this_is_oneof_field_opt(self.shared.bitfield())
         }
@@ -229,7 +230,7 @@ pub mod _view {
     impl self::_pinternal::MessageViewInternal for self::MessageView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
             use self::_pinternal::SharedItems as _;
-            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let mut shared: self::_pinternal::SharedItemsImpl<1usize> = ::std::default::Default::default();
             let fields = self::_root::name_conflict_case::_fields::MessageFields {
                 conflict: self::_pinternal::OneofUnion::new(shared.bitfield_mut()),
             };
