@@ -99,8 +99,9 @@ impl self::_pinternal::MessageInternal for Submsg {
         #[allow(unused)]
         use ::std::vec::Vec;
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_scoped_iter(iter.by_ref())? {
+        while let Some((number, field_data)) = FieldData::from_bytes_scoped_iter(
+            iter.by_ref(),
+        )? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
@@ -201,13 +202,13 @@ pub mod _view {
         pub(crate) use super::_root::_pinternal::*;
     }
     pub struct SubmsgView {
-        pub(super) fields: self::_root::full_coverage2::msg::_fields::SubmsgFields::<
-            self::_pinternal::OptionalNumericalField::<
+        pub(super) fields: self::_root::full_coverage2::msg::_fields::SubmsgFields<
+            self::_pinternal::OptionalNumericalField<
                 i32,
                 self::_pinternal::tags::Int32,
                 0usize,
             >,
-            self::_pinternal::OptionalNumericalField::<
+            self::_pinternal::OptionalNumericalField<
                 i64,
                 self::_pinternal::tags::Int64,
                 1usize,
@@ -224,7 +225,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn i32_required_opt(&self) -> ::std::option::Option::<i32> {
+        pub fn i32_required_opt(&self) -> ::std::option::Option<i32> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.i32_required,
@@ -247,7 +248,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn i64_required_opt(&self) -> ::std::option::Option::<i64> {
+        pub fn i64_required_opt(&self) -> ::std::option::Option<i64> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.i64_required,
@@ -292,7 +293,7 @@ pub mod _view {
     impl self::_pinternal::MessageViewInternal for self::SubmsgView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
             use self::_pinternal::SharedItems as _;
-            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let mut shared: self::_pinternal::SharedItemsImpl<1usize> = ::std::default::Default::default();
             let fields = self::_root::full_coverage2::msg::_fields::SubmsgFields {
                 i32_required: self::_pinternal::FieldType::new(shared.bitfield_mut()),
                 i64_required: self::_pinternal::FieldType::new(shared.bitfield_mut()),

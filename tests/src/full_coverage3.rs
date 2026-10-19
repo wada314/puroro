@@ -47,7 +47,7 @@ impl Msg {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn i32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+    pub fn i32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.i32_repeated,
@@ -95,7 +95,7 @@ impl Msg {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn float_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<f32> {
+    pub fn float_repeated_mut(&mut self) -> &mut ::std::vec::Vec<f32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.float_repeated,
@@ -143,9 +143,7 @@ impl Msg {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn bytes_repeated_mut(
-        &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_puroro::Bytes> {
+    pub fn bytes_repeated_mut(&mut self) -> &mut ::std::vec::Vec<self::_puroro::Bytes> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.bytes_repeated,
@@ -195,7 +193,7 @@ impl Msg {
     }
     pub fn string_repeated_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_puroro::String> {
+    ) -> &mut ::std::vec::Vec<self::_puroro::String> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.string_repeated,
@@ -245,7 +243,7 @@ impl Msg {
     }
     pub fn enum_repeated_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::full_coverage3::Enum> {
+    ) -> &mut ::std::vec::Vec<self::_root::full_coverage3::Enum> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.enum_repeated,
@@ -299,7 +297,7 @@ impl Msg {
     }
     pub fn submsg_repeated_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec::<self::_root::full_coverage3::msg::Submsg> {
+    ) -> &mut ::std::vec::Vec<self::_root::full_coverage3::msg::Submsg> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.submsg_repeated,
@@ -347,7 +345,7 @@ impl Msg {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn i64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i64> {
+    pub fn i64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i64> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.i64_repeated,
@@ -395,7 +393,7 @@ impl Msg {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn u32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<u32> {
+    pub fn u32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.u32_repeated,
@@ -443,7 +441,7 @@ impl Msg {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn u64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<u64> {
+    pub fn u64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u64> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.u64_repeated,
@@ -491,7 +489,7 @@ impl Msg {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn s32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+    pub fn s32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.s32_repeated,
@@ -539,7 +537,7 @@ impl Msg {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn s64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i64> {
+    pub fn s64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i64> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.s64_repeated,
@@ -587,7 +585,7 @@ impl Msg {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn fixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<u32> {
+    pub fn fixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.fixed32_repeated,
@@ -635,7 +633,7 @@ impl Msg {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn fixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<u64> {
+    pub fn fixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u64> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.fixed64_repeated,
@@ -683,7 +681,7 @@ impl Msg {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn sfixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i32> {
+    pub fn sfixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.sfixed32_repeated,
@@ -731,7 +729,7 @@ impl Msg {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn sfixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<i64> {
+    pub fn sfixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i64> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.sfixed64_repeated,
@@ -779,7 +777,7 @@ impl Msg {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn f64_repeated_mut(&mut self) -> &mut ::std::vec::Vec::<f64> {
+    pub fn f64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<f64> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.f64_repeated,
@@ -886,8 +884,9 @@ impl self::_pinternal::MessageInternal for Msg {
         #[allow(unused)]
         use ::std::vec::Vec;
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_scoped_iter(iter.by_ref())? {
+        while let Some((number, field_data)) = FieldData::from_bytes_scoped_iter(
+            iter.by_ref(),
+        )? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
@@ -1401,211 +1400,190 @@ pub mod _view {
         pub(crate) use super::_root::_pinternal::*;
     }
     pub struct MsgView {
-        pub(super) fields: self::_root::full_coverage3::_fields::MsgFields::<
-            self::_pinternal::SingularNumericalField::<
-                i32,
-                self::_pinternal::tags::Int32,
-            >,
-            self::_pinternal::OptionalNumericalField::<
+        pub(super) fields: self::_root::full_coverage3::_fields::MsgFields<
+            self::_pinternal::SingularNumericalField<i32, self::_pinternal::tags::Int32>,
+            self::_pinternal::OptionalNumericalField<
                 i32,
                 self::_pinternal::tags::Int32,
                 0usize,
             >,
-            self::_pinternal::RepeatedNumericalField::<
-                i32,
-                self::_pinternal::tags::Int32,
-            >,
-            self::_pinternal::SingularNumericalField::<
-                f32,
-                self::_pinternal::tags::Float,
-            >,
-            self::_pinternal::OptionalNumericalField::<
+            self::_pinternal::RepeatedNumericalField<i32, self::_pinternal::tags::Int32>,
+            self::_pinternal::SingularNumericalField<f32, self::_pinternal::tags::Float>,
+            self::_pinternal::OptionalNumericalField<
                 f32,
                 self::_pinternal::tags::Float,
                 1usize,
             >,
-            self::_pinternal::RepeatedNumericalField::<
-                f32,
-                self::_pinternal::tags::Float,
-            >,
-            self::_pinternal::SingularUnsizedField::<
+            self::_pinternal::RepeatedNumericalField<f32, self::_pinternal::tags::Float>,
+            self::_pinternal::SingularUnsizedField<
                 self::_puroro::Bytes,
                 self::_pinternal::tags::Bytes,
             >,
-            self::_pinternal::OptionalUnsizedField::<
+            self::_pinternal::OptionalUnsizedField<
                 self::_puroro::Bytes,
                 self::_pinternal::tags::Bytes,
                 2usize,
             >,
-            self::_pinternal::RepeatedUnsizedField::<
+            self::_pinternal::RepeatedUnsizedField<
                 self::_puroro::Bytes,
                 self::_pinternal::tags::Bytes,
             >,
-            self::_pinternal::SingularUnsizedField::<
+            self::_pinternal::SingularUnsizedField<
                 self::_puroro::String,
                 self::_pinternal::tags::String,
             >,
-            self::_pinternal::OptionalUnsizedField::<
+            self::_pinternal::OptionalUnsizedField<
                 self::_puroro::String,
                 self::_pinternal::tags::String,
                 3usize,
             >,
-            self::_pinternal::RepeatedUnsizedField::<
+            self::_pinternal::RepeatedUnsizedField<
                 self::_puroro::String,
                 self::_pinternal::tags::String,
             >,
-            self::_pinternal::SingularNumericalField::<
+            self::_pinternal::SingularNumericalField<
                 self::_root::full_coverage3::Enum,
-                self::_pinternal::tags::Enum3::<self::_root::full_coverage3::Enum>,
+                self::_pinternal::tags::Enum3<self::_root::full_coverage3::Enum>,
             >,
-            self::_pinternal::OptionalNumericalField::<
+            self::_pinternal::OptionalNumericalField<
                 self::_root::full_coverage3::Enum,
-                self::_pinternal::tags::Enum3::<self::_root::full_coverage3::Enum>,
+                self::_pinternal::tags::Enum3<self::_root::full_coverage3::Enum>,
                 4usize,
             >,
-            self::_pinternal::RepeatedNumericalField::<
+            self::_pinternal::RepeatedNumericalField<
                 self::_root::full_coverage3::Enum,
-                self::_pinternal::tags::Enum3::<self::_root::full_coverage3::Enum>,
+                self::_pinternal::tags::Enum3<self::_root::full_coverage3::Enum>,
             >,
-            self::_pinternal::SingularMessageField::<
+            self::_pinternal::SingularMessageField<
                 self::_root::full_coverage3::msg::Submsg,
             >,
-            self::_pinternal::SingularMessageField::<
+            self::_pinternal::SingularMessageField<
                 self::_root::full_coverage3::msg::Submsg,
             >,
-            self::_pinternal::RepeatedMessageField::<
+            self::_pinternal::RepeatedMessageField<
                 self::_root::full_coverage3::msg::Submsg,
             >,
-            self::_pinternal::SingularNumericalField::<
-                i64,
-                self::_pinternal::tags::Int64,
-            >,
-            self::_pinternal::OptionalNumericalField::<
+            self::_pinternal::SingularNumericalField<i64, self::_pinternal::tags::Int64>,
+            self::_pinternal::OptionalNumericalField<
                 i64,
                 self::_pinternal::tags::Int64,
                 5usize,
             >,
-            self::_pinternal::RepeatedNumericalField::<
-                i64,
-                self::_pinternal::tags::Int64,
-            >,
-            self::_pinternal::SingularNumericalField::<
+            self::_pinternal::RepeatedNumericalField<i64, self::_pinternal::tags::Int64>,
+            self::_pinternal::SingularNumericalField<
                 u32,
                 self::_pinternal::tags::UInt32,
             >,
-            self::_pinternal::OptionalNumericalField::<
+            self::_pinternal::OptionalNumericalField<
                 u32,
                 self::_pinternal::tags::UInt32,
                 6usize,
             >,
-            self::_pinternal::RepeatedNumericalField::<
+            self::_pinternal::RepeatedNumericalField<
                 u32,
                 self::_pinternal::tags::UInt32,
             >,
-            self::_pinternal::SingularNumericalField::<
+            self::_pinternal::SingularNumericalField<
                 u64,
                 self::_pinternal::tags::UInt64,
             >,
-            self::_pinternal::OptionalNumericalField::<
+            self::_pinternal::OptionalNumericalField<
                 u64,
                 self::_pinternal::tags::UInt64,
                 7usize,
             >,
-            self::_pinternal::RepeatedNumericalField::<
+            self::_pinternal::RepeatedNumericalField<
                 u64,
                 self::_pinternal::tags::UInt64,
             >,
-            self::_pinternal::SingularNumericalField::<
+            self::_pinternal::SingularNumericalField<
                 i32,
                 self::_pinternal::tags::SInt32,
             >,
-            self::_pinternal::OptionalNumericalField::<
+            self::_pinternal::OptionalNumericalField<
                 i32,
                 self::_pinternal::tags::SInt32,
                 8usize,
             >,
-            self::_pinternal::RepeatedNumericalField::<
+            self::_pinternal::RepeatedNumericalField<
                 i32,
                 self::_pinternal::tags::SInt32,
             >,
-            self::_pinternal::SingularNumericalField::<
+            self::_pinternal::SingularNumericalField<
                 i64,
                 self::_pinternal::tags::SInt64,
             >,
-            self::_pinternal::OptionalNumericalField::<
+            self::_pinternal::OptionalNumericalField<
                 i64,
                 self::_pinternal::tags::SInt64,
                 9usize,
             >,
-            self::_pinternal::RepeatedNumericalField::<
+            self::_pinternal::RepeatedNumericalField<
                 i64,
                 self::_pinternal::tags::SInt64,
             >,
-            self::_pinternal::SingularNumericalField::<
+            self::_pinternal::SingularNumericalField<
                 u32,
                 self::_pinternal::tags::Fixed32,
             >,
-            self::_pinternal::OptionalNumericalField::<
+            self::_pinternal::OptionalNumericalField<
                 u32,
                 self::_pinternal::tags::Fixed32,
                 10usize,
             >,
-            self::_pinternal::RepeatedNumericalField::<
+            self::_pinternal::RepeatedNumericalField<
                 u32,
                 self::_pinternal::tags::Fixed32,
             >,
-            self::_pinternal::SingularNumericalField::<
+            self::_pinternal::SingularNumericalField<
                 u64,
                 self::_pinternal::tags::Fixed64,
             >,
-            self::_pinternal::OptionalNumericalField::<
+            self::_pinternal::OptionalNumericalField<
                 u64,
                 self::_pinternal::tags::Fixed64,
                 11usize,
             >,
-            self::_pinternal::RepeatedNumericalField::<
+            self::_pinternal::RepeatedNumericalField<
                 u64,
                 self::_pinternal::tags::Fixed64,
             >,
-            self::_pinternal::SingularNumericalField::<
+            self::_pinternal::SingularNumericalField<
                 i32,
                 self::_pinternal::tags::SFixed32,
             >,
-            self::_pinternal::OptionalNumericalField::<
+            self::_pinternal::OptionalNumericalField<
                 i32,
                 self::_pinternal::tags::SFixed32,
                 12usize,
             >,
-            self::_pinternal::RepeatedNumericalField::<
+            self::_pinternal::RepeatedNumericalField<
                 i32,
                 self::_pinternal::tags::SFixed32,
             >,
-            self::_pinternal::SingularNumericalField::<
+            self::_pinternal::SingularNumericalField<
                 i64,
                 self::_pinternal::tags::SFixed64,
             >,
-            self::_pinternal::OptionalNumericalField::<
+            self::_pinternal::OptionalNumericalField<
                 i64,
                 self::_pinternal::tags::SFixed64,
                 13usize,
             >,
-            self::_pinternal::RepeatedNumericalField::<
+            self::_pinternal::RepeatedNumericalField<
                 i64,
                 self::_pinternal::tags::SFixed64,
             >,
-            self::_pinternal::SingularNumericalField::<
+            self::_pinternal::SingularNumericalField<
                 f64,
                 self::_pinternal::tags::Double,
             >,
-            self::_pinternal::OptionalNumericalField::<
+            self::_pinternal::OptionalNumericalField<
                 f64,
                 self::_pinternal::tags::Double,
                 14usize,
             >,
-            self::_pinternal::RepeatedNumericalField::<
-                f64,
-                self::_pinternal::tags::Double,
-            >,
+            self::_pinternal::RepeatedNumericalField<f64, self::_pinternal::tags::Double>,
         >,
         pub(super) shared: self::_pinternal::SharedItemsImpl<1usize>,
     }
@@ -1618,7 +1596,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn i32_unlabeled_opt(&self) -> ::std::option::Option::<i32> {
+        pub fn i32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.i32_unlabeled,
@@ -1641,7 +1619,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn i32_optional_opt(&self) -> ::std::option::Option::<i32> {
+        pub fn i32_optional_opt(&self) -> ::std::option::Option<i32> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.i32_optional,
@@ -1673,7 +1651,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn float_unlabeled_opt(&self) -> ::std::option::Option::<f32> {
+        pub fn float_unlabeled_opt(&self) -> ::std::option::Option<f32> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.float_unlabeled,
@@ -1696,7 +1674,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn float_optional_opt(&self) -> ::std::option::Option::<f32> {
+        pub fn float_optional_opt(&self) -> ::std::option::Option<f32> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.float_optional,
@@ -1728,7 +1706,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn bytes_unlabeled_opt(&self) -> ::std::option::Option::<&[u8]> {
+        pub fn bytes_unlabeled_opt(&self) -> ::std::option::Option<&[u8]> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.bytes_unlabeled,
@@ -1751,7 +1729,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn bytes_optional_opt(&self) -> ::std::option::Option::<&[u8]> {
+        pub fn bytes_optional_opt(&self) -> ::std::option::Option<&[u8]> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.bytes_optional,
@@ -1783,7 +1761,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn string_unlabeled_opt(&self) -> ::std::option::Option::<&str> {
+        pub fn string_unlabeled_opt(&self) -> ::std::option::Option<&str> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.string_unlabeled,
@@ -1806,7 +1784,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn string_optional_opt(&self) -> ::std::option::Option::<&str> {
+        pub fn string_optional_opt(&self) -> ::std::option::Option<&str> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.string_optional,
@@ -1840,7 +1818,7 @@ pub mod _view {
         }
         pub fn enum_unlabeled_opt(
             &self,
-        ) -> ::std::option::Option::<self::_root::full_coverage3::Enum> {
+        ) -> ::std::option::Option<self::_root::full_coverage3::Enum> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.enum_unlabeled,
@@ -1865,7 +1843,7 @@ pub mod _view {
         }
         pub fn enum_optional_opt(
             &self,
-        ) -> ::std::option::Option::<self::_root::full_coverage3::Enum> {
+        ) -> ::std::option::Option<self::_root::full_coverage3::Enum> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.enum_optional,
@@ -1894,7 +1872,7 @@ pub mod _view {
         }
         pub fn submsg_unlabeled(
             &self,
-        ) -> ::std::option::Option::<
+        ) -> ::std::option::Option<
             &self::_root::full_coverage3::msg::_view::SubmsgView,
         > {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
@@ -1906,7 +1884,7 @@ pub mod _view {
         }
         pub fn submsg_unlabeled_opt(
             &self,
-        ) -> ::std::option::Option::<
+        ) -> ::std::option::Option<
             &self::_root::full_coverage3::msg::_view::SubmsgView,
         > {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
@@ -1925,7 +1903,7 @@ pub mod _view {
         }
         pub fn submsg_optional(
             &self,
-        ) -> ::std::option::Option::<
+        ) -> ::std::option::Option<
             &self::_root::full_coverage3::msg::_view::SubmsgView,
         > {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
@@ -1937,7 +1915,7 @@ pub mod _view {
         }
         pub fn submsg_optional_opt(
             &self,
-        ) -> ::std::option::Option::<
+        ) -> ::std::option::Option<
             &self::_root::full_coverage3::msg::_view::SubmsgView,
         > {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
@@ -1974,7 +1952,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn i64_unlabeled_opt(&self) -> ::std::option::Option::<i64> {
+        pub fn i64_unlabeled_opt(&self) -> ::std::option::Option<i64> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.i64_unlabeled,
@@ -1997,7 +1975,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn i64_optional_opt(&self) -> ::std::option::Option::<i64> {
+        pub fn i64_optional_opt(&self) -> ::std::option::Option<i64> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.i64_optional,
@@ -2029,7 +2007,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn u32_unlabeled_opt(&self) -> ::std::option::Option::<u32> {
+        pub fn u32_unlabeled_opt(&self) -> ::std::option::Option<u32> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.u32_unlabeled,
@@ -2052,7 +2030,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn u32_optional_opt(&self) -> ::std::option::Option::<u32> {
+        pub fn u32_optional_opt(&self) -> ::std::option::Option<u32> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.u32_optional,
@@ -2084,7 +2062,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn u64_unlabeled_opt(&self) -> ::std::option::Option::<u64> {
+        pub fn u64_unlabeled_opt(&self) -> ::std::option::Option<u64> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.u64_unlabeled,
@@ -2107,7 +2085,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn u64_optional_opt(&self) -> ::std::option::Option::<u64> {
+        pub fn u64_optional_opt(&self) -> ::std::option::Option<u64> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.u64_optional,
@@ -2139,7 +2117,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn s32_unlabeled_opt(&self) -> ::std::option::Option::<i32> {
+        pub fn s32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.s32_unlabeled,
@@ -2162,7 +2140,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn s32_optional_opt(&self) -> ::std::option::Option::<i32> {
+        pub fn s32_optional_opt(&self) -> ::std::option::Option<i32> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.s32_optional,
@@ -2194,7 +2172,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn s64_unlabeled_opt(&self) -> ::std::option::Option::<i64> {
+        pub fn s64_unlabeled_opt(&self) -> ::std::option::Option<i64> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.s64_unlabeled,
@@ -2217,7 +2195,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn s64_optional_opt(&self) -> ::std::option::Option::<i64> {
+        pub fn s64_optional_opt(&self) -> ::std::option::Option<i64> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.s64_optional,
@@ -2249,7 +2227,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn fixed32_unlabeled_opt(&self) -> ::std::option::Option::<u32> {
+        pub fn fixed32_unlabeled_opt(&self) -> ::std::option::Option<u32> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.fixed32_unlabeled,
@@ -2272,7 +2250,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn fixed32_optional_opt(&self) -> ::std::option::Option::<u32> {
+        pub fn fixed32_optional_opt(&self) -> ::std::option::Option<u32> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.fixed32_optional,
@@ -2304,7 +2282,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn fixed64_unlabeled_opt(&self) -> ::std::option::Option::<u64> {
+        pub fn fixed64_unlabeled_opt(&self) -> ::std::option::Option<u64> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.fixed64_unlabeled,
@@ -2327,7 +2305,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn fixed64_optional_opt(&self) -> ::std::option::Option::<u64> {
+        pub fn fixed64_optional_opt(&self) -> ::std::option::Option<u64> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.fixed64_optional,
@@ -2359,7 +2337,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn sfixed32_unlabeled_opt(&self) -> ::std::option::Option::<i32> {
+        pub fn sfixed32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.sfixed32_unlabeled,
@@ -2382,7 +2360,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn sfixed32_optional_opt(&self) -> ::std::option::Option::<i32> {
+        pub fn sfixed32_optional_opt(&self) -> ::std::option::Option<i32> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.sfixed32_optional,
@@ -2414,7 +2392,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn sfixed64_unlabeled_opt(&self) -> ::std::option::Option::<i64> {
+        pub fn sfixed64_unlabeled_opt(&self) -> ::std::option::Option<i64> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.sfixed64_unlabeled,
@@ -2437,7 +2415,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn sfixed64_optional_opt(&self) -> ::std::option::Option::<i64> {
+        pub fn sfixed64_optional_opt(&self) -> ::std::option::Option<i64> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.sfixed64_optional,
@@ -2469,7 +2447,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn f64_unlabeled_opt(&self) -> ::std::option::Option::<f64> {
+        pub fn f64_unlabeled_opt(&self) -> ::std::option::Option<f64> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.f64_unlabeled,
@@ -2492,7 +2470,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn f64_optional_opt(&self) -> ::std::option::Option::<f64> {
+        pub fn f64_optional_opt(&self) -> ::std::option::Option<f64> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.f64_optional,
@@ -2822,7 +2800,7 @@ pub mod _view {
     impl self::_pinternal::MessageViewInternal for self::MsgView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
             use self::_pinternal::SharedItems as _;
-            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let mut shared: self::_pinternal::SharedItemsImpl<1usize> = ::std::default::Default::default();
             let fields = self::_root::full_coverage3::_fields::MsgFields {
                 i32_unlabeled: self::_pinternal::FieldType::new(shared.bitfield_mut()),
                 i32_optional: self::_pinternal::FieldType::new(shared.bitfield_mut()),
@@ -3436,7 +3414,7 @@ impl ::std::default::Default for Enum {
         Self::Zeroth
     }
 }
-impl ::std::convert::From::<Enum> for i32 {
+impl ::std::convert::From<Enum> for i32 {
     fn from(val: Enum) -> i32 {
         match val {
             Enum::Zeroth => 0i32,
@@ -3446,7 +3424,7 @@ impl ::std::convert::From::<Enum> for i32 {
         }
     }
 }
-impl ::std::convert::From::<i32> for Enum {
+impl ::std::convert::From<i32> for Enum {
     fn from(val: i32) -> Self {
         match val {
             0i32 => self::Enum::Zeroth,

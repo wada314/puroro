@@ -18,7 +18,7 @@ use super::{
     LengthDelimitedType, PURORO_INTERNAL, PURORO_LIB,
 };
 use crate::syn::{
-    parse2, Arm, Attribute, Expr, ExprMethodCall, FieldValue, ImplItemMethod, PathSegment, Stmt,
+    parse2, Arm, Attribute, Expr, ExprMethodCall, FieldValue, ImplItemFn, PathSegment, Stmt,
     Type,
 };
 use crate::{FatalErrorKind, Result};
@@ -120,13 +120,13 @@ impl Field {
         })?))
     }
 
-    pub(crate) fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
+    pub(crate) fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemFn>> {
         match self.rule()? {
             FieldRule::Repeated => self.gen_message_struct_field_methods_for_repeated(),
             _ => self.gen_message_struct_field_methods_for_non_repeated(),
         }
     }
-    pub(crate) fn gen_view_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
+    pub(crate) fn gen_view_struct_methods(&self) -> Result<Vec<ImplItemFn>> {
         match self.rule()? {
             FieldRule::Repeated => self.gen_view_struct_field_methods_for_repeated(),
             _ => self.gen_view_struct_field_methods_for_non_repeated(),
@@ -237,7 +237,7 @@ impl Field {
         })?)
     }
 
-    fn gen_message_struct_field_methods_for_repeated(&self) -> Result<Vec<ImplItemMethod>> {
+    fn gen_message_struct_field_methods_for_repeated(&self) -> Result<Vec<ImplItemFn>> {
         debug_assert!(matches!(self.rule(), Ok(FieldRule::Repeated)));
         let getter_mut_ident = format_ident!("{}_mut", self.name()?.to_lower_snake_case());
         let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
@@ -263,7 +263,7 @@ impl Field {
         ])
     }
 
-    fn gen_message_struct_field_methods_for_non_repeated(&self) -> Result<Vec<ImplItemMethod>> {
+    fn gen_message_struct_field_methods_for_non_repeated(&self) -> Result<Vec<ImplItemFn>> {
         debug_assert!(matches!(
             self.rule(),
             Ok(FieldRule::Optional | FieldRule::Singular)
@@ -305,7 +305,7 @@ impl Field {
         Ok(sci.gen_doc_attributes()?)
     }
 
-    fn gen_view_struct_field_methods_for_repeated(&self) -> Result<Vec<ImplItemMethod>> {
+    fn gen_view_struct_field_methods_for_repeated(&self) -> Result<Vec<ImplItemFn>> {
         debug_assert!(matches!(self.rule(), Ok(FieldRule::Repeated)));
         let getter_ident = format_ident!(
             "{}",
@@ -334,7 +334,7 @@ impl Field {
         })?])
     }
 
-    fn gen_view_struct_field_methods_for_non_repeated(&self) -> Result<Vec<ImplItemMethod>> {
+    fn gen_view_struct_field_methods_for_non_repeated(&self) -> Result<Vec<ImplItemFn>> {
         debug_assert!(matches!(
             self.rule(),
             Ok(FieldRule::Optional | FieldRule::Singular)

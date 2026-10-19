@@ -5,6 +5,8 @@
 # v 0.14.1
 - Upgraded crate dependencies (`thiserror` 2, `itertools` 0.14, `protoc-bin-vendored` 3.1, and others).
 - `puroro-codegen` is 0.14.2 in this release.
+- Updated the code generator for `syn` 2 (`ImplItemMethod` is now `ImplItemFn`).
+- Dropped nightly features that current rustc has stabilized (`vec_into_raw_parts`, `result_flattening`, `trait_upcasting`, `allocator_api`). `try_find` and `error_generic_member_access` are still required.
 
 # v 0.14.0
 - Introduced puroro-specific `String` and `Bytes` types with a small-buffer optimization.

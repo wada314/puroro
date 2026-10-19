@@ -75,8 +75,9 @@ impl self::_pinternal::MessageInternal for Msg {
         #[allow(unused)]
         use ::std::vec::Vec;
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_scoped_iter(iter.by_ref())? {
+        while let Some((number, field_data)) = FieldData::from_bytes_scoped_iter(
+            iter.by_ref(),
+        )? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
@@ -214,8 +215,9 @@ impl self::_pinternal::MessageInternal for _Self {
         #[allow(unused)]
         use ::std::vec::Vec;
         use self::_puroro::PuroroError;
-        while let Some((number, field_data))
-            = FieldData::from_bytes_scoped_iter(iter.by_ref())? {
+        while let Some((number, field_data)) = FieldData::from_bytes_scoped_iter(
+            iter.by_ref(),
+        )? {
             let result: self::_puroro::Result<()> = (|| {
                 match number {
                     1i32 => {
@@ -303,8 +305,8 @@ pub mod _view {
         pub(crate) use super::_root::_pinternal::*;
     }
     pub struct MsgView {
-        pub(super) fields: self::_root::keywords::_fields::MsgFields::<
-            self::_pinternal::OptionalNumericalField::<
+        pub(super) fields: self::_root::keywords::_fields::MsgFields<
+            self::_pinternal::OptionalNumericalField<
                 i32,
                 self::_pinternal::tags::Int32,
                 0usize,
@@ -321,7 +323,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn type_opt(&self) -> ::std::option::Option::<i32> {
+        pub fn type_opt(&self) -> ::std::option::Option<i32> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.r#type,
@@ -360,7 +362,7 @@ pub mod _view {
     impl self::_pinternal::MessageViewInternal for self::MsgView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
             use self::_pinternal::SharedItems as _;
-            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let mut shared: self::_pinternal::SharedItemsImpl<1usize> = ::std::default::Default::default();
             let fields = self::_root::keywords::_fields::MsgFields {
                 r#type: self::_pinternal::FieldType::new(shared.bitfield_mut()),
             };
@@ -410,8 +412,8 @@ pub mod _view {
         }
     }
     pub struct SelfView {
-        pub(super) fields: self::_root::keywords::_fields::SelfFields::<
-            self::_pinternal::OptionalNumericalField::<
+        pub(super) fields: self::_root::keywords::_fields::SelfFields<
+            self::_pinternal::OptionalNumericalField<
                 i32,
                 self::_pinternal::tags::Int32,
                 0usize,
@@ -428,7 +430,7 @@ pub mod _view {
                 ::std::default::Default::default,
             )
         }
-        pub fn type_opt(&self) -> ::std::option::Option::<i32> {
+        pub fn type_opt(&self) -> ::std::option::Option<i32> {
             use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
             NonRepeatedFieldType::get_field_opt(
                 &self.fields.r#type,
@@ -467,7 +469,7 @@ pub mod _view {
     impl self::_pinternal::MessageViewInternal for self::SelfView {
         fn new_boxed() -> ::std::boxed::Box<Self> {
             use self::_pinternal::SharedItems as _;
-            let mut shared: self::_pinternal::SharedItemsImpl::<1usize> = ::std::default::Default::default();
+            let mut shared: self::_pinternal::SharedItemsImpl<1usize> = ::std::default::Default::default();
             let fields = self::_root::keywords::_fields::SelfFields {
                 r#type: self::_pinternal::FieldType::new(shared.bitfield_mut()),
             };

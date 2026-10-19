@@ -15,7 +15,7 @@
 use super::super::util::*;
 use super::{FieldOrOneof, FieldOrOneofCase};
 use crate::syn::{
-    parse2, Arm, Expr, Field as SynField, FieldValue, Ident, ImplItemMethod, NamedField, Stmt, Type,
+    parse2, Arm, Expr, Field as SynField, FieldValue, Ident, ImplItemFn, NamedField, Stmt, Type,
 };
 use crate::Result;
 use ::once_cell::unsync::OnceCell;
@@ -29,8 +29,8 @@ pub(crate) trait FieldOrOneofExt {
     fn gen_fields_struct_field_type(&self) -> Result<Rc<Type>>;
     fn gen_fields_struct_field(&self) -> Result<SynField>;
 
-    fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
-    fn gen_view_struct_methods(&self) -> Result<Vec<ImplItemMethod>>;
+    fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemFn>>;
+    fn gen_view_struct_methods(&self) -> Result<Vec<ImplItemFn>>;
 
     fn gen_message_struct_impl_message_deser_arms(
         &self,
@@ -95,14 +95,14 @@ impl<T: ?Sized + FieldOrOneof> FieldOrOneofExt for T {
         .into())
     }
 
-    fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
+    fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemFn>> {
         match self.either() {
             FieldOrOneofCase::Field(f) => f.gen_message_struct_methods(),
             FieldOrOneofCase::Oneof(o) => o.gen_message_struct_methods(),
         }
     }
 
-    fn gen_view_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
+    fn gen_view_struct_methods(&self) -> Result<Vec<ImplItemFn>> {
         match self.either() {
             FieldOrOneofCase::Field(f) => f.gen_view_struct_methods(),
             FieldOrOneofCase::Oneof(o) => o.gen_view_struct_methods(),

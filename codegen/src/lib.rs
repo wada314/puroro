@@ -13,10 +13,7 @@
 // limitations under the License.
 
 #![feature(error_generic_member_access)]
-#![feature(result_flattening)]
 #![feature(try_find)]
-#![feature(trait_upcasting)]
-#![feature(allocator_api)]
 
 mod codegen;
 mod error;
@@ -24,7 +21,7 @@ mod error;
 mod syn {
     pub(crate) use ::syn::{
         parse2, parse_str, Arm, Attribute, Expr, ExprMethodCall, Field, FieldValue, File, Ident,
-        ImplItemConst, ImplItemMethod, Item, ItemEnum, ItemImpl, Lifetime, Path, PathSegment, Stmt,
+        ImplItemConst, ImplItemFn, Item, ItemEnum, ItemImpl, Lifetime, Path, PathSegment, Stmt,
         Type,
     };
     pub(crate) struct NamedField(::syn::Field);
