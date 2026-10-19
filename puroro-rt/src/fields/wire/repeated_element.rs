@@ -188,6 +188,45 @@ impl<C: NumericalType> RepeatedElement for Numerical<C> {
     unsafe fn deallocate_element<A: Allocator>(_elem: C::NativeType, _alloc: &A) {}
 }
 
+impl<C: NumericalType> Numerical<C> {
+    /// Appends packed bodies. The length prefix is already consumed.
+    pub(crate) fn merge_packed_buf<B, F>(buf: &mut B, mut push: F) -> Result<(), DecodeError>
+    where
+        B: Buf,
+        F: FnMut(C::NativeType),
+    {
+        match <C::WireBody as WirePayload>::WIRE_TYPE {
+            WireType::Varint => {
+                while buf.has_remaining() {
+                    push(C::from_wire_body(C::WireBody::decode_body(buf)?)?);
+                }
+                Ok(())
+            }
+            WireType::Int32 => {
+                if !buf.remaining().is_multiple_of(FIXED32_BYTES) {
+                    return Err(DecodeError::TruncatedMessage);
+                }
+                while buf.has_remaining() {
+                    push(C::from_wire_body(C::WireBody::decode_body(buf)?)?);
+                }
+                Ok(())
+            }
+            WireType::Int64 => {
+                if !buf.remaining().is_multiple_of(FIXED64_BYTES) {
+                    return Err(DecodeError::TruncatedMessage);
+                }
+                while buf.has_remaining() {
+                    push(C::from_wire_body(C::WireBody::decode_body(buf)?)?);
+                }
+                Ok(())
+            }
+            WireType::Len | WireType::SGroup | WireType::EGroup => {
+                unreachable!("numerical WireBody is never Len or group")
+            }
+        }
+    }
+}
+
 impl<A: Allocator + Clone, C: NumericalType> RepeatedElementMerge<A> for Numerical<C> {
     #[inline]
     fn default_element(_alloc: A) -> C::NativeType {
@@ -216,80 +255,17 @@ impl<A: Allocator + Clone, C: NumericalType> RepeatedElementMerge<A> for Numeric
         F: FnMut(C::NativeType),
     {
         match <C::WireBody as WirePayload>::WIRE_TYPE {
-            WireType::Varint => match wire_type {
+            WireType::Varint | WireType::Int32 | WireType::Int64 => match wire_type {
                 WireType::Len => {
                     let len = decode::decode_varint(buf)? as usize;
                     if buf.remaining() < len {
                         return Err(DecodeError::TruncatedMessage);
                     }
                     let mut sub = buf.take(len);
-                    while sub.has_remaining() {
-                        push(C::from_wire_body(C::WireBody::decode(
-                            WireType::Varint,
-                            &mut sub,
-                        )?)?);
-                    }
-                    Ok(())
+                    Numerical::<C>::merge_packed_buf(&mut sub, push)
                 }
-                WireType::Varint => {
-                    push(C::from_wire_body(C::WireBody::decode(
-                        WireType::Varint,
-                        buf,
-                    )?)?);
-                    Ok(())
-                }
-                _ => Err(DecodeError::InvalidTag),
-            },
-            WireType::Int32 => match wire_type {
-                WireType::Len => {
-                    let len = decode::decode_varint(buf)? as usize;
-                    if buf.remaining() < len {
-                        return Err(DecodeError::TruncatedMessage);
-                    }
-                    if !len.is_multiple_of(FIXED32_BYTES) {
-                        return Err(DecodeError::TruncatedMessage);
-                    }
-                    let mut sub = buf.take(len);
-                    while sub.has_remaining() {
-                        push(C::from_wire_body(C::WireBody::decode(
-                            WireType::Int32,
-                            &mut sub,
-                        )?)?);
-                    }
-                    Ok(())
-                }
-                WireType::Int32 => {
-                    push(C::from_wire_body(C::WireBody::decode(
-                        WireType::Int32,
-                        buf,
-                    )?)?);
-                    Ok(())
-                }
-                _ => Err(DecodeError::InvalidTag),
-            },
-            WireType::Int64 => match wire_type {
-                WireType::Len => {
-                    let len = decode::decode_varint(buf)? as usize;
-                    if buf.remaining() < len {
-                        return Err(DecodeError::TruncatedMessage);
-                    }
-                    if !len.is_multiple_of(FIXED64_BYTES) {
-                        return Err(DecodeError::TruncatedMessage);
-                    }
-                    let mut sub = buf.take(len);
-                    while sub.has_remaining() {
-                        push(C::from_wire_body(C::WireBody::decode(
-                            WireType::Int64,
-                            &mut sub,
-                        )?)?);
-                    }
-                    Ok(())
-                }
-                WireType::Int64 => {
-                    push(C::from_wire_body(C::WireBody::decode(
-                        WireType::Int64,
-                        buf,
-                    )?)?);
+                wt if wt == <C::WireBody as WirePayload>::WIRE_TYPE => {
+                    push(C::from_wire_body(C::WireBody::decode_body(buf)?)?);
                     Ok(())
                 }
                 _ => Err(DecodeError::InvalidTag),
