@@ -124,6 +124,22 @@ impl<A: Allocator> LazyScan<A> {
         Ok(())
     }
 
+    /// Byte equality of the ingested body (regions, or the whole island buffer).
+    ///
+    /// Lazy `PartialEq` uses this when an eager value cannot be built, so a
+    /// message stays equal to itself. Does not require [`finish`](Self::finish).
+    pub fn body_eq(&self, other: &Self) -> bool {
+        if self.body_len() != other.body_len() {
+            return false;
+        }
+        let mut left = Vec::new();
+        let mut right = Vec::new();
+        match (self.write_bodies(&mut left), other.write_bodies(&mut right)) {
+            (Ok(()), Ok(())) => left == right,
+            _ => false,
+        }
+    }
+
     /// Replay each body region (or the whole buffer) into `f`.
     pub fn for_each_body(
         &self,
@@ -297,5 +313,28 @@ pub trait LazyMessage<A: Allocator + Clone> {
             self.apply_record(&rec, span.offset)?;
         }
         Ok(())
+    }
+
+    /// Equality for a lazy alias.
+    ///
+    /// When both sides have been scanned and both `to_eager` calls succeed,
+    /// compare those eager values. When both sides fail the same way (the scan
+    /// is unfinished, or building the eager message fails, including
+    /// `DecodeError::InvalidUtf8`), compare ingested body bytes so equality
+    /// stays reflexive. One success and one failure is not equal.
+    fn eq_with_eager<E: ::core::cmp::PartialEq>(
+        &self,
+        other: &Self,
+        to_eager: impl Fn(&Self) -> Result<E, DecodeError>,
+    ) -> bool {
+        match (self.ensure_scanned(), other.ensure_scanned()) {
+            (Ok(()), Ok(())) => match (to_eager(self), to_eager(other)) {
+                (Ok(left), Ok(right)) => left == right,
+                (Err(_), Err(_)) => self.scan().body_eq(other.scan()),
+                _ => false,
+            },
+            (Err(_), Err(_)) => self.scan().body_eq(other.scan()),
+            _ => false,
+        }
     }
 }

@@ -271,6 +271,50 @@ fn invalid_utf8_before_optional() {
 }
 
 #[test]
+fn invalid_utf8_lazy_eq_compares_body_bytes() {
+    let mut bytes = Vec::new();
+    encode_len_bytes(FIELD_TITLE, &[0xff, 0xfe], &mut bytes);
+    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    assert_eq!(lazy, lazy.clone());
+    assert_eq!(lazy, TaskLazy::decode(&bytes[..]).unwrap());
+
+    let mut other = Vec::new();
+    encode_len_bytes(FIELD_TITLE, &[0xff], &mut other);
+    assert_ne!(lazy, TaskLazy::decode(&other[..]).unwrap());
+
+    let mut good = Vec::new();
+    encode_len_bytes(FIELD_TITLE, b"ok", &mut good);
+    assert_ne!(lazy, TaskLazy::decode(&good[..]).unwrap());
+}
+
+#[test]
+fn lazy_eq_is_semantic_when_eager_build_works() {
+    let mut repeated = Vec::new();
+    encode_len_bytes(FIELD_TITLE, b"first", &mut repeated);
+    encode_len_bytes(FIELD_TITLE, b"second", &mut repeated);
+    let mut once = Vec::new();
+    encode_len_bytes(FIELD_TITLE, b"second", &mut once);
+
+    let left = TaskLazy::decode(&repeated[..]).unwrap();
+    let right = TaskLazy::decode(&once[..]).unwrap();
+    assert_eq!(left, right);
+    assert_ne!(
+        left.encode_to_vec().unwrap(),
+        right.encode_to_vec().unwrap()
+    );
+}
+
+#[test]
+fn unfinished_lazy_eq_is_reflexive_and_differs_from_finished() {
+    let mut bytes = Vec::new();
+    encode_len_bytes(FIELD_TITLE, b"ok", &mut bytes);
+    let mut unfinished = TaskLazy::new();
+    unfinished.push(&bytes).unwrap();
+    assert_eq!(unfinished, unfinished.clone());
+    assert_ne!(unfinished, TaskLazy::decode(&bytes[..]).unwrap());
+}
+
+#[test]
 fn missing_string_and_bytes() {
     let mut bytes = Vec::new();
     encode_varint_field(
@@ -999,7 +1043,10 @@ fn lazy_partial_eq_follows_eager_fields() {
     left.push(&once.encode_to_vec().unwrap()).unwrap();
     let mut right = TaskLazy::new();
     right.push(&once.encode_to_vec().unwrap()).unwrap();
-    assert_ne!(left, right);
+    // Unfinished ingest is not a finished value, but identical bodies stay
+    // equal. A finished decode of the same bytes does not.
+    assert_eq!(left, right);
+    assert_ne!(left, once);
 
     let mut streets = Vec::new();
     encode_len_bytes(FIELD_STREET, b"old", &mut streets);
