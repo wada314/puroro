@@ -131,14 +131,20 @@ impl<A: Allocator + Clone> LazyMessage<A> for PointLazy<A> {
         &mut self._common.lazy.scan
     }
 
-    fn apply_record(&mut self, rec: &ScannedRecord<A>, _origin: usize) -> Result<(), DecodeError> {
+    fn apply_record(&mut self, rec: &ScannedRecord, origin: usize) -> Result<(), DecodeError> {
         match rec.field_number.as_u32() {
-            FIELD_X => merge_scanned_field(&rec.field, |wire_type, buf| {
-                self.x.bind_mut(&mut self._common).merge(wire_type, buf, 0)
-            }),
-            FIELD_Y => merge_scanned_field(&rec.field, |wire_type, buf| {
-                self.y.bind_mut(&mut self._common).merge(wire_type, buf, 0)
-            }),
+            FIELD_X => merge_scanned_field(
+                rec,
+                self._common.lazy.scan.shared().clone_handle().as_bytes(),
+                origin,
+                |wire_type, buf| self.x.bind_mut(&mut self._common).merge(wire_type, buf, 0),
+            ),
+            FIELD_Y => merge_scanned_field(
+                rec,
+                self._common.lazy.scan.shared().clone_handle().as_bytes(),
+                origin,
+                |wire_type, buf| self.y.bind_mut(&mut self._common).merge(wire_type, buf, 0),
+            ),
             _ => Ok(()),
         }
     }

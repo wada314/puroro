@@ -158,7 +158,7 @@ impl<A: Allocator + Clone> LazyScan<A> {
     pub fn push(
         &mut self,
         chunk: &[u8],
-    ) -> Result<(usize, AllocVec<ScannedRecord<A>, A>), DecodeError> {
+    ) -> Result<(usize, AllocVec<ScannedRecord, A>), DecodeError> {
         debug_assert!(self.wire.as_bytes().ends_with(self.scanner.leftover()));
         let origin = self.wire.len() - self.scanner.leftover().len();
         let records = self.scanner.push(chunk)?;
@@ -212,7 +212,7 @@ impl<A: Allocator + Clone> LazyScan<A> {
     pub fn scan_region(
         &mut self,
         span: WireSpan,
-    ) -> Result<AllocVec<ScannedRecord<A>, A>, DecodeError> {
+    ) -> Result<AllocVec<ScannedRecord, A>, DecodeError> {
         self.finished = false;
         let payload = span.slice(self.wire.as_bytes())?;
         let records = self.scanner.push(payload)?;
@@ -257,7 +257,7 @@ impl<A: Allocator + Clone> MessageScan<A> for Lazy<A> {
 pub trait LazyMessage<A: Allocator + Clone> {
     fn scan(&self) -> &LazyScan<A>;
     fn scan_mut(&mut self) -> &mut LazyScan<A>;
-    fn apply_record(&mut self, rec: &ScannedRecord<A>, origin: usize) -> Result<(), DecodeError>;
+    fn apply_record(&mut self, rec: &ScannedRecord, origin: usize) -> Result<(), DecodeError>;
 
     /// Parse stored regions on the first field get.
     fn ensure_scanned(&self) -> Result<(), DecodeError> {

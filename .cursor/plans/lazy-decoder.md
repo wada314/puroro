@@ -5,6 +5,11 @@ emit `Name` / `NameLazy` as `NameImpl<A, Eager>` / `NameImpl<A, Lazy<A>>`.
 [DESIGN.md §8](../../DESIGN.md#tasklaya--lazy-parse-timing) describes that
 alias. The per-field `FieldCache` machine is rejected; do not revive it.
 
+Updated (2026-10-19): `RecordScanner` emits [`ScannedRecord`](../../puroro-rt/src/decode/record.rs)
+/ [`ScannedValue`](../../puroro-rt/src/decode/record.rs). LEN is `payload_len`
+only; callers slice `_wire`. Do not rebuild `protobuf_core::Field` with an
+owned LEN `AllocVec`.
+
 Still out of v1: `TaskView`, lazy mutation, `MessageFallible` on the lazy
 alias, intra-field repeated cursors, zero-copy spanning LEN, packed repeated
 left unread.
@@ -107,9 +112,12 @@ EOF. Early `title()` would be a provisional value and cannot back out of
 I/O into a reused fixed-size buffer is common and **must** be accepted as
 input. That does **not** mean spanning payloads stay zero-copy:
 
-- Complete records are contiguous views (or a copy of that payload only).
-- A LEN that straddles chunks is copied (or decoded) when it becomes complete.
-- Child `_wire` / `&str` are always one contiguous region.
+- Complete records are metadata (and a small numeric). LEN is a span into
+  the island, not a second payload copy.
+- A LEN that straddles chunks is **not** copied into the scan record.
+  Leftover holds the unfinished tail; that prefix is already on the island
+  from the earlier append, then the completing chunk is appended.
+- Child `_wire` / `&str` are always one contiguous region on the island.
 - A reused stack read buffer cannot be sliced; those bytes are copied into
   long-lived storage at ingest. Prefer one `BytesMut` gather when the source
   is a reused temp buffer. A `Vec<Bytes>` rope is for chunks that are already
@@ -215,9 +223,10 @@ No message type. Input: `Buf` / chunks. Output: complete
 incomplete tag, length varint, or LEN prefix.
 
 Implemented: [`puroro-rt/src/decode/record.rs`](../../puroro-rt/src/decode/record.rs)
-(`RecordScanner` → [`protobuf_core::Field`](../../protobuf-core/src/field.rs)).
-`push` returns complete fields; leftover means need more; `finish` is
-`TruncatedMessage` if leftover remains.
+(`RecordScanner` → `ScannedRecord` / `ScannedValue`). `push` returns complete
+records; leftover means need more; `finish` is `TruncatedMessage` if leftover
+remains. LEN payloads are not copied into the scan record
+(updated 2026-10-19; was `protobuf_core::Field` + owned LEN).
 
 Tests: mid-varint, mid-fixed, mid-LEN, empty chunk, two chunks that form one
 record, trailing garbage after `finish` (error).
@@ -334,8 +343,10 @@ bytes are included. `Layout` associated types cover slots that differ.
 **Done:** sample and plugin lazy aliases. Chunked or gathered input,
 `finish`, numericals applied on the scan, string / bytes `WireOrSso`, nested
 messages and maps as spans, repeated `labels` as a span list (first get
-materialises), oneof, `Layout` associated types. Eager `Task` implements
-handwritten `task::MessageFallible` (`Error = Infallible`).
+materialises), oneof, `Layout` associated types. The scan record itself is
+a span (`ScannedRecord` / `ScannedValue`); complete LEN is not copied off
+the island. Eager `Task` implements handwritten `task::MessageFallible`
+(`Error = Infallible`).
 
 **Not done:** `TaskView`, lazy mutation, `MessageFallible` for `TaskLazy`
 (follow-parent fields change type with the parent; the plugin does not emit

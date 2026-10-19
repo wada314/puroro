@@ -407,7 +407,7 @@ impl<A: Allocator + Clone> LazyMessage<A> for TaskLazy<A> {
         &mut self._common.lazy.scan
     }
 
-    fn apply_record(&mut self, rec: &ScannedRecord<A>, origin: usize) -> Result<(), DecodeError> {
+    fn apply_record(&mut self, rec: &ScannedRecord, origin: usize) -> Result<(), DecodeError> {
         match rec.field_number.as_u32() {
             FIELD_TITLE => {
                 let span = scanned_len_span(origin, rec)?;
@@ -455,13 +455,18 @@ impl<A: Allocator + Clone> LazyMessage<A> for TaskLazy<A> {
                     .store_len_span(span, &mut self._common);
                 Ok(())
             }
-            FIELD_WEBHOOK_ID => merge_scanned_field(&rec.field, |wire_type, buf| {
-                self.notification
-                    .bind_mut(&mut self._common)
-                    .variant_mut::<FIELD_WEBHOOK_ID>()
-                    .bind_mut(&mut self._common)
-                    .merge(wire_type, buf, 0)
-            }),
+            FIELD_WEBHOOK_ID => merge_scanned_field(
+                rec,
+                self._common.lazy.scan.shared().clone_handle().as_bytes(),
+                origin,
+                |wire_type, buf| {
+                    self.notification
+                        .bind_mut(&mut self._common)
+                        .variant_mut::<FIELD_WEBHOOK_ID>()
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf, 0)
+                },
+            ),
             FIELD_POSTAL => {
                 let span = scanned_len_span(origin, rec)?;
                 let root = self._common.lazy.scan.shared().clone_handle();
@@ -470,13 +475,18 @@ impl<A: Allocator + Clone> LazyMessage<A> for TaskLazy<A> {
                     .variant_mut::<FIELD_POSTAL>()
                     .merge_shared(&root, span, &mut self._common)
             }
-            FIELD_URGENT => merge_scanned_field(&rec.field, |wire_type, buf| {
-                self.notification
-                    .bind_mut(&mut self._common)
-                    .variant_mut::<FIELD_URGENT>()
-                    .bind_mut(&mut self._common)
-                    .merge(wire_type, buf, 0)
-            }),
+            FIELD_URGENT => merge_scanned_field(
+                rec,
+                self._common.lazy.scan.shared().clone_handle().as_bytes(),
+                origin,
+                |wire_type, buf| {
+                    self.notification
+                        .bind_mut(&mut self._common)
+                        .variant_mut::<FIELD_URGENT>()
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf, 0)
+                },
+            ),
             FIELD_LABELS => {
                 let span = scanned_len_span(origin, rec)?;
                 self.labels
@@ -487,51 +497,96 @@ impl<A: Allocator + Clone> LazyMessage<A> for TaskLazy<A> {
                 self.attributes
                     .store_span(span, self._common.lazy.scan.wire(), &self._common)
             }
-            FIELD_SCORE => merge_scanned_field(&rec.field, |wire_type, buf| {
-                self.score
-                    .bind_mut(&mut self._common)
-                    .merge(wire_type, buf, 0)
-            }),
-            FIELD_MAX_RETRIES => merge_scanned_field(&rec.field, |wire_type, buf| {
-                self.max_retries
-                    .bind_mut(&mut self._common)
-                    .merge(wire_type, buf, 0)
-            }),
-            FIELD_TAG_IDS => merge_scanned_field(&rec.field, |wire_type, buf| {
-                self.tag_ids
-                    .bind_mut(&mut self._common)
-                    .merge(wire_type, buf, 0)
-            }),
-            FIELD_SCORES => merge_scanned_field(&rec.field, |wire_type, buf| {
-                self.scores
-                    .bind_mut(&mut self._common)
-                    .merge(wire_type, buf, 0)
-            }),
-            FIELD_STATUS => merge_scanned_field(&rec.field, |wire_type, buf| {
-                self.status
-                    .bind_mut(&mut self._common)
-                    .merge(wire_type, buf, 0)
-            }),
-            FIELD_PRIORITY => merge_scanned_field(&rec.field, |wire_type, buf| {
-                self.priority
-                    .bind_mut(&mut self._common)
-                    .merge(wire_type, buf, 0)
-            }),
-            FIELD_DONE => merge_scanned_field(&rec.field, |wire_type, buf| {
-                self.done
-                    .bind_mut(&mut self._common)
-                    .merge(wire_type, buf, 0)
-            }),
-            FIELD_FLAG => merge_scanned_field(&rec.field, |wire_type, buf| {
-                self.flag
-                    .bind_mut(&mut self._common)
-                    .merge(wire_type, buf, 0)
-            }),
-            FIELD_VOTES => merge_scanned_field(&rec.field, |wire_type, buf| {
-                self.votes
-                    .bind_mut(&mut self._common)
-                    .merge(wire_type, buf, 0)
-            }),
+            FIELD_SCORE => merge_scanned_field(
+                rec,
+                self._common.lazy.scan.shared().clone_handle().as_bytes(),
+                origin,
+                |wire_type, buf| {
+                    self.score
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf, 0)
+                },
+            ),
+            FIELD_MAX_RETRIES => merge_scanned_field(
+                rec,
+                self._common.lazy.scan.shared().clone_handle().as_bytes(),
+                origin,
+                |wire_type, buf| {
+                    self.max_retries
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf, 0)
+                },
+            ),
+            FIELD_TAG_IDS => merge_scanned_field(
+                rec,
+                self._common.lazy.scan.shared().clone_handle().as_bytes(),
+                origin,
+                |wire_type, buf| {
+                    self.tag_ids
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf, 0)
+                },
+            ),
+            FIELD_SCORES => merge_scanned_field(
+                rec,
+                self._common.lazy.scan.shared().clone_handle().as_bytes(),
+                origin,
+                |wire_type, buf| {
+                    self.scores
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf, 0)
+                },
+            ),
+            FIELD_STATUS => merge_scanned_field(
+                rec,
+                self._common.lazy.scan.shared().clone_handle().as_bytes(),
+                origin,
+                |wire_type, buf| {
+                    self.status
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf, 0)
+                },
+            ),
+            FIELD_PRIORITY => merge_scanned_field(
+                rec,
+                self._common.lazy.scan.shared().clone_handle().as_bytes(),
+                origin,
+                |wire_type, buf| {
+                    self.priority
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf, 0)
+                },
+            ),
+            FIELD_DONE => merge_scanned_field(
+                rec,
+                self._common.lazy.scan.shared().clone_handle().as_bytes(),
+                origin,
+                |wire_type, buf| {
+                    self.done
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf, 0)
+                },
+            ),
+            FIELD_FLAG => merge_scanned_field(
+                rec,
+                self._common.lazy.scan.shared().clone_handle().as_bytes(),
+                origin,
+                |wire_type, buf| {
+                    self.flag
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf, 0)
+                },
+            ),
+            FIELD_VOTES => merge_scanned_field(
+                rec,
+                self._common.lazy.scan.shared().clone_handle().as_bytes(),
+                origin,
+                |wire_type, buf| {
+                    self.votes
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf, 0)
+                },
+            ),
             _ => Ok(()),
         }
     }
