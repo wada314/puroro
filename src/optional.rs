@@ -1,6 +1,4 @@
 //! The [`Optional`] type and [`HasDefault`] trait for explicit-presence fields.
-//!
-//! See `DESIGN.md` §3 for semantics and §8 for lazy (`TaskLazy`) behaviour.
 
 use ::core::marker::PhantomData;
 
