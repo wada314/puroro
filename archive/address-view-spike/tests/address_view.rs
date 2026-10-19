@@ -1,8 +1,9 @@
 //! Behavior of the handwritten [`AddressView`] spike.
 
+use ::address_view_spike::AddressView;
 use ::allocator_api2::alloc::Global;
 use ::puroro::{DecodeError, Message, StringMut};
-use ::puroro_sample_generated::{Address, AddressView};
+use ::puroro_sample_generated::Address;
 
 fn encoded(street: &str, city: &str, postal_code: u32, latitude: f64) -> Vec<u8> {
     let mut msg = Address::new();

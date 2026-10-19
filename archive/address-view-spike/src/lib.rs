@@ -1,6 +1,7 @@
-//! Handwritten zero-copy view of [`Address`](crate::Address).
+//! Archived zero-copy view of [`Address`](::puroro_sample_generated::Address).
 //!
-//! This is a spike, not plugin output and not [`task::MessageFallible`].
+//! This crate is not workspace member code and not plugin output. It is not
+//! [`task::MessageFallible`]. `sample-generated` stays the generator reference.
 //! One scan records last-wins offsets into the caller's buffer. String and
 //! the numeric payloads are not copied. String UTF-8 is checked on each get,
 //! so a numeric-only read does not pay for validation, and a repeated get
@@ -18,9 +19,10 @@ use ::core::fmt;
 use ::core::str;
 use ::puroro::{DecodeError, Message, WireType};
 use ::puroro_rt::decode::{decode_tag, decode_varint};
-
-use super::{FIELD_CITY, FIELD_LATITUDE, FIELD_POSTAL_CODE, FIELD_STREET};
-use crate::Address;
+use ::puroro_sample_generated::Address;
+use ::puroro_sample_generated::address::{
+    FIELD_CITY, FIELD_LATITUDE, FIELD_POSTAL_CODE, FIELD_STREET,
+};
 
 /// `u32::MAX` length means the field was absent. A real protobuf string is at
 /// most 2 GiB, so this sentinel does not collide with a present empty string.

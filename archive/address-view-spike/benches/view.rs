@@ -1,6 +1,6 @@
 //! `AddressView` versus eager `Address` and `AddressLazy`.
 //!
-//! Handwritten spike. Not a generated API. One scan stores last-wins offsets
+//! Archived spike, outside `sample-generated`. One scan stores last-wins offsets
 //! into the caller's buffer. String UTF-8 is checked on every get.
 //!
 //! `rescan_*` walks the whole buffer on every read. That is the fully-lazy
@@ -36,14 +36,12 @@
 //! View parse does not touch string bytes, so short and long parses match.
 //! Repeated string gets re-check UTF-8. `to_owned` is a second eager decode.
 //!
-//! Run:
+//! Run from this crate (it is outside the puroro workspace):
 //! ```text
-//! cargo bench -p puroro --bench view
+//! cargo bench --bench view
 //! ```
 
-#[path = "keep.rs"]
-mod keep;
-
+use ::address_view_spike::AddressView;
 use ::allocator_api2::alloc::Global;
 use ::bytes::Buf;
 use ::core::str;
@@ -51,7 +49,7 @@ use ::core::time::Duration;
 use ::criterion::{Criterion, Throughput, black_box, criterion_group, criterion_main};
 use ::puroro::{DecodeError, Message, WireType};
 use ::puroro_rt::decode::{decode_tag, decode_varint};
-use ::puroro_sample_generated::{Address, AddressLazy, AddressView};
+use ::puroro_sample_generated::{Address, AddressLazy};
 use ::std::sync::LazyLock;
 
 use keep::iter_keep;
@@ -313,3 +311,33 @@ criterion_group! {
     targets = bench_short, bench_long
 }
 criterion_main!(benches);
+
+/// Local copy of `puroro/benches/keep.rs` so this archive does not import the
+/// product bench module.
+mod keep {
+    use ::core::time::Duration;
+    use ::criterion::Bencher;
+    use ::criterion::measurement::WallTime;
+    use ::std::time::Instant;
+
+    const KEEP_BATCH: usize = 1024;
+
+    pub fn iter_keep<T>(bencher: &mut Bencher<'_, WallTime>, mut f: impl FnMut() -> T) {
+        bencher.iter_custom(|iters| {
+            let mut kept = Vec::<T>::with_capacity(KEEP_BATCH);
+            let mut total = Duration::ZERO;
+            let mut remaining = iters;
+            while remaining > 0 {
+                let n = remaining.min(KEEP_BATCH as u64);
+                let start = Instant::now();
+                for _ in 0..n {
+                    kept.push(f());
+                }
+                total += start.elapsed();
+                kept.clear();
+                remaining -= n;
+            }
+            total
+        });
+    }
+}
