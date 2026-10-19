@@ -58,10 +58,12 @@ pub enum DecodeError {
     },
     /// An unrecognized field number on a message that rejects unknown tags.
     ///
-    /// Produced by the reject unknown-field policy. Preserve and discard do
-    /// not return this. Closed-enum unknowns are diverted instead and do not
-    /// use this variant. A truncated or otherwise illegal payload is reported
-    /// as that wire error, not as an unrecognized field.
+    /// Produced only by puroro's `(puroro.unknown_fields) = REJECT` policy.
+    /// The protobuf spec does not define this failure: a conforming parser
+    /// accepts an unknown field number and preserves it. Preserve and discard
+    /// do not return this variant. Closed-enum unknowns are diverted instead.
+    /// A truncated or otherwise illegal payload is reported as that wire
+    /// error, not as an unrecognized field.
     UnrecognizedField {
         /// Field number from the tag.
         field_number: u32,

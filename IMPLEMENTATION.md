@@ -849,6 +849,8 @@ The `set_*` per-variant setters are removed, matching the other field families.
 
 **Storage:** [`MessageCommon<B, A, U, L>`](puroro-rt/src/fields/shared.rs) with [`UnknownStore`](puroro-rt/src/unknown_fields.rs). Default `U = UnknownFields<A>` — empty is one word; `skip_field_and_save` / `save_unknown_varint_field` append this message’s blob. [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs) is a ZST (decode skips, encode / iterator empty). [`RejectUnknowns`](puroro-rt/src/unknown_fields.rs) is a ZST: `skip_field_and_save_in` returns `DecodeError::UnrecognizedField` after a well-formed payload; closed-enum `save_unknown_varint_field` still drops. Generated / sample messages bake `U` into `Foo<A>` (`impl<A>` only). Sample `Point` preserves; sample `Marker` bakes discard. Plugin: `(puroro.unknown_fields) = DISCARD` emits `DiscardUnknowns`; `REJECT` emits `RejectUnknowns`. Encode uses `Deref` to `[u8]`. Inlined children keep a separate store on their own `MessageCommon`. `SGroup` / `EGroup` not preserved.
 
+**Spec.** Preserve is the protobuf rule (accept an unknown field number and write it back). Discard and reject are puroro opt-ins. Reject failing the parse is not a wire-format, proto2, proto3, or Editions behavior; do not treat a conformance miss on that message as a bug, and do not change reject to preserve in order to match the spec. The public statement is [DESIGN.md §4.9](DESIGN.md#49-unknown-fields).
+
 **Public accessor:** `Message::unknown_fields()` returns `impl Iterator<Item = ::puroro::UnknownField<'_>>` by parsing that blob with [`iter_unknown_fields`](puroro-rt/src/decode.rs) (also `MessageCommon::iter_unknown_fields`). Encode paths read the blob directly and do not go through the iterator.
 
 ---

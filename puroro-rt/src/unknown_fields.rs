@@ -172,7 +172,9 @@ impl Deref for DiscardUnknowns {
 
 /// Reject-policy unknown fields: no buffer, unrecognized tags fail decode.
 ///
-/// A well-formed unrecognized tag becomes
+/// This policy is outside the protobuf spec. A conforming parser accepts an
+/// unknown field number and preserves the bytes. A well-formed unrecognized
+/// tag becomes
 /// [`DecodeError::UnrecognizedField`](::puroro::DecodeError::UnrecognizedField)
 /// after its payload is consumed. Closed-enum diversion still calls
 /// [`append_blob_mut`](UnknownStore::append_blob_mut), which drops the value
