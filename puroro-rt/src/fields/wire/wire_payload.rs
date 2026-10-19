@@ -42,6 +42,9 @@ pub trait CopyWirePayload: WirePayload + Copy + Sized {
     /// Reads one body after the tag has been consumed.
     fn decode(wire_type: WireType, buf: &mut impl Buf) -> Result<Self, DecodeError>;
 
+    /// Reads one body. The caller already knows the wire type (packed inners).
+    fn decode_body(buf: &mut impl Buf) -> Result<Self, DecodeError>;
+
     /// Uses a value the lazy scanner already decoded. Wrong wire shape is
     /// [`DecodeError::InvalidTag`].
     fn from_scanned(value: &ScannedValue) -> Result<Self, DecodeError>;
@@ -74,6 +77,11 @@ impl CopyWirePayload for VarintPayload {
         if wire_type != WireType::Varint {
             return Err(DecodeError::InvalidTag);
         }
+        Self::decode_body(buf)
+    }
+
+    #[inline]
+    fn decode_body(buf: &mut impl Buf) -> Result<Self, DecodeError> {
         Ok(Self(Varint::from_uint64(decode::decode_varint(buf)?)))
     }
 
@@ -111,6 +119,11 @@ impl CopyWirePayload for Fixed32Payload {
         if wire_type != WireType::Int32 {
             return Err(DecodeError::InvalidTag);
         }
+        Self::decode_body(buf)
+    }
+
+    #[inline]
+    fn decode_body(buf: &mut impl Buf) -> Result<Self, DecodeError> {
         if buf.remaining() < FIXED32_BYTES {
             return Err(DecodeError::TruncatedMessage);
         }
@@ -153,6 +166,11 @@ impl CopyWirePayload for Fixed64Payload {
         if wire_type != WireType::Int64 {
             return Err(DecodeError::InvalidTag);
         }
+        Self::decode_body(buf)
+    }
+
+    #[inline]
+    fn decode_body(buf: &mut impl Buf) -> Result<Self, DecodeError> {
         if buf.remaining() < FIXED64_BYTES {
             return Err(DecodeError::TruncatedMessage);
         }
