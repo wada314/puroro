@@ -32,6 +32,7 @@ pub(crate) struct InlineBuf {
 const _: () = assert!(mem::size_of::<InlineBuf>() == mem::size_of::<usize>() * 3);
 
 impl InlineBuf {
+    #[inline]
     pub(crate) fn empty() -> Self {
         Self {
             data: [MaybeUninit::uninit(); INLINE_CAP],
@@ -40,6 +41,7 @@ impl InlineBuf {
     }
 
     /// Copies `bytes` into the initialized prefix. The tail stays uninitialized.
+    #[inline]
     pub(crate) fn from_bytes(bytes: &[u8]) -> Self {
         debug_assert!(bytes.len() <= INLINE_CAP);
         let mut inline = Self::empty();
@@ -52,12 +54,14 @@ impl InlineBuf {
     ///
     /// Does not update [`len`](Self::len). The caller sets `len` to cover every
     /// index it has written.
+    #[inline]
     pub(crate) fn write_at(&mut self, at: usize, bytes: &[u8]) {
         let end = at + bytes.len();
         debug_assert!(end <= INLINE_CAP);
         self.data[at..end].write_copy_of_slice(bytes);
     }
 
+    #[inline]
     pub(crate) fn as_bytes(&self) -> &[u8] {
         let len = self.len as usize;
         debug_assert!(len <= INLINE_CAP);
@@ -211,6 +215,7 @@ impl<H> SsoBuf<H> {
         }
     }
 
+    #[inline]
     pub(crate) fn as_bytes<A: Allocator>(&self, is_heap: bool) -> &[u8]
     where
         H: SsoHeap<A>,
