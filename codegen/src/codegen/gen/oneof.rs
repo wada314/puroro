@@ -18,7 +18,7 @@ use super::{
     PURORO_INTERNAL, PURORO_LIB,
 };
 use crate::syn::{
-    parse2, Arm, Attribute, Expr, FieldValue, Ident, ImplItemMethod, Item, ItemImpl, Stmt, Type,
+    parse2, Arm, Attribute, Expr, FieldValue, Ident, ImplItemFn, Item, ItemImpl, Stmt, Type,
 };
 use crate::{FatalErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
@@ -178,7 +178,7 @@ impl Oneof {
         self.gen_oneof_union_type(generic_params.iter().cloned())
     }
 
-    pub(crate) fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
+    pub(crate) fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemFn>> {
         let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
         let field_ident = self.gen_fields_struct_field_ident()?;
         let view_type = self.message()?.gen_view_struct_type()?;
@@ -192,7 +192,7 @@ impl Oneof {
         })?])
     }
 
-    pub(crate) fn gen_view_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
+    pub(crate) fn gen_view_struct_methods(&self) -> Result<Vec<ImplItemFn>> {
         let getter_ident = format_ident!(
             "{}",
             self.name()?.to_lower_snake_case().escape_rust_keywords()

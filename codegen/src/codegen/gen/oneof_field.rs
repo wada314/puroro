@@ -18,7 +18,7 @@ use super::{
     OneofField, PURORO_INTERNAL,
 };
 use crate::syn::{
-    parse2, Attribute, Expr, ExprMethodCall, Field, Ident, ImplItemMethod, Lifetime, NamedField,
+    parse2, Attribute, Expr, ExprMethodCall, Field, Ident, ImplItemFn, Lifetime, NamedField,
     PathSegment, Type,
 };
 use crate::Result;
@@ -178,7 +178,7 @@ impl OneofField {
         ))
     }
 
-    pub(crate) fn gen_oneof_union_methods(&self) -> Result<Vec<ImplItemMethod>> {
+    pub(crate) fn gen_oneof_union_methods(&self) -> Result<Vec<ImplItemFn>> {
         let getter_ident = self.gen_oneof_union_getter_ident()?;
         let getter_opt_ident = self.gen_oneof_union_getter_opt_ident()?;
         let getter_mut_ident = self.gen_oneof_union_getter_mut_ident()?;
@@ -268,7 +268,7 @@ impl OneofField {
         ])
     }
 
-    pub(crate) fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
+    pub(crate) fn gen_message_struct_methods(&self) -> Result<Vec<ImplItemFn>> {
         let oneof_struct_field_ident = self.oneof()?.gen_fields_struct_field_ident()?;
         let getter_mut_ident = self.gen_oneof_union_getter_mut_ident()?;
         let clear_ident = format_ident!("clear_{}", self.name()?.to_lower_snake_case());
@@ -299,7 +299,7 @@ impl OneofField {
         ])
     }
 
-    pub(crate) fn gen_view_struct_methods(&self) -> Result<Vec<ImplItemMethod>> {
+    pub(crate) fn gen_view_struct_methods(&self) -> Result<Vec<ImplItemFn>> {
         let oneof_struct_field_ident = self.oneof()?.gen_fields_struct_field_ident()?;
         let getter_ident = self.gen_oneof_union_getter_ident()?;
         let getter_opt_ident = self.gen_oneof_union_getter_opt_ident()?;
