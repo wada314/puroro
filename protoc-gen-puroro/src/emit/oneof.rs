@@ -3,6 +3,7 @@
 use super::layout::{LayoutAssoc, LayoutAssocKind, LenAccess, MessageApply};
 use super::message::SingularMutStyle;
 use crate::default_value::CustomDefault;
+use crate::descriptor::UnknownFieldsPolicy;
 use crate::error::Result;
 use crate::module_tree::nested_root_alias;
 use ::proc_macro2::{Ident, Span, TokenStream};
@@ -80,14 +81,14 @@ pub(super) fn render_module_and_exports(
     oneof: &OneofEmit,
     bits_ty: &TokenStream,
     lazy_bits_ty: &TokenStream,
-    discard_unknowns: bool,
+    unknown_fields: UnknownFieldsPolicy,
 ) -> Result<Vec<Item>> {
     let mod_name = &oneof.mod_name;
     let shape_name = &oneof.shape_name;
     let case_name = &oneof.case_name;
     let storage_name = &oneof.storage_name;
 
-    let module_body = render_module_body(oneof, bits_ty, lazy_bits_ty, discard_unknowns)?;
+    let module_body = render_module_body(oneof, bits_ty, lazy_bits_ty, unknown_fields)?;
     super::parse::parse_items(quote! {
         mod #mod_name {
             #module_body
@@ -102,7 +103,7 @@ fn render_module_body(
     oneof: &OneofEmit,
     bits_ty: &TokenStream,
     lazy_bits_ty: &TokenStream,
-    discard_unknowns: bool,
+    unknown_fields: UnknownFieldsPolicy,
 ) -> Result<TokenStream> {
     let shape_name = &oneof.shape_name;
     let case_name = &oneof.case_name;
@@ -356,10 +357,16 @@ fn render_module_body(
         })
         .collect();
 
-    let unknown_assoc = if discard_unknowns {
-        quote! { type Unknown = ::puroro_rt::DiscardUnknowns; }
-    } else {
-        quote! { type Unknown = ::puroro_rt::UnknownFields<A>; }
+    let unknown_assoc = match unknown_fields {
+        UnknownFieldsPolicy::Discard => {
+            quote! { type Unknown = ::puroro_rt::DiscardUnknowns; }
+        }
+        UnknownFieldsPolicy::Reject => {
+            quote! { type Unknown = ::puroro_rt::RejectUnknowns; }
+        }
+        UnknownFieldsPolicy::Unspecified | UnknownFieldsPolicy::Preserve => {
+            quote! { type Unknown = ::puroro_rt::UnknownFields<A>; }
+        }
     };
 
     let root_alias = nested_root_alias();

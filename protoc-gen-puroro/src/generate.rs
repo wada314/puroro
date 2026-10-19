@@ -325,6 +325,22 @@ mod tests {
     }
 
     #[test]
+    fn reject_unknowns_bakes_store() {
+        let mut request = empty_request("Strict");
+        request.proto_files[0].messages[0].unknown_fields = UnknownFieldsPolicy::Reject;
+        request.proto_files[0].messages[0].fields = vec![desc::field("n", 1, FieldType::Int32)];
+        let content = generate_lib(&request);
+        assert!(
+            content.contains("RejectUnknowns"),
+            "reject must bake RejectUnknowns: {content}"
+        );
+        assert!(
+            !content.contains("DiscardUnknowns"),
+            "reject must not bake DiscardUnknowns: {content}"
+        );
+    }
+
+    #[test]
     fn heap_bytes_layout_does_not_emit_sso() {
         let mut request = empty_request("HeapBytes");
         request.proto_files[0].messages[0].fields = vec![FieldDesc {

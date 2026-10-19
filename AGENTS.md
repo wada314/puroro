@@ -46,6 +46,10 @@ Fix new fmt/clippy issues. Do not silence lints unless this repo already does fo
 - New submodules use `foo.rs`, not `foo/mod.rs`.
 - In `quote!`, interpolations must be simple `#ident` (bind expressions first).
 
+## Unknown-field reject
+
+`(puroro.unknown_fields) = REJECT` fails decode on an unrecognized field number (`DecodeError::UnrecognizedField`). That is outside the protobuf spec. A conforming parser accepts the tag and preserves the bytes; the default preserve store is that behavior. Do not describe reject as conformant, and do not change it to preserve in order to match the spec. Closed-enum unknowns still divert and, with no store, are dropped. Public wording: [`DESIGN.md` §4.9](DESIGN.md#49-unknown-fields).
+
 ## SSO inline slot
 
 Singular `string` / `bytes` SSO stores `[MaybeUninit<u8>; INLINE_CAP]` plus a length byte. Only that prefix is initialized. Short decode copies the wire bytes once into the prefix, and the first merge writes an absent slot in place. Do not zero the tail or read it as `[u8]`. Layout and merge rules: [`IMPLEMENTATION.md` §17.2](IMPLEMENTATION.md#172-string--bytes-inline-optimisation).

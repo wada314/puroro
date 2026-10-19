@@ -22,7 +22,7 @@ pub(crate) mod value_slot;
 
 pub use crate::decode::{Eager, Lazy};
 pub use crate::fields::wire::wire_or_sso::WireOrSso;
-pub use crate::unknown_fields::{DiscardUnknowns, UnknownFields, UnknownStore};
+pub use crate::unknown_fields::{DiscardUnknowns, RejectUnknowns, UnknownFields, UnknownStore};
 pub use ::unmanaged::DefaultIn;
 pub use field_deallocate::FieldDeallocate;
 pub use field_inspect::{
@@ -219,8 +219,8 @@ pub trait MessageCommonAlloc {
 /// [`ManuallyDrop`], so it never frees itself implicitly; the owning message
 /// releases it via [`deallocate`](Self::deallocate) in its `Drop`.
 ///
-/// `U` selects preserve ([`UnknownFields`], default) or discard
-/// ([`DiscardUnknowns`]).
+/// `U` selects preserve ([`UnknownFields`], default), discard
+/// ([`DiscardUnknowns`]), or reject ([`RejectUnknowns`]).
 ///
 /// `L` is the ingest layout: [`Eager`] (default ZST) or [`Lazy`] (owns
 /// [`LazyScan`](crate::decode::LazyScan)). That is the message-wide ingest
@@ -294,6 +294,14 @@ impl<B, A: Allocator, U: UnknownStore<A>, S> MessageCommon<B, A, U, S> {
     #[inline]
     pub fn unknown_fields_eq(&self, other: &Self) -> bool {
         self.unknown_fields.as_bytes() == other.unknown_fields.as_bytes()
+    }
+
+    /// Unrecognized field number. Reject fails; preserve and discard succeed.
+    ///
+    /// Closed-enum diversion does not use this.
+    #[inline]
+    pub fn on_unrecognized_tag(&self, field_number: u32) -> Result<(), ::puroro::DecodeError> {
+        UnknownStore::on_unrecognized_tag(&*self.unknown_fields, field_number)
     }
 
     /// Releases the unknown-field buffer. Must be called exactly once from the

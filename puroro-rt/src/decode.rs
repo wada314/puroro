@@ -148,7 +148,11 @@ pub fn skip_field_and_save<B: Buf, A: Allocator + Clone>(
     skip_field_and_save_in(field_number, wire_type, buf, unknown_fields, alloc)
 }
 
-/// [`skip_field_and_save`] for any [`UnknownStore`] (preserve or discard).
+/// [`skip_field_and_save`] for any [`UnknownStore`] (preserve, discard, or reject).
+///
+/// Reject consumes a well-formed payload, then returns
+/// [`DecodeError::UnrecognizedField`]. A truncated or illegal payload is that
+/// wire error instead. Closed-enum diversion does not use this function.
 pub fn skip_field_and_save_in<B: Buf, A: Allocator + Clone, U: UnknownStore<A>>(
     field_number: FieldNumber,
     wire_type: WireType,
@@ -156,6 +160,11 @@ pub fn skip_field_and_save_in<B: Buf, A: Allocator + Clone, U: UnknownStore<A>>(
     unknown_fields: &mut U,
     alloc: A,
 ) -> Result<(), DecodeError> {
+    let rejected = unknown_fields.on_unrecognized_tag(field_number.as_u32());
+    if rejected.is_err() {
+        skip_field(wire_type, buf)?;
+        return rejected;
+    }
     let Some(blob) = unknown_fields.append_blob_mut(alloc.clone()) else {
         return skip_field(wire_type, buf);
     };

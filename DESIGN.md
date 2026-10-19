@@ -74,7 +74,7 @@ The puroro project comprises several crates and tools with distinct roles:
 
 ## 1. Goals
 
-- **Protobuf spec compliance.** Support the canonical wire format (varints, I32, I64, LEN records, packed repeated, oneofs, unknown fields) for proto2, proto3, and editions. Deprecated group wire types (`SGroup` / `EGroup`) are never generated; the decoder does not preserve them (see [§0](#0-project-architecture)).
+- **Protobuf spec compliance.** Support the canonical wire format (varints, I32, I64, LEN records, packed repeated, oneofs, unknown fields) for proto2, proto3, and editions. The compliant unknown-field behavior is preserve-and-round-trip. Opt-in `DISCARD` and `REJECT` leave that rule ([§4.9](#49-unknown-fields)). Deprecated group wire types (`SGroup` / `EGroup`) are never generated; the decoder does not preserve them (see [§0](#0-project-architecture)).
 - **Allocator support.** Every generated message is generic over `A: Allocator + Clone` using the `allocator-api2` crate ([why `Clone` is on the struct](#why-a-clone-is-a-struct-bound)). Arena allocators (e.g. `bumpalo`) and custom pools are first-class citizens.
 - **Performance-oriented interface.** Accessors return borrowed references (`&str`, `&[u8]`, `&[T]`), never freshly allocated containers. The `encode_to_vec` / `encode_to_bytes` convenience methods allocate; `Message::encode` writes into a caller-owned buffer. Wire-body sizing / writing (`encoded_len` / `encode_raw` with `EncodeCtx`) lives on `puroro_rt::MessageEncode`, not on `Message`.
 - **Rust idioms.** Private fields accessed via generated accessor methods; `Optional<T, impl HasDefault<T>>` for explicit-presence scalar, string, and enum fields; singular nested messages return `Option<&M>` / `&mut M` (inlined children are a full `M` with their own `MessageCommon`); no `unsafe` in user-visible APIs.
@@ -939,15 +939,22 @@ This shape is the **common public contract**: it does not require contiguous wir
 
 `Message::unknown_fields()` stays the self-blob iterator. An inlined child is a full `M`, so unknowns recorded while merging that child live on the child’s own store and re-encode **inside the child’s LEN**. `clear_*` / oneof switch / Drop of an inlined slot drops that child (and its unknowns).
 
-**Policies:** [`UnknownStore`](puroro-rt/src/unknown_fields.rs) is the third type parameter on [`MessageCommon`](puroro-rt/src/fields/shared.rs) (`U = UnknownFields<A>` by default). [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs) is a ZST: decode still consumes unrecognized payloads; the iterator is empty; encode emits nothing. Public messages stay `Foo<A>` — the store is **baked** into that type (`MessageCommon<Bits, A>` or `MessageCommon<Bits, A, DiscardUnknowns>`), so impls are `impl<A> Foo<A>` with no `U:` bound. Sample [`Point`](sample-generated/src/point_type.rs) preserves; sample [`Marker`](sample-generated/src/marker_type.rs) bakes discard.
+**Policies:** [`UnknownStore`](puroro-rt/src/unknown_fields.rs) is the third type parameter on [`MessageCommon`](puroro-rt/src/fields/shared.rs) (`U = UnknownFields<A>` by default). [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs) is a ZST: decode still consumes unrecognized payloads; the iterator is empty; encode emits nothing. [`RejectUnknowns`](puroro-rt/src/unknown_fields.rs) is a ZST: a well-formed unrecognized tag fails decode with [`DecodeError::UnrecognizedField`](src/error.rs); the iterator is empty; encode emits nothing. A truncated payload is that wire error, not `UnrecognizedField`. Public messages stay `Foo<A>` — the store is **baked** into that type (`MessageCommon<Bits, A>`, `MessageCommon<Bits, A, DiscardUnknowns>`, or `MessageCommon<Bits, A, RejectUnknowns>`), so impls are `impl<A> Foo<A>` with no `U:` bound. Sample [`Point`](sample-generated/src/point_type.rs) preserves; sample [`Marker`](sample-generated/src/marker_type.rs) bakes discard.
 
-Codegen: [`(puroro.unknown_fields)`](proto/puroro/options.proto) on `google.protobuf.MessageOptions` (`UNSPECIFIED` / `PRESERVE` / `DISCARD`, field 51403). Unspecified and Preserve emit the default store; Discard bakes `DiscardUnknowns`. A parent discard does not change a child’s store.
+Closed-enum unknowns are not unrecognized tags. They still take the divert path (`save_unknown_varint_field`). On a ZST store that path drops the value and decode succeeds; the field reads as unset and the value is not re-encoded.
+
+Codegen: [`(puroro.unknown_fields)`](proto/puroro/options.proto) on `google.protobuf.MessageOptions` (`UNSPECIFIED` / `PRESERVE` / `DISCARD` / `REJECT`, field 51403). Unspecified and Preserve emit the default store; Discard bakes `DiscardUnknowns`; Reject bakes `RejectUnknowns`. A parent policy does not change a child’s store. The lazy alias calls the same reject check while scanning; preserve and discard still leave unknown tags in the ingested wire until `into_eager`.
 
 | Policy | Behaviour |
 |---|---|
-| **Preserve** (default) | Keep unknowns for round-trip; expose via the iterator |
-| **Discard** | Opt-in store type; omit the buffer; iterator is empty. Spec prefers preserve; discard is a deliberate size/privacy trade-off |
-| **Custom** | Later hook / additional `UnknownStore` impl (not reject-on-decode; see [§8.2](#other-future-work)) |
+| **Preserve** (default) | Spec behavior. Keep unknowns for round-trip; expose via the iterator |
+| **Discard** | Accept the message and drop the bytes. Outside the current preservation rule |
+| **Reject** | Fail decode. Outside the protobuf spec. Closed-enum unknowns stay on the divert path |
+| **Custom** | Later hook / additional `UnknownStore` impl |
+
+**Outside the spec.** The language guides require a parser to accept a field number it does not know and to write those bytes back on the next serialization ([proto3: Updating A Message Type](https://protobuf.dev/programming-guides/proto3/#updating), and the same section in the [proto2 guide](https://protobuf.dev/programming-guides/proto2/#updating)). Early proto3 dropped unknown fields; preservation has been the rule again since proto3.5, and Editions did not add a reject feature. The wire format carries a wire type so an old parser can skip a new field. `PRESERVE` is that behavior.
+
+`DISCARD` still accepts the message. It only omits the bytes. `REJECT` does not accept the message: a well-formed unrecognized tag is `DecodeError::UnrecognizedField`. No protobuf syntax, Edition feature, or conformance case defines that failure. It is a puroro option for a closed schema, and a message that uses it is not a conforming parser of the wire format. Closed-enum unknowns stay on the spec's "do not fail the parse" path. With no store, that value is dropped, so a `REJECT` message does not preserve them either.
 
 ---
 
@@ -1370,7 +1377,7 @@ Generic code that only reads fields is meant to use `task::MessageFallible` with
 ### Other future work
 
 - **Unknown-field preservation opt-out.** `(puroro.unknown_fields) = DISCARD` bakes [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs) on the eager alias. File-level / package default is not wired. The lazy alias's `unknown_fields()` iterator is empty either way; unknown tags stay in the ingested wire until `into_eager`.
-- **Unknown-field reject-on-decode.** Possible later option (e.g. `REJECT`) that returns `DecodeError` on an unrecognized tag. This is decode control flow, not a third store — `UnknownStore` would need a `Result` path. Preserve + `unknown_fields().next().is_none()` covers post-decode checks. A baked ZST reject is only warranted for “no store word **and** fail”. Closed-enum unknowns stay a separate decision (default: still divert; do not treat as a bad tag). Parent / child independent, same as Discard.
+- **Unknown-field reject-on-decode.** Shipped as `(puroro.unknown_fields) = REJECT` ([§4.9](#49-unknown-fields)). This failure is outside the protobuf spec. File-level / package default is not wired, same as Discard.
 - **Service / RPC definitions.** Out of scope for the runtime library.
 - **Well-known types.** `google.protobuf.Timestamp`, `Duration`, `Any`, etc.
 - **Reflection / descriptors.** Runtime introspection of message schema.

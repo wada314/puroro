@@ -80,7 +80,7 @@ pub struct Message<'a> {
     oneofs: Vec<Oneof>,
     /// Synthetic map entry (`MessageOptions.map_entry = true`).
     map_entry: bool,
-    /// `(puroro.unknown_fields)` — Discard bakes `DiscardUnknowns`.
+    /// `(puroro.unknown_fields)` — Discard / Reject bake a ZST store.
     unknown_fields: UnknownFieldsPolicy,
     /// `(puroro.child_parse)` on this message. Default for its fields.
     child_parse: ChildParse,
@@ -234,9 +234,9 @@ impl<'a> Message<'a> {
         self.map_entry
     }
 
-    /// Whether generated code should bake `DiscardUnknowns`.
-    pub fn discard_unknowns(&self) -> bool {
-        self.unknown_fields.discard()
+    /// `(puroro.unknown_fields)` (`Unspecified` if absent).
+    pub fn unknown_fields(&self) -> UnknownFieldsPolicy {
+        self.unknown_fields
     }
 
     /// `(puroro.child_parse)` on this message (`Unspecified` if absent).

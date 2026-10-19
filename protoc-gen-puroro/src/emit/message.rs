@@ -11,6 +11,7 @@ use super::layout::{self, LayoutAssoc, LayoutAssocKind, LenAccess, MessageApply}
 use super::oneof::{self, OneofEmit, OneofVariantEmit};
 use super::type_path::{fqn_to_enum_root_path, fqn_to_message_lazy_path, fqn_to_message_root_path};
 use crate::default_value::CustomDefault;
+use crate::descriptor::UnknownFieldsPolicy;
 use crate::descriptor::features::EnumType;
 use crate::error::{Error, Result};
 use crate::field_kind::{
@@ -253,11 +254,7 @@ pub(super) fn render_items(
     } else {
         bits_ty.clone()
     };
-    let unknown_ty = if field_plan.discard_unknowns() {
-        quote! { ::puroro_rt::DiscardUnknowns }
-    } else {
-        quote! { ::puroro_rt::UnknownFields<A> }
-    };
+    let unknown_ty = unknown_store_ty(field_plan.unknown_fields());
     // Struct is generic over `L`. Eager inherent methods monomorphize `L = Eager`.
     let struct_common = quote! {
         ::puroro_rt::MessageCommon<<L as #companion::Layout<A>>::Bits, A, #unknown_ty, L>
@@ -291,7 +288,7 @@ pub(super) fn render_items(
         &fields,
         &bits_ty,
         &lazy_bits_ty,
-        field_plan.discard_unknowns(),
+        field_plan.unknown_fields(),
     )?;
     let layout_assocs = collect_layout_assocs(&fields);
     let layout_items =
@@ -1425,7 +1422,7 @@ fn render_oneof_modules(
     fields: &[FieldEmit],
     bits_ty: &TokenStream,
     lazy_bits_ty: &TokenStream,
-    discard_unknowns: bool,
+    unknown_fields: UnknownFieldsPolicy,
 ) -> Result<Vec<Item>> {
     let mut out = Vec::new();
     for field in fields {
@@ -1434,11 +1431,21 @@ fn render_oneof_modules(
                 o,
                 bits_ty,
                 lazy_bits_ty,
-                discard_unknowns,
+                unknown_fields,
             )?);
         }
     }
     Ok(out)
+}
+
+fn unknown_store_ty(policy: UnknownFieldsPolicy) -> TokenStream {
+    match policy {
+        UnknownFieldsPolicy::Discard => quote! { ::puroro_rt::DiscardUnknowns },
+        UnknownFieldsPolicy::Reject => quote! { ::puroro_rt::RejectUnknowns },
+        UnknownFieldsPolicy::Unspecified | UnknownFieldsPolicy::Preserve => {
+            quote! { ::puroro_rt::UnknownFields<A> }
+        }
+    }
 }
 
 fn wire_marker_path(wire: &WireTypeKind<'_>) -> Result<Type> {

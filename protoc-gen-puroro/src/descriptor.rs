@@ -227,6 +227,9 @@ pub const UNKNOWN_FIELDS_OPTION_NUMBER: u32 = 51403;
 /// [`Unspecified`](Self::Unspecified) (and an absent option) preserves
 /// unrecognized tags. [`Preserve`](Self::Preserve) pins that.
 /// [`Discard`](Self::Discard) emits `MessageCommon<…, DiscardUnknowns>`.
+/// [`Reject`](Self::Reject) emits `MessageCommon<…, RejectUnknowns>`.
+/// Reject is outside the protobuf spec: a conforming parser preserves
+/// unknown field numbers instead of failing decode.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, TryFrom)]
 #[try_from(repr)]
 #[repr(i32)]
@@ -235,12 +238,18 @@ pub enum UnknownFieldsPolicy {
     Unspecified = 0,
     Preserve = 1,
     Discard = 2,
+    Reject = 3,
 }
 
 impl UnknownFieldsPolicy {
     /// Whether generated code should bake `DiscardUnknowns`.
     pub fn discard(self) -> bool {
         matches!(self, Self::Discard)
+    }
+
+    /// Whether generated code should bake `RejectUnknowns`.
+    pub fn reject(self) -> bool {
+        matches!(self, Self::Reject)
     }
 }
 

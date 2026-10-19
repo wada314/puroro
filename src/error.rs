@@ -5,6 +5,8 @@
 //! ([`DecodeError::MissingRequiredField`]). Closed-enum unknowns use
 //! [`DecodeError::UnknownClosedEnum`] internally and are diverted into the
 //! message unknown-field set rather than aborting `merge_from`.
+//! [`DecodeError::UnrecognizedField`] aborts `merge_from` when the message
+//! bakes the reject policy.
 //!
 //! Encoding into a growing `Vec` / `BytesMut` is infallible, so there is no
 //! public encode error type.
@@ -54,6 +56,18 @@ pub enum DecodeError {
         /// Raw varint numeric value as read from the wire (for unknown-field round-trip).
         raw: u64,
     },
+    /// An unrecognized field number on a message that rejects unknown tags.
+    ///
+    /// Produced only by puroro's `(puroro.unknown_fields) = REJECT` policy.
+    /// The protobuf spec does not define this failure: a conforming parser
+    /// accepts an unknown field number and preserves it. Preserve and discard
+    /// do not return this variant. Closed-enum unknowns are diverted instead.
+    /// A truncated or otherwise illegal payload is reported as that wire
+    /// error, not as an unrecognized field.
+    UnrecognizedField {
+        /// Field number from the tag.
+        field_number: u32,
+    },
 }
 
 impl fmt::Display for DecodeError {
@@ -73,6 +87,9 @@ impl fmt::Display for DecodeError {
             }
             DecodeError::UnknownClosedEnum { raw } => {
                 write!(f, "closed enum value {raw} is not in the known set")
+            }
+            DecodeError::UnrecognizedField { field_number } => {
+                write!(f, "unrecognized field {field_number}")
             }
         }
     }

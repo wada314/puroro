@@ -39,17 +39,25 @@ enum MessageLayout {
   MESSAGE_LAYOUT_BOXED = 2;
 }
 
-// Unknown-field store for a generated message.
+// Unknown-field policy for a generated message.
 //
-// Unset and `UNKNOWN_FIELDS_UNSPECIFIED` preserve unrecognized tags (default
-// `UnknownFields` blob). `UNKNOWN_FIELDS_PRESERVE` pins that. `UNKNOWN_FIELDS_DISCARD`
-// bakes `DiscardUnknowns` into the message type (ZST; decode consumes, encode
-// omits). Nested children keep their own option; a parent discard does not
-// discard a child's unknowns.
+// The protobuf spec accepts an unknown field number and preserves it
+// (proto2, proto3 since 3.5, Editions). Unset, `UNKNOWN_FIELDS_UNSPECIFIED`,
+// and `UNKNOWN_FIELDS_PRESERVE` do that (`UnknownFields` blob).
+//
+// `UNKNOWN_FIELDS_DISCARD` and `UNKNOWN_FIELDS_REJECT` are puroro options,
+// not protobuf features. Discard still accepts the message and drops the
+// bytes. Reject bakes `RejectUnknowns` and fails decode with
+// `UnrecognizedField`. A conforming parser must not do that. Closed-enum
+// unknowns are not unrecognized tags: they still take the divert path, which
+// retains nothing when the store is a ZST.
+// Nested children keep their own option; a parent policy does not apply to a
+// child's unknowns.
 enum UnknownFieldsPolicy {
   UNKNOWN_FIELDS_UNSPECIFIED = 0;
   UNKNOWN_FIELDS_PRESERVE = 1;
   UNKNOWN_FIELDS_DISCARD = 2;
+  UNKNOWN_FIELDS_REJECT = 3;
 }
 
 // Whether a nested message is stored eager or lazy.

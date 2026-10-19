@@ -942,6 +942,25 @@ mod tests {
             decoded.proto_files[0].messages[0].unknown_fields,
             UnknownFieldsPolicy::Discard
         );
+
+        let reject = encode_varint_field(
+            UNKNOWN_FIELDS_OPTION_NUMBER,
+            UnknownFieldsPolicy::Reject as i32,
+        );
+        let mut reject_message = Vec::new();
+        reject_message.extend(encode_string_field(1, "R"));
+        reject_message.extend(encode_message_field(7, &reject));
+        let mut reject_file = Vec::new();
+        reject_file.extend(encode_string_field(1, "t.proto"));
+        reject_file.extend(encode_message_field(4, &reject_message));
+        let mut reject_request = Vec::new();
+        reject_request.extend(encode_string_field(1, "t.proto"));
+        reject_request.extend(encode_message_field(15, &reject_file));
+        let decoded = decode_request(&reject_request).unwrap();
+        assert_eq!(
+            decoded.proto_files[0].messages[0].unknown_fields,
+            UnknownFieldsPolicy::Reject
+        );
     }
 
     #[test]
