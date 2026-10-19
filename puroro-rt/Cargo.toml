@@ -1,0 +1,19 @@
+[package]
+name = "puroro-rt"
+version = "0.1.0"
+edition = "2024"
+description = "Runtime implementation for puroro-generated protobuf code (not for direct use)"
+publish = false
+
+[lints]
+workspace = true
+
+[dependencies]
+allocator-api2 = "0.2"
+bitvec = "1"
+bytes = "1"
+derive_more = { version = "2.1", default-features = false, features = ["deref", "deref_mut", "from", "into"] }
+hashbrown = "0.17"
+protobuf-core = { path = "../protobuf-core" }
+puroro = { path = ".." }
+unmanaged = { path = "../unmanaged" }

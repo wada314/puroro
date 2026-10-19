@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package demo;
+
+message Address {
+  optional string street = 1;
+}
+
+message Task {
+  Address assignee = 1;
+}

@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+enum Kind {
+  KIND_UNSPECIFIED = 0;
+  KIND_A = 1;
+}
+
+message Peer {
+  optional string name = 1;
+}
+
+message Holder {
+  oneof choice {
+    string email = 1;
+    int32 code = 2;
+    bool urgent = 3;
+    Peer peer = 4;
+    Kind kind = 5;
+    bytes blob = 6;
+  }
+  oneof alt {
+    string note = 7;
+    int32 rank = 8;
+  }
+}

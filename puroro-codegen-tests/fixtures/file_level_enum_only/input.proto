@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package demo;
+
+// File-level enum with no messages in the file.
+enum Color {
+  COLOR_UNSPECIFIED = 0;
+  COLOR_RED = 1;
+  COLOR_GREEN = 2;
+}

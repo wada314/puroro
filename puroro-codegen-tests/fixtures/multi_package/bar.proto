@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package pkg.b;
+
+import "foo.proto";
+
+message Bar {
+  pkg.a.Foo foo = 1;
+}

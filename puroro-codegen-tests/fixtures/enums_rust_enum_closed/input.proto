@@ -1,0 +1,17 @@
+edition = "2023";
+
+package demo;
+
+import "puroro/options.proto";
+
+enum Priority {
+  option features.enum_type = CLOSED;
+  option (puroro.enum_repr) = ENUM_REPR_RUST_ENUM;
+  PRIORITY_UNSPECIFIED = 0;
+  PRIORITY_LOW = 1;
+  PRIORITY_HIGH = 2;
+}
+
+message Holder {
+  Priority priority = 1;
+}

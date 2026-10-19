@@ -1,0 +1,325 @@
+//! Wire-format decoding helpers used by generated field types.
+//!
+//! Varint decoding is pluggable via [`VarintDecoder`]. [`decode_varint`] uses
+//! [`ChunkScanHot4`]; [`decode_tag`] uses [`decode_varint_with`] with
+//! [`ChunkScanLikely1`]. Tags are unpacked here into a validated [`FieldNumber`]
+//! plus [`WireType`].
+
+mod lazy_scan;
+mod record;
+mod shared_wire;
+mod varint;
+
+pub use self::lazy_scan::{Eager, Lazy, LazyMessage, LazyScan, MessageScan};
+pub use self::record::{
+    RecordScanner, ScannedRecord, ScannedValue, WireSpan, merge_scanned_field, scanned_len_payload,
+    scanned_len_span,
+};
+pub use self::shared_wire::SharedWire;
+pub use self::varint::{
+    ByteIterator, BytePair, ByteQuad, ChunkScan, ChunkScan1, ChunkScan2, ChunkScan4, ChunkScanHot2,
+    ChunkScanHot4, ChunkScanHot8, ChunkScanHot10, ChunkScanHotAdapt, ChunkScanLikely1,
+    ChunkScanMsb, VarintDecoder,
+};
+
+use ::allocator_api2::alloc::Allocator;
+use ::bytes::Buf;
+use ::protobuf_core::{FieldNumber, Varint};
+use ::puroro::wire_type;
+use ::puroro::{DecodeError, UnknownField, UnknownPayload, WireType};
+use ::unmanaged::{UnmanagedString, UnmanagedVec};
+
+use crate::unknown_fields::{UnknownFields, UnknownStore};
+
+use crate::encode;
+
+/// Decodes a base-128 varint from `buf` with [`ChunkScanHot4`].
+#[inline]
+pub fn decode_varint<B: Buf>(buf: &mut B) -> Result<u64, DecodeError> {
+    decode_varint_with::<ChunkScanHot4, _>(buf)
+}
+
+/// Decodes a base-128 varint from `buf` using algorithm `D`.
+///
+/// Prefer [`decode_varint`] for ordinary values; use this when a different
+/// decoder is appropriate (e.g. tags via [`ChunkScanLikely1`]).
+#[inline]
+pub fn decode_varint_with<D: VarintDecoder, B: Buf>(buf: &mut B) -> Result<u64, DecodeError> {
+    D::decode_varint(buf)
+}
+
+/// Decodes a tag and returns `(field_number, wire_type)`.
+///
+/// Uses [`ChunkScanLikely1`] for the tag varint (mostly 1-byte field numbers).
+/// Field-number range is validated via [`FieldNumber::try_new`]; wire type via
+/// [`wire_type::from_raw`]. Does not build a [`protobuf_core::Tag`] intermediate.
+#[inline]
+pub fn decode_tag<B: Buf>(buf: &mut B) -> Result<(FieldNumber, WireType), DecodeError> {
+    let raw = decode_varint_with::<ChunkScanLikely1, _>(buf)?;
+    // Tag values are u32 on the wire; preserve the previous InvalidVarint mapping
+    // used when going through `Varint::try_to_uint32`.
+    if raw > u64::from(u32::MAX) {
+        return Err(DecodeError::InvalidVarint);
+    }
+    let raw = raw as u32;
+    let field_number = FieldNumber::try_new(raw >> 3).map_err(|_| DecodeError::InvalidTag)?;
+    let wire_type = wire_type::from_raw((raw & 0b111) as u8)?;
+    Ok((field_number, wire_type))
+}
+
+/// Decodes one LEN payload into an [`UnmanagedVec<u8, A>`].
+pub(crate) fn decode_bytes_in<B: Buf, A: Allocator>(
+    buf: &mut B,
+    alloc: A,
+) -> Result<UnmanagedVec<u8, A>, DecodeError> {
+    use crate::fields::wire::wire_payload::LenPayload;
+
+    Ok(LenPayload::decode_in(WireType::Len, buf, alloc)?.into_vec())
+}
+
+/// Decodes one LEN payload as UTF-8 into an [`UnmanagedString<A>`].
+///
+/// Invalid UTF-8 returns [`DecodeError::InvalidUtf8`]. Used for
+/// `utf8_validation=VERIFY` (`ProtoString`). `NONE` strings decode as bytes.
+pub(crate) fn decode_string_in<B: Buf, A: Allocator + Clone>(
+    buf: &mut B,
+    alloc: A,
+) -> Result<UnmanagedString<A>, DecodeError> {
+    use crate::fields::wire::wire_payload::LenPayload;
+
+    let payload = LenPayload::decode_in(WireType::Len, buf, alloc.clone())?;
+    let bytes = payload.into_vec();
+    match UnmanagedString::from_utf8(bytes) {
+        Ok(s) => Ok(s),
+        Err(bytes) => {
+            // SAFETY: `alloc` owns the buffer produced by `decode_in`.
+            unsafe { bytes.deallocate(&alloc) };
+            Err(DecodeError::InvalidUtf8)
+        }
+    }
+}
+
+/// Skips one field payload for `wire_type` without preserving unknowns.
+///
+/// Used for map-entry interiors (and similar ephemeral messages) where unknown
+/// fields are not round-tripped.
+pub(crate) fn skip_field<B: Buf>(wire_type: WireType, buf: &mut B) -> Result<(), DecodeError> {
+    match wire_type {
+        WireType::Varint => {
+            decode_varint(buf)?;
+        }
+        WireType::Int64 => {
+            if buf.remaining() < 8 {
+                return Err(DecodeError::UnexpectedEof);
+            }
+            buf.advance(8);
+        }
+        WireType::Len => {
+            let len = decode_varint(buf)? as usize;
+            if buf.remaining() < len {
+                return Err(DecodeError::TruncatedMessage);
+            }
+            buf.advance(len);
+        }
+        WireType::Int32 => {
+            if buf.remaining() < 4 {
+                return Err(DecodeError::UnexpectedEof);
+            }
+            buf.advance(4);
+        }
+        WireType::SGroup | WireType::EGroup => {
+            return Err(DecodeError::InvalidTag);
+        }
+    }
+    Ok(())
+}
+
+/// Skips one field payload and appends its tag + wire bytes to a preserve store.
+///
+/// Used by message `merge` unknown arms. Discard messages call
+/// [`skip_field_and_save_in`] instead.
+pub fn skip_field_and_save<B: Buf, A: Allocator + Clone>(
+    field_number: FieldNumber,
+    wire_type: WireType,
+    buf: &mut B,
+    unknown_fields: &mut UnknownFields<A>,
+    alloc: A,
+) -> Result<(), DecodeError> {
+    skip_field_and_save_in(field_number, wire_type, buf, unknown_fields, alloc)
+}
+
+/// [`skip_field_and_save`] for any [`UnknownStore`] (preserve, discard, or reject).
+///
+/// Reject consumes a well-formed payload, then returns
+/// [`DecodeError::UnrecognizedField`]. A truncated or illegal payload is that
+/// wire error instead. Closed-enum diversion does not use this function.
+pub fn skip_field_and_save_in<B: Buf, A: Allocator + Clone, U: UnknownStore<A>>(
+    field_number: FieldNumber,
+    wire_type: WireType,
+    buf: &mut B,
+    unknown_fields: &mut U,
+    alloc: A,
+) -> Result<(), DecodeError> {
+    let rejected = unknown_fields.on_unrecognized_tag(field_number.as_u32());
+    if rejected.is_err() {
+        skip_field(wire_type, buf)?;
+        return rejected;
+    }
+    let Some(blob) = unknown_fields.append_blob_mut(alloc.clone()) else {
+        return skip_field(wire_type, buf);
+    };
+    // SAFETY: the owned `alloc` (an `alloc.clone()` from the caller) is
+    // interchangeable with the allocator that owns this vector's buffer.
+    let mut g = unsafe { blob.with_alloc(alloc) };
+    encode::write_tag_to_vec(field_number, wire_type, &mut *g);
+
+    match wire_type {
+        WireType::Varint => {
+            let v = decode_varint(buf)?;
+            encode::write_varint_to_vec(Varint::from_uint64(v), &mut *g);
+        }
+        WireType::Int64 => {
+            if buf.remaining() < 8 {
+                return Err(DecodeError::UnexpectedEof);
+            }
+            let bytes = buf.copy_to_bytes(8);
+            g.extend_from_slice(&bytes);
+        }
+        WireType::Len => {
+            let len = decode_varint(buf)?;
+            if buf.remaining() < len as usize {
+                return Err(DecodeError::TruncatedMessage);
+            }
+            encode::write_varint_to_vec(Varint::from_uint64(len), &mut *g);
+            let bytes = buf.copy_to_bytes(len as usize);
+            g.extend_from_slice(&bytes);
+        }
+        WireType::Int32 => {
+            if buf.remaining() < 4 {
+                return Err(DecodeError::UnexpectedEof);
+            }
+            let bytes = buf.copy_to_bytes(4);
+            g.extend_from_slice(&bytes);
+        }
+        WireType::SGroup | WireType::EGroup => {
+            return Err(DecodeError::InvalidTag);
+        }
+    }
+    Ok(())
+}
+
+pub(crate) fn save_unknown_varint_field<A: Allocator + Clone, U: UnknownStore<A>>(
+    field_number: FieldNumber,
+    value: u64,
+    unknown_fields: &mut U,
+    alloc: A,
+) {
+    let Some(blob) = unknown_fields.append_blob_mut(alloc.clone()) else {
+        return;
+    };
+    // SAFETY: the owned `alloc` (an `alloc.clone()` from the caller) is
+    // interchangeable with the allocator that owns this vector's buffer.
+    let mut g = unsafe { blob.with_alloc(alloc) };
+    encode::write_tag_to_vec(field_number, WireType::Varint, &mut *g);
+    encode::write_varint_to_vec(Varint::from_uint64(value), &mut *g);
+}
+
+/// Iterates unknown fields stored as a contiguous partial protobuf stream.
+///
+/// The buffer is expected to be written only by [`skip_field_and_save`] and
+/// [`save_unknown_varint_field`]. On truncated or otherwise corrupt input the
+/// iterator ends (infallible for callers).
+#[inline]
+pub fn iter_unknown_fields(bytes: &[u8]) -> UnknownFieldsIter<'_> {
+    UnknownFieldsIter { rest: bytes }
+}
+
+/// Iterator over [`UnknownField`] values parsed from a preserved unknown-fields
+/// wire blob.
+#[derive(Debug, Clone)]
+pub struct UnknownFieldsIter<'a> {
+    rest: &'a [u8],
+}
+
+impl<'a> Iterator for UnknownFieldsIter<'a> {
+    type Item = UnknownField<'a>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.rest.is_empty() {
+            return None;
+        }
+
+        let mut buf = self.rest;
+        let (number, wire_type) = match decode_tag(&mut buf) {
+            Ok(t) => t,
+            Err(_) => {
+                debug_assert!(false, "corrupt unknown-fields blob: bad tag");
+                self.rest = &[];
+                return None;
+            }
+        };
+        let number = number.as_u32();
+
+        let payload = match wire_type {
+            WireType::Varint => {
+                let v = match decode_varint(&mut buf) {
+                    Ok(v) => v,
+                    Err(_) => {
+                        debug_assert!(false, "corrupt unknown-fields blob: bad varint");
+                        self.rest = &[];
+                        return None;
+                    }
+                };
+                UnknownPayload::Varint(v)
+            }
+            WireType::Int64 => {
+                if buf.len() < 8 {
+                    debug_assert!(false, "corrupt unknown-fields blob: truncated I64");
+                    self.rest = &[];
+                    return None;
+                }
+                let mut le = [0u8; 8];
+                le.copy_from_slice(&buf[..8]);
+                buf = &buf[8..];
+                UnknownPayload::Fixed64(u64::from_le_bytes(le))
+            }
+            WireType::Len => {
+                let len = match decode_varint(&mut buf) {
+                    Ok(v) => v as usize,
+                    Err(_) => {
+                        debug_assert!(false, "corrupt unknown-fields blob: bad LEN length");
+                        self.rest = &[];
+                        return None;
+                    }
+                };
+                if buf.len() < len {
+                    debug_assert!(false, "corrupt unknown-fields blob: truncated LEN");
+                    self.rest = &[];
+                    return None;
+                }
+                let payload = &buf[..len];
+                buf = &buf[len..];
+                UnknownPayload::Bytes(payload)
+            }
+            WireType::Int32 => {
+                if buf.len() < 4 {
+                    debug_assert!(false, "corrupt unknown-fields blob: truncated I32");
+                    self.rest = &[];
+                    return None;
+                }
+                let mut le = [0u8; 4];
+                le.copy_from_slice(&buf[..4]);
+                buf = &buf[4..];
+                UnknownPayload::Fixed32(u32::from_le_bytes(le))
+            }
+            WireType::SGroup | WireType::EGroup => {
+                debug_assert!(false, "groups are not preserved in unknown fields");
+                self.rest = &[];
+                return None;
+            }
+        };
+
+        self.rest = buf;
+        Some(UnknownField::new(number, payload))
+    }
+}

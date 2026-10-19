@@ -1,0 +1,84 @@
+---
+description: Rust name resolution and clippy::absolute_paths fix strategy
+globs: "**/*.rs"
+alwaysApply: false
+---
+
+# Rust name resolution
+
+
+## What names to import
+
+- Basically, import the module-level items; e.g. types, traits, constants
+- If you think the identifier you are going to import is too generic, import its module name instead
+
+```rust
+// GOOD - importing the names under the module
+use ::std::ops::{Add, Range};
+
+// BAD - importing the names under enum
+use ::std::borrow::Cow::Borrowed;
+
+// GOOD - using `take` with its module name to clarify which `take` we are using
+use ::std::mem;
+mem::take(...);
+
+// BAD - `take` is too generic name to import
+use ::std::mem::take;
+```
+
+## Path roots in `use`
+
+- Current crate: `crate::...` or `self::...`
+- Anything else (std/core/alloc, deps, other workspace crates): must start with `::`
+
+```rust
+// GOOD
+use crate::fields::wire::ProtoType;
+use ::core::mem::ManuallyDrop;
+use ::bytes::{Buf, BufMut};
+use ::puroro::DecodeError;
+use ::std::mem;
+
+// BAD — missing `::` for an external crate
+use bytes::Buf;
+use std::io::Read;
+```
+
+## Name `Result`
+
+The name `Result` is a little special because typically a library defines its own `Result` type.
+So here's the rule:
+
+1. If the currently working crate is defining its own `Result` type, then *no other `Result` name should be imported without aliasing*. Otherwise you can import a single `Result` type per file.
+2. You can, though, import any `Result` type freely if you alias it.
+3. When you want to alias other crate's name `Result`, prefix it by a short name of the module or crate. e.g. `::std::result::Result` can be aliased to `StdResult`.
+
+## When `clippy::absolute_paths` fires
+
+1. Decide what name you want to use instead. It might be a bare Identifier (`Deref`), or a name with its module name (`ops::Deref`).
+2. Add a `use` with the correct root (`crate::` / `self::` / `::...`) which is needed for your name.
+3. Replace the inline path with the new name.
+4. Do not silence the lint unless:
+  1. the code is machine-generated and intentionally excluded from workspace lints.
+  2. you are confident that the identifier is confusing even if the module name is appended.
+
+```rust
+// BAD — inline absolute path
+fn open() -> ::std::io::Result<::std::fs::File> {
+    ::std::fs::File::open("data.bin")
+}
+
+// GOOD
+use ::std::fs::File;
+use ::std::io::Result;
+
+fn open() -> Result<File> {
+    File::open("data.bin")
+}
+```
+
+## Exceptions
+
+- Macro-generated code may keep absolute paths; Clippy already skips many macro expansions.
+- Doc examples should still follow the same `use` / `::` style when they are project-owned.

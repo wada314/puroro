@@ -1,0 +1,7 @@
+edition = "2023";
+
+package demo;
+
+message ExpandedIds {
+  repeated int32 ids = 1 [features.repeated_field_encoding = EXPANDED];
+}
