@@ -1329,7 +1329,7 @@ Eager and lazy are not a runtime enum inside `Task`. Slots that must differ (str
 | Kind | During the scan | On the getter |
 |---|---|---|
 | Singular numerical / enum / bool | Catalog `merge_scanned` from `ScannedValue` (last wins) | Already materialised |
-| Repeated numerical, packed or expanded | Expanded: `merge_scanned` from `ScannedValue`; packed LEN: catalog merge of the island body | `&[T]` |
+| Repeated numerical, packed or expanded | Expanded: `merge_scanned` from `ScannedValue`; packed LEN: `len_span` + `merge_packed_buf` | `&[T]` |
 | Singular / oneof string / bytes | Store a span (`WireOrSso`) | Semantic decode. `InvalidUtf8` is `Err` before `Optional` is built. A later get does not re-validate. `has_*` is presence only |
 | Nested message | Merge each LEN into the child | `Option<&Child>` |
 | Repeated message | One child per occurrence | `&[Child]` |

@@ -18,7 +18,7 @@ Instructions for coding agents working in this repository. Human-oriented docs s
 
 Library users of generated messages depend on the generated crate and `puroro` only. Do not surface `puroro-rt` types in public generated signatures.
 
-Lazy `RecordScanner` emits `ScannedRecord` / `ScannedValue`. LEN is a span into `_wire`, not a `protobuf_core::Field` / owned payload. Do not copy complete LEN bodies into the scan record. Numerical apply uses catalog `merge_scanned` (`CopyWirePayload::from_scanned`). Do not rematch scalars through `merge_scanned_field`.
+Lazy `RecordScanner` emits `ScannedRecord` / `ScannedValue`. LEN is a span into `_wire`, not a `protobuf_core::Field` / owned payload. Do not copy complete LEN bodies into the scan record. Numerical apply uses catalog `merge_scanned` (`CopyWirePayload::from_scanned`). Do not rematch scalars through `merge_scanned_field`. Packed LEN uses the scanned `payload_len` (`merge_packed_buf`); do not re-read the length prefix.
 
 ## Setup
 

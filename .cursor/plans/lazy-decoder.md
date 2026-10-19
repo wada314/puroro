@@ -11,14 +11,16 @@ only; callers slice `_wire`. Do not rebuild `protobuf_core::Field` with an
 owned LEN `AllocVec`. Numerical apply uses catalog `merge_scanned` /
 `CopyWirePayload::from_scanned`. Do not rematch `Varint` / `I32` / `I64`
 through `merge_scanned_field` (re-encode then catalog `merge`). Packed LEN
-inner varints were never scanned; they still walk the island body.
+uses `payload_len` / `len_span` and `merge_packed_buf` — do not re-read the
+length prefix via `merge(WireType::Len)`. Inner bodies were not scanned.
 
 Measured (2026-10-19, Criterion `generated` `task|map`, `taskset -c 0`):
 span-only `task_lazy/decode` was 1.295 µs; after `merge_scanned` it is
 1.12 µs (~−14%). `map/decode_lazy` did not move (map entries stay spans
 at ingest). Eager `task/decode` drifted a few percent; treat gaps under
 ~10% as noise. Typical TaskLazy decode is about 1.08× eager after rematch.
-Remaining ingest cost is the island copy and packed inner varints.
+Remaining ingest cost is the island copy. Packed inners still walk the
+payload (unread packed-as-slice is out of v1).
 
 Still out of v1: `TaskView`, lazy mutation, `MessageFallible` on the lazy
 alias, intra-field repeated cursors, zero-copy spanning LEN, packed repeated

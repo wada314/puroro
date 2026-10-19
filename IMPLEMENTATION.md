@@ -274,7 +274,7 @@ One marker + trait per protobuf **type** (e.g. `int32`, `string`). Wire-shape re
 [`EncodeType`](puroro-rt/src/fields/wire/encode_type.rs) for string / bytes / message; this module
 keeps owned [`LenPayload`](puroro-rt/src/fields/wire/wire_payload.rs) for decode. Copy numericals also
 implement [`CopyWirePayload`](puroro-rt/src/fields/wire/wire_payload.rs) (`decode` without an
-allocator, plus `from_scanned` so lazy apply can skip a rematch).
+allocator, `decode_body` for packed inners, plus `from_scanned` so lazy apply can skip a rematch).
 
 ### Proto-type encode + tagged framing ([`wire/encode_type.rs`](puroro-rt/src/fields/wire/encode_type.rs))
 
@@ -659,7 +659,7 @@ fn encode_raw<B: BufMut>(&self, ctx: &mut EncodeCtx, buf: &mut B) {
 
 ### Decode
 
-**Eager** (the loop below). **Lazy** ingest is `LazyScan::push` / `finish` then `LazyMessage::ensure_scanned` / `apply_record`. [`RecordScanner`](puroro-rt/src/decode/record.rs) emits [`ScannedRecord`](puroro-rt/src/decode/record.rs) metadata ([`ScannedValue`](puroro-rt/src/decode/record.rs): a small numeric or `Len { payload_len }`). Singular / expanded numericals call catalog `merge_scanned` (`CopyWirePayload::from_scanned` → `from_wire_body`); they do not re-encode through [`merge_scanned_field`](puroro-rt/src/decode/record.rs). Packed LEN still walks the island body (`body_slice` + packed `merge`). String / bytes / map / nested message store a span (`scanned_len_span`). When a merge still needs a wire slice, pass a [`SharedWire`](puroro-rt/src/decode/shared_wire.rs) handle (`clone_handle().as_bytes()`), not `scan.wire()`. See [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing). A failed scan does not append the chunk (`1d1ae757`). Criterion `generated` (`task|map`, pinned CPU): span-only `task_lazy/decode` was 1.295 µs; after `merge_scanned` it is 1.12 µs (~−14%). `map/decode_lazy` did not move. Gaps under ~10% are noise. Typical lazy/eager decode is ~1.08× after rematch.
+**Eager** (the loop below). **Lazy** ingest is `LazyScan::push` / `finish` then `LazyMessage::ensure_scanned` / `apply_record`. [`RecordScanner`](puroro-rt/src/decode/record.rs) emits [`ScannedRecord`](puroro-rt/src/decode/record.rs) metadata ([`ScannedValue`](puroro-rt/src/decode/record.rs): a small numeric or `Len { payload_len }`). Singular / expanded numericals call catalog `merge_scanned` (`CopyWirePayload::from_scanned` → `from_wire_body`); they do not re-encode through [`merge_scanned_field`](puroro-rt/src/decode/record.rs). Packed LEN uses `len_span` + `Numerical::merge_packed_buf` (length prefix already known). String / bytes / map / nested message store a span (`scanned_len_span`). When a merge still needs a wire slice, pass a [`SharedWire`](puroro-rt/src/decode/shared_wire.rs) handle (`clone_handle().as_bytes()`), not `scan.wire()`. See [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing). A failed scan does not append the chunk (`1d1ae757`). Criterion `generated` (`task|map`, pinned CPU): span-only `task_lazy/decode` was 1.295 µs; after `merge_scanned` it is 1.12 µs (~−14%). `map/decode_lazy` did not move. Gaps under ~10% are noise. Typical lazy/eager decode is ~1.08× after rematch.
 
 1. Loop: `puroro_rt::decode::decode_tag` → `(field_number, wire_type)`.
 2. `match field_number` — one catalog `merge` per arm (closed-enum unknowns are diverted inside `merge` via `DecodeError::UnknownClosedEnum`).
