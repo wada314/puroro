@@ -213,7 +213,7 @@ Live plugin emits both aliases for every message (`Name` = `NameImpl<A, Eager>`,
 | [`message_merge.rs`](puroro-rt/src/message_merge.rs) | `MessageMerge` / `merge_message` |
 | [`decode.rs`](puroro-rt/src/decode.rs) | Tag / skip / unknown-field helpers |
 | [`decode/lazy_scan.rs`](puroro-rt/src/decode/lazy_scan.rs) | `Eager` / `Lazy<A>` / `MessageScan` / `LazyScan` / `LazyMessage` |
-| [`decode/record.rs`](puroro-rt/src/decode/record.rs) | `RecordScanner` / `ScannedRecord` / `merge_scanned_field` |
+| [`decode/record.rs`](puroro-rt/src/decode/record.rs) | `RecordScanner` / `ScannedRecord` / `ScannedValue` / `merge_scanned_field` — LEN is a span, not an owned payload |
 | [`decode/shared_wire.rs`](puroro-rt/src/decode/shared_wire.rs) | `SharedWire` — lazy ingested blob (`bytes::Bytes` + `A`) |
 | [`decode/varint.rs`](puroro-rt/src/decode/varint.rs) | Pluggable `VarintDecoder` / chunked varint scan |
 
@@ -659,7 +659,7 @@ fn encode_raw<B: BufMut>(&self, ctx: &mut EncodeCtx, buf: &mut B) {
 
 ### Decode
 
-**Eager** (the loop below). **Lazy** ingest is `LazyScan::push` / `finish` then `LazyMessage::ensure_scanned` / `merge_scanned_field` — see [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing). A failed scan does not append the chunk (`1d1ae757`).
+**Eager** (the loop below). **Lazy** ingest is `LazyScan::push` / `finish` then `LazyMessage::ensure_scanned` / `apply_record`. [`RecordScanner`](puroro-rt/src/decode/record.rs) emits [`ScannedRecord`](puroro-rt/src/decode/record.rs) metadata ([`ScannedValue`](puroro-rt/src/decode/record.rs): a small numeric or `Len { payload_len }`). LEN / packed bodies are sliced from the island after append (`scanned_len_span` / `body_slice`). [`merge_scanned_field`](puroro-rt/src/decode/record.rs) takes a [`SharedWire`](puroro-rt/src/decode/shared_wire.rs) handle slice (`clone_handle().as_bytes()`), not `scan.wire()`, so the merge closure can mutate `_common`. See [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing). A failed scan does not append the chunk (`1d1ae757`).
 
 1. Loop: `puroro_rt::decode::decode_tag` → `(field_number, wire_type)`.
 2. `match field_number` — one catalog `merge` per arm (closed-enum unknowns are diverted inside `merge` via `DecodeError::UnknownClosedEnum`).
@@ -865,7 +865,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 | Map wrappers | `MapField` + `MapKey` / `RepeatedElement` (sample `attributes`) | — |
 | `protoc-gen-puroro` field emission | Eager and lazy aliases (`Name` / `NameLazy`); singular / repeated / enum / message / oneof / map / defaults / `child_parse`; see [§3](#3-implementation-status) | Typed extensions / services |
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |
-| `TaskLazy` | Plugin emits `NameLazy` (one scan, numericals applied immediately, `WireOrSso` / span lists). Sample is the same shape. Lazy `unknown_fields()` is empty. `MessageFallible` is eager-only | [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing); lock: [`.cursor/plans/lazy-decoder.md`](.cursor/plans/lazy-decoder.md) |
+| `TaskLazy` | Plugin emits `NameLazy` (one scan, numericals applied immediately, `WireOrSso` / span lists; the scan record does not own LEN). Sample is the same shape. Lazy `unknown_fields()` is empty. `MessageFallible` is eager-only | [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing); lock: [`.cursor/plans/lazy-decoder.md`](.cursor/plans/lazy-decoder.md) |
 | `Hash` / `serde` | Deferred | Opt-in features |
 | Unknown-field reject-on-decode | Preserve / Discard only (`UnknownStore` is write-or-drop) | Optional `REJECT` (DESIGN.md §8.2): `DecodeError` on unknown tag; not a third blob store |
 | Submessage inline | Sample singular **and** oneof nested messages use [`ProtoMessage<M>`](puroro-rt/src/fields/wire/proto_message.rs): inline slot = full `M`, boxed slot = `UnmanagedBox<M>`, getters are `&M` / `&mut M`. Repeated / map store `M` | codegen ([§17.1](#171-submessage-inline-optimisation)) |

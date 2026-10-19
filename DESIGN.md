@@ -1328,7 +1328,7 @@ Eager and lazy are not a runtime enum inside `Task`. Slots that must differ (str
 
 Child layout follows [Child parse timing](#child-parse-timing). A follow-parent field is a `Layout` associated type. A pin is a concrete child type on both aliases.
 
-The wire blob is [`SharedWire`](puroro-rt/src/decode/shared_wire.rs): `bytes::Bytes` plus the message's `A`. A lazy child keeps a handle and a span. It does not copy the LEN body. A LEN that straddles `push` chunks is copied when the record becomes complete. `&str` and a child body are one contiguous region. `Bytes` is the wire store because sub-slicing matters more than placing that blob in `A`. Decoded values still allocate through `A`.
+The wire blob is [`SharedWire`](puroro-rt/src/decode/shared_wire.rs): `bytes::Bytes` plus the message's `A`. Each `push` chunk is appended to that island after a successful scan. The scanner does not copy a complete LEN body; it stores a span and callers slice `_wire`. An incomplete record stays in leftover. When a later chunk completes it, leftover is already on the island from the earlier append, so the full record is one contiguous region. A lazy child keeps a handle and a span. It does not copy the LEN body. `Bytes` is the wire store because sub-slicing matters more than placing that blob in `A`. Decoded values still allocate through `A`.
 
 **Encode and equality.** Encode of a finished lazy message writes the ingested wire as-is. Field order need not match an eager encode. After more than one `merge_from`, the encoded length is the concatenated ingest. `PartialEq` and `Debug` compare semantics by building the eager message. `unknown_fields()` on the lazy alias is empty. Unknown tags stay in the wire and appear on the eager message after `into_eager`.
 

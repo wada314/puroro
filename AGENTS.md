@@ -18,6 +18,8 @@ Instructions for coding agents working in this repository. Human-oriented docs s
 
 Library users of generated messages depend on the generated crate and `puroro` only. Do not surface `puroro-rt` types in public generated signatures.
 
+Lazy `RecordScanner` emits `ScannedRecord` / `ScannedValue`. LEN is a span into `_wire`, not a `protobuf_core::Field` / owned payload. Do not copy complete LEN bodies into the scan record.
+
 ## Setup
 
 - Nightly is pinned by `rust-toolchain.toml`. `.cargo/config.toml` enables `-Z bindeps` (needed by `puroro-codegen-tests`).
