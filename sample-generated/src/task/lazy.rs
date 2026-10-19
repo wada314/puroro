@@ -354,14 +354,6 @@ impl<A: Allocator + Clone> TaskLazy<A> {
         Ok(())
     }
 
-    fn push_bytes(&mut self, chunk: ::bytes::Bytes) -> Result<(), DecodeError> {
-        let (origin, records) = self._common.lazy.scan.push_bytes(chunk)?;
-        for rec in records {
-            self.apply_record(&rec, origin)?;
-        }
-        Ok(())
-    }
-
     /// Close the current input stream. Non-empty leftover is truncated input.
     pub fn finish(&mut self) -> Result<(), DecodeError> {
         self._common.lazy.scan.finish()
@@ -376,9 +368,15 @@ impl<A: Allocator + Clone> TaskLazy<A> {
     }
 
     fn ingest_buf<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
-        if buf.has_remaining() {
-            let rest = buf.copy_to_bytes(buf.remaining());
-            self.push_bytes(rest)?;
+        while buf.has_remaining() {
+            let n = buf.chunk().len();
+            if n == 0 {
+                let rest = buf.copy_to_bytes(buf.remaining());
+                self.push(&rest)?;
+                break;
+            }
+            self.push(buf.chunk())?;
+            buf.advance(n);
         }
         self.finish()
     }

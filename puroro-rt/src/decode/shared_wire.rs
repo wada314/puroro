@@ -58,15 +58,6 @@ impl<A: Allocator + Clone> SharedWire<A> {
         }
     }
 
-    /// Adopt an existing [`Bytes`] allocation (no payload copy).
-    pub fn from_bytes(data: Bytes, alloc: A) -> Self {
-        Self { data, alloc }
-    }
-
-    pub(crate) fn allocator(&self) -> &A {
-        &self.alloc
-    }
-
     /// Cheap handle to the same allocation (same as [`Clone`]).
     pub fn clone_handle(&self) -> Self {
         self.clone()
@@ -98,28 +89,6 @@ impl<A: Allocator + Clone> SharedWire<A> {
         let mut buf = BytesMut::from(mem::take(&mut self.data));
         buf.extend_from_slice(more);
         self.data = buf.freeze();
-    }
-
-    /// Append `more`. An empty island adopts `more` without copying.
-    pub fn append_bytes(&mut self, more: Bytes) {
-        if more.is_empty() {
-            return;
-        }
-        if self.data.is_empty() {
-            self.data = more;
-            return;
-        }
-        let mut buf = BytesMut::from(mem::take(&mut self.data));
-        buf.extend_from_slice(&more);
-        self.data = buf.freeze();
-    }
-
-    /// Drop bytes after `len`. A failed ingest uses this to roll back `append`.
-    pub fn truncate(&mut self, len: usize) {
-        if len >= self.data.len() {
-            return;
-        }
-        self.data = self.data.slice(..len);
     }
 }
 
@@ -166,29 +135,5 @@ mod tests {
         parent.append(b"cd");
         assert_eq!(parent.as_bytes(), b"abcd");
         assert_eq!(child.as_bytes(), b"ab");
-    }
-
-    #[test]
-    fn from_bytes_adopts_allocation() {
-        let data = Bytes::from_static(b"hello");
-        let ptr = data.as_ptr();
-        let w = SharedWire::from_bytes(data, Global);
-        assert_eq!(w.as_bytes().as_ptr(), ptr);
-    }
-
-    #[test]
-    fn append_bytes_adopts_when_empty() {
-        let data = Bytes::from_static(b"hello");
-        let ptr = data.as_ptr();
-        let mut w = SharedWire::empty(Global);
-        w.append_bytes(data);
-        assert_eq!(w.as_bytes().as_ptr(), ptr);
-    }
-
-    #[test]
-    fn truncate_drops_suffix() {
-        let mut w = SharedWire::from_slice(b"abcdef", Global);
-        w.truncate(3);
-        assert_eq!(w.as_bytes(), b"abc");
     }
 }

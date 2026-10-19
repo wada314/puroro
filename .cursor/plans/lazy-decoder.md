@@ -19,18 +19,17 @@ span-only `task_lazy/decode` was 1.295 µs; after `merge_scanned` it is
 1.12 µs (~−14%). `map/decode_lazy` did not move (map entries stay spans
 at ingest). `merge_packed_buf` did not move typical `task_lazy/decode` or
 `map/decode_lazy` (typical Task packed fields are tiny; a noisy first
-`task_lazy/decode` run was discarded on recheck). Island-first
-`SharedWire` ingest (`push` copies, then scans; leftover is an offset)
-did not move typical `task_lazy/decode` (+1.7%) or `map/decode_lazy`
-(+0.1%) vs `c51e5da6`. Eager `task/decode` drifted a few percent; treat
-gaps under ~10% as noise. Typical TaskLazy decode is about 1.1× eager
-after rematch (1.08–1.14 across runs).
-Remaining ingest cost is the one island copy of `decode(&[u8])`.
-`push(&[u8])` copies onto `SharedWire` first, then scans that instance
-(failed scan truncates). `merge_from` / `decode` adopt `Bytes` from
-`copy_to_bytes` when the island is empty. Leftover is an offset on the
-island. Packed inners still walk the payload (unread packed-as-slice is
-out of v1).
+`task_lazy/decode` run was discarded on recheck). Eager `task/decode`
+drifted a few percent; treat gaps under ~10% as noise. Typical TaskLazy
+decode is about 1.1× eager after rematch (1.08–1.14 across runs).
+Remaining ingest cost is the island copy (`append` / `copy_from_slice`).
+Island-first ingest (copy onto `SharedWire`, then scan; leftover as an
+offset; internal `push_bytes`) was tried and reverted: typical
+`task_lazy/decode` / `map/decode_lazy` did not move (+1.7% / +0.1%,
+noise), and it added a second leftover model plus truncate rollback.
+Do not re-land that shape to chase the island copy. `decode(&[u8])` still
+has to copy; `TaskView` is the extra-lifetime alternative. Packed inners
+still walk the payload (unread packed-as-slice is out of v1).
 
 Still out of v1: `TaskView`, lazy mutation, `MessageFallible` on the lazy
 alias, intra-field repeated cursors, zero-copy spanning LEN, packed repeated
@@ -367,16 +366,15 @@ bytes are included. `Layout` associated types cover slots that differ.
 messages and maps as spans, repeated `labels` as a span list (first get
 materialises), oneof, `Layout` associated types. The scan record itself is
 a span (`ScannedRecord` / `ScannedValue`); complete LEN is not copied off
-the island. Numericals use catalog `merge_scanned` (no rematch). Packed LEN
-uses `merge_packed_buf`. `push` copies onto `SharedWire` first; leftover is
-an island offset. Eager `Task` implements handwritten `task::MessageFallible`
-(`Error = Infallible`).
+the island. Numericals use catalog `merge_scanned` (no rematch). Eager
+`Task` implements handwritten `task::MessageFallible` (`Error = Infallible`).
 
 **Not done:** `TaskView`, lazy mutation, `MessageFallible` for `TaskLazy`
 (follow-parent fields change type with the parent; the plugin does not emit
 the trait), intra-field repeated cursors, zero-copy spanning LEN,
-packed-as-unread-slice. Lazy `unknown_fields()` is empty; unknown tags stay
-in the wire and surface on `into_eager`.
+packed-as-unread-slice. Island-first leftover-as-offset ingest was tried
+and reverted (no typical-bench win). Lazy `unknown_fields()` is empty;
+unknown tags stay in the wire and surface on `into_eager`.
 
 ## Revisit later — VERIFY string vs closed-enum unknown
 

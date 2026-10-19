@@ -1,19 +1,14 @@
-//! Island-root ingest used by handwritten lazy messages.
-//!
-//! [`LazyScan::push`] copies each chunk onto [`SharedWire`] once, then scans
-//! that instance. An unfinished tail is an offset (`unparsed`), not a second
-//! `AllocVec`. [`LazyScan::push_bytes`] adopts a [`Bytes`] when the island is
-//! empty.
+//! Shared leftover + `_wire` ingest used by handwritten lazy messages.
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::vec::Vec as AllocVec;
-use ::bytes::{BufMut, Bytes};
+use ::bytes::BufMut;
 use ::core::cell::Cell;
 use ::core::ptr;
 use ::puroro::DecodeError;
 use ::std::vec::Vec;
 
-use super::record::{ScannedRecord, WireSpan, scan_slice};
+use super::record::{RecordScanner, ScannedRecord, WireSpan};
 use super::shared_wire::SharedWire;
 
 /// Ingest layout stored in [`MessageCommon`](crate::MessageCommon)::`lazy`.
@@ -52,9 +47,7 @@ impl<A: Allocator> MessageScan<A> for Eager {
 /// walked them yet. Field getters call [`LazyMessage::ensure_scanned`] and
 /// parse then. Encode / `into_eager` may use the regions without parsing.
 pub struct LazyScan<A: Allocator = Global> {
-    /// Start of the unfinished tail in [`wire`](Self::wire). Equal to
-    /// `wire.len()` when every ingested byte is a complete record.
-    unparsed: usize,
+    scanner: RecordScanner<A>,
     finished: bool,
     /// `false` when [`regions`](Self::regions) are waiting for a first field get.
     applied: Cell<bool>,
@@ -76,7 +69,7 @@ impl<A: Allocator> LazyScan<A> {
     pub fn require_finished(&self) -> Result<(), DecodeError> {
         if self.finished {
             Ok(())
-        } else if self.unparsed < self.wire.len() {
+        } else if self.scanner.needs_more() {
             Err(DecodeError::TruncatedMessage)
         } else {
             Err(DecodeError::UnfinishedMessage)
@@ -149,7 +142,7 @@ impl<A: Allocator> LazyScan<A> {
 impl<A: Allocator + Clone> LazyScan<A> {
     pub fn new_in(alloc: A) -> Self {
         Self {
-            unparsed: 0,
+            scanner: RecordScanner::new_in(alloc.clone()),
             finished: true,
             applied: Cell::new(true),
             wire: SharedWire::empty(alloc.clone()),
@@ -157,63 +150,26 @@ impl<A: Allocator + Clone> LazyScan<A> {
         }
     }
 
-    /// Unfinished tail still on the island (`wire[unparsed..]`).
-    pub fn leftover(&self) -> &[u8] {
-        &self.wire.as_bytes()[self.unparsed..]
-    }
-
-    /// Copy `chunk` onto the island once, then scan that instance.
+    /// Parse `chunk` and, on success, append it to the island buffer.
     ///
-    /// A scan error truncates `_wire` back to its previous length so a rejected
-    /// chunk cannot sit ahead of the scanner. Returns the origin of the
-    /// scanned range in `_wire`, plus the records.
+    /// A scan error leaves `_wire`, the leftover, and the finished flag as they
+    /// were, so a rejected chunk cannot sit in the buffer ahead of the scanner.
+    /// Returns the origin of `leftover || chunk` in `_wire`, plus the records.
     pub fn push(
         &mut self,
         chunk: &[u8],
     ) -> Result<(usize, AllocVec<ScannedRecord, A>), DecodeError> {
-        self.ingest(|wire| wire.append(chunk))
-    }
-
-    /// Same as [`push`](Self::push), but an empty island adopts `chunk`.
-    pub fn push_bytes(
-        &mut self,
-        chunk: Bytes,
-    ) -> Result<(usize, AllocVec<ScannedRecord, A>), DecodeError> {
-        self.ingest(|wire| wire.append_bytes(chunk))
-    }
-
-    fn ingest(
-        &mut self,
-        append: impl FnOnce(&mut SharedWire<A>),
-    ) -> Result<(usize, AllocVec<ScannedRecord, A>), DecodeError> {
-        debug_assert!(self.unparsed <= self.wire.len());
-        let old_len = self.wire.len();
-        let origin = self.unparsed;
-        append(&mut self.wire);
-        match self.scan_from(origin) {
-            Ok(records) => {
-                self.finished = false;
-                Ok((origin, records))
-            }
-            Err(e) => {
-                self.wire.truncate(old_len);
-                Err(e)
-            }
-        }
-    }
-
-    fn scan_from(&mut self, origin: usize) -> Result<AllocVec<ScannedRecord, A>, DecodeError> {
-        let alloc = self.wire.allocator().clone();
-        let (records, consumed) = scan_slice(&self.wire.as_bytes()[origin..], alloc)?;
-        self.unparsed = origin + consumed;
-        debug_assert!(self.unparsed <= self.wire.len());
-        Ok(records)
+        debug_assert!(self.wire.as_bytes().ends_with(self.scanner.leftover()));
+        let origin = self.wire.len() - self.scanner.leftover().len();
+        let records = self.scanner.push(chunk)?;
+        self.finished = false;
+        self.wire.append(chunk);
+        debug_assert!(self.wire.as_bytes().ends_with(self.scanner.leftover()));
+        Ok((origin, records))
     }
 
     pub fn finish(&mut self) -> Result<(), DecodeError> {
-        if self.unparsed < self.wire.len() {
-            return Err(DecodeError::TruncatedMessage);
-        }
+        self.scanner.finish()?;
         self.finished = true;
         Ok(())
     }
@@ -221,7 +177,6 @@ impl<A: Allocator + Clone> LazyScan<A> {
     /// Point this scan at an existing island-root buffer (no payload copy).
     pub fn adopt(&mut self, root: &SharedWire<A>) {
         self.wire = root.clone_handle();
-        self.unparsed = self.wire.len();
     }
 
     /// Remember a complete message-body LEN inside the adopted island buffer.
@@ -260,18 +215,15 @@ impl<A: Allocator + Clone> LazyScan<A> {
     ) -> Result<AllocVec<ScannedRecord, A>, DecodeError> {
         self.finished = false;
         let payload = span.slice(self.wire.as_bytes())?;
-        let alloc = self.wire.allocator().clone();
-        let (records, consumed) = scan_slice(payload, alloc)?;
-        if consumed < payload.len() {
-            return Err(DecodeError::TruncatedMessage);
-        }
+        let records = self.scanner.push(payload)?;
+        self.scanner.finish()?;
         self.finished = true;
         Ok(records)
     }
 
     pub fn clone_in(&self, alloc: A) -> Self {
         Self {
-            unparsed: self.unparsed,
+            scanner: self.scanner.clone(),
             finished: self.finished,
             applied: Cell::new(self.applied.get()),
             wire: self.wire.clone_in(alloc.clone()),
@@ -345,74 +297,5 @@ pub trait LazyMessage<A: Allocator + Clone> {
             self.apply_record(&rec, span.offset)?;
         }
         Ok(())
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use ::allocator_api2::alloc::Global;
-    use ::puroro::DecodeError;
-
-    /// Field 1, varint 1 (`0x08 0x01`).
-    const SCORE_ONE: &[u8] = &[0x08, 0x01];
-    /// Field 1, wire type 7 — invalid tag.
-    const BAD_TAG: &[u8] = &[0x0f];
-
-    #[test]
-    fn push_copies_once_then_scans_island() {
-        let mut scan = LazyScan::new_in(Global);
-        let (origin, recs) = scan.push(SCORE_ONE).unwrap();
-        scan.finish().unwrap();
-        assert_eq!(origin, 0);
-        assert_eq!(recs.len(), 1);
-        assert_eq!(scan.wire(), SCORE_ONE);
-        assert!(scan.leftover().is_empty());
-    }
-
-    #[test]
-    fn leftover_is_island_tail() {
-        let mut scan = LazyScan::new_in(Global);
-        let (origin, recs) = scan.push(&[0x08]).unwrap();
-        assert_eq!(origin, 0);
-        assert!(recs.is_empty());
-        assert_eq!(scan.leftover(), &[0x08]);
-        assert_eq!(scan.wire(), &[0x08]);
-        let (origin, recs) = scan.push(&[0x01]).unwrap();
-        scan.finish().unwrap();
-        assert_eq!(origin, 0);
-        assert_eq!(recs.len(), 1);
-        assert_eq!(scan.wire(), SCORE_ONE);
-        assert!(scan.leftover().is_empty());
-    }
-
-    #[test]
-    fn rejected_chunk_does_not_stay_on_island() {
-        let mut scan = LazyScan::new_in(Global);
-        scan.push(SCORE_ONE).unwrap();
-        scan.finish().unwrap();
-        assert_eq!(scan.push(BAD_TAG).err(), Some(DecodeError::InvalidTag));
-        assert_eq!(scan.wire(), SCORE_ONE);
-        assert!(scan.leftover().is_empty());
-    }
-
-    #[test]
-    fn push_bytes_adopts_when_empty() {
-        let data = Bytes::from_static(SCORE_ONE);
-        let ptr = data.as_ptr();
-        let mut scan = LazyScan::new_in(Global);
-        let (origin, recs) = scan.push_bytes(data).unwrap();
-        scan.finish().unwrap();
-        assert_eq!(origin, 0);
-        assert_eq!(recs.len(), 1);
-        assert_eq!(scan.wire().as_ptr(), ptr);
-    }
-
-    #[test]
-    fn failed_push_bytes_does_not_adopt() {
-        let data = Bytes::from_static(BAD_TAG);
-        let mut scan = LazyScan::new_in(Global);
-        assert_eq!(scan.push_bytes(data).err(), Some(DecodeError::InvalidTag));
-        assert!(scan.wire().is_empty());
     }
 }
