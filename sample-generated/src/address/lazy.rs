@@ -170,7 +170,7 @@ impl<A: Allocator + Clone> LazyMessage<A> for AddressLazy<A> {
         &mut self._common.lazy.scan
     }
 
-    fn apply_record(&mut self, rec: &ScannedRecord<A>, origin: usize) -> Result<(), DecodeError> {
+    fn apply_record(&mut self, rec: &ScannedRecord, origin: usize) -> Result<(), DecodeError> {
         match rec.field_number.as_u32() {
             FIELD_STREET => {
                 let span = scanned_len_span(origin, rec)?;
@@ -182,16 +182,26 @@ impl<A: Allocator + Clone> LazyMessage<A> for AddressLazy<A> {
                 self.city.store_len_span(span, &mut self._common);
                 Ok(())
             }
-            FIELD_POSTAL_CODE => merge_scanned_field(&rec.field, |wire_type, buf| {
-                self.postal_code
-                    .bind_mut(&mut self._common)
-                    .merge(wire_type, buf, 0)
-            }),
-            FIELD_LATITUDE => merge_scanned_field(&rec.field, |wire_type, buf| {
-                self.latitude
-                    .bind_mut(&mut self._common)
-                    .merge(wire_type, buf, 0)
-            }),
+            FIELD_POSTAL_CODE => merge_scanned_field(
+                rec,
+                self._common.lazy.scan.shared().clone_handle().as_bytes(),
+                origin,
+                |wire_type, buf| {
+                    self.postal_code
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf, 0)
+                },
+            ),
+            FIELD_LATITUDE => merge_scanned_field(
+                rec,
+                self._common.lazy.scan.shared().clone_handle().as_bytes(),
+                origin,
+                |wire_type, buf| {
+                    self.latitude
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf, 0)
+                },
+            ),
             _ => Ok(()),
         }
     }

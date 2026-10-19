@@ -201,7 +201,7 @@ fn render_lazy_message(lazy_alias: &Ident, apply_arms: &[TokenStream]) -> TokenS
 
             fn apply_record(
                 &mut self,
-                rec: &::puroro_rt::decode::ScannedRecord<A>,
+                rec: &::puroro_rt::decode::ScannedRecord,
                 origin: usize,
             ) -> ::core::result::Result<(), ::puroro::DecodeError> {
                 let _ = origin;
@@ -704,7 +704,9 @@ fn apply_arm(
         SlotApply::Message(apply) => message_apply_arm(slot, field_const, companion, apply),
         SlotApply::Numerical => quote! {
             #companion::#field_const => ::puroro_rt::decode::merge_scanned_field(
-                &rec.field,
+                rec,
+                self._common.lazy.scan.shared().clone_handle().as_bytes(),
+                origin,
                 |wire_type, buf| {
                     #slot
                         .bind_mut(&mut self._common)

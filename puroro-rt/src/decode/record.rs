@@ -1,19 +1,18 @@
 //! Incremental field-record scanner.
 //!
-//! `push` emits every **complete** [`Field`]. An incomplete tag, length
-//! varint, fixed payload, or LEN body stays in leftover. [`RecordScanner::finish`]
-//! errors if leftover is not empty.
+//! `push` emits every **complete** record as metadata (and a small numeric
+//! value). LEN payloads are **not** copied — callers slice `_wire` after
+//! append via [`scanned_len_span`]. An incomplete tag, length varint, fixed
+//! payload, or LEN body stays in leftover. [`RecordScanner::finish`] errors if
+//! leftover is not empty.
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::vec::Vec as AllocVec;
-use ::core::ops::Deref;
 use ::protobuf_core::{
-    Field, FieldNumber, FieldValue, MAX_VARINT_BYTES, VARINT_CONTINUATION_BIT, VARINT_PAYLOAD_MASK,
-    Varint,
+    FieldNumber, MAX_VARINT_BYTES, VARINT_CONTINUATION_BIT, VARINT_PAYLOAD_MASK, Varint,
 };
 use ::puroro::wire_type;
 use ::puroro::{DecodeError, ScopedBuf, WireType};
-use ::std::vec::Vec;
 
 /// Byte range of one field payload inside a parent `_wire` buffer.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -34,44 +33,72 @@ impl WireSpan {
     }
 }
 
-/// One complete record from [`RecordScanner::push`], with its position in
-/// `leftover || chunk`.
-#[derive(Debug)]
-pub struct ScannedRecord<A: Allocator> {
-    pub field: Field<AllocVec<u8, A>>,
-    pub start: usize,
-    pub len: usize,
+/// Decoded body of one [`ScannedRecord`].
+///
+/// LEN keeps only the payload length. The bytes live in `_wire` after append.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ScannedValue {
+    Varint(Varint),
+    I32([u8; 4]),
+    I64([u8; 8]),
+    Len { payload_len: usize },
 }
 
-impl<A: Allocator> Deref for ScannedRecord<A> {
-    type Target = Field<AllocVec<u8, A>>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.field
-    }
+/// One complete record from [`RecordScanner::push`], with its position in
+/// `leftover || chunk`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct ScannedRecord {
+    pub field_number: FieldNumber,
+    pub start: usize,
+    pub len: usize,
+    pub tag_len: usize,
+    pub value: ScannedValue,
 }
 
 /// LEN payload range in `_wire`, given `origin` of `leftover || chunk`.
 ///
-/// The payload is the last `Len` bytes of the record (after tag + length).
-pub fn scanned_len_span<A: Allocator>(
-    origin: usize,
-    rec: &ScannedRecord<A>,
-) -> Result<WireSpan, DecodeError> {
-    match &rec.field.value {
-        FieldValue::Len(payload) => Ok(WireSpan {
-            offset: origin + rec.start + rec.len - payload.len(),
-            len: payload.len(),
-        }),
-        _ => Err(DecodeError::InvalidTag),
-    }
+/// The payload is the last `payload_len` bytes of the record (after tag + length).
+pub fn scanned_len_span(origin: usize, rec: &ScannedRecord) -> Result<WireSpan, DecodeError> {
+    rec.len_span(origin)
 }
 
-/// LEN payload bytes from a scanned record (content only).
-pub fn scanned_len_payload<A: Allocator>(rec: &ScannedRecord<A>) -> Result<&[u8], DecodeError> {
-    match &rec.field.value {
-        FieldValue::Len(payload) => Ok(payload.as_slice()),
-        _ => Err(DecodeError::InvalidTag),
+/// LEN payload bytes in `wire`, given `origin` of `leftover || chunk`.
+pub fn scanned_len_payload<'a>(
+    origin: usize,
+    rec: &ScannedRecord,
+    wire: &'a [u8],
+) -> Result<&'a [u8], DecodeError> {
+    rec.len_span(origin)?.slice(wire)
+}
+
+impl ScannedRecord {
+    /// LEN payload range in `_wire`.
+    pub fn len_span(&self, origin: usize) -> Result<WireSpan, DecodeError> {
+        let ScannedValue::Len { payload_len } = self.value else {
+            return Err(DecodeError::InvalidTag);
+        };
+        let offset = origin
+            .checked_add(self.start)
+            .and_then(|s| s.checked_add(self.len))
+            .and_then(|end| end.checked_sub(payload_len))
+            .ok_or(DecodeError::TruncatedMessage)?;
+        Ok(WireSpan {
+            offset,
+            len: payload_len,
+        })
+    }
+
+    /// Tag-stripped field body in `_wire` (length prefix included for LEN).
+    pub fn body_slice<'a>(&self, origin: usize, wire: &'a [u8]) -> Result<&'a [u8], DecodeError> {
+        let start = origin
+            .checked_add(self.start)
+            .and_then(|s| s.checked_add(self.tag_len))
+            .ok_or(DecodeError::TruncatedMessage)?;
+        let end = origin
+            .checked_add(self.start)
+            .and_then(|s| s.checked_add(self.len))
+            .ok_or(DecodeError::TruncatedMessage)?;
+        wire.get(start..end).ok_or(DecodeError::TruncatedMessage)
     }
 }
 
@@ -134,73 +161,66 @@ impl<A: Allocator + Clone> RecordScanner<A> {
     /// Complete records are read in place. Only the unfinished tail is copied
     /// into leftover. Incomplete input is not an error here — call
     /// [`finish`](Self::finish) when no more bytes will arrive.
-    pub fn push(&mut self, chunk: &[u8]) -> Result<AllocVec<ScannedRecord<A>, A>, DecodeError> {
+    pub fn push(&mut self, chunk: &[u8]) -> Result<AllocVec<ScannedRecord, A>, DecodeError> {
         let alloc = self.leftover.allocator().clone();
-        let mut records = AllocVec::new_in(alloc.clone());
+        let mut records = AllocVec::new_in(alloc);
         let src = TwoSlice {
             head: &self.leftover,
             tail: chunk,
         };
         let mut pos = 0usize;
-        while let TryRecord::Done { field, len } = try_record_at(&src, pos, alloc.clone())? {
-            records.push(ScannedRecord {
-                field,
-                start: pos,
-                len,
-            });
-            pos += len;
+        while let TryRecord::Done { rec } = try_record_at(&src, pos)? {
+            pos += rec.len;
+            records.push(rec);
         }
         keep_unparsed_tail(&mut self.leftover, chunk, pos);
         Ok(records)
     }
 }
 
-/// Reconstructs the post-tag body of a scanned [`Field`] for catalog `merge`.
+/// Feeds a scanned record into catalog `merge`.
 ///
-/// [`FieldValue::Len`] is payload only; packed / LEN catalog paths still read a
-/// length varint, so that arm prefixes the length before calling `merge`.
-pub fn merge_scanned_field<L, F>(field: &Field<L>, merge: F) -> Result<(), DecodeError>
+/// Numerics re-encode the small value. LEN / packed slices `wire` after the
+/// tag (length prefix included) so the catalog path is not rebuilt in a `Vec`.
+/// Pass a [`SharedWire`](super::shared_wire::SharedWire) handle slice, not
+/// `scan.wire()`, when `merge` also mutates the message that owns the scan.
+pub fn merge_scanned_field<F>(
+    rec: &ScannedRecord,
+    wire: &[u8],
+    origin: usize,
+    merge: F,
+) -> Result<(), DecodeError>
 where
-    L: AsRef<[u8]>,
     F: FnOnce(WireType, &mut ScopedBuf<'_, &[u8]>) -> Result<(), DecodeError>,
 {
-    match &field.value {
-        FieldValue::Varint(v) => {
+    match rec.value {
+        ScannedValue::Varint(v) => {
             let (bytes, n) = v.encode();
             let mut slice = &bytes[..n];
             let mut scoped = ScopedBuf::new(&mut slice);
             merge(WireType::Varint, &mut scoped)
         }
-        FieldValue::I32(bytes) => {
+        ScannedValue::I32(bytes) => {
             let mut slice = bytes.as_slice();
             let mut scoped = ScopedBuf::new(&mut slice);
             merge(WireType::Int32, &mut scoped)
         }
-        FieldValue::I64(bytes) => {
+        ScannedValue::I64(bytes) => {
             let mut slice = bytes.as_slice();
             let mut scoped = ScopedBuf::new(&mut slice);
             merge(WireType::Int64, &mut scoped)
         }
-        FieldValue::Len(payload) => {
-            let payload = payload.as_ref();
-            let (len_bytes, n) = Varint::from_uint64(payload.len() as u64).encode();
-            let total = n + payload.len();
-            let mut body = Vec::with_capacity(total);
-            body.extend_from_slice(&len_bytes[..n]);
-            body.extend_from_slice(payload);
-            let mut slice = body.as_slice();
+        ScannedValue::Len { .. } => {
+            let mut slice = rec.body_slice(origin, wire)?;
             let mut scoped = ScopedBuf::new(&mut slice);
             merge(WireType::Len, &mut scoped)
         }
     }
 }
 
-enum TryRecord<A: Allocator> {
+enum TryRecord {
     NeedMore,
-    Done {
-        field: Field<AllocVec<u8, A>>,
-        len: usize,
-    },
+    Done { rec: ScannedRecord },
 }
 
 enum TryVarint {
@@ -233,36 +253,6 @@ impl<'a> TwoSlice<'a> {
             *slot = self.get(start + j)?;
         }
         Some(out)
-    }
-
-    fn copy_range<A: Allocator + Clone>(
-        &self,
-        start: usize,
-        end: usize,
-        alloc: A,
-    ) -> AllocVec<u8, A> {
-        debug_assert!(start <= end && end <= self.len());
-        let mut v = AllocVec::with_capacity_in(end - start, alloc);
-        if let Some(slice) = self.contiguous(start, end) {
-            v.extend_from_slice(slice);
-            return v;
-        }
-        for i in start..end {
-            v.push(self.get(i).expect("range in bounds"));
-        }
-        v
-    }
-
-    fn contiguous(&self, start: usize, end: usize) -> Option<&'a [u8]> {
-        if end <= self.head.len() {
-            Some(&self.head[start..end])
-        } else if start >= self.head.len() {
-            let s = start - self.head.len();
-            let e = end - self.head.len();
-            Some(&self.tail[s..e])
-        } else {
-            None
-        }
     }
 }
 
@@ -302,11 +292,7 @@ fn try_varint_at(src: &TwoSlice<'_>, start: usize) -> Result<TryVarint, DecodeEr
     Err(DecodeError::InvalidVarint)
 }
 
-fn try_record_at<A: Allocator + Clone>(
-    src: &TwoSlice<'_>,
-    start: usize,
-    alloc: A,
-) -> Result<TryRecord<A>, DecodeError> {
+fn try_record_at(src: &TwoSlice<'_>, start: usize) -> Result<TryRecord, DecodeError> {
     if start >= src.len() {
         return Ok(TryRecord::NeedMore);
     }
@@ -331,19 +317,21 @@ fn try_record_at<A: Allocator + Clone>(
     let (value, body_len) = match wire_type {
         WireType::Varint => match try_varint_at(src, body_at)? {
             TryVarint::NeedMore => return Ok(TryRecord::NeedMore),
-            TryVarint::Done { value, len } => (FieldValue::from_uint64(value), len),
+            TryVarint::Done { value, len } => {
+                (ScannedValue::Varint(Varint::from_uint64(value)), len)
+            }
         },
         WireType::Int64 => {
             let Some(bytes) = src.copy_fixed::<8>(body_at) else {
                 return Ok(TryRecord::NeedMore);
             };
-            (FieldValue::I64(bytes), 8)
+            (ScannedValue::I64(bytes), 8)
         }
         WireType::Int32 => {
             let Some(bytes) = src.copy_fixed::<4>(body_at) else {
                 return Ok(TryRecord::NeedMore);
             };
-            (FieldValue::I32(bytes), 4)
+            (ScannedValue::I32(bytes), 4)
         }
         WireType::Len => {
             let TryVarint::Done {
@@ -357,22 +345,23 @@ fn try_record_at<A: Allocator + Clone>(
             let body_len = len_len
                 .checked_add(payload_len)
                 .ok_or(DecodeError::TruncatedMessage)?;
-            let payload_at = body_at + len_len;
             let payload_end = body_at + body_len;
             if src.len() < payload_end {
                 return Ok(TryRecord::NeedMore);
             }
-            (
-                FieldValue::Len(src.copy_range(payload_at, payload_end, alloc)),
-                body_len,
-            )
+            (ScannedValue::Len { payload_len }, body_len)
         }
         WireType::SGroup | WireType::EGroup => unreachable!("rejected above"),
     };
 
     Ok(TryRecord::Done {
-        field: Field::new(field_number, value),
-        len: tag_len + body_len,
+        rec: ScannedRecord {
+            field_number,
+            start,
+            len: tag_len + body_len,
+            tag_len,
+            value,
+        },
     })
 }
 
@@ -382,6 +371,7 @@ mod tests {
     use crate::encode::{encode_tag, encode_varint, encode_varint_field};
     use ::protobuf_core::Varint;
     use ::puroro::WireType;
+    use ::std::vec::Vec;
 
     fn field(n: u32) -> FieldNumber {
         FieldNumber::try_new(n).expect("test field number")
@@ -409,16 +399,6 @@ mod tests {
         buf
     }
 
-    fn copy_slice_in<A: Allocator + Clone>(bytes: &[u8], alloc: A) -> AllocVec<u8, A> {
-        let mut v = AllocVec::with_capacity_in(bytes.len(), alloc);
-        v.extend_from_slice(bytes);
-        v
-    }
-
-    fn len_bytes(bytes: &[u8]) -> FieldValue<AllocVec<u8, Global>> {
-        FieldValue::Len(copy_slice_in(bytes, Global))
-    }
-
     #[test]
     fn empty_chunk_then_finish() {
         let mut s = RecordScanner::new();
@@ -435,10 +415,8 @@ mod tests {
         let recs = s.push(&wire).unwrap();
         s.finish().unwrap();
         assert_eq!(recs.len(), 1);
-        assert_eq!(
-            recs[0].field,
-            Field::new(field(1), FieldValue::from_uint64(42))
-        );
+        assert_eq!(recs[0].field_number, field(1));
+        assert_eq!(recs[0].value, ScannedValue::Varint(Varint::from_uint64(42)));
         assert_eq!(recs[0].start, 0);
         assert_eq!(recs[0].len, wire.len());
     }
@@ -464,7 +442,10 @@ mod tests {
         let recs = s.push(&wire[2..]).unwrap();
         s.finish().unwrap();
         assert_eq!(recs.len(), 1);
-        assert_eq!(recs[0].value, FieldValue::from_uint64(300));
+        assert_eq!(
+            recs[0].value,
+            ScannedValue::Varint(Varint::from_uint64(300))
+        );
     }
 
     #[test]
@@ -483,7 +464,7 @@ mod tests {
         let recs = s.push(&wire[4..]).unwrap();
         s.finish().unwrap();
         assert_eq!(recs.len(), 1);
-        assert_eq!(recs[0].value, FieldValue::from_fixed64(7));
+        assert_eq!(recs[0].value, ScannedValue::I64(7u64.to_le_bytes()));
     }
 
     #[test]
@@ -504,9 +485,19 @@ mod tests {
         let recs = s.push(&wire[mid..]).unwrap();
         s.finish().unwrap();
         assert_eq!(recs.len(), 1);
-        assert_eq!(recs[0].value, len_bytes(b"hello"));
+        assert_eq!(recs[0].value, ScannedValue::Len { payload_len: 5 });
         let span = scanned_len_span(0, &recs[0]).unwrap();
         assert_eq!(&wire[span.offset..span.offset + span.len], b"hello");
+        merge_scanned_field(&recs[0], &wire, 0, |wt, buf| {
+            assert_eq!(wt, WireType::Len);
+            let n = ::bytes::Buf::remaining(buf);
+            let mut body = vec![0u8; n];
+            ::bytes::Buf::copy_to_slice(buf, &mut body);
+            assert_eq!(body[0], 5);
+            assert_eq!(&body[1..], b"hello");
+            Ok(())
+        })
+        .unwrap();
     }
 
     #[test]
@@ -593,7 +584,7 @@ mod tests {
         let recs = s.push(&wire[b..]).unwrap();
         s.finish().unwrap();
         assert_eq!(recs.len(), 1);
-        assert_eq!(recs[0].value, len_bytes(b"hello"));
+        assert_eq!(recs[0].value, ScannedValue::Len { payload_len: 5 });
     }
 
     #[test]
@@ -649,7 +640,7 @@ mod tests {
         let recs = s.push(&wire[2..]).unwrap();
         s.finish().unwrap();
         assert_eq!(recs.len(), 1);
-        assert_eq!(recs[0].value, len_bytes(&content));
+        assert_eq!(recs[0].value, ScannedValue::Len { payload_len: 128 });
     }
 
     #[test]
@@ -660,6 +651,9 @@ mod tests {
         let recs = s.push(&wire[3..]).unwrap();
         s.finish().unwrap();
         assert_eq!(recs.len(), 1);
-        assert_eq!(recs[0].value, FieldValue::from_fixed32(0xAABBCCDD));
+        assert_eq!(
+            recs[0].value,
+            ScannedValue::I32(0xAABBCCDDu32.to_le_bytes())
+        );
     }
 }
