@@ -7,8 +7,9 @@ use ::unmanaged::String as AllocString;
 /// Mutator API for a singular `string` field (`title_mut()`, …).
 ///
 /// Generated accessors return a concrete mutator that implements this trait.
-/// Short values may be stored inline; methods promote to the heap when the
-/// result no longer fits.
+/// Short values may be stored inline. Bytes past the current length in that
+/// slot are uninitialized and are not part of the dereferenced `str`.
+/// Methods promote to the heap when the result no longer fits.
 pub trait StringMut<A: Allocator>: Deref<Target = str> {
     /// Replaces the contents by copying from `s`.
     fn set(&mut self, s: &str);

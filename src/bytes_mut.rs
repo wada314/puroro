@@ -7,8 +7,9 @@ use ::core::ops::Deref;
 /// Mutator API for a singular `bytes` field (`payload_mut()`, …).
 ///
 /// Generated accessors return a concrete mutator that implements this trait.
-/// Short values may be stored inline; methods promote to the heap when the
-/// result no longer fits.
+/// Short values may be stored inline. Bytes past the current length in that
+/// slot are uninitialized and are not part of the dereferenced `[u8]`.
+/// Methods promote to the heap when the result no longer fits.
 pub trait BytesMut<A: Allocator>: Deref<Target = [u8]> {
     /// Replaces the contents by copying from `bytes`.
     fn set(&mut self, bytes: &[u8]);
