@@ -22,8 +22,14 @@ at ingest). `merge_packed_buf` did not move typical `task_lazy/decode` or
 `task_lazy/decode` run was discarded on recheck). Eager `task/decode`
 drifted a few percent; treat gaps under ~10% as noise. Typical TaskLazy
 decode is about 1.1× eager after rematch (1.08–1.14 across runs).
-Remaining ingest cost is the island copy. Packed inners still walk the
-payload (unread packed-as-slice is out of v1).
+Remaining ingest cost is the island copy (`append` / `copy_from_slice`).
+Island-first ingest (copy onto `SharedWire`, then scan; leftover as an
+offset; internal `push_bytes`) was tried and reverted: typical
+`task_lazy/decode` / `map/decode_lazy` did not move (+1.7% / +0.1%,
+noise), and it added a second leftover model plus truncate rollback.
+Do not re-land that shape to chase the island copy. `decode(&[u8])` still
+has to copy; `TaskView` is the extra-lifetime alternative. Packed inners
+still walk the payload (unread packed-as-slice is out of v1).
 
 Still out of v1: `TaskView`, lazy mutation, `MessageFallible` on the lazy
 alias, intra-field repeated cursors, zero-copy spanning LEN, packed repeated
@@ -368,8 +374,9 @@ the island. Numericals use catalog `merge_scanned` (no rematch). Eager
 **Not done:** `TaskView`, lazy mutation, `MessageFallible` for `TaskLazy`
 (follow-parent fields change type with the parent; the plugin does not emit
 the trait), intra-field repeated cursors, zero-copy spanning LEN,
-packed-as-unread-slice. Lazy `unknown_fields()` is empty; unknown tags stay
-in the wire and surface on `into_eager`.
+packed-as-unread-slice. Island-first leftover-as-offset ingest was tried
+and reverted (no typical-bench win). Lazy `unknown_fields()` is empty;
+unknown tags stay in the wire and surface on `into_eager`.
 
 ## Locked — VERIFY failure vs closed-enum unknown
 
