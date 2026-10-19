@@ -21,7 +21,7 @@ use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES, Varint};
 use ::puroro::{DecodeError, WireType};
 use ::unmanaged::UnmanagedVec;
 
-use crate::decode;
+use crate::decode::{self, ScannedValue};
 
 /// Untagged body for a wire type (`Varint`, `Int32`, `Int64`, or `Len`).
 #[doc(hidden)]
@@ -41,6 +41,10 @@ pub trait WirePayload {
 pub trait CopyWirePayload: WirePayload + Copy + Sized {
     /// Reads one body after the tag has been consumed.
     fn decode(wire_type: WireType, buf: &mut impl Buf) -> Result<Self, DecodeError>;
+
+    /// Uses a value the lazy scanner already decoded. Wrong wire shape is
+    /// [`DecodeError::InvalidTag`].
+    fn from_scanned(value: &ScannedValue) -> Result<Self, DecodeError>;
 }
 
 /// Varint wire body (`WireType::Varint`) — [`Varint`] before proto-type mapping
@@ -71,6 +75,14 @@ impl CopyWirePayload for VarintPayload {
             return Err(DecodeError::InvalidTag);
         }
         Ok(Self(Varint::from_uint64(decode::decode_varint(buf)?)))
+    }
+
+    #[inline]
+    fn from_scanned(value: &ScannedValue) -> Result<Self, DecodeError> {
+        match *value {
+            ScannedValue::Varint(v) => Ok(Self(v)),
+            _ => Err(DecodeError::InvalidTag),
+        }
     }
 }
 
@@ -106,6 +118,14 @@ impl CopyWirePayload for Fixed32Payload {
         buf.copy_to_slice(&mut bytes);
         Ok(Self(bytes))
     }
+
+    #[inline]
+    fn from_scanned(value: &ScannedValue) -> Result<Self, DecodeError> {
+        match *value {
+            ScannedValue::I32(bytes) => Ok(Self(bytes)),
+            _ => Err(DecodeError::InvalidTag),
+        }
+    }
 }
 
 /// Fixed64-family wire body (`WireType::Int64`) — 8 LE bytes (`fixed64` / `double` / …).
@@ -139,6 +159,14 @@ impl CopyWirePayload for Fixed64Payload {
         let mut bytes = [0u8; FIXED64_BYTES];
         buf.copy_to_slice(&mut bytes);
         Ok(Self(bytes))
+    }
+
+    #[inline]
+    fn from_scanned(value: &ScannedValue) -> Result<Self, DecodeError> {
+        match *value {
+            ScannedValue::I64(bytes) => Ok(Self(bytes)),
+            _ => Err(DecodeError::InvalidTag),
+        }
     }
 }
 

@@ -630,6 +630,7 @@ enum SlotApply<'a> {
     SpanList,
     Message(&'a MessageApply),
     Numerical,
+    RepeatedNumerical,
 }
 
 fn singular_apply(field: &ScalarEmit, companion: &Ident) -> TokenStream {
@@ -651,7 +652,7 @@ fn repeated_apply(field: &RepeatedEmit, companion: &Ident) -> TokenStream {
     } else if let Some(apply) = field.message_apply.as_ref() {
         SlotApply::Message(apply)
     } else {
-        SlotApply::Numerical
+        SlotApply::RepeatedNumerical
     };
     apply_arm(&field.field_const, companion, quote! { self.#name }, kind)
 }
@@ -703,16 +704,19 @@ fn apply_arm(
         },
         SlotApply::Message(apply) => message_apply_arm(slot, field_const, companion, apply),
         SlotApply::Numerical => quote! {
-            #companion::#field_const => ::puroro_rt::decode::merge_scanned_field(
-                rec,
-                self._common.lazy.scan.shared().clone_handle().as_bytes(),
-                origin,
-                |wire_type, buf| {
-                    #slot
-                        .bind_mut(&mut self._common)
-                        .merge(wire_type, buf, 0)
-                },
-            ),
+            #companion::#field_const => #slot
+                .bind_mut(&mut self._common)
+                .merge_scanned(&rec.value),
+        },
+        SlotApply::RepeatedNumerical => quote! {
+            #companion::#field_const => {
+                let wire = self._common.lazy.scan.shared().clone_handle();
+                #slot.bind_mut(&mut self._common).merge_scanned(
+                    rec,
+                    wire.as_bytes(),
+                    origin,
+                )
+            }
         },
     }
 }

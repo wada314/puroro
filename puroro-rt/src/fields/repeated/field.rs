@@ -13,22 +13,24 @@ use ::core::mem::ManuallyDrop;
 use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::BufMut;
-use ::puroro::{DecodeBuf, DecodeError, WireType};
+use ::puroro::{DecodeBuf, DecodeError, ScopedBuf, WireType};
 use ::unmanaged::CloneIn;
 use ::unmanaged::DeallocateIn;
 use ::unmanaged::UnmanagedString;
 use ::unmanaged::UnmanagedVec;
 use ::unmanaged::vec::VecGuard;
 
-use crate::decode::{LazyMessage, SharedWire, WireSpan};
+use crate::decode::{LazyMessage, ScannedRecord, ScannedValue, SharedWire, WireSpan};
 use crate::encode::field_number_const;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{DefaultIn, FieldDeallocate, MessageCommon, MessageCommonAlloc};
 use crate::fields::wire::len::{ProtoBytes, ProtoString, ProtoStringUnchecked};
+use crate::fields::wire::numerical::{Numerical, NumericalType};
 use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedVecMut,
 };
+use crate::fields::wire::wire_payload::CopyWirePayload;
 use crate::message_encode::{EncodeCtx, MessageEncode};
 
 use super::container::RepeatedElementsMut;
@@ -383,6 +385,42 @@ where
     }
 }
 
+impl<'f, 'c, C, E, const FIELD: u32, A, Cx> RepeatedFieldMut<'f, 'c, Numerical<C>, E, FIELD, A, Cx>
+where
+    C: NumericalType,
+    E: RepeatedEncoding<Numerical<C>, A>,
+    A: Allocator + Clone,
+    Cx: MessageCommonAlloc<Alloc = A>,
+{
+    /// Appends a scanner numeric, or packed LEN sliced from `wire`.
+    ///
+    /// Expanded occurrences use the already-decoded value. Packed LEN still
+    /// walks the island body (inner varints were not scanned).
+    pub fn merge_scanned(
+        self,
+        rec: &ScannedRecord,
+        wire: &[u8],
+        origin: usize,
+    ) -> Result<(), DecodeError> {
+        match rec.value {
+            ScannedValue::Len { .. } => {
+                let mut slice = rec.body_slice(origin, wire)?;
+                let mut scoped = ScopedBuf::new(&mut slice);
+                self.merge(WireType::Len, &mut scoped, 0)
+            }
+            _ => {
+                let elem: <Numerical<C> as RepeatedElement>::Element<A> =
+                    C::from_wire_body(C::WireBody::from_scanned(&rec.value)?)?;
+                let alloc = self.common.clone_alloc();
+                // SAFETY: an owned clone of the message allocator owns this vector.
+                let mut g = unsafe { self.field.storage.with_alloc(alloc) };
+                g.push(elem);
+                Ok(())
+            }
+        }
+    }
+}
+
 impl<T, E, const FIELD: u32, A> RepeatedField<T, E, FIELD, A>
 where
     T: RepeatedElement,
@@ -686,6 +724,55 @@ mod tests {
             field.bind(&wire, &common).err(),
             Some(DecodeError::InvalidUtf8)
         );
+        field.deallocate(&common);
+    }
+
+    #[test]
+    fn proto_int32_merge_scanned_appends_without_wire() {
+        use crate::ProtoInt32;
+        use crate::decode::{ScannedRecord, ScannedValue};
+        use ::protobuf_core::{FieldNumber, Varint};
+
+        let mut common = TestCommon::new_in(BitArray::ZERO, Global);
+        let mut field = RepeatedField::<ProtoInt32, Expanded, 1, Global>::new_in(Global);
+        let rec = ScannedRecord {
+            field_number: FieldNumber::try_new(1).unwrap(),
+            start: 0,
+            len: 2,
+            tag_len: 1,
+            value: ScannedValue::Varint(Varint::from_int32(7)),
+        };
+        field
+            .bind_mut(&mut common)
+            .merge_scanned(&rec, &[], 0)
+            .expect("merge_scanned");
+        assert_eq!(field.as_slice(), &[7]);
+        field.deallocate(&common);
+    }
+
+    #[test]
+    fn proto_int32_merge_scanned_packed_len_still_walks_body() {
+        use super::super::Packed;
+        use crate::ProtoInt32;
+        use crate::decode::{ScannedRecord, ScannedValue};
+        use ::protobuf_core::FieldNumber;
+
+        let mut common = TestCommon::new_in(BitArray::ZERO, Global);
+        let mut field = RepeatedField::<ProtoInt32, Packed, 1, Global>::new_in(Global);
+        // tag (field 1, LEN) + length 2 + varints 1, 2
+        let wire = [0x0a, 0x02, 0x01, 0x02];
+        let rec = ScannedRecord {
+            field_number: FieldNumber::try_new(1).unwrap(),
+            start: 0,
+            len: 4,
+            tag_len: 1,
+            value: ScannedValue::Len { payload_len: 2 },
+        };
+        field
+            .bind_mut(&mut common)
+            .merge_scanned(&rec, &wire, 0)
+            .expect("packed merge_scanned");
+        assert_eq!(field.as_slice(), &[1, 2]);
         field.deallocate(&common);
     }
 }
