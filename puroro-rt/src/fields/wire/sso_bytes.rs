@@ -23,7 +23,9 @@ use super::sso_string::INLINE_CAP;
 
 /// Untagged 24-byte singular `bytes` slot (inline buffer or heap [`UnmanagedVec`]).
 ///
-/// Arm selection requires an external `is_heap` flag ([`InlineOrHeap`] heap bit).
+/// The inline prefix of length `len` holds the bytes. The rest of the inline
+/// buffer is uninitialized and is not part of the `&[u8]`. Arm selection requires
+/// an external `is_heap` flag ([`InlineOrHeap`] heap bit).
 ///
 /// [`InlineOrHeap`]: crate::fields::shared::value_layout::InlineOrHeap
 pub type SsoBytes<A> = SsoBuf<UnmanagedVec<u8, A>>;

@@ -27,7 +27,9 @@ pub use super::sso_buf::INLINE_CAP;
 
 /// Untagged 24-byte singular `string` slot (inline buffer or heap [`UnmanagedString`]).
 ///
-/// Arm selection requires an external `is_heap` flag ([`InlineOrHeap`] heap bit).
+/// The inline prefix of length `len` holds the string. The rest of the inline
+/// buffer is uninitialized and is not part of the `&str`. Arm selection requires
+/// an external `is_heap` flag ([`InlineOrHeap`] heap bit).
 ///
 /// [`InlineOrHeap`]: crate::fields::shared::value_layout::InlineOrHeap
 pub type SsoString<A> = SsoBuf<UnmanagedString<A>>;

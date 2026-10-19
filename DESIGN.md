@@ -524,6 +524,8 @@ Both presence modes apply uniformly across every entry in this table.
 
 String getters yield a borrowed `&str` (via `Optional::get` when presence-tracked) when `utf8_validation=VERIFY`. The default singular layout is SSO ([`InlineOrHeap`](IMPLEMENTATION.md#172-string--bytes-inline-optimisation)); `_mut` returns [`StringMut`](src/string_mut.rs) (`set` / `set_string` / `clear` / `push_str` / `push` / `truncate`). Callers need `use puroro::StringMut` for those methods. `(puroro.string_layout) = STRING_LAYOUT_HEAP` selects heap `UnmanagedString` and `impl DerefMut<Target = ::puroro::String<A>>` instead.
 
+Short SSO values live in the message. Bytes past the string length in that slot are uninitialized and are not part of the value: getters, equality, and encode observe the logical `&str` only. Do not read the message's raw memory for a zeroed tail.
+
 **Implicit presence:**
 
 ```rust
@@ -558,7 +560,7 @@ To keep proto2 strings as `&str` without changing the `.proto` files, pass the p
 
 ### 4.3 Bytes fields
 
-Bytes fields follow the same pattern as strings with `&[u8]` as the value type. Default singular layout is SSO; `_mut` returns [`BytesMut`](src/bytes_mut.rs) (`set` / `set_vec` / `clear` / `extend_from_slice` / `push` / `truncate`). Callers need `use puroro::BytesMut`. `(puroro.bytes_layout) = BYTES_LAYOUT_HEAP` selects heap `UnmanagedVec` and `impl DerefMut<Target = Vec<u8, A>>` (`allocator_api2`) instead.
+Bytes fields follow the same pattern as strings with `&[u8]` as the value type. Default singular layout is SSO; `_mut` returns [`BytesMut`](src/bytes_mut.rs) (`set` / `set_vec` / `clear` / `extend_from_slice` / `push` / `truncate`). Callers need `use puroro::BytesMut`. `(puroro.bytes_layout) = BYTES_LAYOUT_HEAP` selects heap `UnmanagedVec` and `impl DerefMut<Target = Vec<u8, A>>` (`allocator_api2`) instead. Unused SSO capacity is uninitialized and is not visible through `&[u8]`, same as strings.
 
 **Implicit presence:**
 

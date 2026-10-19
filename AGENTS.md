@@ -44,6 +44,10 @@ Fix new fmt/clippy issues. Do not silence lints unless this repo already does fo
 - New submodules use `foo.rs`, not `foo/mod.rs`.
 - In `quote!`, interpolations must be simple `#ident` (bind expressions first).
 
+## SSO inline slot
+
+Singular `string` / `bytes` SSO stores `[MaybeUninit<u8>; INLINE_CAP]` plus a length byte. Only that prefix is initialized. Short decode copies the wire bytes once into the prefix, and the first merge writes an absent slot in place. Do not zero the tail or read it as `[u8]`. Layout and merge rules: [`IMPLEMENTATION.md` §17.2](IMPLEMENTATION.md#172-string--bytes-inline-optimisation).
+
 ## Where to read next
 
 - Public API: [`DESIGN.md`](DESIGN.md)

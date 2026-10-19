@@ -14,6 +14,9 @@ use ::core::str;
 use ::unmanaged::{CloneIn, DefaultIn, String as AllocString, UnmanagedString, UnmanagedVec};
 
 /// Max inline byte length (one byte of the 3-word slot is the length).
+///
+/// The inline buffer is `[MaybeUninit<u8>; INLINE_CAP]`. Only the first
+/// `len` bytes are initialized; the tail is not a zero fill.
 pub const INLINE_CAP: usize = mem::size_of::<usize>() * 3 - 1;
 
 #[repr(C)]
