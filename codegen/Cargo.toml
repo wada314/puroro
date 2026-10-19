@@ -11,7 +11,7 @@ documentation = "https://docs.rs/puroro/"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-stable_puroro = { package = "puroro", version = "0.14.0" }
+stable_puroro = { package = "puroro", version = "0.14.1", path = "../puroro" }
 itertools = "0.14"
 lazy_static = "1.5"
 thiserror = "2.0"

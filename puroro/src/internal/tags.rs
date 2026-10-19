@@ -18,8 +18,6 @@ use crate::{PuroroError, Result};
 use ::std::io::Result as IoResult;
 use ::std::marker::PhantomData;
 use ::std::ops::Deref;
-use crate::string::String as PuroroString;
-use crate::bytes::Bytes as PuroroBytes;
 
 // Variants
 #[derive(Default, Clone)]
@@ -287,11 +285,11 @@ impl NumericalType for SFixed64 {
     }
 }
 impl UnsizedType for String {
-    type RustOwnedType = crate::string::String;
+    type RustOwnedType = ::std::string::String;
     type RustRefType<'a> = &'a str
     where
         Self: 'a;
-    type RustMutType<'a> = &'a mut crate::string::String 
+    type RustMutType<'a> = &'a mut ::std::string::String 
     where
         Self: 'a;
     type DefaultValueType = &'static str;
@@ -303,26 +301,26 @@ impl UnsizedType for String {
         val
     }
     fn default_to_value<'a>(default: Self::DefaultValueType) -> Self::RustOwnedType {
-        default.into()
+        default.to_string()
     }
     fn default_to_ref<'a>(default: Self::DefaultValueType) -> Self::RustRefType<'a> {
         default
     }
 
     fn from_bytes_iter<I: Iterator<Item = IoResult<u8>>>(bytes: I) -> Result<Self::RustOwnedType> {
-        let bytes = bytes.collect::<IoResult<PuroroBytes>>()?;
-        Ok(PuroroString::from_utf8(bytes)?)
+        let bytes = bytes.collect::<IoResult<Vec<_>>>()?;
+        Ok(::std::string::String::from_utf8(bytes)?)
     }
     fn to_bytes_slice(val: &Self::RustOwnedType) -> Result<&[u8]> {
         Ok(val.as_bytes())
     }
 }
 impl UnsizedType for Bytes {
-    type RustOwnedType = PuroroBytes;
+    type RustOwnedType = Vec<u8>;
     type RustRefType<'a> = &'a [u8]
     where
         Self: 'a;
-    type RustMutType<'a> = &'a mut PuroroBytes
+    type RustMutType<'a> = &'a mut Vec<u8>
     where
         Self: 'a;
     type DefaultValueType = &'static [u8];
@@ -334,17 +332,17 @@ impl UnsizedType for Bytes {
         val
     }
     fn default_to_value<'a>(default: Self::DefaultValueType) -> Self::RustOwnedType {
-        default.into()
+        default.to_vec()
     }
     fn default_to_ref<'a>(default: Self::DefaultValueType) -> Self::RustRefType<'a> {
         default
     }
 
     fn from_bytes_iter<I: Iterator<Item = IoResult<u8>>>(bytes: I) -> Result<Self::RustOwnedType> {
-        Ok(bytes.collect::<IoResult<PuroroBytes>>()?)
+        Ok(bytes.collect::<IoResult<Vec<_>>>()?)
     }
     fn to_bytes_slice(val: &Self::RustOwnedType) -> Result<&[u8]> {
-        Ok(&val)
+        Ok(val.as_slice())
     }
 }
 

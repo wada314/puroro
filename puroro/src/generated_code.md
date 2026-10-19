@@ -134,7 +134,7 @@ pub struct Book(/* private */);
 
 impl Book {
     // per-field mutators — see Fields
-    pub fn title_mut(&mut self) -> &mut puroro::String { /* ... */ }
+    pub fn title_mut(&mut self) -> &mut std::string::String { /* ... */ }
     pub fn clear_title(&mut self) { /* ... */ }
 
     pub const TITLE_FIELD_NUMBER: i32 = 1;
@@ -226,9 +226,8 @@ If a message has no nested types and no oneofs, no extra module is generated.
 
 # Scalar type mapping
 
-Scalar fields use the same Rust types as the official proto3 scalar table,
-except that `string` and `bytes` use puroro’s own buffer types instead of
-`String` / `Vec<u8>`:
+Scalar fields use the same Rust types as the official proto3 scalar table.
+`string` is [`std::string::String`] and `bytes` is [`Vec<u8>`](std::vec::Vec).
 
 | Proto type | Getter (`foo()`) | Mutator (`foo_mut()`) | Owned element type |
 | --- | --- | --- | --- |
@@ -239,15 +238,12 @@ except that `string` and `bytes` use puroro’s own buffer types instead of
 | `uint32`, `fixed32` | `u32` | `&mut u32` | `u32` |
 | `uint64`, `fixed64` | `u64` | `&mut u64` | `u64` |
 | `bool` | `bool` | `&mut bool` | `bool` |
-| `string` | `&str` | `&mut puroro::String` | `puroro::String` |
-| `bytes` | `&[u8]` | `&mut puroro::Bytes` | `puroro::Bytes` |
+| `string` | `&str` | `&mut std::string::String` | `std::string::String` |
+| `bytes` | `&[u8]` | `&mut Vec<u8>` | `Vec<u8>` |
 | enum `E` | `E` | `&mut E` | `E` |
 | message `M` | `Option<&MView>` | `&mut M` | `M` |
 
-`puroro::String` derefs to `str` and implements `From<&str>` and
-`From<std::string::String>`, so assignment looks like
-`*book.title_mut() = "Yo".into();`.
-`puroro::Bytes` derefs to `[u8]`.
+Assign a string with `*book.title_mut() = "Yo".to_string();`.
 
 # Fields
 
@@ -394,8 +390,8 @@ View item type `V` vs mutator element type:
 | Proto `T` | `foo()` item | `foo_mut()` |
 | --- | --- | --- |
 | numeric / bool / enum | owned `T` (`i32`, `MyEnum`, …) | `&mut Vec<T>` |
-| `string` | `str` | `&mut Vec<puroro::String>` |
-| `bytes` | `[u8]` | `&mut Vec<puroro::Bytes>` |
+| `string` | `str` | `&mut Vec<std::string::String>` |
+| `bytes` | `[u8]` | `&mut Vec<Vec<u8>>` |
 | message `M` | `MView` | `&mut Vec<M>` |
 
 Example:

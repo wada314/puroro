@@ -109,7 +109,7 @@ impl Msg {
             self.0.shared.bitfield_mut(),
         )
     }
-    pub fn bytes_required_mut(&mut self) -> &mut self::_puroro::Bytes {
+    pub fn bytes_required_mut(&mut self) -> &mut ::std::vec::Vec<u8> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::full_coverage2::_view::MsgView = &mut self.0;
         NonRepeatedFieldType::get_field_mut(
@@ -126,7 +126,7 @@ impl Msg {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn bytes_optional_mut(&mut self) -> &mut self::_puroro::Bytes {
+    pub fn bytes_optional_mut(&mut self) -> &mut ::std::vec::Vec<u8> {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::full_coverage2::_view::MsgView = &mut self.0;
         NonRepeatedFieldType::get_field_mut(
@@ -143,7 +143,7 @@ impl Msg {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn bytes_repeated_mut(&mut self) -> &mut ::std::vec::Vec<self::_puroro::Bytes> {
+    pub fn bytes_repeated_mut(&mut self) -> &mut ::std::vec::Vec<::std::vec::Vec<u8>> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.bytes_repeated,
@@ -157,7 +157,7 @@ impl Msg {
             self.0.shared.bitfield_mut(),
         )
     }
-    pub fn string_required_mut(&mut self) -> &mut self::_puroro::String {
+    pub fn string_required_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::full_coverage2::_view::MsgView = &mut self.0;
         NonRepeatedFieldType::get_field_mut(
@@ -174,7 +174,7 @@ impl Msg {
             mut_view.shared.bitfield_mut(),
         )
     }
-    pub fn string_optional_mut(&mut self) -> &mut self::_puroro::String {
+    pub fn string_optional_mut(&mut self) -> &mut ::std::string::String {
         use self::_pinternal::{NonRepeatedFieldType, SharedItems as _};
         let mut_view: &mut self::_root::full_coverage2::_view::MsgView = &mut self.0;
         NonRepeatedFieldType::get_field_mut(
@@ -193,7 +193,7 @@ impl Msg {
     }
     pub fn string_repeated_mut(
         &mut self,
-    ) -> &mut ::std::vec::Vec<self::_puroro::String> {
+    ) -> &mut ::std::vec::Vec<::std::string::String> {
         use self::_pinternal::{RepeatedFieldType, SharedItems as _};
         RepeatedFieldType::get_field_mut(
             &mut self.0.fields.string_repeated,
@@ -1424,31 +1424,31 @@ pub mod _view {
             >,
             self::_pinternal::RepeatedNumericalField<f32, self::_pinternal::tags::Float>,
             self::_pinternal::OptionalUnsizedField<
-                self::_puroro::Bytes,
+                ::std::vec::Vec<u8>,
                 self::_pinternal::tags::Bytes,
                 4usize,
             >,
             self::_pinternal::OptionalUnsizedField<
-                self::_puroro::Bytes,
+                ::std::vec::Vec<u8>,
                 self::_pinternal::tags::Bytes,
                 5usize,
             >,
             self::_pinternal::RepeatedUnsizedField<
-                self::_puroro::Bytes,
+                ::std::vec::Vec<u8>,
                 self::_pinternal::tags::Bytes,
             >,
             self::_pinternal::OptionalUnsizedField<
-                self::_puroro::String,
+                ::std::string::String,
                 self::_pinternal::tags::String,
                 6usize,
             >,
             self::_pinternal::OptionalUnsizedField<
-                self::_puroro::String,
+                ::std::string::String,
                 self::_pinternal::tags::String,
                 7usize,
             >,
             self::_pinternal::RepeatedUnsizedField<
-                self::_puroro::String,
+                ::std::string::String,
                 self::_pinternal::tags::String,
             >,
             self::_pinternal::OptionalNumericalField<

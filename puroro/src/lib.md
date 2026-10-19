@@ -46,7 +46,7 @@ impl Deref for Book {
 }
 
 impl Book {
-    pub fn title_mut(&mut self) -> &mut ::puroro::String {
+    pub fn title_mut(&mut self) -> &mut ::std::string::String {
         // ...
 #       todo!()
     }
@@ -105,9 +105,7 @@ The `Book` struct also implements [`Clone`], [`Default`], [`PartialEq`] and
 [`Debug`](std::fmt::Debug). `BookView` implements `ToOwned<Owned = Book>`,
 [`PartialEq`] and [`Debug`](std::fmt::Debug).
 
-String fields use [`crate::String`] (re-exported as `puroro::String`) instead of
-`std::string::String`. It derefs to `str` and implements `From<&str>`, so
-assignment with `.into()` works as shown below.
+String fields use [`std::string::String`]. Bytes fields use [`Vec<u8>`](std::vec::Vec).
 
 Let's assume the generated code is in `doc_samples` module,
 then you can use the generated protobuf like this:
@@ -117,7 +115,7 @@ then you can use the generated protobuf like this:
 use doc_samples::library::Book;
 
 let mut book = Book::default();
-*book.title_mut() = "The C Programming Language".into();
+*book.title_mut() = "The C Programming Language".to_string();
 // We are not setting the number of pages here.
 
 assert_eq!("The C Programming Language", book.title());
@@ -162,7 +160,7 @@ use doc_samples::library::Book;
 let mut output = vec![];
 let mut book = Book::default();
 
-*book.title_mut() = "Yo".into();
+*book.title_mut() = "Yo".to_string();
 book.to_bytes(&mut output).unwrap();
 
 assert_eq!(vec![0x0a, 0x02, 0x59, 0x6f], output);
