@@ -1,18 +1,22 @@
 //! Unknown-field store for [`crate::MessageCommon`].
 //!
 //! [`UnknownFields`] preserves unrecognized wire bytes (empty is one word).
-//! [`DiscardUnknowns`] is a ZST that skips the same payloads. Catalog code
-//! talks to either through [`UnknownStore`].
+//! [`DiscardUnknowns`] is a ZST that skips the same payloads.
+//! [`RejectUnknowns`] is a ZST that fails decode on an unrecognized tag.
+//! Catalog code talks to any of them through [`UnknownStore`].
 
 use ::allocator_api2::alloc::Allocator;
 use ::core::fmt;
 use ::core::ops::Deref;
 use ::unmanaged::{CloneIn, DeallocateIn, DefaultIn, UnmanagedBox, UnmanagedVec};
 
-/// Message-level unknown-field policy (preserve vs discard).
+/// Message-level unknown-field policy (preserve, discard, or reject).
 ///
 /// Decode helpers append through [`append_blob_mut`](Self::append_blob_mut).
-/// Discard returns [`None`] and still advances the input via `skip_field`.
+/// Discard and reject return [`None`] there. Unrecognized tags also consult
+/// [`on_unrecognized_tag`](Self::on_unrecognized_tag): reject fails, preserve
+/// and discard succeed. Closed-enum diversion uses only `append_blob_mut`,
+/// so a ZST store drops that value instead of failing decode.
 pub trait UnknownStore<A: Allocator>: Sized {
     /// Empty store.
     fn new() -> Self;
@@ -42,6 +46,15 @@ pub trait UnknownStore<A: Allocator>: Sized {
     fn append_blob_mut(&mut self, alloc: A) -> Option<&mut UnmanagedVec<u8, A>>
     where
         A: Clone;
+
+    /// Unrecognized field number (not a closed-enum divert).
+    ///
+    /// Preserve and discard return [`Ok`]. Reject returns
+    /// [`DecodeError::UnrecognizedField`](::puroro::DecodeError::UnrecognizedField).
+    fn on_unrecognized_tag(&self, field_number: u32) -> Result<(), ::puroro::DecodeError> {
+        let _ = field_number;
+        Ok(())
+    }
 }
 
 /// Preserve-policy unknown fields: this message’s wire trailer.
@@ -157,6 +170,61 @@ impl Deref for DiscardUnknowns {
     }
 }
 
+/// Reject-policy unknown fields: no buffer, unrecognized tags fail decode.
+///
+/// A well-formed unrecognized tag becomes
+/// [`DecodeError::UnrecognizedField`](::puroro::DecodeError::UnrecognizedField)
+/// after its payload is consumed. Closed-enum diversion still calls
+/// [`append_blob_mut`](UnknownStore::append_blob_mut), which drops the value
+/// and does not fail. Empty is a ZST (no word in [`crate::MessageCommon`]).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct RejectUnknowns;
+
+impl<A: Allocator> UnknownStore<A> for RejectUnknowns {
+    #[inline]
+    fn new() -> Self {
+        Self
+    }
+
+    #[inline]
+    fn as_bytes(&self) -> &[u8] {
+        &[]
+    }
+
+    #[inline]
+    fn clone_in(&self, _alloc: A) -> Self
+    where
+        A: Clone,
+    {
+        Self
+    }
+
+    #[inline]
+    unsafe fn deallocate(self, _alloc: &A) {}
+
+    #[inline]
+    fn append_blob_mut(&mut self, _alloc: A) -> Option<&mut UnmanagedVec<u8, A>>
+    where
+        A: Clone,
+    {
+        None
+    }
+
+    #[inline]
+    fn on_unrecognized_tag(&self, field_number: u32) -> Result<(), ::puroro::DecodeError> {
+        Err(::puroro::DecodeError::UnrecognizedField { field_number })
+    }
+}
+
+impl Deref for RejectUnknowns {
+    type Target = [u8];
+
+    #[inline]
+    fn deref(&self) -> &[u8] {
+        &[]
+    }
+}
+
 impl<A: Allocator> Default for UnknownFields<A> {
     #[inline]
     fn default() -> Self {
@@ -223,7 +291,7 @@ impl<A: Allocator> fmt::Debug for UnknownFields<A> {
 
 #[cfg(test)]
 mod tests {
-    use super::{DiscardUnknowns, UnknownFields, UnknownStore};
+    use super::{DiscardUnknowns, RejectUnknowns, UnknownFields, UnknownStore};
     use crate::decode::{
         iter_unknown_fields, save_unknown_varint_field, skip_field_and_save, skip_field_and_save_in,
     };
@@ -231,7 +299,7 @@ mod tests {
     use ::bytes::Buf;
     use ::core::mem::size_of;
     use ::protobuf_core::FieldNumber;
-    use ::puroro::WireType;
+    use ::puroro::{DecodeError, WireType};
     use ::std::vec::Vec;
     use ::unmanaged::{CloneIn, DeallocateIn};
 
@@ -281,6 +349,34 @@ mod tests {
             copy.deallocate_in(&Global);
             s.deallocate_in(&Global);
         }
+    }
+
+    #[test]
+    fn reject_is_zst_and_fails_unrecognized_tag() {
+        assert_eq!(size_of::<RejectUnknowns>(), 0);
+        let mut s = RejectUnknowns;
+        let mut wire: &[u8] = &[1];
+        let err = skip_field_and_save_in(field(3), WireType::Varint, &mut wire, &mut s, Global)
+            .unwrap_err();
+        assert_eq!(err, DecodeError::UnrecognizedField { field_number: 3 });
+        assert!(!wire.has_remaining());
+        assert_eq!(iter_unknown_fields(&s).count(), 0);
+    }
+
+    #[test]
+    fn reject_truncated_payload_is_wire_error() {
+        let mut wire: &[u8] = &[];
+        let mut s = RejectUnknowns;
+        let err = skip_field_and_save_in(field(3), WireType::Varint, &mut wire, &mut s, Global)
+            .unwrap_err();
+        assert_eq!(err, DecodeError::UnexpectedEof);
+    }
+
+    #[test]
+    fn reject_closed_enum_divert_drops_without_error() {
+        let mut s = RejectUnknowns;
+        save_unknown_varint_field(field(1), 99, &mut s, Global);
+        assert_eq!(iter_unknown_fields(&s).count(), 0);
     }
 
     #[test]

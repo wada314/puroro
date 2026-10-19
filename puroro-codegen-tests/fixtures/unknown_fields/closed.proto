@@ -1,0 +1,16 @@
+edition = "2023";
+
+import "puroro/options.proto";
+
+// Closed enum; file default field_presence is EXPLICIT.
+enum Status {
+  option features.enum_type = CLOSED;
+  STATUS_UNSPECIFIED = 0;
+  STATUS_OK = 1;
+}
+
+// Unknown closed values are diverted, not rejected. The ZST store drops them.
+message RejectClosed {
+  option (puroro.unknown_fields) = UNKNOWN_FIELDS_REJECT;
+  Status status = 1;
+}

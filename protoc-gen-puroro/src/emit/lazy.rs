@@ -207,7 +207,7 @@ fn render_lazy_message(lazy_alias: &Ident, apply_arms: &[TokenStream]) -> TokenS
                 let _ = origin;
                 match rec.field_number.as_u32() {
                     #(#apply_arms)*
-                    _ => ::core::result::Result::Ok(()),
+                    _ => self._common.on_unrecognized_tag(rec.field_number.as_u32()),
                 }
             }
         }

@@ -5,7 +5,7 @@ use super::{
     ResolvedChildParse, WireTypeKind, field_number_const, resolve_child_parse, value_bit_const,
 };
 use crate::default_value::interpret_custom_default;
-use crate::descriptor::{BytesLayout, StringLayout};
+use crate::descriptor::{BytesLayout, StringLayout, UnknownFieldsPolicy};
 use crate::error::{Error, Result};
 use crate::resolved::{Field, FieldOccurrence, Message, SingularPresence, TypeRef};
 use ::std::collections::HashMap;
@@ -23,8 +23,8 @@ pub struct MessageFieldPlan<'a> {
     /// bytes field. Lazy messages use `InteriorBitArray` only when this is
     /// larger.
     lazy_bit_count: usize,
-    /// Bake [`DiscardUnknowns`] into `MessageCommon`.
-    discard_unknowns: bool,
+    /// `(puroro.unknown_fields)` baked into `MessageCommon`.
+    unknown_fields: UnknownFieldsPolicy,
 }
 
 /// One direct struct member of the generated message.
@@ -71,9 +71,9 @@ impl<'a> MessageFieldPlan<'a> {
         self.lazy_bit_count
     }
 
-    /// Whether generated code should bake `DiscardUnknowns`.
-    pub fn discard_unknowns(&self) -> bool {
-        self.discard_unknowns
+    /// `(puroro.unknown_fields)` for this message (`Unspecified` preserves).
+    pub fn unknown_fields(&self) -> UnknownFieldsPolicy {
+        self.unknown_fields
     }
 }
 
@@ -239,7 +239,7 @@ pub fn plan_fields<'a>(
         members,
         bit_count: next_bit,
         lazy_bit_count,
-        discard_unknowns: message.discard_unknowns(),
+        unknown_fields: message.unknown_fields(),
     })
 }
 

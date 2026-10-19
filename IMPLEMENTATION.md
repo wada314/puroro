@@ -228,7 +228,7 @@ The table above is the `fields/` catalog plus the encode/decode modules that gen
 | Member | Role |
 |---|---|
 | `bits: B` | `BitArray<[u8; N], Lsb0>` **common bits** (eager) or [`InteriorBitArray`](puroro-rt/src/fields/shared.rs) (lazy): EXPLICIT / LEGACY_REQUIRED presence, packed bool values, string / bytes SSO heap-arm bits, and lazy `WireOrSso` kind bits |
-| `unknown_fields: ManuallyDrop<U>` | [`UnknownStore`](puroro-rt/src/unknown_fields.rs). Default `U = UnknownFields<A>`: empty ≈ 1 word; first use allocates this message’s wire blob. [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs) is a ZST (omits the word). Public iterator parses `U::as_bytes()`. Generated / sample messages bake `U` into `Foo<A>` (`impl<A>` only). Lazy `Message::unknown_fields()` is empty; unknown tags stay in the ingested wire until `into_eager` |
+| `unknown_fields: ManuallyDrop<U>` | [`UnknownStore`](puroro-rt/src/unknown_fields.rs). Default `U = UnknownFields<A>`: empty ≈ 1 word; first use allocates this message’s wire blob. [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs) and [`RejectUnknowns`](puroro-rt/src/unknown_fields.rs) are ZSTs (omit the word). Reject fails decode on an unrecognized tag. Public iterator parses `U::as_bytes()`. Generated / sample messages bake `U` into `Foo<A>` (`impl<A>` only). Lazy `Message::unknown_fields()` is empty; preserve / discard unknown tags stay in the ingested wire until `into_eager`. Reject fails the lazy scan |
 | `alloc: A` | The single canonical allocator instance; cloned (by value) into every field operation that (de)allocates |
 | `lazy: L` | [`Eager`](puroro-rt/src/decode/lazy_scan.rs) (ZST) or [`Lazy<A>`](puroro-rt/src/decode/lazy_scan.rs) (`LazyScan` island buffer / leftover) |
 
@@ -847,7 +847,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 
 ### Unknown
 
-**Storage:** [`MessageCommon<B, A, U, L>`](puroro-rt/src/fields/shared.rs) with [`UnknownStore`](puroro-rt/src/unknown_fields.rs). Default `U = UnknownFields<A>` — empty is one word; `skip_field_and_save` / `save_unknown_varint_field` append this message’s blob. [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs) is a ZST (decode skips, encode / iterator empty). Generated / sample messages bake `U` into `Foo<A>` (`impl<A>` only). Sample `Point` preserves; sample `Marker` bakes discard. Plugin: `(puroro.unknown_fields) = DISCARD` emits `MessageCommon<Bits, A, DiscardUnknowns>` and `skip_field_and_save_in`. Encode uses `Deref` to `[u8]`. Inlined children keep a separate store on their own `MessageCommon`. `SGroup` / `EGroup` not preserved.
+**Storage:** [`MessageCommon<B, A, U, L>`](puroro-rt/src/fields/shared.rs) with [`UnknownStore`](puroro-rt/src/unknown_fields.rs). Default `U = UnknownFields<A>` — empty is one word; `skip_field_and_save` / `save_unknown_varint_field` append this message’s blob. [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs) is a ZST (decode skips, encode / iterator empty). [`RejectUnknowns`](puroro-rt/src/unknown_fields.rs) is a ZST: `skip_field_and_save_in` returns `DecodeError::UnrecognizedField` after a well-formed payload; closed-enum `save_unknown_varint_field` still drops. Generated / sample messages bake `U` into `Foo<A>` (`impl<A>` only). Sample `Point` preserves; sample `Marker` bakes discard. Plugin: `(puroro.unknown_fields) = DISCARD` emits `DiscardUnknowns`; `REJECT` emits `RejectUnknowns`. Encode uses `Deref` to `[u8]`. Inlined children keep a separate store on their own `MessageCommon`. `SGroup` / `EGroup` not preserved.
 
 **Public accessor:** `Message::unknown_fields()` returns `impl Iterator<Item = ::puroro::UnknownField<'_>>` by parsing that blob with [`iter_unknown_fields`](puroro-rt/src/decode.rs) (also `MessageCommon::iter_unknown_fields`). Encode paths read the blob directly and do not go through the iterator.
 
@@ -867,7 +867,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |
 | `TaskLazy` | Plugin emits `NameLazy` (one scan, numericals applied immediately, `WireOrSso` / span lists; the scan record does not own LEN). Sample is the same shape. Lazy `unknown_fields()` is empty. `MessageFallible` is eager-only | [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing); lock: [`.cursor/plans/lazy-decoder.md`](.cursor/plans/lazy-decoder.md) |
 | `Hash` / `serde` | Deferred | Opt-in features |
-| Unknown-field reject-on-decode | Preserve / Discard only (`UnknownStore` is write-or-drop) | Optional `REJECT` (DESIGN.md §8.2): `DecodeError` on unknown tag; not a third blob store |
+| Unknown-field reject-on-decode | `(puroro.unknown_fields) = REJECT` bakes [`RejectUnknowns`](puroro-rt/src/unknown_fields.rs) (ZST; `UnrecognizedField`) | — |
 | Submessage inline | Sample singular **and** oneof nested messages use [`ProtoMessage<M>`](puroro-rt/src/fields/wire/proto_message.rs): inline slot = full `M`, boxed slot = `UnmanagedBox<M>`, getters are `&M` / `&mut M`. Repeated / map store `M` | codegen ([§17.1](#171-submessage-inline-optimisation)) |
 | String / Bytes inline | Singular `string` / `bytes` use SSO (`SsoString` / `SsoBytes` + `InlineOrHeap`); repeated / map stay heap | Repeated / map SSO deferred ([§17.2](#172-string--bytes-inline-optimisation)) |
 

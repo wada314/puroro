@@ -5,6 +5,8 @@
 //! ([`DecodeError::MissingRequiredField`]). Closed-enum unknowns use
 //! [`DecodeError::UnknownClosedEnum`] internally and are diverted into the
 //! message unknown-field set rather than aborting `merge_from`.
+//! [`DecodeError::UnrecognizedField`] aborts `merge_from` when the message
+//! bakes the reject policy.
 //!
 //! Encoding into a growing `Vec` / `BytesMut` is infallible, so there is no
 //! public encode error type.
@@ -54,6 +56,16 @@ pub enum DecodeError {
         /// Raw varint numeric value as read from the wire (for unknown-field round-trip).
         raw: u64,
     },
+    /// An unrecognized field number on a message that rejects unknown tags.
+    ///
+    /// Produced by the reject unknown-field policy. Preserve and discard do
+    /// not return this. Closed-enum unknowns are diverted instead and do not
+    /// use this variant. A truncated or otherwise illegal payload is reported
+    /// as that wire error, not as an unrecognized field.
+    UnrecognizedField {
+        /// Field number from the tag.
+        field_number: u32,
+    },
 }
 
 impl fmt::Display for DecodeError {
@@ -73,6 +85,9 @@ impl fmt::Display for DecodeError {
             }
             DecodeError::UnknownClosedEnum { raw } => {
                 write!(f, "closed enum value {raw} is not in the known set")
+            }
+            DecodeError::UnrecognizedField { field_number } => {
+                write!(f, "unrecognized field {field_number}")
             }
         }
     }
