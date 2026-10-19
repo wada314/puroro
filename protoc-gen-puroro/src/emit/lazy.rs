@@ -143,6 +143,17 @@ fn lazy_ingest_methods(
                 ::core::result::Result::Ok(())
             }
 
+            fn push_bytes(
+                &mut self,
+                chunk: ::bytes::Bytes,
+            ) -> ::core::result::Result<(), ::puroro::DecodeError> {
+                let (origin, records) = self._common.lazy.scan.push_bytes(chunk)?;
+                for rec in records {
+                    ::puroro_rt::decode::LazyMessage::apply_record(self, &rec, origin)?;
+                }
+                ::core::result::Result::Ok(())
+            }
+
             pub fn finish(&mut self) -> ::core::result::Result<(), ::puroro::DecodeError> {
                 self._common.lazy.scan.finish()
             }
@@ -158,15 +169,9 @@ fn lazy_ingest_methods(
                 &mut self,
                 buf: &mut B,
             ) -> ::core::result::Result<(), ::puroro::DecodeError> {
-                while ::bytes::Buf::has_remaining(buf) {
-                    let n = ::bytes::Buf::chunk(buf).len();
-                    if n == 0 {
-                        let rest = ::bytes::Buf::copy_to_bytes(buf, ::bytes::Buf::remaining(buf));
-                        self.push(&rest)?;
-                        break;
-                    }
-                    self.push(::bytes::Buf::chunk(buf))?;
-                    ::bytes::Buf::advance(buf, n);
+                if ::bytes::Buf::has_remaining(buf) {
+                    let rest = ::bytes::Buf::copy_to_bytes(buf, ::bytes::Buf::remaining(buf));
+                    self.push_bytes(rest)?;
                 }
                 self.finish()
             }

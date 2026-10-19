@@ -163,19 +163,41 @@ impl<A: Allocator + Clone> RecordScanner<A> {
     /// [`finish`](Self::finish) when no more bytes will arrive.
     pub fn push(&mut self, chunk: &[u8]) -> Result<AllocVec<ScannedRecord, A>, DecodeError> {
         let alloc = self.leftover.allocator().clone();
-        let mut records = AllocVec::new_in(alloc);
         let src = TwoSlice {
             head: &self.leftover,
             tail: chunk,
         };
-        let mut pos = 0usize;
-        while let TryRecord::Done { rec } = try_record_at(&src, pos)? {
-            pos += rec.len;
-            records.push(rec);
-        }
+        let (records, pos) = scan_src(&src, alloc)?;
         keep_unparsed_tail(&mut self.leftover, chunk, pos);
         Ok(records)
     }
+}
+
+/// Complete records in `buf`, plus the first unparsed index.
+pub(super) fn scan_slice<A: Allocator + Clone>(
+    buf: &[u8],
+    alloc: A,
+) -> Result<(AllocVec<ScannedRecord, A>, usize), DecodeError> {
+    scan_src(
+        &TwoSlice {
+            head: &[],
+            tail: buf,
+        },
+        alloc,
+    )
+}
+
+fn scan_src<A: Allocator + Clone>(
+    src: &TwoSlice<'_>,
+    alloc: A,
+) -> Result<(AllocVec<ScannedRecord, A>, usize), DecodeError> {
+    let mut records = AllocVec::new_in(alloc);
+    let mut pos = 0usize;
+    while let TryRecord::Done { rec } = try_record_at(src, pos)? {
+        pos += rec.len;
+        records.push(rec);
+    }
+    Ok((records, pos))
 }
 
 /// Feeds a scanned record into catalog `merge` by reconstructing a wire body.
