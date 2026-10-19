@@ -17,8 +17,11 @@ length prefix via `merge(WireType::Len)`. Inner bodies were not scanned.
 Measured (2026-10-19, Criterion `generated` `task|map`, `taskset -c 0`):
 span-only `task_lazy/decode` was 1.295 µs; after `merge_scanned` it is
 1.12 µs (~−14%). `map/decode_lazy` did not move (map entries stay spans
-at ingest). Eager `task/decode` drifted a few percent; treat gaps under
-~10% as noise. Typical TaskLazy decode is about 1.08× eager after rematch.
+at ingest). `merge_packed_buf` did not move typical `task_lazy/decode` or
+`map/decode_lazy` (typical Task packed fields are tiny; a noisy first
+`task_lazy/decode` run was discarded on recheck). Eager `task/decode`
+drifted a few percent; treat gaps under ~10% as noise. Typical TaskLazy
+decode is about 1.1× eager after rematch (1.08–1.14 across runs).
 Remaining ingest cost is the island copy. Packed inners still walk the
 payload (unread packed-as-slice is out of v1).
 
