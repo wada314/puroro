@@ -20,8 +20,6 @@
 //! **`puroro-rt`** crate. Generated code depends on it; application code that
 //! only uses generated messages should not need to import `puroro-rt` directly.
 //!
-//! See [`DESIGN.md`](DESIGN.md) for the interface specification.
-//!
 //! # Example
 //!
 //! ```ignore
