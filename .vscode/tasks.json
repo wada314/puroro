@@ -2,232 +2,81 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "type": "cargo",
-            "command": "build",
-            "problemMatcher": [
-                "$rustc"
-            ],
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": true
-            },
-            "group": "build",
-            "label": "rust: cargo build"
-        },
-        {
+            "label": "cargo: build (workspace)",
             "type": "cargo",
             "command": "build",
             "args": [
-                "--config",
-                "patch.crates-io.stable_puroro.git=\"https://github.com/wada314/puroro\"",
-                "--config",
-                "patch.crates-io.stable_puroro.branch=\"master\"",
-                "--config",
-                "patch.crates-io.stable_puroro.package=\"puroro\"",
+                "--workspace",
+                "--all-targets"
             ],
             "problemMatcher": [
                 "$rustc"
             ],
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": true
+            "group": {
+                "kind": "build",
+                "isDefault": true
             },
-            "group": "build",
-            "label": "rust: cargo build (use git master branch puroro)"
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "options": {
+                "env": {
+                    "PROTOC": "${env:HOME}/.local/protoc/bin/protoc",
+                    "PATH": "${env:HOME}/.local/protoc/bin:${env:PATH}"
+                }
+            }
         },
         {
-            "type": "cargo",
-            "command": "test",
-            "problemMatcher": [
-                "$rustc"
-            ],
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": true
-            },
-            "env": {
-                "RUST_BACKTRACE": "1"
-            },
-            "group": "test",
-            "label": "rust: cargo test"
-        },
-        {
+            "label": "cargo: test (workspace)",
             "type": "cargo",
             "command": "test",
             "args": [
-                "--config",
-                "patch.crates-io.stable_puroro.git=\"https://github.com/wada314/puroro\"",
-                "--config",
-                "patch.crates-io.stable_puroro.branch=\"master\"",
-                "--config",
-                "patch.crates-io.stable_puroro.package=\"puroro\"",
+                "--workspace",
+                "--all-targets"
             ],
             "problemMatcher": [
                 "$rustc"
             ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
             "presentation": {
-                "echo": true,
                 "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": true
+                "panel": "shared"
             },
-            "env": {
-                "RUST_BACKTRACE": "1"
-            },
-            "group": "test",
-            "label": "rust: cargo test (use git master branch puroro)"
+            "options": {
+                "env": {
+                    "PROTOC": "${env:HOME}/.local/protoc/bin/protoc",
+                    "PATH": "${env:HOME}/.local/protoc/bin:${env:PATH}"
+                }
+            }
         },
         {
+            "label": "cargo: clippy (workspace)",
             "type": "cargo",
-            "command": "test",
+            "command": "clippy",
             "args": [
-                "-p",
-                "tests"
+                "--workspace",
+                "--all-targets",
+                "--",
+                "-D",
+                "warnings"
             ],
             "problemMatcher": [
                 "$rustc"
             ],
             "presentation": {
-                "echo": true,
                 "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": true
+                "panel": "shared"
             },
-            "env": {
-                "RUST_BACKTRACE": "1"
-            },
-            "group": "test",
-            "label": "rust: cargo test -p tests"
-        },
-        {
-            "type": "cargo",
-            "command": "test",
-            "args": [
-                "-p",
-                "tests",
-                "--config",
-                "patch.crates-io.stable_puroro.git=\"https://github.com/wada314/puroro\"",
-                "--config",
-                "patch.crates-io.stable_puroro.branch=\"master\"",
-                "--config",
-                "patch.crates-io.stable_puroro.package=\"puroro\"",
-            ],
-            "problemMatcher": [
-                "$rustc"
-            ],
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": true
-            },
-            "env": {
-                "RUST_BACKTRACE": "1"
-            },
-            "group": "test",
-            "label": "rust: cargo test -p tests (use git master branch puroro)"
-        },
-        {
-            "type": "cargo",
-            "command": "doc",
-            "args": [
-                "-p",
-                "puroro",
-                "--no-deps"
-            ],
-            "problemMatcher": [
-                "$rustc"
-            ],
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": true
-            },
-            "group": "build",
-            "label": "rust: cargo doc -p puroro"
-        },
-        {
-            "type": "cargo",
-            "command": "run",
-            "args": [
-                "-p",
-                "update-puroro-protobuf",
-                "--config",
-                "patch.crates-io.stable_puroro.git=\"https://github.com/wada314/puroro\"",
-                "--config",
-                "patch.crates-io.stable_puroro.branch=\"master\"",
-                "--config",
-                "patch.crates-io.stable_puroro.package=\"puroro\"",
-            ],
-            "problemMatcher": [
-                "$rustc"
-            ],
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": true
-            },
-            "group": "build",
-            "label": "rust: cargo run -p update-puroro-protobuf"
-        },
-        {
-            "type": "cargo",
-            "command": "run",
-            "args": [
-                "-p",
-                "update-puroro-doc-samples",
-                "--config",
-                "patch.crates-io.stable_puroro.git=\"https://github.com/wada314/puroro\"",
-                "--config",
-                "patch.crates-io.stable_puroro.branch=\"master\"",
-                "--config",
-                "patch.crates-io.stable_puroro.package=\"puroro\"",
-            ],
-            "problemMatcher": [
-                "$rustc"
-            ],
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": true
-            },
-            "group": "build",
-            "label": "rust: cargo run -p update-puroro-doc-samples"
-        },
-        {
-            "group": "build",
-            "label": "rust: generate in-puroro protobufs",
-            "dependsOn": [
-                "rust: cargo run -p update-puroro-protobuf",
-                "rust: cargo run -p update-puroro-doc-samples"
-            ]
-        },
+            "options": {
+                "env": {
+                    "PROTOC": "${env:HOME}/.local/protoc/bin/protoc",
+                    "PATH": "${env:HOME}/.local/protoc/bin:${env:PATH}"
+                }
+            }
+        }
     ]
 }

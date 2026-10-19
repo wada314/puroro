@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package demo;
+
+enum Code {
+  option allow_alias = true;
+  CODE_UNSPECIFIED = 0;
+  CODE_OK = 1;
+  CODE_SUCCESS = 1;
+}
+
+message Holder {
+  Code code = 1;
+}

@@ -1,0 +1,765 @@
+//! Emit a oneof submodule (`shape` / `Case` / `Storage` + trait impls).
+
+use super::layout::{LayoutAssoc, LayoutAssocKind, LenAccess, MessageApply};
+use super::message::SingularMutStyle;
+use crate::default_value::CustomDefault;
+use crate::descriptor::UnknownFieldsPolicy;
+use crate::error::Result;
+use crate::module_tree::nested_root_alias;
+use ::proc_macro2::{Ident, Span, TokenStream};
+use ::quote::quote;
+use ::syn::{Item, Type, parse_quote};
+
+/// Owned facts for one generated oneof group.
+pub(super) struct OneofEmit {
+    /// Struct / accessor ident — `kind`.
+    pub name: Ident,
+    /// Raw proto oneof name — `"kind"` (visit key, `kind_mut`).
+    pub name_str: String,
+    /// Companion submodule — `kind` (`mod kind { … }`).
+    pub mod_name: Ident,
+    /// Shared / mut shape enum — `Kind`.
+    pub shape_name: Ident,
+    /// Discriminant enum — `KindCase`.
+    pub case_name: Ident,
+    /// `OneofSlot` storage type — `KindStorage`.
+    pub storage_name: Ident,
+    /// Proto fields in this oneof, in field-number order.
+    pub variants: Vec<OneofVariantEmit>,
+}
+
+/// One variant inside a oneof group.
+pub(super) struct OneofVariantEmit {
+    /// Accessor ident — `email`.
+    pub name: Ident,
+    /// Raw proto field name — `"email"`.
+    pub name_str: String,
+    /// Enum variant ident — `Email` (`Kind::Email`, `KindCase::Email`).
+    pub variant_name: Ident,
+    /// Shape type parameter — `T0`, `T1`.
+    pub type_param: Ident,
+    /// `SingularField` alias in the oneof module — `EmailField`.
+    pub field_alias: Ident,
+    /// Parent companion const — `FIELD_EMAIL`.
+    pub field_const: Ident,
+    /// Proto field number — `3`.
+    pub number: u32,
+    /// `T` type arg — `::puroro_rt::ProtoString`, `ProtoInt32`, `ProtoMessage<Address<A>>`.
+    pub marker: Type,
+    /// `L` type arg. `None` omits it (`Inline` default). `Some(Inline)` when a
+    /// custom `D` must follow. Also `BitPacked<{ super::BIT_DONE_VALUE }>`,
+    /// `InlineOrHeap<{ super::BIT_EMAIL_SSO }>`.
+    pub layout_ty: Option<Type>,
+    /// Bool value bit — `Some((BIT_FLAG_VALUE, 4))`; `None` otherwise.
+    pub value_bit: Option<(Ident, usize)>,
+    /// Message variant — `get()` / `get_mut()` instead of scalar optional.
+    pub is_message: bool,
+    /// Bool variant — value lives in a bit, not in the payload word.
+    pub is_bool: bool,
+    /// `_mut` return: `DerefMut` vs `StringMut` / `BytesMut` (SSO).
+    pub mut_style: SingularMutStyle,
+    /// `_mut` `DerefMut` target — `i32`, `::puroro::String<A>`, `Address<A>`.
+    pub mut_target: Type,
+    /// Optional view — `i32`, `&'a str`, `Status`.
+    pub optional_ty: Type,
+    /// Non-type-zero `[default = …]` (`EmailDefault` + `HasDefault` items).
+    pub custom_default: Option<(CustomDefault, Vec<Item>)>,
+    /// Lazy string / bytes read. `None` for other variants.
+    pub len_access: Option<LenAccess>,
+    /// Lazy message apply. `None` when this variant is not a message.
+    pub message_apply: Option<MessageApply>,
+    /// `Layout` associated type for this variant (string slot or follow-parent child).
+    pub layout: Option<LayoutAssoc>,
+    /// `BIT_*_LAZY_KIND` when this variant stores a `WireOrSso` arm.
+    pub lazy_kind: Option<(Ident, usize)>,
+    /// Field alias is `Alias<A, L>` because the payload mentions `Layout`.
+    pub generic_layout: bool,
+}
+
+/// Render `mod <oneof> { … }` plus `use` / `pub use` for the parent message module.
+pub(super) fn render_module_and_exports(
+    oneof: &OneofEmit,
+    bits_ty: &TokenStream,
+    lazy_bits_ty: &TokenStream,
+    unknown_fields: UnknownFieldsPolicy,
+) -> Result<Vec<Item>> {
+    let mod_name = &oneof.mod_name;
+    let shape_name = &oneof.shape_name;
+    let case_name = &oneof.case_name;
+    let storage_name = &oneof.storage_name;
+
+    let module_body = render_module_body(oneof, bits_ty, lazy_bits_ty, unknown_fields)?;
+    super::parse::parse_items(quote! {
+        mod #mod_name {
+            #module_body
+        }
+
+        pub(crate) use #mod_name::#storage_name;
+        pub use #mod_name::{#shape_name, #case_name};
+    })
+}
+
+fn render_module_body(
+    oneof: &OneofEmit,
+    bits_ty: &TokenStream,
+    lazy_bits_ty: &TokenStream,
+    unknown_fields: UnknownFieldsPolicy,
+) -> Result<TokenStream> {
+    let shape_name = &oneof.shape_name;
+    let case_name = &oneof.case_name;
+    let storage_name = &oneof.storage_name;
+
+    let type_params: Vec<&Ident> = oneof.variants.iter().map(|v| &v.type_param).collect();
+
+    let shape_variants: Vec<_> = oneof
+        .variants
+        .iter()
+        .map(|v| {
+            let vn = &v.variant_name;
+            let tp = &v.type_param;
+            quote! { #vn(#tp), }
+        })
+        .collect();
+
+    let case_variants: Vec<_> = oneof
+        .variants
+        .iter()
+        .map(|v| {
+            let vn = &v.variant_name;
+            quote! { #vn, }
+        })
+        .collect();
+
+    let default_uses: Vec<_> = oneof
+        .variants
+        .iter()
+        .filter_map(|v| {
+            let (custom, _) = v.custom_default.as_ref()?;
+            let marker = Ident::new(&custom.marker_name, Span::call_site());
+            Some(quote! { use super::defaults::#marker; })
+        })
+        .collect();
+
+    let field_alias_defs: Vec<_> = oneof
+        .variants
+        .iter()
+        .map(|v| {
+            let alias = &v.field_alias;
+            let marker = &v.marker;
+            let field_const = &v.field_const;
+            let layout_ty: Option<Type> = match v.layout.as_ref() {
+                Some(assoc) if matches!(assoc.kind, LayoutAssocKind::SingularLen { .. }) => {
+                    let name = &assoc.assoc;
+                    Some(parse_quote! { <L as super::Layout<A>>::#name })
+                }
+                _ => v.layout_ty.clone(),
+            };
+            let layout_ty = layout_ty.iter();
+            let default_ty: Option<Type> = v.custom_default.as_ref().map(|(c, _)| {
+                let marker = Ident::new(&c.marker_name, Span::call_site());
+                parse_quote! { #marker }
+            });
+            let default_ty = default_ty.iter();
+            let params = alias_params(v.generic_layout);
+            quote! {
+                type #alias<#params> = ::puroro_rt::SingularField<
+                    #marker,
+                    ::puroro_rt::Oneof,
+                    { super::#field_const },
+                    A
+                    #(, #layout_ty)*
+                    #(, #default_ty)*
+                >;
+            }
+        })
+        .collect();
+
+    let value_params = alias_params(oneof.variants.iter().any(|v| v.generic_layout));
+    let value_name = Ident::new(&format!("{shape_name}Value"), Span::call_site());
+
+    let storage_args: Vec<_> = oneof
+        .variants
+        .iter()
+        .map(|v| alias_use(&v.field_alias, v.generic_layout, quote! { L }))
+        .collect();
+
+    let case_match_arms: Vec<_> = oneof
+        .variants
+        .iter()
+        .map(|v| {
+            let vn = &v.variant_name;
+            quote! {
+                #shape_name::#vn(_) => #case_name::#vn,
+            }
+        })
+        .collect();
+
+    let to_ref_arms: Vec<_> = oneof
+        .variants
+        .iter()
+        .map(|v| {
+            let vn = &v.variant_name;
+            quote! {
+                #shape_name::#vn(f) => #shape_name::#vn(f.value(common)),
+            }
+        })
+        .collect();
+
+    let to_mut_arms: Vec<_> = oneof
+        .variants
+        .iter()
+        .map(|v| {
+            let vn = &v.variant_name;
+            if v.is_bool {
+                let bit = v
+                    .value_bit
+                    .as_ref()
+                    .map(|(ident, _)| ident)
+                    .expect("oneof bool has value bit");
+                quote! {
+                    #shape_name::#vn(_) => #shape_name::#vn(common.bit_mut(super::#bit)),
+                }
+            } else {
+                quote! {
+                    #shape_name::#vn(f) => #shape_name::#vn(f.value_mut(common)),
+                }
+            }
+        })
+        .collect();
+
+    let clone_arms: Vec<_> = oneof
+        .variants
+        .iter()
+        .map(|v| {
+            let vn = &v.variant_name;
+            quote! {
+                #shape_name::#vn(f) => #shape_name::#vn(::puroro_rt::FieldCloneIn::clone_field(
+                    f, common, alloc,
+                )),
+            }
+        })
+        .collect();
+
+    let ref_tys: Vec<_> = oneof
+        .variants
+        .iter()
+        .map(|v| {
+            if v.is_message {
+                let mut_target = &v.mut_target;
+                quote! { &'a #mut_target }
+            } else {
+                let optional_ty = &v.optional_ty;
+                quote! { #optional_ty }
+            }
+        })
+        .collect();
+
+    let mut_tys: Vec<_> = oneof
+        .variants
+        .iter()
+        .map(|v| {
+            let alias = alias_use(
+                &v.field_alias,
+                v.generic_layout,
+                quote! { ::puroro_rt::Eager },
+            );
+            quote! { <#alias as ::puroro_rt::SingularFieldAccess>::Mut<'a> }
+        })
+        .collect();
+
+    let oneof_variant_impls: Vec<_> = oneof
+        .variants
+        .iter()
+        .map(|v| {
+            let vn = &v.variant_name;
+            let alias = &v.field_alias;
+            let field_const = &v.field_const;
+            let value = alias_use(alias, v.generic_layout, quote! { L });
+            quote! {
+                impl<
+                    A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
+                    L: super::Layout<A>,
+                > ::puroro_rt::OneofVariant<{ super::#field_const }> for #storage_name<A, L>
+                {
+                    type Value = #value;
+
+                    fn variant_ref(&self) -> ::core::option::Option<&Self::Value> {
+                        match &self.value {
+                            #shape_name::#vn(f) => ::core::option::Option::Some(f),
+                            _ => ::core::option::Option::None,
+                        }
+                    }
+
+                    fn variant_mut(&mut self) -> ::core::option::Option<&mut Self::Value> {
+                        match &mut self.value {
+                            #shape_name::#vn(f) => ::core::option::Option::Some(f),
+                            _ => ::core::option::Option::None,
+                        }
+                    }
+
+                    fn from_variant(value: Self::Value) -> Self {
+                        Self {
+                            value: #shape_name::#vn(value),
+                            _layout: ::core::marker::PhantomData,
+                        }
+                    }
+                }
+            }
+        })
+        .collect();
+
+    let encode_len_arms: Vec<_> = oneof
+        .variants
+        .iter()
+        .map(|v| {
+            let vn = &v.variant_name;
+            quote! { #shape_name::#vn(f) => ::puroro_rt::FieldEncode::encoded_len(f, common, ctx), }
+        })
+        .collect();
+
+    let encode_raw_arms: Vec<_> = oneof
+        .variants
+        .iter()
+        .map(|v| {
+            let vn = &v.variant_name;
+            quote! { #shape_name::#vn(f) => ::puroro_rt::FieldEncode::encode_raw(f, common, ctx, buf), }
+        })
+        .collect();
+
+    let dealloc_arms: Vec<_> = oneof
+        .variants
+        .iter()
+        .map(|v| {
+            let vn = &v.variant_name;
+            quote! { #shape_name::#vn(mut f) => f.deallocate(common), }
+        })
+        .collect();
+
+    let lazy_clear_bits: Vec<TokenStream> = oneof
+        .variants
+        .iter()
+        .flat_map(|v| {
+            let mut bits = Vec::new();
+            if let Some((ident, _)) = &v.lazy_kind {
+                bits.push(quote! {
+                    common.set_bit(super::#ident, false);
+                    common.set_bit(super::#ident + 1, false);
+                });
+            }
+            if v.is_bool
+                && let Some((ident, _)) = &v.value_bit
+            {
+                bits.push(quote! {
+                    common.set_bit(super::#ident, false);
+                });
+            }
+            bits
+        })
+        .collect();
+
+    let unknown_assoc = match unknown_fields {
+        UnknownFieldsPolicy::Discard => {
+            quote! { type Unknown = ::puroro_rt::DiscardUnknowns; }
+        }
+        UnknownFieldsPolicy::Reject => {
+            quote! { type Unknown = ::puroro_rt::RejectUnknowns; }
+        }
+        UnknownFieldsPolicy::Unspecified | UnknownFieldsPolicy::Preserve => {
+            quote! { type Unknown = ::puroro_rt::UnknownFields<A>; }
+        }
+    };
+
+    let root_alias = nested_root_alias();
+    Ok(quote! {
+        #root_alias
+
+        use ::allocator_api2::alloc::Allocator;
+        use ::bytes::BufMut;
+        use ::puroro_rt::{
+            FieldDeallocate, MessageCommon, MessageCommonAlloc, MessageCommonBits, OneofDeallocate,
+            OneofEncodable, OneofGroup, UnknownStore,
+        };
+
+        #[derive(Clone, Copy, PartialEq)]
+        pub enum #shape_name<#(#type_params),*> {
+            #(#shape_variants)*
+        }
+
+        #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+        pub enum #case_name {
+            #(#case_variants)*
+        }
+
+        #(#default_uses)*
+
+        #(#field_alias_defs)*
+
+        type #value_name<#value_params> = #shape_name<#(#storage_args),*>;
+
+        pub(crate) struct #storage_name<A, L = ::puroro_rt::Eager>
+        where
+            A: ::allocator_api2::alloc::Allocator,
+            L: super::Layout<A>,
+        {
+            value: #value_name<#value_params>,
+            _layout: ::core::marker::PhantomData<L>,
+        }
+
+        impl<A: Allocator + ::core::clone::Clone> OneofGroup for #storage_name<A, ::puroro_rt::Eager> {
+            type Case = #case_name;
+            type Ref<'a>
+                = #shape_name<#(#ref_tys),*>
+            where
+                A: 'a;
+            type Mut<'a>
+                = #shape_name<#(#mut_tys),*>
+            where
+                A: 'a;
+            type Bits = #bits_ty;
+            type Alloc = A;
+            #unknown_assoc
+            type Layout = ::puroro_rt::Eager;
+
+            fn case(storage: &Self) -> Self::Case {
+                match &storage.value {
+                    #(#case_match_arms)*
+                }
+            }
+
+            fn to_ref<'a>(
+                storage: &'a Self,
+                common: &'a MessageCommon<Self::Bits, Self::Alloc, Self::Unknown>,
+            ) -> Self::Ref<'a> {
+                match &storage.value {
+                    #(#to_ref_arms)*
+                }
+            }
+
+            fn to_mut<'a>(
+                storage: &'a mut Self,
+                common: &'a mut MessageCommon<Self::Bits, Self::Alloc, Self::Unknown>,
+            ) -> Self::Mut<'a>
+            where
+                A: ::core::clone::Clone,
+            {
+                match &mut storage.value {
+                    #(#to_mut_arms)*
+                }
+            }
+
+            fn clone_storage_in(
+                storage: &Self,
+                common: &MessageCommon<Self::Bits, Self::Alloc, Self::Unknown>,
+                alloc: Self::Alloc,
+            ) -> Self
+            where
+                A: ::core::clone::Clone,
+            {
+                let value = match &storage.value {
+                    #(#clone_arms)*
+                };
+                Self {
+                    value,
+                    _layout: ::core::marker::PhantomData,
+                }
+            }
+        }
+
+        #(#oneof_variant_impls)*
+
+        impl<A: Allocator + ::core::clone::Clone> OneofEncodable<A>
+            for #storage_name<A, ::puroro_rt::Eager>
+        {
+            fn encoded_len<P, U: UnknownStore<A>>(
+                &self,
+                common: &MessageCommon<P, A, U>,
+                ctx: &mut ::puroro_rt::EncodeCtx,
+            ) -> usize
+            where
+                MessageCommon<P, A, U>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
+            {
+                match &self.value {
+                    #(#encode_len_arms)*
+                }
+            }
+
+            fn encode_raw<P, U: UnknownStore<A>, B: BufMut>(
+                &self,
+                common: &MessageCommon<P, A, U>,
+                ctx: &mut ::puroro_rt::EncodeCtx,
+                buf: &mut B,
+            ) where
+                MessageCommon<P, A, U>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
+            {
+                match &self.value {
+                    #(#encode_raw_arms)*
+                }
+            }
+        }
+
+        impl<A: Allocator + ::core::clone::Clone, L: super::Layout<A>, P, U: UnknownStore<A>>
+            OneofDeallocate<MessageCommon<P, A, U, L>> for #storage_name<A, L>
+        where
+            MessageCommon<P, A, U, L>: MessageCommonBits,
+        {
+            unsafe fn deallocate(self, common: &MessageCommon<P, A, U, L>) {
+                match self.value {
+                    #(#dealloc_arms)*
+                }
+            }
+        }
+
+        impl<A: Allocator + ::core::clone::Clone> OneofGroup
+            for #storage_name<A, ::puroro_rt::Lazy<A>>
+        {
+            type Case = #case_name;
+            type Ref<'a>
+                = #case_name
+            where
+                A: 'a;
+            type Mut<'a>
+                = ()
+            where
+                A: 'a;
+            type Bits = #lazy_bits_ty;
+            type Alloc = A;
+            #unknown_assoc
+            type Layout = ::puroro_rt::Lazy<A>;
+
+            fn case(storage: &Self) -> Self::Case {
+                match &storage.value {
+                    #(#case_match_arms)*
+                }
+            }
+
+            fn to_ref<'a>(
+                storage: &'a Self,
+                _common: &'a MessageCommon<Self::Bits, Self::Alloc, Self::Unknown, Self::Layout>,
+            ) -> Self::Ref<'a> {
+                Self::case(storage)
+            }
+
+            fn to_mut<'a>(
+                _storage: &'a mut Self,
+                _common: &'a mut MessageCommon<Self::Bits, Self::Alloc, Self::Unknown, Self::Layout>,
+            ) -> Self::Mut<'a>
+            where
+                A: ::core::clone::Clone,
+            {
+            }
+
+            fn clone_storage_in(
+                storage: &Self,
+                common: &MessageCommon<Self::Bits, Self::Alloc, Self::Unknown, Self::Layout>,
+                alloc: Self::Alloc,
+            ) -> Self
+            where
+                A: ::core::clone::Clone,
+            {
+                let value = match &storage.value {
+                    #(#clone_arms)*
+                };
+                Self {
+                    value,
+                    _layout: ::core::marker::PhantomData,
+                }
+            }
+
+            fn after_deallocate(
+                common: &mut MessageCommon<Self::Bits, Self::Alloc, Self::Unknown, Self::Layout>,
+            )
+            where
+                A: ::core::clone::Clone,
+            {
+                let _ = common;
+                #(#lazy_clear_bits)*
+            }
+        }
+    })
+}
+
+/// Group getter / clear + per-variant accessors for the parent message.
+pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> (TokenStream, TokenStream) {
+    let name = &oneof.name;
+    let name_str = &oneof.name_str;
+    let name_mut = Ident::new(&format!("{name_str}_mut"), name.span());
+    let clear_name = Ident::new(&format!("clear_{name_str}"), name.span());
+    let case_name = &oneof.case_name;
+    let shape_name = &oneof.shape_name;
+    let storage_name = &oneof.storage_name;
+
+    let ref_tys: Vec<_> = oneof
+        .variants
+        .iter()
+        .map(|v| {
+            if v.is_message {
+                let mut_target = &v.mut_target;
+                quote! { &'a #mut_target }
+            } else {
+                let optional_ty = &v.optional_ty;
+                quote! { #optional_ty }
+            }
+        })
+        .collect();
+
+    let mut variant_getters = Vec::new();
+    let mut variant_mutators = Vec::new();
+    for v in &oneof.variants {
+        let vname = &v.name;
+        let vname_str = &v.name_str;
+        let vname_mut = Ident::new(&format!("{vname_str}_mut"), vname.span());
+        let field_const = &v.field_const;
+        let mut_target = &v.mut_target;
+        let optional_ty = &v.optional_ty;
+        let group = name;
+
+        if v.is_message {
+            variant_getters.push(quote! {
+                pub fn #vname(&self) -> ::core::option::Option<&#mut_target> {
+                    self.#group
+                        .bind(&self._common)
+                        .variant_of::<{ #companion::#field_const }>()
+                        .get()
+                }
+            });
+            variant_mutators.push(quote! {
+                pub fn #vname_mut(&mut self) -> &mut #mut_target {
+                    self.#group
+                        .bind_mut(&mut self._common)
+                        .variant_mut::<{ #companion::#field_const }>()
+                        .bind_mut(&mut self._common)
+                        .value_mut()
+                }
+            });
+        } else {
+            variant_getters.push(quote! {
+                pub fn #vname<'a>(
+                    &'a self,
+                ) -> ::puroro::Optional<#optional_ty, impl ::puroro::HasDefault<#optional_ty>>
+                where
+                    A: 'a,
+                {
+                    self.#group
+                        .bind(&self._common)
+                        .variant_of::<{ #companion::#field_const }>()
+                        .optional()
+                }
+            });
+            let mut_ret = v.mut_style.return_ty(&parse_quote! { 's }, mut_target);
+            variant_mutators.push(quote! {
+                pub fn #vname_mut<'s>(&'s mut self) -> #mut_ret {
+                    self.#group
+                        .bind_mut(&mut self._common)
+                        .variant_mut::<{ #companion::#field_const }>()
+                        .bind_mut(&mut self._common)
+                        .value_mut()
+                }
+            });
+        }
+    }
+
+    let getters = quote! {
+        pub fn #name<'a>(
+            &'a self,
+        ) -> impl ::puroro::OneofView<
+            Case = #companion::#case_name,
+            Ref = #companion::#shape_name<#(#ref_tys),*>,
+        > + 'a {
+            ::puroro_rt::OneofView::<#companion::#storage_name<A>>::new(&self.#name, &self._common)
+        }
+
+        #(#variant_getters)*
+    };
+    let mutators = quote! {
+        pub fn #name_mut<'a>(&'a mut self) -> impl ::puroro::OneofViewMut<Case = #companion::#case_name> + 'a {
+            ::puroro_rt::OneofViewMut::<#companion::#storage_name<A>>::new(
+                &mut self.#name,
+                &mut self._common,
+            )
+        }
+
+        pub fn #clear_name(&mut self) {
+            ::puroro::OneofViewMut::clear(self.#name_mut());
+        }
+
+        #(#variant_mutators)*
+    };
+    (getters, mutators)
+}
+
+/// Merge arms for every variant field number.
+pub(super) fn render_merge_arms(oneof: &OneofEmit, companion: &Ident) -> Vec<TokenStream> {
+    let group = &oneof.name;
+    oneof
+        .variants
+        .iter()
+        .map(|v| {
+            let field_const = &v.field_const;
+            quote! {
+                #companion::#field_const => {
+                    self.#group
+                        .bind_mut(&mut self._common)
+                        .variant_mut::<{ #companion::#field_const }>()
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf, depth)?;
+                }
+            }
+        })
+        .collect()
+}
+
+/// `FIELD_*` constants for each variant.
+pub(super) fn render_field_consts(oneof: &OneofEmit) -> Vec<Item> {
+    oneof
+        .variants
+        .iter()
+        .map(|v| {
+            let ident = &v.field_const;
+            let number = v.number;
+            parse_quote! {
+                pub const #ident: u32 = #number;
+            }
+        })
+        .collect()
+}
+
+/// Bool value-bit constants for oneof variants.
+pub(super) fn render_bit_consts(oneof: &OneofEmit) -> Vec<Item> {
+    oneof
+        .variants
+        .iter()
+        .flat_map(|v| {
+            let mut items = Vec::new();
+            if let Some((ident, bit)) = &v.value_bit {
+                items.push(parse_quote! {
+                    pub const #ident: usize = #bit;
+                });
+            }
+            if let Some((ident, bit)) = &v.lazy_kind {
+                items.push(parse_quote! {
+                    pub const #ident: usize = #bit;
+                });
+            }
+            items
+        })
+        .collect()
+}
+
+/// Generic parameter list of a variant alias: `A, L` when the payload mentions
+/// `Layout`, otherwise `A`.
+fn alias_params(generic_layout: bool) -> TokenStream {
+    if generic_layout {
+        quote! { A, L }
+    } else {
+        quote! { A }
+    }
+}
+
+/// `Alias<A, #layout>` when the variant mentions `Layout`, otherwise `Alias<A>`.
+fn alias_use(alias: &Ident, generic_layout: bool, layout: TokenStream) -> TokenStream {
+    if generic_layout {
+        quote! { #alias<A, #layout> }
+    } else {
+        quote! { #alias<A> }
+    }
+}

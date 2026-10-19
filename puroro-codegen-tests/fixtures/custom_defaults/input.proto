@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+enum Kind {
+  KIND_A = 1;
+  KIND_B = 2;
+}
+
+message Holder {
+  optional int32 max_retries = 1 [default = 3];
+  // Type zero — generator should keep ProtoDefault (no ZeroIntDefault ZST).
+  optional int32 zero_int = 2 [default = 0];
+  optional bool flag = 3 [default = true];
+  optional string title = 4 [default = "hi"];
+  optional bytes payload = 5 [default = "a\000b"];
+  optional Kind kind = 6 [default = KIND_B];
+
+  oneof choice {
+    int32 webhook_id = 7 [default = -1];
+    string note = 8;
+  }
+}

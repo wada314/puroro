@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+import "puroro/options.proto";
+
+// Default / unspecified: preserve unrecognized tags.
+message Keep {
+  optional int32 n = 1;
+}
+
+message Discard {
+  option (puroro.unknown_fields) = UNKNOWN_FIELDS_DISCARD;
+  optional int32 n = 1;
+}
+
+// Discard + oneof must type-check (OneofGroup Unknown = DiscardUnknowns).
+message DiscardChoice {
+  option (puroro.unknown_fields) = UNKNOWN_FIELDS_DISCARD;
+  oneof choice {
+    int32 a = 1;
+    string b = 2;
+  }
+}
+
+// Unrecognized tags fail decode. Closed-enum unknowns are not this path.
+message Reject {
+  option (puroro.unknown_fields) = UNKNOWN_FIELDS_REJECT;
+  optional int32 n = 1;
+}
+
+message RejectChoice {
+  option (puroro.unknown_fields) = UNKNOWN_FIELDS_REJECT;
+  oneof choice {
+    int32 a = 1;
+    string b = 2;
+  }
+}
+
+// Parent reject does not apply to a child that preserves.
+message KeepChild {
+  optional int32 n = 1;
+}
+
+message RejectParent {
+  option (puroro.unknown_fields) = UNKNOWN_FIELDS_REJECT;
+  KeepChild child = 1;
+}
+
+// Child reject fails the parent decode when the child body has an unknown tag.
+message RejectChild {
+  option (puroro.unknown_fields) = UNKNOWN_FIELDS_REJECT;
+  optional int32 n = 1;
+}
+
+message KeepParent {
+  RejectChild child = 1;
+}

@@ -1,0 +1,111 @@
+syntax = "proto2";
+
+package puroro;
+
+import "google/protobuf/descriptor.proto";
+
+// Layout of a singular `string` field in generated Rust.
+//
+// Unset and `STRING_LAYOUT_UNSPECIFIED` let the generator pick the default
+// (currently SSO / `InlineOrHeap`). `STRING_LAYOUT_SSO` and
+// `STRING_LAYOUT_HEAP` pin the layout. Non-`string` fields ignore this option.
+enum StringLayout {
+  STRING_LAYOUT_UNSPECIFIED = 0;
+  STRING_LAYOUT_SSO = 1;
+  STRING_LAYOUT_HEAP = 2;
+}
+
+// Layout of a singular `bytes` field in generated Rust.
+//
+// Unset and `BYTES_LAYOUT_UNSPECIFIED` let the generator pick the default
+// (currently SSO / `InlineOrHeap`). `BYTES_LAYOUT_SSO` and
+// `BYTES_LAYOUT_HEAP` pin the layout. Non-`bytes` fields ignore this option.
+enum BytesLayout {
+  BYTES_LAYOUT_UNSPECIFIED = 0;
+  BYTES_LAYOUT_SSO = 1;
+  BYTES_LAYOUT_HEAP = 2;
+}
+
+// Layout of a singular nested message field in generated Rust.
+//
+// Unset and `MESSAGE_LAYOUT_UNSPECIFIED` let the generator pick (auto-inline
+// a tiny scalar-only child, otherwise boxed). `MESSAGE_LAYOUT_INLINE` requests
+// embedding; `MESSAGE_LAYOUT_BOXED` pins a heap box. Repeated / map /
+// same-SCC (recursive) fields always box and ignore INLINE. Oneof message
+// variants use the same boxed-vs-inline rules as ordinary singular messages.
+enum MessageLayout {
+  MESSAGE_LAYOUT_UNSPECIFIED = 0;
+  MESSAGE_LAYOUT_INLINE = 1;
+  MESSAGE_LAYOUT_BOXED = 2;
+}
+
+// Unknown-field policy for a generated message.
+//
+// The protobuf spec accepts an unknown field number and preserves it
+// (proto2, proto3 since 3.5, Editions). Unset, `UNKNOWN_FIELDS_UNSPECIFIED`,
+// and `UNKNOWN_FIELDS_PRESERVE` do that (`UnknownFields` blob).
+//
+// `UNKNOWN_FIELDS_DISCARD` and `UNKNOWN_FIELDS_REJECT` are puroro options,
+// not protobuf features. Discard still accepts the message and drops the
+// bytes. Reject bakes `RejectUnknowns` and fails decode with
+// `UnrecognizedField`. A conforming parser must not do that. Closed-enum
+// unknowns are not unrecognized tags: they still take the divert path, which
+// retains nothing when the store is a ZST.
+// Nested children keep their own option; a parent policy does not apply to a
+// child's unknowns.
+enum UnknownFieldsPolicy {
+  UNKNOWN_FIELDS_UNSPECIFIED = 0;
+  UNKNOWN_FIELDS_PRESERVE = 1;
+  UNKNOWN_FIELDS_DISCARD = 2;
+  UNKNOWN_FIELDS_REJECT = 3;
+}
+
+// Whether a nested message is stored eager or lazy.
+//
+// Unset and `CHILD_PARSE_UNSPECIFIED` follow the parent: an eager parent
+// stores the eager child, a lazy parent stores the lazy child. `EAGER` and
+// `LAZY` pin that child on both parent aliases. Orthogonal to
+// `message_layout` (inline vs boxed).
+//
+// On a message, this is the default for fields declared on that message.
+// It does not force every embedding of that type elsewhere. A field option
+// wins over the enclosing message option.
+enum ChildParse {
+  CHILD_PARSE_UNSPECIFIED = 0;
+  CHILD_PARSE_EAGER = 1;
+  CHILD_PARSE_LAZY = 2;
+}
+
+// Rust representation of a generated protobuf enum.
+//
+// Unset and `ENUM_REPR_UNSPECIFIED` emit the default newtype-over-`i32`
+// (official protobuf Rust). `ENUM_REPR_NEWTYPE` pins that.
+// `ENUM_REPR_RUST_ENUM` emits a native Rust `enum`. That form cannot
+// represent two names that share a wire number: if the proto actually
+// aliases a number, codegen fails. `allow_alias = true` with no duplicate
+// numbers is fine.
+enum EnumRepr {
+  ENUM_REPR_UNSPECIFIED = 0;
+  ENUM_REPR_NEWTYPE = 1;
+  ENUM_REPR_RUST_ENUM = 2;
+}
+
+extend google.protobuf.FieldOptions {
+  // Custom-option numbers 50000–99999 are for internal use.
+  optional StringLayout string_layout = 51400;
+  optional BytesLayout bytes_layout = 51401;
+  optional MessageLayout message_layout = 51402;
+  optional ChildParse child_parse = 51404;
+}
+
+extend google.protobuf.EnumOptions {
+  optional EnumRepr enum_repr = 51405;
+}
+
+extend google.protobuf.MessageOptions {
+  optional UnknownFieldsPolicy unknown_fields = 51403;
+  // Same field number as `FieldOptions.child_parse`. Extension names are
+  // unique in a package, so the message-level default cannot reuse that name.
+  // Proto syntax: `(puroro.message_child_parse)`.
+  optional ChildParse message_child_parse = 51404;
+}

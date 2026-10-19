@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package demo;
+
+message Outer {
+  enum Kind {
+    KIND_UNSPECIFIED = 0;
+    KIND_A = 1;
+  }
+
+  message Inner {
+    optional string name = 1;
+  }
+
+  repeated int32 tag_ids = 1;
+  repeated Inner inners = 2;
+  Kind kind = 3;
+  Inner child = 4;
+}

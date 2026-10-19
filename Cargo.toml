@@ -1,18 +1,61 @@
 [workspace]
-members = [
-    "puroro",
-    "codegen",
-    "inline",
-    "update-puroro-doc-samples",
-    "update-puroro-protobuf",
-    "tests",
-]
-default-members = [
-    "puroro",
-    "codegen",
-    "inline",
-    #    "update-puroro-doc-samples",
-    #    "update-puroro-protobuf",
-    "tests",
-]
+members = [".", "puroro-rt", "protobuf-core", "protoc-gen-puroro", "puroro-codegen-tests", "sample-generated", "unmanaged", "archive/address-view-spike"]
 resolver = "2"
+
+[workspace.lints.clippy]
+# Restriction lint (allow by default). Do not opt git submodules into this.
+absolute_paths = "warn"
+
+[package]
+name = "puroro"
+version = "0.15.0"
+authors = ["Shohei Wada <pc@wada314.jp>"]
+edition = "2024"
+license = "Apache-2.0"
+description = "A Rust implementation of Google Protocol Buffer."
+repository = "https://github.com/wada314/puroro"
+
+[lints]
+workspace = true
+
+# Do not run the default libtest bench harness on the library target
+# (`cargo bench` should only run Criterion targets below).
+[lib]
+bench = false
+
+[dependencies]
+allocator-api2 = "0.2"
+bytes = "1"
+protobuf-core = { path = "protobuf-core" }
+unmanaged = { path = "unmanaged" }
+
+[dev-dependencies]
+bitvec = "1"
+# DESIGN.md §5: arena pattern is `A = &Bump` (`Copy`, deallocate is a no-op).
+bumpalo = { version = "3", features = ["allocator-api2"] }
+# Same stack as the historical `puroro/benches/variant.rs` setup.
+criterion = { version = "0.5.1", features = ["html_reports"] }
+puroro-rt = { path = "puroro-rt" }
+puroro-sample-generated = { path = "sample-generated" }
+rand = { version = "0.9", features = ["small_rng"] }
+rand_distr = "0.5"
+
+[[bench]]
+name = "ser_de"
+harness = false
+
+[[bench]]
+name = "varint"
+harness = false
+
+[[bench]]
+name = "string_layout"
+harness = false
+
+[[bench]]
+name = "allocator"
+harness = false
+
+[[bench]]
+name = "generated"
+harness = false

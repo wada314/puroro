@@ -1,0 +1,34 @@
+//! Const-generic dispatch on oneof storage variants by proto field number.
+//!
+//! Generated oneof storage enums implement [`OneofVariant`] once per member,
+//! keyed by that member's field number. This lets
+//! [`OneofSlot`](super::oneof::OneofSlot) and
+//! [`OneofSlotMut`](super::oneof::OneofSlotMut) select a variant without
+//! per-call-site closure boilerplate or zero-sized marker types.
+//!
+//! Empty payload construction uses [`DefaultIn`](::unmanaged::DefaultIn) on
+//! [`Value`](Self::Value) (e.g. [`SingularField::default_in`](super::singular::SingularField)),
+//! not a per-variant `new_value` hook.
+
+/// Field-number access to one member of a oneof storage enum `Self`.
+///
+/// `FIELD` is the protobuf field number of the variant. Generated code
+/// implements this trait on the storage enum for each member.
+pub trait OneofVariant<const FIELD: u32> {
+    /// The payload type stored in the variant numbered `FIELD`.
+    ///
+    /// Installing a fresh variant uses [`DefaultIn`](::unmanaged::DefaultIn)
+    /// on this type at the [`OneofSlotMut::variant_mut`](super::oneof::OneofSlotMut::variant_mut)
+    /// call site.
+    type Value;
+
+    /// Borrowed reference to the variant's payload, or `None` if a different
+    /// variant is active.
+    fn variant_ref(&self) -> Option<&Self::Value>;
+
+    /// Mutable reference ditto.
+    fn variant_mut(&mut self) -> Option<&mut Self::Value>;
+
+    /// Wraps `value` as the variant numbered `FIELD` of `Self`.
+    fn from_variant(value: Self::Value) -> Self;
+}

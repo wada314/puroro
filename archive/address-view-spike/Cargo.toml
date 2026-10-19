@@ -1,0 +1,25 @@
+# Workspace member so it keeps compiling. Not generator output.
+# `sample-generated` is the generator reference.
+[package]
+name = "address-view-spike"
+version = "0.0.0"
+edition = "2024"
+publish = false
+description = "Archived zero-copy AddressView spike. Not generator output."
+
+[dependencies]
+allocator-api2 = "0.2"
+bytes = "1"
+puroro = { path = "../.." }
+puroro-rt = { path = "../../puroro-rt" }
+puroro-sample-generated = { path = "../../sample-generated" }
+
+[dev-dependencies]
+criterion = { version = "0.5.1", features = ["html_reports"] }
+
+[[bench]]
+name = "view"
+harness = false
+
+[lints]
+workspace = true
