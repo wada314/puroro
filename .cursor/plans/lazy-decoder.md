@@ -19,9 +19,12 @@ span-only `task_lazy/decode` was 1.295 µs; after `merge_scanned` it is
 1.12 µs (~−14%). `map/decode_lazy` did not move (map entries stay spans
 at ingest). `merge_packed_buf` did not move typical `task_lazy/decode` or
 `map/decode_lazy` (typical Task packed fields are tiny; a noisy first
-`task_lazy/decode` run was discarded on recheck). Eager `task/decode`
-drifted a few percent; treat gaps under ~10% as noise. Typical TaskLazy
-decode is about 1.1× eager after rematch (1.08–1.14 across runs).
+`task_lazy/decode` run was discarded on recheck). Island-first
+`SharedWire` ingest (`push` copies, then scans; leftover is an offset)
+did not move typical `task_lazy/decode` (+1.7%) or `map/decode_lazy`
+(+0.1%) vs `c51e5da6`. Eager `task/decode` drifted a few percent; treat
+gaps under ~10% as noise. Typical TaskLazy decode is about 1.1× eager
+after rematch (1.08–1.14 across runs).
 Remaining ingest cost is the one island copy of `decode(&[u8])`.
 `push(&[u8])` copies onto `SharedWire` first, then scans that instance
 (failed scan truncates). `merge_from` / `decode` adopt `Bytes` from
