@@ -9,7 +9,7 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::vec::Vec as AllocVec;
-use ::core::mem::{self, ManuallyDrop};
+use ::core::mem::{self, ManuallyDrop, MaybeUninit};
 use ::core::str;
 use ::unmanaged::{CloneIn, DefaultIn, String as AllocString, UnmanagedString, UnmanagedVec};
 
@@ -19,7 +19,9 @@ pub const INLINE_CAP: usize = mem::size_of::<usize>() * 3 - 1;
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub(crate) struct InlineBuf {
-    pub(crate) data: [u8; INLINE_CAP],
+    /// Payload bytes. Only the prefix of length [`len`](Self::len) is
+    /// initialized; the tail is left uninitialized.
+    data: [MaybeUninit<u8>; INLINE_CAP],
     /// Inline length (`0..=INLINE_CAP`). Not a heap/inline tag.
     pub(crate) len: u8,
 }
@@ -29,25 +31,36 @@ const _: () = assert!(mem::size_of::<InlineBuf>() == mem::size_of::<usize>() * 3
 impl InlineBuf {
     pub(crate) fn empty() -> Self {
         Self {
-            data: [0u8; INLINE_CAP],
+            data: [MaybeUninit::uninit(); INLINE_CAP],
             len: 0,
         }
     }
 
+    /// Copies `bytes` into the initialized prefix. The tail stays uninitialized.
     pub(crate) fn from_bytes(bytes: &[u8]) -> Self {
         debug_assert!(bytes.len() <= INLINE_CAP);
-        let mut data = [0u8; INLINE_CAP];
-        data[..bytes.len()].copy_from_slice(bytes);
-        Self {
-            data,
-            len: bytes.len() as u8,
-        }
+        let mut inline = Self::empty();
+        inline.write_at(0, bytes);
+        inline.len = bytes.len() as u8;
+        inline
+    }
+
+    /// Overwrites `data[at..at + bytes.len()]` without reading or zeroing the rest.
+    ///
+    /// Does not update [`len`](Self::len). The caller sets `len` to cover every
+    /// index it has written.
+    pub(crate) fn write_at(&mut self, at: usize, bytes: &[u8]) {
+        let end = at + bytes.len();
+        debug_assert!(end <= INLINE_CAP);
+        self.data[at..end].write_copy_of_slice(bytes);
     }
 
     pub(crate) fn as_bytes(&self) -> &[u8] {
         let len = self.len as usize;
         debug_assert!(len <= INLINE_CAP);
-        &self.data[..len]
+        // SAFETY: `from_bytes` / `write_at` initialize exactly the prefix
+        // covered by `len`. The tail is `MaybeUninit` and is not read.
+        unsafe { self.data[..len].assume_init_ref() }
     }
 }
 
@@ -152,9 +165,13 @@ impl<H> Drop for SsoBuf<H> {
 /// Inline arm from bytes (`len <= INLINE_CAP`).
 #[inline]
 pub(crate) fn pack_inline<H>(bytes: &[u8]) -> SsoBuf<H> {
-    SsoBuf {
-        inline: InlineBuf::from_bytes(bytes),
-    }
+    pack_inline_buf(InlineBuf::from_bytes(bytes))
+}
+
+/// Inline arm from an already-filled [`InlineBuf`] (no second payload copy).
+#[inline]
+pub(crate) fn pack_inline_buf<H>(inline: InlineBuf) -> SsoBuf<H> {
+    SsoBuf { inline }
 }
 
 /// Heap arm from an already-built heap value (any length, including short/empty).
@@ -230,7 +247,10 @@ impl<H> SsoBuf<H> {
             let heap = unsafe { &*self.heap };
             (pack_heap(heap.clone_heap(alloc)), true)
         } else {
-            (pack_inline(self.as_bytes::<A>(false)), false)
+            // SAFETY: caller affirms the inline arm is live. Copying
+            // `InlineBuf` preserves the uninitialized tail.
+            let inline = unsafe { self.inline };
+            (pack_inline_buf(inline), false)
         }
     }
 
@@ -289,14 +309,9 @@ impl<H> SsoBuf<H> {
         if is_heap {
             return;
         }
-        // Copy inline bytes before replacing the union arm.
-        let (len, data) = {
-            // SAFETY: caller affirms inline arm is live.
-            let inline = unsafe { &self.inline };
-            (inline.len as usize, inline.data)
-        };
-        debug_assert!(len <= INLINE_CAP);
-        let new_slot = pack_heap(H::from_slice(&data[..len], alloc));
+        // Copy the initialized prefix before replacing the union arm.
+        // SAFETY: caller affirms the inline arm is live.
+        let new_slot = pack_heap(H::from_slice(unsafe { self.inline.as_bytes() }, alloc));
         let prev = mem::replace(self, new_slot);
         mem::forget(prev);
     }

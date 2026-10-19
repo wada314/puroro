@@ -990,6 +990,58 @@ mod tests {
     }
 
     #[test]
+    fn proto_string_sso_merges_inline_and_replaces() {
+        let mut common = TestCommon::new_in(Bits1::ZERO, Global);
+        let mut field =
+            SingularField::<ProtoString, Explicit<0>, 1, Global, InlineOrHeap<1>>::new_in(Global);
+
+        let mut data: &[u8] = &[2, b'h', b'i'];
+        let mut buf = ScopedBuf::new(&mut data);
+        field
+            .bind_mut(&mut common)
+            .merge(WireType::Len, &mut buf, 0)
+            .expect("merge hi");
+        assert_eq!(field.bind(&common).get(), Some("hi"));
+        assert!(!common.is_bit_set(1));
+
+        field.bind_mut(&mut common).value_mut().push_str("!");
+        assert_eq!(field.bind(&common).get(), Some("hi!"));
+
+        let mut again: &[u8] = &[2, b'y', b'o'];
+        let mut buf = ScopedBuf::new(&mut again);
+        field
+            .bind_mut(&mut common)
+            .merge(WireType::Len, &mut buf, 0)
+            .expect("replace with yo");
+        assert_eq!(field.bind(&common).get(), Some("yo"));
+        assert!(!common.is_bit_set(1));
+
+        let n = crate::INLINE_CAP + 1;
+        let mut payload = vec![n as u8];
+        payload.extend(vec![b'z'; n]);
+        let mut data: &[u8] = payload.as_slice();
+        let mut buf = ScopedBuf::new(&mut data);
+        field
+            .bind_mut(&mut common)
+            .merge(WireType::Len, &mut buf, 0)
+            .expect("replace with heap arm");
+        assert_eq!(field.bind(&common).get().expect("heap").len(), n);
+        assert!(common.is_bit_set(1));
+
+        let mut back: &[u8] = &[1, b'q'];
+        let mut buf = ScopedBuf::new(&mut back);
+        field
+            .bind_mut(&mut common)
+            .merge(WireType::Len, &mut buf, 0)
+            .expect("replace heap with inline");
+        assert_eq!(field.bind(&common).get(), Some("q"));
+        assert!(!common.is_bit_set(1));
+
+        field.deallocate(&common);
+        common.deallocate();
+    }
+
+    #[test]
     fn proto_string_unchecked_sso_accepts_invalid_utf8() {
         let mut common = TestCommon::new_in(Bits1::ZERO, Global);
         let mut field =

@@ -136,7 +136,7 @@ impl<'a, A: Allocator + Clone> SsoBytesMut<'a, A> {
             if cur_len + bytes.len() <= INLINE_CAP {
                 // SAFETY: tag says inline arm is live.
                 let inline = unsafe { &mut self.slot.inline };
-                inline.data[cur_len..cur_len + bytes.len()].copy_from_slice(bytes);
+                inline.write_at(cur_len, bytes);
                 inline.len = (cur_len + bytes.len()) as u8;
                 return;
             }

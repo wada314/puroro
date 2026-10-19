@@ -163,7 +163,7 @@ impl<'a, A: Allocator + Clone> SsoStringMut<'a, A> {
             if cur_len + s.len() <= INLINE_CAP {
                 // SAFETY: tag says inline arm is live.
                 let inline = unsafe { &mut self.slot.inline };
-                inline.data[cur_len..cur_len + s.len()].copy_from_slice(s.as_bytes());
+                inline.write_at(cur_len, s.as_bytes());
                 inline.len = (cur_len + s.len()) as u8;
                 return;
             }

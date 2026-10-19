@@ -28,11 +28,9 @@ use crate::fields::wire::numerical::ProtoBool;
 use crate::fields::wire::numerical::{BoolCodec, NumericalType};
 use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::singular_type::{PayloadAccess, PayloadMerge, SingularType};
-use crate::fields::wire::sso_buf::pack_inline;
+use crate::fields::wire::sso_buf::{InlineBuf, SsoBuf, SsoHeap, pack_inline_buf};
 use crate::fields::wire::sso_bytes::{SsoBytes, SsoBytesMut, pack_written as pack_written_bytes};
-use crate::fields::wire::sso_string::{
-    INLINE_CAP, SsoString, SsoStringMut, pack_inline_utf8, pack_written,
-};
+use crate::fields::wire::sso_string::{INLINE_CAP, SsoString, SsoStringMut, pack_written};
 use crate::fields::wire::wire_payload::{CopyWirePayload, VarintPayload};
 use crate::message_encode::MessageEncode;
 use crate::message_merge::MessageMerge;
@@ -691,12 +689,7 @@ impl<A: Allocator, const HEAP_BIT: usize> ValueLayoutMerge<ProtoString, A>
         }
         let (new, new_is_heap) = decode_sso_packed(buf, common.clone_alloc())?;
         let old_is_heap = Self::is_heap(common);
-        let alloc = common.clone_alloc();
-        {
-            let s = ValueSlot::with_mut(slot, init, common).get_mut();
-            // SAFETY: message allocator owns any previous heap buffer; bit matches arm.
-            unsafe { s.replace_packed(new, new_is_heap, old_is_heap, &alloc) };
-        }
+        install_sso_packed(slot, init, common, new, old_is_heap);
         Self::set_heap(common, new_is_heap);
         Ok(())
     }
@@ -838,12 +831,7 @@ impl<A: Allocator, const HEAP_BIT: usize, C: BytesLikeLenCodec> ValueLayoutMerge
         }
         let (new, new_is_heap) = decode_sso_bytes_packed(buf, common.clone_alloc())?;
         let old_is_heap = Self::is_heap(common);
-        let alloc = common.clone_alloc();
-        {
-            let s = ValueSlot::with_mut(slot, init, common).get_mut();
-            // SAFETY: message allocator owns any previous heap buffer; bit matches arm.
-            unsafe { s.replace_packed(new, new_is_heap, old_is_heap, &alloc) };
-        }
+        install_sso_packed(slot, init, common, new, old_is_heap);
         Self::set_heap(common, new_is_heap);
         Ok(())
     }
@@ -866,9 +854,35 @@ impl<A: Allocator + Clone, const HEAP_BIT: usize, C: BytesLikeLenCodec>
     }
 }
 
+/// Installs a packed SSO slot.
+///
+/// An uninitialized slot is written in place, so decode does not build an empty
+/// inline value only to free it. An initialized slot returns the previous arm,
+/// which is deallocated here.
+fn install_sso_packed<H, A, VS, I, Cx>(
+    slot: &mut VS,
+    init: I,
+    common: &mut Cx,
+    new: SsoBuf<H>,
+    old_is_heap: bool,
+) where
+    A: Allocator + Clone,
+    H: SsoHeap<A>,
+    VS: ValueSlot<SsoBuf<H>, A>,
+    I: SlotInitMut,
+    Cx: MessageBindingMut<A>,
+{
+    let alloc = common.clone_alloc();
+    if let Some(old) = slot.with_mut(init, common).replace(new) {
+        // SAFETY: `old_is_heap` matches the arm that was live before `replace`.
+        // `alloc` owns any heap buffer in `old`.
+        unsafe { old.deallocate(old_is_heap, &alloc) };
+    }
+}
+
 /// Bytes read from one LEN payload, still untyped (string vs bytes).
 enum SsoLenRead<A: Allocator> {
-    Inline { data: [u8; INLINE_CAP], len: usize },
+    Inline(InlineBuf),
     Heap(UnmanagedVec<u8, A>),
 }
 
@@ -881,18 +895,20 @@ fn read_sso_len<B: Buf, A: Allocator + Clone>(
         return Err(DecodeError::TruncatedMessage);
     }
     if len <= INLINE_CAP {
-        let mut data = [0u8; INLINE_CAP];
+        // One copy into the initialized prefix. The tail stays uninitialized.
+        let mut inline = InlineBuf::empty();
         let mut remaining = len;
         let mut filled = 0usize;
         while remaining > 0 {
             let chunk = buf.chunk();
             let to_copy = chunk.len().min(remaining);
-            data[filled..filled + to_copy].copy_from_slice(&chunk[..to_copy]);
+            inline.write_at(filled, &chunk[..to_copy]);
             buf.advance(to_copy);
             filled += to_copy;
             remaining -= to_copy;
         }
-        Ok(SsoLenRead::Inline { data, len })
+        inline.len = len as u8;
+        Ok(SsoLenRead::Inline(inline))
     } else {
         let mut vec = AllocVec::<u8, A>::with_capacity_in(len, alloc);
         let mut remaining = len;
@@ -915,10 +931,12 @@ fn decode_sso_packed<B: Buf, A: Allocator + Clone>(
     use ::core::str;
 
     match read_sso_len(buf, alloc.clone())? {
-        SsoLenRead::Inline { data, len } => match str::from_utf8(&data[..len]) {
-            Ok(s) => Ok((pack_inline_utf8(s.as_bytes()), false)),
-            Err(_) => Err(DecodeError::InvalidUtf8),
-        },
+        SsoLenRead::Inline(inline) => {
+            if str::from_utf8(inline.as_bytes()).is_err() {
+                return Err(DecodeError::InvalidUtf8);
+            }
+            Ok((pack_inline_buf(inline), false))
+        }
         SsoLenRead::Heap(bytes) => match UnmanagedString::from_utf8(bytes) {
             Ok(s) => Ok(pack_written(s, alloc)),
             Err(bytes) => {
@@ -936,7 +954,7 @@ fn decode_sso_bytes_packed<B: Buf, A: Allocator + Clone>(
     alloc: A,
 ) -> Result<(SsoBytes<A>, bool), DecodeError> {
     match read_sso_len(buf, alloc.clone())? {
-        SsoLenRead::Inline { data, len } => Ok((pack_inline(&data[..len]), false)),
+        SsoLenRead::Inline(inline) => Ok((pack_inline_buf(inline), false)),
         SsoLenRead::Heap(bytes) => Ok(pack_written_bytes(bytes, alloc)),
     }
 }
