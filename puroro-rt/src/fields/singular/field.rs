@@ -25,18 +25,19 @@ use ::bytes::BufMut;
 use crate::defaults::ProtoDefault;
 use ::puroro::{DecodeBuf, DecodeError, HasDefault, Optional, WireType};
 
-use crate::decode::{LazyMessage, SharedWire, WireSpan};
+use crate::decode::{LazyMessage, ScannedValue, SharedWire, WireSpan, save_unknown_varint_field};
 use crate::encode::field_number_const;
 use crate::fields::shared::FieldDeallocate;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{
-    DefaultIn, MessageBindingMut, MessageCommonAlloc, MessageCommonSharedBits,
+    DeallocateBound, DefaultIn, MessageBindingMut, MessageCommonAlloc, MessageCommonBits,
+    MessageCommonSharedBits,
     field_presence::{
         Explicit, FieldPresence, Implicit, LegacyRequired, Message, Oneof, RequiredFieldPresence,
     },
     slot_init::{AlwaysInitialized, SlotInitView},
     value_layout::{
-        Boxed, Inline, ValueLayout, ValueLayoutClone, ValueLayoutGet, ValueLayoutMerge,
+        BitPacked, Boxed, Inline, ValueLayout, ValueLayoutClone, ValueLayoutGet, ValueLayoutMerge,
         ValueLayoutMut,
     },
     value_slot::{
@@ -45,10 +46,12 @@ use crate::fields::shared::{
 };
 use crate::fields::wire::encode_type::{encode_field, encoded_len_field};
 use crate::fields::wire::len::{BytesLikeLenCodec, LenScalar, ProtoString};
+use crate::fields::wire::numerical::{BoolCodec, Numerical, NumericalType, ProtoBool};
 use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::proto_ref_ops::{ProtoRefDebug, ProtoRefEq};
-use crate::fields::wire::singular_type::SingularType;
+use crate::fields::wire::singular_type::{PayloadAccess, SingularType};
 use crate::fields::wire::wire_or_sso::{WireOrSso, WireOrSsoKind, WireOrSsoStore};
+use crate::fields::wire::wire_payload::{CopyWirePayload, VarintPayload};
 use crate::message_encode::EncodeCtx;
 
 /// Type-level projection of a [`SingularField`]'s `_mut` payload.
@@ -573,6 +576,61 @@ where
     }
 }
 
+impl<'f, 'c, C, P, const FIELD: u32, A, D, Cx>
+    SingularFieldMut<'f, 'c, Numerical<C>, P, FIELD, A, Inline, D, Cx>
+where
+    C: NumericalType,
+    C::NativeType: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
+    P: FieldPresence,
+    A: Allocator + Clone,
+    Cx: MessageBindingMut<A>,
+    P::ValueSlot<C::NativeType>: ValueSlot<C::NativeType, A>,
+{
+    /// Writes a scanner numeric without re-encoding it to the wire.
+    pub fn merge_scanned(self, value: &ScannedValue) -> Result<(), DecodeError> {
+        match C::from_wire_body(C::WireBody::from_scanned(value)?) {
+            Ok(new) => {
+                Numerical::<C>::write(&mut *self.field.value, P::slot_init_mut(), self.common, new);
+                Ok(())
+            }
+            Err(DecodeError::UnknownClosedEnum { raw }) => {
+                let alloc = self.common.clone_alloc();
+                save_unknown_varint_field(
+                    field_number_const::<FIELD>(),
+                    raw,
+                    self.common.unknown_fields_mut(),
+                    alloc,
+                );
+                Ok(())
+            }
+            Err(e) => Err(e),
+        }
+    }
+}
+
+impl<'f, 'c, P, const FIELD: u32, A, const VALUE_BIT: usize, D, Cx>
+    SingularFieldMut<'f, 'c, ProtoBool, P, FIELD, A, BitPacked<VALUE_BIT>, D, Cx>
+where
+    P: FieldPresence,
+    A: Allocator + Clone,
+    Cx: MessageBindingMut<A>,
+    P::ValueSlot<()>: ValueSlot<(), A>,
+{
+    /// Writes a scanner bool without re-encoding it to the wire.
+    pub fn merge_scanned(self, value: &ScannedValue) -> Result<(), DecodeError> {
+        match BoolCodec::from_wire_body(VarintPayload::from_scanned(value)?) {
+            Ok(new) => {
+                let _ =
+                    ValueSlot::with_mut(&mut *self.field.value, P::slot_init_mut(), self.common)
+                        .get_mut();
+                MessageCommonBits::set_bit(self.common, VALUE_BIT, new);
+                Ok(())
+            }
+            Err(e) => Err(e),
+        }
+    }
+}
+
 impl<T, P, const FIELD: u32, A, const KIND: usize, D>
     SingularField<T, P, FIELD, A, WireOrSso<KIND>, D>
 where
@@ -935,6 +993,23 @@ mod tests {
             .merge(WireType::Varint, &mut buf, 0)
             .expect("merge true");
         assert_eq!(field.bind(&common).get(), Some(true));
+        field.deallocate(&common);
+        common.deallocate();
+    }
+
+    #[test]
+    fn proto_int32_merge_scanned_skips_wire() {
+        use crate::decode::ScannedValue;
+        use ::protobuf_core::Varint;
+
+        let mut common = TestCommon::new_in(Bits1::ZERO, Global);
+        let mut field =
+            SingularField::<crate::ProtoInt32, Implicit, 1, Global, Inline>::new_in(Global);
+        field
+            .bind_mut(&mut common)
+            .merge_scanned(&ScannedValue::Varint(Varint::from_int32(42)))
+            .expect("merge_scanned");
+        assert_eq!(field.bind(&common).get(), Some(42));
         field.deallocate(&common);
         common.deallocate();
     }

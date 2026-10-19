@@ -199,10 +199,10 @@ Live plugin emits both aliases for every message (`Name` = `NameImpl<A, Eager>`,
 | [`wire/sso_string.rs`](puroro-rt/src/fields/wire/sso_string.rs) | `SsoString` / `SsoStringMut` |
 | [`wire/sso_bytes.rs`](puroro-rt/src/fields/wire/sso_bytes.rs) | `SsoBytes` / `SsoBytesMut` |
 | [`singular.rs`](puroro-rt/src/fields/singular.rs) | Singular field re-exports |
-| [`singular/field.rs`](puroro-rt/src/fields/singular/field.rs) | `SingularField` — `T: SingularType`, stores `L::Slot` |
+| [`singular/field.rs`](puroro-rt/src/fields/singular/field.rs) | `SingularField` — `T: SingularType`, stores `L::Slot`; lazy numerics use `merge_scanned` |
 | [`repeated.rs`](puroro-rt/src/fields/repeated.rs) | Repeated field re-exports |
 | [`repeated/encoding.rs`](puroro-rt/src/fields/repeated/encoding.rs) | `Packed` / `Expanded` (`RepeatedEncoding`) |
-| [`repeated/field.rs`](puroro-rt/src/fields/repeated/field.rs) | `RepeatedField` — `T: RepeatedElement`; eager `RepeatedReady` / lazy `RepeatedSpans` |
+| [`repeated/field.rs`](puroro-rt/src/fields/repeated/field.rs) | `RepeatedField` — `T: RepeatedElement`; eager `RepeatedReady` / lazy `RepeatedSpans`; numeric `merge_scanned` |
 | [`repeated/container.rs`](puroro-rt/src/fields/repeated/container.rs) | Repeated mut container helpers |
 | [`map.rs`](puroro-rt/src/fields/map.rs) | Map field re-exports; `MapKey: RepeatedElement` |
 | [`map/entry.rs`](puroro-rt/src/fields/map/entry.rs) | Map-entry wire encode / decode (`key=1`, `value=2`) |
@@ -213,7 +213,7 @@ Live plugin emits both aliases for every message (`Name` = `NameImpl<A, Eager>`,
 | [`message_merge.rs`](puroro-rt/src/message_merge.rs) | `MessageMerge` / `merge_message` |
 | [`decode.rs`](puroro-rt/src/decode.rs) | Tag / skip / unknown-field helpers |
 | [`decode/lazy_scan.rs`](puroro-rt/src/decode/lazy_scan.rs) | `Eager` / `Lazy<A>` / `MessageScan` / `LazyScan` / `LazyMessage` |
-| [`decode/record.rs`](puroro-rt/src/decode/record.rs) | `RecordScanner` / `ScannedRecord` / `ScannedValue` / `merge_scanned_field` — LEN is a span, not an owned payload |
+| [`decode/record.rs`](puroro-rt/src/decode/record.rs) | `RecordScanner` / `ScannedRecord` / `ScannedValue` / `merge_scanned_field` (LEN reconstruct helper; numerics use catalog `merge_scanned`) |
 | [`decode/shared_wire.rs`](puroro-rt/src/decode/shared_wire.rs) | `SharedWire` — lazy ingested blob (`bytes::Bytes` + `A`) |
 | [`decode/varint.rs`](puroro-rt/src/decode/varint.rs) | Pluggable `VarintDecoder` / chunked varint scan |
 
@@ -274,7 +274,7 @@ One marker + trait per protobuf **type** (e.g. `int32`, `string`). Wire-shape re
 [`EncodeType`](puroro-rt/src/fields/wire/encode_type.rs) for string / bytes / message; this module
 keeps owned [`LenPayload`](puroro-rt/src/fields/wire/wire_payload.rs) for decode. Copy numericals also
 implement [`CopyWirePayload`](puroro-rt/src/fields/wire/wire_payload.rs) (`decode` without an
-allocator).
+allocator, plus `from_scanned` so lazy apply can skip a rematch).
 
 ### Proto-type encode + tagged framing ([`wire/encode_type.rs`](puroro-rt/src/fields/wire/encode_type.rs))
 
@@ -332,7 +332,7 @@ Public codegen uses aliases such as [`ProtoInt32`](puroro-rt/src/fields/wire/num
 
 [`NumericalType`](puroro-rt/src/fields/wire/numerical.rs) maps `NativeType` ↔
 [`CopyWirePayload`](puroro-rt/src/fields/wire/wire_payload.rs) via `to_wire_body` /
-`from_wire_body`. `NativeType` is the **logical** copy value for encode/decode and field
+`from_wire_body` (lazy apply uses `from_scanned` then `from_wire_body`). `NativeType` is the **logical** copy value for encode/decode and field
 get/set — not a storage contract. Inline singular storage (`AddressableSlot`,
 `Slot = NativeType` for addressable markers) lives on
 [`PayloadAccess`](puroro-rt/src/fields/wire/singular_type.rs); singular
@@ -659,7 +659,7 @@ fn encode_raw<B: BufMut>(&self, ctx: &mut EncodeCtx, buf: &mut B) {
 
 ### Decode
 
-**Eager** (the loop below). **Lazy** ingest is `LazyScan::push` / `finish` then `LazyMessage::ensure_scanned` / `apply_record`. [`RecordScanner`](puroro-rt/src/decode/record.rs) emits [`ScannedRecord`](puroro-rt/src/decode/record.rs) metadata ([`ScannedValue`](puroro-rt/src/decode/record.rs): a small numeric or `Len { payload_len }`). LEN / packed bodies are sliced from the island after append (`scanned_len_span` / `body_slice`). [`merge_scanned_field`](puroro-rt/src/decode/record.rs) takes a [`SharedWire`](puroro-rt/src/decode/shared_wire.rs) handle slice (`clone_handle().as_bytes()`), not `scan.wire()`, so the merge closure can mutate `_common`. See [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing). A failed scan does not append the chunk (`1d1ae757`).
+**Eager** (the loop below). **Lazy** ingest is `LazyScan::push` / `finish` then `LazyMessage::ensure_scanned` / `apply_record`. [`RecordScanner`](puroro-rt/src/decode/record.rs) emits [`ScannedRecord`](puroro-rt/src/decode/record.rs) metadata ([`ScannedValue`](puroro-rt/src/decode/record.rs): a small numeric or `Len { payload_len }`). Singular / expanded numericals call catalog `merge_scanned` (`CopyWirePayload::from_scanned` → `from_wire_body`); they do not re-encode through [`merge_scanned_field`](puroro-rt/src/decode/record.rs). Packed LEN still walks the island body (`body_slice` + packed `merge`). String / bytes / map / nested message store a span (`scanned_len_span`). When a merge still needs a wire slice, pass a [`SharedWire`](puroro-rt/src/decode/shared_wire.rs) handle (`clone_handle().as_bytes()`), not `scan.wire()`. See [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing). A failed scan does not append the chunk (`1d1ae757`). Criterion `generated` (`task|map`, pinned CPU): span-only `task_lazy/decode` was 1.295 µs; after `merge_scanned` it is 1.12 µs (~−14%). `map/decode_lazy` did not move. Gaps under ~10% are noise. Typical lazy/eager decode is ~1.08× after rematch.
 
 1. Loop: `puroro_rt::decode::decode_tag` → `(field_number, wire_type)`.
 2. `match field_number` — one catalog `merge` per arm (closed-enum unknowns are diverted inside `merge` via `DecodeError::UnknownClosedEnum`).
@@ -867,7 +867,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 | Map wrappers | `MapField` + `MapKey` / `RepeatedElement` (sample `attributes`) | — |
 | `protoc-gen-puroro` field emission | Eager and lazy aliases (`Name` / `NameLazy`); singular / repeated / enum / message / oneof / map / defaults / `child_parse`; see [§3](#3-implementation-status) | Typed extensions / services |
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |
-| `TaskLazy` | Plugin emits `NameLazy` (one scan, numericals applied immediately, `WireOrSso` / span lists; the scan record does not own LEN). Sample is the same shape. Lazy `unknown_fields()` is empty. `MessageFallible` is eager-only | [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing); lock: [`.cursor/plans/lazy-decoder.md`](.cursor/plans/lazy-decoder.md) |
+| `TaskLazy` | Plugin emits `NameLazy` (one scan, numericals via `merge_scanned`, `WireOrSso` / span lists; the scan record does not own LEN). Sample is the same shape. Typical `task_lazy/decode` is ~1.08× eager after rematch. Lazy `unknown_fields()` is empty. `MessageFallible` is eager-only | [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing); lock: [`.cursor/plans/lazy-decoder.md`](.cursor/plans/lazy-decoder.md) |
 | `Hash` / `serde` | Deferred | Opt-in features |
 | Unknown-field reject-on-decode | `(puroro.unknown_fields) = REJECT` bakes [`RejectUnknowns`](puroro-rt/src/unknown_fields.rs) (ZST; `UnrecognizedField`) | — |
 | Submessage inline | Sample singular **and** oneof nested messages use [`ProtoMessage<M>`](puroro-rt/src/fields/wire/proto_message.rs): inline slot = full `M`, boxed slot = `UnmanagedBox<M>`, getters are `&M` / `&mut M`. Repeated / map store `M` | codegen ([§17.1](#171-submessage-inline-optimisation)) |

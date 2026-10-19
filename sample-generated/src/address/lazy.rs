@@ -9,9 +9,7 @@ use ::bytes::{Buf, BufMut};
 use ::core::fmt::{self, Debug, Formatter};
 use ::core::iter;
 use ::puroro::{DecodeBuf, DecodeError, HasDefault, Message, Optional, RECURSION_LIMIT};
-use ::puroro_rt::decode::{
-    LazyMessage, LazyScan, ScannedRecord, merge_scanned_field, scanned_len_span,
-};
+use ::puroro_rt::decode::{LazyMessage, LazyScan, ScannedRecord, scanned_len_span};
 use ::puroro_rt::{
     CloneIn, DeallocateIn, DefaultIn, EncodeCtx, FieldCloneIn, InteriorBitArray, LazyMessageCommon,
     MessageEncode, MessageMerge, SingularField,
@@ -182,26 +180,14 @@ impl<A: Allocator + Clone> LazyMessage<A> for AddressLazy<A> {
                 self.city.store_len_span(span, &mut self._common);
                 Ok(())
             }
-            FIELD_POSTAL_CODE => merge_scanned_field(
-                rec,
-                self._common.lazy.scan.shared().clone_handle().as_bytes(),
-                origin,
-                |wire_type, buf| {
-                    self.postal_code
-                        .bind_mut(&mut self._common)
-                        .merge(wire_type, buf, 0)
-                },
-            ),
-            FIELD_LATITUDE => merge_scanned_field(
-                rec,
-                self._common.lazy.scan.shared().clone_handle().as_bytes(),
-                origin,
-                |wire_type, buf| {
-                    self.latitude
-                        .bind_mut(&mut self._common)
-                        .merge(wire_type, buf, 0)
-                },
-            ),
+            FIELD_POSTAL_CODE => self
+                .postal_code
+                .bind_mut(&mut self._common)
+                .merge_scanned(&rec.value),
+            FIELD_LATITUDE => self
+                .latitude
+                .bind_mut(&mut self._common)
+                .merge_scanned(&rec.value),
             _ => Ok(()),
         }
     }

@@ -8,7 +8,17 @@ alias. The per-field `FieldCache` machine is rejected; do not revive it.
 Updated (2026-10-19): `RecordScanner` emits [`ScannedRecord`](../../puroro-rt/src/decode/record.rs)
 / [`ScannedValue`](../../puroro-rt/src/decode/record.rs). LEN is `payload_len`
 only; callers slice `_wire`. Do not rebuild `protobuf_core::Field` with an
-owned LEN `AllocVec`.
+owned LEN `AllocVec`. Numerical apply uses catalog `merge_scanned` /
+`CopyWirePayload::from_scanned`. Do not rematch `Varint` / `I32` / `I64`
+through `merge_scanned_field` (re-encode then catalog `merge`). Packed LEN
+inner varints were never scanned; they still walk the island body.
+
+Measured (2026-10-19, Criterion `generated` `task|map`, `taskset -c 0`):
+span-only `task_lazy/decode` was 1.295 µs; after `merge_scanned` it is
+1.12 µs (~−14%). `map/decode_lazy` did not move (map entries stay spans
+at ingest). Eager `task/decode` drifted a few percent; treat gaps under
+~10% as noise. Typical TaskLazy decode is about 1.08× eager after rematch.
+Remaining ingest cost is the island copy and packed inner varints.
 
 Still out of v1: `TaskView`, lazy mutation, `MessageFallible` on the lazy
 alias, intra-field repeated cursors, zero-copy spanning LEN, packed repeated
@@ -345,8 +355,8 @@ bytes are included. `Layout` associated types cover slots that differ.
 messages and maps as spans, repeated `labels` as a span list (first get
 materialises), oneof, `Layout` associated types. The scan record itself is
 a span (`ScannedRecord` / `ScannedValue`); complete LEN is not copied off
-the island. Eager `Task` implements handwritten `task::MessageFallible`
-(`Error = Infallible`).
+the island. Numericals use catalog `merge_scanned` (no rematch). Eager
+`Task` implements handwritten `task::MessageFallible` (`Error = Infallible`).
 
 **Not done:** `TaskView`, lazy mutation, `MessageFallible` for `TaskLazy`
 (follow-parent fields change type with the parent; the plugin does not emit
