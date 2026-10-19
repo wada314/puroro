@@ -18,6 +18,7 @@
 //!
 //! **Module layout.** Message structs are public at this crate root
 //! (`Task` / `TaskLazy` (`TaskImpl`), `Address` / `AddressLazy` (`AddressImpl`),
+//! `AddressView` (handwritten zero-copy spike, not plugin output),
 //! `Point` / `PointLazy` (`PointImpl`), `School`, `Student`, `Marker`) — the parent of their
 //! snake_case companion modules (`address`, `task`, `school`, `student`,
 //! `point`, `marker`) which hold `FIELD_*` / `BIT_*`, defaults, oneofs, and
@@ -50,6 +51,7 @@ mod school_type;
 mod student_type;
 mod task_type;
 
+pub use address::AddressView;
 pub use address_type::{Address, AddressImpl, AddressLazy};
 pub use enums::{Priority, Status};
 pub use marker_type::Marker;
