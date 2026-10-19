@@ -54,8 +54,6 @@ pub enum PuroroError {
     InvalidSliceViewType,
     #[error("Invalid UTF8 string is given.")]
     InvalidUtf8(#[from] std::string::FromUtf8Error),
-    #[error("Invalid UTF8 string is given to puroro::String.")]
-    InvalidUtf8Puroro(#[from] crate::string::FromUtf8Error),
     #[error("Invalid UTF8 string is given.")]
     InvalidUtf8Bumpalo(),
     #[error("Group is not supported.")]

@@ -13,10 +13,7 @@
 // limitations under the License.
 
 use super::super::util::*;
-use super::{
-    Bits32Type, Bits64Type, FieldType, LengthDelimitedType, VariantType, PURORO_INTERNAL,
-    PURORO_LIB,
-};
+use super::{Bits32Type, Bits64Type, FieldType, LengthDelimitedType, VariantType, PURORO_INTERNAL};
 use crate::syn::{parse2, Lifetime, Type};
 use crate::Result;
 use ::quote::quote;
@@ -100,8 +97,8 @@ impl LengthDelimitedType {
     fn rust_type(&self) -> Result<Rc<Type>> {
         use LengthDelimitedType::*;
         Ok(Rc::new(parse2(match self {
-            String => quote! { #PURORO_LIB::String },
-            Bytes => quote! { #PURORO_LIB::Bytes },
+            String => quote! { ::std::string::String },
+            Bytes => quote! { ::std::vec::Vec<u8> },
             Message(m) => {
                 return Ok(m.try_upgrade()?.gen_message_struct_type()?);
             }
@@ -121,8 +118,8 @@ impl LengthDelimitedType {
     fn rust_mut_ref_type(&self) -> Result<Rc<Type>> {
         use LengthDelimitedType::*;
         Ok(Rc::new(parse2(match self {
-            String => quote! { &mut #PURORO_LIB::String },
-            Bytes => quote! { &mut #PURORO_LIB::Bytes },
+            String => quote! { &mut ::std::string::String },
+            Bytes => quote! { &mut ::std::vec::Vec::<u8> },
             Message(m) => {
                 let ty = m.try_upgrade()?.gen_message_struct_type()?;
                 quote! { &mut #ty }

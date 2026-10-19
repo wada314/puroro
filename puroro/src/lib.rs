@@ -14,7 +14,6 @@
 
 #![doc = include_str!("lib.md")]
 
-pub mod bytes;
 pub mod doc_samples;
 pub mod generated_code;
 mod error;
@@ -22,13 +21,10 @@ pub mod internal;
 pub mod message;
 pub mod protobuf;
 pub mod repeated;
-pub mod string;
 
 pub use self::error::PuroroError;
 pub type Result<T> = ::std::result::Result<T, PuroroError>;
 
 // Re-exports
-pub use crate::bytes::Bytes;
 pub use crate::message::{Message, MessageView};
 pub use crate::repeated::RepeatedFieldView;
-pub use crate::string::String;
