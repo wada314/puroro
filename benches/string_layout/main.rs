@@ -5,6 +5,8 @@
 //! - `mixed` — four inline-sized + four longer-than-inline values
 //!
 //! Criterion IDs are workload names, not wire sizes.
+//! `decode` includes `Drop`; `decode_keep` uses [`keep::iter_keep`] so only
+//! parse is timed.
 //!
 //! Run:
 //! ```text
@@ -12,19 +14,24 @@
 //! cargo bench -p puroro --bench string_layout -- --test
 //! ```
 
+#[path = "../keep.rs"]
+mod keep;
+
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
 use ::core::time::Duration;
 use ::criterion::measurement::WallTime;
-use ::criterion::{BenchmarkGroup, BenchmarkId, Criterion, Throughput, black_box, criterion_group};
+use ::criterion::{black_box, criterion_group, BenchmarkGroup, BenchmarkId, Criterion, Throughput};
 use ::puroro::{DecodeBuf, DecodeError, Message, String as AllocString};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
     EncodeCtx, Explicit, FieldDeallocate, FieldEncode, INLINE_CAP, Inline, InlineOrHeap,
     MessageCommon, MessageEncode, MessageMerge, ProtoString, SingularField,
 };
+
+use keep::iter_keep;
 
 /// All eight values fit in the SSO slot (`len <= INLINE_CAP`).
 const ALL_LE23: [&str; 8] = ["id", "ok", "us", "v1", "name", "code", "short", "label"];
@@ -353,6 +360,24 @@ fn bench_decode(c: &mut Criterion) {
     group.finish();
 }
 
+fn bench_decode_keep(c: &mut Criterion) {
+    let mut group = c.benchmark_group("string_layout/decode_keep");
+    configure(&mut group);
+    for work in WORKLOADS {
+        let bytes = SsoShort::sample(work.values).encode_to_vec();
+        group.throughput(Throughput::Bytes(bytes.len() as u64));
+        group.bench_function(BenchmarkId::new("sso", work.name), |b| {
+            let bytes = bytes.as_slice();
+            iter_keep(b, || SsoShort::decode(black_box(bytes)).unwrap())
+        });
+        group.bench_function(BenchmarkId::new("heap", work.name), |b| {
+            let bytes = bytes.as_slice();
+            iter_keep(b, || HeapShort::decode(black_box(bytes)).unwrap())
+        });
+    }
+    group.finish();
+}
+
 fn bench_set(c: &mut Criterion) {
     let mut group = c.benchmark_group("string_layout/set");
     configure(&mut group);
@@ -370,7 +395,13 @@ fn bench_set(c: &mut Criterion) {
     group.finish();
 }
 
-criterion_group!(benches, bench_encode, bench_decode, bench_set);
+criterion_group!(
+    benches,
+    bench_encode,
+    bench_decode,
+    bench_decode_keep,
+    bench_set
+);
 
 fn main() {
     assert!(

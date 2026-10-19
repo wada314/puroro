@@ -6,6 +6,7 @@ use ::allocator_api2::alloc::Global;
 use ::puroro::{BytesMut, MapMut, MapRef, Message, OneofView, RepeatedStringMut, StringMut};
 use ::puroro_rt::encode::encode_varint_field;
 use ::puroro_rt::{FieldNumber, Varint};
+use ::puroro_sample_generated::task::NotificationCase;
 use ::puroro_sample_generated::{
     Address, AddressLazy, Marker, Point, PointLazy, Priority, Status, Task, TaskLazy,
 };
@@ -24,6 +25,15 @@ pub static UNKNOWN_BYTES: LazyLock<Vec<u8>> = LazyLock::new(unknown_heavy_bytes)
 
 pub static MAP_KEYS: LazyLock<Vec<String>> =
     LazyLock::new(|| (0..MAP_LEN).map(|i| format!("attr-{i:04}")).collect());
+
+pub static ONEOF_EMAIL_BYTES: LazyLock<Vec<u8>> =
+    LazyLock::new(|| oneof_email_task().encode_to_vec());
+
+pub static ONEOF_WEBHOOK_BYTES: LazyLock<Vec<u8>> =
+    LazyLock::new(|| oneof_webhook_task().encode_to_vec());
+
+pub static ONEOF_POSTAL_BYTES: LazyLock<Vec<u8>> =
+    LazyLock::new(|| oneof_postal_task().encode_to_vec());
 
 fn address(street: &str, city: &str, postal_code: u32, latitude: f64) -> Address {
     let mut a = Address::new();
@@ -63,6 +73,56 @@ pub fn typical_task() -> Task {
     *task.origin_mut().x_mut() = 10;
     *task.origin_mut().y_mut() = 20;
     task
+}
+
+fn oneof_required() -> Task {
+    let mut task = Task::new();
+    task.owner_id_mut().set("user-1");
+    task
+}
+
+/// Oneof LEN string variant only.
+pub fn oneof_email_task() -> Task {
+    let mut task = oneof_required();
+    task.email_address_mut().set("a@example.com");
+    task
+}
+
+/// Oneof VARINT variant only.
+pub fn oneof_webhook_task() -> Task {
+    let mut task = oneof_required();
+    *task.webhook_id_mut() = 7;
+    task
+}
+
+/// Oneof nested-message variant only.
+pub fn oneof_postal_task() -> Task {
+    let mut task = oneof_required();
+    let postal = task.postal_mut();
+    postal.street_mut().set("1 Main St");
+    postal.city_mut().set("Tokyo");
+    *postal.postal_code_mut() = 1_000_001;
+    task
+}
+
+/// Cycle the notification group through the cheap variants (clear last).
+pub fn switch_oneof(task: &mut Task) -> usize {
+    task.email_address_mut().set("a@example.com");
+    let mut n = usize::from(task.notification().case() == Some(NotificationCase::EmailAddress));
+    task.phone_number_mut().set("555");
+    n = n.wrapping_add(usize::from(
+        task.notification().case() == Some(NotificationCase::PhoneNumber),
+    ));
+    *task.webhook_id_mut() = 9;
+    n = n.wrapping_add(task.webhook_id().get() as usize);
+    *task.urgent_mut() = true;
+    n = n.wrapping_add(usize::from(task.urgent().get()));
+    task.clear_notification();
+    n.wrapping_add(usize::from(task.notification().case().is_some()))
+}
+
+pub fn read_oneof_case(task: &Task) -> Option<NotificationCase> {
+    task.notification().case()
 }
 
 /// `Task` whose payload is almost only `map<string, int32> attributes`.
@@ -241,4 +301,27 @@ pub fn assert_payloads() {
     assert_eq!(discarded.n(), 3);
     assert!(discarded.unknown_fields().next().is_none());
     assert_ne!(discarded.encode_to_vec(), *UNKNOWN_BYTES);
+
+    let email = Task::<Global>::decode(ONEOF_EMAIL_BYTES.as_slice()).expect("oneof email decode");
+    assert_eq!(email, oneof_email_task());
+    assert_eq!(
+        read_oneof_case(&email),
+        Some(NotificationCase::EmailAddress)
+    );
+
+    let webhook =
+        Task::<Global>::decode(ONEOF_WEBHOOK_BYTES.as_slice()).expect("oneof webhook decode");
+    assert_eq!(webhook, oneof_webhook_task());
+    assert_eq!(
+        read_oneof_case(&webhook),
+        Some(NotificationCase::WebhookId)
+    );
+
+    let postal = Task::<Global>::decode(ONEOF_POSTAL_BYTES.as_slice()).expect("oneof postal decode");
+    assert_eq!(postal, oneof_postal_task());
+    assert_eq!(read_oneof_case(&postal), Some(NotificationCase::Postal));
+
+    let mut switched = oneof_required();
+    assert_eq!(switch_oneof(&mut switched), 1 + 1 + 9 + 1);
+    assert!(read_oneof_case(&switched).is_none());
 }

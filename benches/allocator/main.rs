@@ -8,6 +8,8 @@
 //!
 //! Workloads reuse `ser_de` messages. `flat_scalars` / `short_strings` are
 //! controls (little or no heap); `nested` / `strings` / `packed_ints` allocate.
+//! Construct / bump loops pass the message through [`black_box`] by value so
+//! LLVM cannot skip the stores (a `&msg` barrier is not enough).
 //!
 //! Run:
 //! ```text
@@ -25,10 +27,10 @@ use ::bumpalo::Bump;
 use ::criterion::{BenchmarkId, Criterion, Throughput, black_box, criterion_group};
 use ::puroro::Message;
 
-use messages::{FlatScalars, Nest, PackedInts, ShortStrings, StringHeavy};
+use messages::{FlatScalars, Nest, PackedInts, ShortStrings, StringHeavy, Wrap, WrapInline};
 use payloads::{
     FLAT_BYTES, NEST_BYTES, NEST_DEPTH, PACKED_BYTES, PACKED_LEN, SHORT_STRINGS_BYTES,
-    STRINGS_BYTES,
+    STRINGS_BYTES, WRAP_BYTES,
 };
 
 fn decode_in<M>(alloc: M::Alloc, bytes: &[u8]) -> M
@@ -54,10 +56,7 @@ fn bench_decode_alloc(c: &mut Criterion) {
         let mut bump = Bump::new();
         group.bench_function(BenchmarkId::new("flat_scalars", "bump"), |b| {
             b.iter(|| {
-                {
-                    let msg = decode_in::<FlatScalars<_>>(&bump, black_box(bytes));
-                    black_box(&msg);
-                }
+                black_box(decode_in::<FlatScalars<_>>(&bump, black_box(bytes)));
                 bump.reset();
             })
         });
@@ -72,10 +71,34 @@ fn bench_decode_alloc(c: &mut Criterion) {
         let mut bump = Bump::new();
         group.bench_function(BenchmarkId::new("nested", "bump"), |b| {
             b.iter(|| {
-                {
-                    let msg = decode_in::<Nest<_>>(&bump, black_box(bytes));
-                    black_box(&msg);
-                }
+                black_box(decode_in::<Nest<_>>(&bump, black_box(bytes)));
+                bump.reset();
+            })
+        });
+    }
+
+    let bytes = WRAP_BYTES.as_slice();
+    group.throughput(Throughput::Bytes(bytes.len() as u64));
+    group.bench_function(BenchmarkId::new("wrap", "global"), |b| {
+        b.iter(|| decode_in::<Wrap<Global>>(Global, black_box(bytes)))
+    });
+    {
+        let mut bump = Bump::new();
+        group.bench_function(BenchmarkId::new("wrap", "bump"), |b| {
+            b.iter(|| {
+                black_box(decode_in::<Wrap<_>>(&bump, black_box(bytes)));
+                bump.reset();
+            })
+        });
+    }
+    group.bench_function(BenchmarkId::new("wrap_inline", "global"), |b| {
+        b.iter(|| decode_in::<WrapInline<Global>>(Global, black_box(bytes)))
+    });
+    {
+        let mut bump = Bump::new();
+        group.bench_function(BenchmarkId::new("wrap_inline", "bump"), |b| {
+            b.iter(|| {
+                black_box(decode_in::<WrapInline<_>>(&bump, black_box(bytes)));
                 bump.reset();
             })
         });
@@ -90,10 +113,7 @@ fn bench_decode_alloc(c: &mut Criterion) {
         let mut bump = Bump::new();
         group.bench_function(BenchmarkId::new("packed_ints", "bump"), |b| {
             b.iter(|| {
-                {
-                    let msg = decode_in::<PackedInts<_>>(&bump, black_box(bytes));
-                    black_box(&msg);
-                }
+                black_box(decode_in::<PackedInts<_>>(&bump, black_box(bytes)));
                 bump.reset();
             })
         });
@@ -108,10 +128,7 @@ fn bench_decode_alloc(c: &mut Criterion) {
         let mut bump = Bump::new();
         group.bench_function(BenchmarkId::new("strings", "bump"), |b| {
             b.iter(|| {
-                {
-                    let msg = decode_in::<StringHeavy<_>>(&bump, black_box(bytes));
-                    black_box(&msg);
-                }
+                black_box(decode_in::<StringHeavy<_>>(&bump, black_box(bytes)));
                 bump.reset();
             })
         });
@@ -126,10 +143,7 @@ fn bench_decode_alloc(c: &mut Criterion) {
         let mut bump = Bump::new();
         group.bench_function(BenchmarkId::new("short_strings", "bump"), |b| {
             b.iter(|| {
-                {
-                    let msg = decode_in::<ShortStrings<_>>(&bump, black_box(bytes));
-                    black_box(&msg);
-                }
+                black_box(decode_in::<ShortStrings<_>>(&bump, black_box(bytes)));
                 bump.reset();
             })
         });
@@ -143,16 +157,13 @@ fn bench_construct_alloc(c: &mut Criterion) {
 
     group.throughput(Throughput::Elements(1));
     group.bench_function(BenchmarkId::new("flat_scalars", "global"), |b| {
-        b.iter(|| FlatScalars::sample_in(Global))
+        b.iter(|| black_box(FlatScalars::sample_in(Global)))
     });
     {
         let mut bump = Bump::new();
         group.bench_function(BenchmarkId::new("flat_scalars", "bump"), |b| {
             b.iter(|| {
-                {
-                    let msg = FlatScalars::sample_in(&bump);
-                    black_box(&msg);
-                }
+                black_box(FlatScalars::sample_in(&bump));
                 bump.reset();
             })
         });
@@ -160,16 +171,39 @@ fn bench_construct_alloc(c: &mut Criterion) {
 
     group.throughput(Throughput::Elements(NEST_DEPTH as u64));
     group.bench_function(BenchmarkId::new("nested", "global"), |b| {
-        b.iter(|| Nest::sample_in(Global, NEST_DEPTH))
+        b.iter(|| black_box(Nest::sample_in(Global, NEST_DEPTH)))
     });
     {
         let mut bump = Bump::new();
         group.bench_function(BenchmarkId::new("nested", "bump"), |b| {
             b.iter(|| {
-                {
-                    let msg = Nest::sample_in(&bump, NEST_DEPTH);
-                    black_box(&msg);
-                }
+                black_box(Nest::sample_in(&bump, NEST_DEPTH));
+                bump.reset();
+            })
+        });
+    }
+
+    group.throughput(Throughput::Elements(1));
+    group.bench_function(BenchmarkId::new("wrap", "global"), |b| {
+        b.iter(|| black_box(Wrap::sample_in(Global)))
+    });
+    {
+        let mut bump = Bump::new();
+        group.bench_function(BenchmarkId::new("wrap", "bump"), |b| {
+            b.iter(|| {
+                black_box(Wrap::sample_in(&bump));
+                bump.reset();
+            })
+        });
+    }
+    group.bench_function(BenchmarkId::new("wrap_inline", "global"), |b| {
+        b.iter(|| black_box(WrapInline::sample_in(Global)))
+    });
+    {
+        let mut bump = Bump::new();
+        group.bench_function(BenchmarkId::new("wrap_inline", "bump"), |b| {
+            b.iter(|| {
+                black_box(WrapInline::sample_in(&bump));
                 bump.reset();
             })
         });
@@ -177,16 +211,13 @@ fn bench_construct_alloc(c: &mut Criterion) {
 
     group.throughput(Throughput::Elements(PACKED_LEN as u64));
     group.bench_function(BenchmarkId::new("packed_ints", "global"), |b| {
-        b.iter(|| PackedInts::sample_in(Global, PACKED_LEN))
+        b.iter(|| black_box(PackedInts::sample_in(Global, PACKED_LEN)))
     });
     {
         let mut bump = Bump::new();
         group.bench_function(BenchmarkId::new("packed_ints", "bump"), |b| {
             b.iter(|| {
-                {
-                    let msg = PackedInts::sample_in(&bump, PACKED_LEN);
-                    black_box(&msg);
-                }
+                black_box(PackedInts::sample_in(&bump, PACKED_LEN));
                 bump.reset();
             })
         });
@@ -194,32 +225,26 @@ fn bench_construct_alloc(c: &mut Criterion) {
 
     group.throughput(Throughput::Elements(1));
     group.bench_function(BenchmarkId::new("strings", "global"), |b| {
-        b.iter(|| StringHeavy::sample_in(Global))
+        b.iter(|| black_box(StringHeavy::sample_in(Global)))
     });
     {
         let mut bump = Bump::new();
         group.bench_function(BenchmarkId::new("strings", "bump"), |b| {
             b.iter(|| {
-                {
-                    let msg = StringHeavy::sample_in(&bump);
-                    black_box(&msg);
-                }
+                black_box(StringHeavy::sample_in(&bump));
                 bump.reset();
             })
         });
     }
 
     group.bench_function(BenchmarkId::new("short_strings", "global"), |b| {
-        b.iter(|| ShortStrings::sample_in(Global))
+        b.iter(|| black_box(ShortStrings::sample_in(Global)))
     });
     {
         let mut bump = Bump::new();
         group.bench_function(BenchmarkId::new("short_strings", "bump"), |b| {
             b.iter(|| {
-                {
-                    let msg = ShortStrings::sample_in(&bump);
-                    black_box(&msg);
-                }
+                black_box(ShortStrings::sample_in(&bump));
                 bump.reset();
             })
         });
@@ -237,6 +262,14 @@ fn assert_bump_roundtrips() {
     assert_eq!(
         decode_in::<Nest<_>>(&bump, NEST_BYTES.as_slice()).encode_to_vec(),
         *NEST_BYTES
+    );
+    assert_eq!(
+        decode_in::<Wrap<_>>(&bump, WRAP_BYTES.as_slice()).encode_to_vec(),
+        *WRAP_BYTES
+    );
+    assert_eq!(
+        decode_in::<WrapInline<_>>(&bump, WRAP_BYTES.as_slice()).encode_to_vec(),
+        *WRAP_BYTES
     );
     assert_eq!(
         decode_in::<PackedInts<_>>(&bump, PACKED_BYTES.as_slice()).encode_to_vec(),

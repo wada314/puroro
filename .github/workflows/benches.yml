@@ -1,0 +1,23 @@
+# Smoke-compile Criterion targets (`--test` runs each bench once).
+name: benches
+
+on:
+  push:
+    branches: [scratch-ai, master]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  bench-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prefer HTTPS for git submodules
+        run: git config --global url."https://github.com/".insteadOf git@github.com:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@nightly
+      - name: Smoke-test benches
+        run: cargo bench -p puroro -- --test

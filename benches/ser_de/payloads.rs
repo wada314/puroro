@@ -8,7 +8,9 @@ use ::std::sync::LazyLock;
 
 use ::puroro::Message;
 
-use crate::messages::{FlatScalars, Nest, PackedInts, ShortStrings, StringHeavy};
+use crate::messages::{
+    FlatScalars, Nest, PackedInts, ShortStrings, StringHeavy, Wrap, WrapInline,
+};
 
 /// Nesting depth exercised by the nested-message benches.
 pub const NEST_DEPTH: usize = 16;
@@ -20,6 +22,8 @@ pub static FLAT_BYTES: LazyLock<Vec<u8>> = LazyLock::new(|| FlatScalars::sample(
 
 pub static NEST_BYTES: LazyLock<Vec<u8>> =
     LazyLock::new(|| Nest::sample(NEST_DEPTH).encode_to_vec());
+
+pub static WRAP_BYTES: LazyLock<Vec<u8>> = LazyLock::new(|| Wrap::sample().encode_to_vec());
 
 pub static PACKED_BYTES: LazyLock<Vec<u8>> =
     LazyLock::new(|| PackedInts::sample(PACKED_LEN).encode_to_vec());
@@ -34,6 +38,7 @@ pub static SHORT_STRINGS_BYTES: LazyLock<Vec<u8>> =
 pub fn assert_roundtrips() {
     assert!(!FLAT_BYTES.is_empty());
     assert!(!NEST_BYTES.is_empty());
+    assert!(!WRAP_BYTES.is_empty());
     assert!(!PACKED_BYTES.is_empty());
     assert!(!STRINGS_BYTES.is_empty());
     assert!(!SHORT_STRINGS_BYTES.is_empty());
@@ -43,6 +48,16 @@ pub fn assert_roundtrips() {
 
     let nest = Nest::decode(NEST_BYTES.as_slice()).expect("nest decode");
     assert_eq!(nest.encode_to_vec(), *NEST_BYTES);
+
+    let wrap = Wrap::decode(WRAP_BYTES.as_slice()).expect("wrap decode");
+    assert_eq!(wrap.encode_to_vec(), *WRAP_BYTES);
+    assert_eq!(
+        WrapInline::sample().encode_to_vec(),
+        *WRAP_BYTES,
+        "inline wrap wire must match boxed wrap"
+    );
+    let wrap_inline = WrapInline::decode(WRAP_BYTES.as_slice()).expect("wrap inline decode");
+    assert_eq!(wrap_inline.encode_to_vec(), *WRAP_BYTES);
 
     let packed = PackedInts::decode(PACKED_BYTES.as_slice()).expect("packed decode");
     assert_eq!(packed.encode_to_vec(), *PACKED_BYTES);
