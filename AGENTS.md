@@ -56,6 +56,7 @@ Singular `string` / `bytes` SSO stores `[MaybeUninit<u8>; INLINE_CAP]` plus a le
 
 ## Where to read next
 
+- Crate landing page (GitHub repository root and the crates.io page): [`README.md`](README.md). It tells most users to use Google's `google-protobuf` instead.
 - Public API: [`DESIGN.md`](DESIGN.md)
 - Generated-code internals: [`IMPLEMENTATION.md`](IMPLEMENTATION.md)
 - Topic locks (lazy decode, SSO bools, superseded sharing): [`.cursor/plans/`](.cursor/plans/)
