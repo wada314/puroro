@@ -690,7 +690,7 @@ Nested LEN payloads use `Buf::take(len)` before child `merge_from`.
 | `Default` | `A: Clone + Default` | Clears presence; empty heap fields |
 | `Drop` | `A: Clone` | Calls `deallocate(&_common)` on every direct child ([`FieldDeallocate`](puroro-rt/src/fields/shared/field_deallocate.rs)), then `_common.deallocate()` |
 | `Clone` / `CloneIn` | `A: Clone` | Field-wise [`FieldCloneIn::clone_field`](puroro-rt/src/fields/shared/field_inspect.rs); `Clone` clones `MessageCommon.alloc` and delegates |
-| `PartialEq` | `A: Clone` | Semantic getter comparison (not wire bytes); float uses Rust `PartialEq` |
+| `PartialEq` | `A: Clone` | Eager: semantic getter comparison (not wire bytes); float uses Rust `PartialEq`. Lazy: eager values when both sides build; ingested body bytes when both builds fail ([DESIGN.md](DESIGN.md#eager-and-lazy-semantic-gaps)) |
 | `Debug` | `A: Clone` | Field-name `debug_struct` (oneof shown as `notification` → `case`) |
 
 **Not currently generated:** `Eq`, `Copy`, `Ord`, `Hash`.

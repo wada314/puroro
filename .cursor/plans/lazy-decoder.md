@@ -194,7 +194,9 @@ After a field promotes to Inline/Heap it no longer depends on `_wire`.
 | Second emit / aliases (plugin later) | Incremental `push` / `finish` |
 
 Encode on a finished, unmutated lazy message may emit `_wire` (field order
-need not match eager). `PartialEq` is semantic, not wire identity. `Clone`
+need not match eager). `PartialEq` is semantic when both sides build an
+eager message. When both builds fail, it compares ingested body bytes so
+equality stays reflexive. `Clone`
 may clone `_wire` and drop unpromoted caches, or clone slots; pick one in
 step 8 and test it. Prefer: clone `_wire` + leftover/scan state + already
 applied numericals / promoted SSO; unpromoted LEN stays offsets.

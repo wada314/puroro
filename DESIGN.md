@@ -38,7 +38,7 @@ This document specifies the **public interface** of the `puroro` Protocol Buffer
 7. [Design decisions and trade-offs](#7-design-decisions-and-trade-offs)
 8. [Future work](#8-future-work)
    - 8.0 [Per-message traits (not yet generated)](#per-message-traits-not-yet-generated)
-   - 8.1 [Specialized message implementations](#specialized-message-implementations) (`TaskLazy<A>`, `TaskView<'buf>`) — includes [lazy parse timing](#tasklaya--lazy-parse-timing)
+   - 8.1 [Specialized message implementations](#specialized-message-implementations) (`TaskLazy<A>`, `TaskView<'buf>`) — includes [lazy parse timing](#tasklaya--lazy-parse-timing) and [eager / lazy semantic gaps](#eager-and-lazy-semantic-gaps)
    - 8.2 [Other future work](#other-future-work)
 
 ---
@@ -1075,7 +1075,7 @@ impl Task<Global> {
 impl<A: Allocator + Clone + Default> Default for Task<A> { … }
 ```
 
-**Derived traits.** Generated messages implement `Default` (for `A: Allocator + Clone + Default`) plus a custom `Drop` (for `A: Allocator + Clone`). `Task::new()` is a `Global`-only convenience so `Task::new()` infers (`new()` delegates to `Default`; custom allocators use `new_in` / `Task::<A>::default()`). `Clone` / `PartialEq` / `Debug` are hand-written (not `#[derive]`): `Clone` delegates to field-wise [`FieldCloneIn`](puroro-rt/src/fields/shared/field_inspect.rs) (which uses [`CloneIn`](unmanaged/) for heap payloads); `PartialEq` / `Debug` compare / format via semantic getters. Wire bytes are not deterministic across encodes. Full matrix: [IMPLEMENTATION.md §13](IMPLEMENTATION.md#13-derived-traits).
+**Derived traits.** Generated messages implement `Default` (for `A: Allocator + Clone + Default`) plus a custom `Drop` (for `A: Allocator + Clone`). `Task::new()` is a `Global`-only convenience so `Task::new()` infers (`new()` delegates to `Default`; custom allocators use `new_in` / `Task::<A>::default()`). `Clone` / `PartialEq` / `Debug` are hand-written (not `#[derive]`): `Clone` delegates to field-wise [`FieldCloneIn`](puroro-rt/src/fields/shared/field_inspect.rs) (which uses [`CloneIn`](unmanaged/) for heap payloads); eager `PartialEq` / `Debug` compare / format via semantic getters. The lazy alias compares eager values when both sides build one, and ingested body bytes when both builds fail ([eager / lazy gaps](#eager-and-lazy-semantic-gaps)). Wire bytes are not deterministic across encodes. Full matrix: [IMPLEMENTATION.md §13](IMPLEMENTATION.md#13-derived-traits).
 
 **Mutation API (`_mut`).** Mutation is unified under `_mut` accessors (RPIT). Default singular `string` / `bytes` yield `impl ::puroro::StringMut<A>` / `impl ::puroro::BytesMut<A>` (SSO; heap layout via `(puroro.string_layout)` / `(puroro.bytes_layout) = HEAP` is `impl DerefMut<Target = ::puroro::String<A>>` / `impl DerefMut<Target = Vec<u8, A>>`). Packable repeated `*_mut()` yield `impl DerefMut<Target = Vec<_, A>>` (`allocator_api2`); scalar/enum `_mut` accessors return `impl DerefMut<Target = T>`. The guard **owns** a clone of the message allocator when the payload is heap-backed. Acquiring an explicit-presence `_mut` sets the presence bit. There are no generated `set_*` / `push_*` helpers **for scalars**: append packable elements with `tag_ids_mut().push(…)`; for repeated `string` / `bytes`, use `labels_mut()` / `*_mut()` → [`RepeatedStringMut`](src/repeated.rs) / [`RepeatedBytesMut`](src/repeated.rs) (`push()` then fill the empty element); for repeated messages, `watchers_mut()` → `impl DerefMut<Target = Vec<Address<A>, A>>` (`push(addr)`). Nested singular messages use `set_assignee` / `set_origin` as move-replace. Library users of generated messages depend on `puroro` (+ the generated crate), not on `puroro-rt`.
 
@@ -1399,7 +1399,7 @@ Generic code that only reads fields is meant to use `task::MessageFallible` with
 
 ### Other future work
 
-- **Unknown-field preservation opt-out.** `(puroro.unknown_fields) = DISCARD` bakes [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs) on the eager alias. File-level / package default is not wired. The lazy alias's `unknown_fields()` iterator is empty either way; unknown tags stay in the ingested wire until `into_eager`.
+- **Unknown-field preservation opt-out.** `(puroro.unknown_fields) = DISCARD` bakes [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs) on the eager alias. File-level / package default is not wired. The lazy alias's `unknown_fields()` iterator is empty either way; unknown tags stay in the ingested wire until `into_eager`. The rest of the eager / lazy split, including this one, is listed under [eager / lazy semantic gaps](#eager-and-lazy-semantic-gaps).
 - **Unknown-field reject-on-decode.** Shipped as `(puroro.unknown_fields) = REJECT` ([§4.9](#49-unknown-fields)). This failure is outside the protobuf spec. File-level / package default is not wired, same as Discard.
 - **Service / RPC definitions.** Out of scope for the runtime library.
 - **Well-known types.** `google.protobuf.Timestamp`, `Duration`, `Any`, etc.
