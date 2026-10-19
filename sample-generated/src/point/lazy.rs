@@ -158,13 +158,7 @@ impl<A: Allocator + Clone> Clone for PointLazy<A> {
 
 impl<A: Allocator + Clone> PartialEq for PointLazy<A> {
     fn eq(&self, other: &Self) -> bool {
-        if self.ensure_scanned().is_err() || other.ensure_scanned().is_err() {
-            return false;
-        }
-        match (self.clone().into_eager(), other.clone().into_eager()) {
-            (Ok(left), Ok(right)) => left == right,
-            _ => false,
-        }
+        LazyMessage::eq_with_eager(self, other, |msg| msg.clone().into_eager())
     }
 }
 

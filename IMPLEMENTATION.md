@@ -690,7 +690,7 @@ Nested LEN payloads use `Buf::take(len)` before child `merge_from`.
 | `Default` | `A: Clone + Default` | Clears presence; empty heap fields |
 | `Drop` | `A: Clone` | Calls `deallocate(&_common)` on every direct child ([`FieldDeallocate`](puroro-rt/src/fields/shared/field_deallocate.rs)), then `_common.deallocate()` |
 | `Clone` / `CloneIn` | `A: Clone` | Field-wise [`FieldCloneIn::clone_field`](puroro-rt/src/fields/shared/field_inspect.rs); `Clone` clones `MessageCommon.alloc` and delegates |
-| `PartialEq` | `A: Clone` | Semantic getter comparison (not wire bytes); float uses Rust `PartialEq` |
+| `PartialEq` | `A: Clone` | Eager: semantic getter comparison (not wire bytes); float uses Rust `PartialEq`. Lazy: eager values when both sides build; ingested body bytes when both builds fail ([DESIGN.md](DESIGN.md#eager-and-lazy-semantic-gaps)) |
 | `Debug` | `A: Clone` | Field-name `debug_struct` (oneof shown as `notification` → `case`) |
 
 **Not currently generated:** `Eq`, `Copy`, `Ord`, `Hash`.
@@ -861,13 +861,13 @@ The `set_*` per-variant setters are removed, matching the other field families.
 
 | Area | Current | Target |
 |---|---|---|
-| UTF-8 validation | Per-field `utf8_validation` (`ProtoString` / `&str` vs `ProtoStringUnchecked` / `&[u8]`) | — |
+| UTF-8 validation | Per-field `utf8_validation` (`ProtoString` / `&str` vs `ProtoStringUnchecked` / `&[u8]`). `VERIFY` failure is `InvalidUtf8`, not an unknown-field divert. | Eager / lazy timing and the other alias gaps: [DESIGN.md](DESIGN.md#eager-and-lazy-semantic-gaps) |
 | Recursion limit | Enforced (`RECURSION_LIMIT = 100`, `merge_from_with_depth`) | — |
 | Repeated wrappers | `RepeatedField` + `RepeatedElement` (message / bool / scalar / LEN) | — |
 | Map wrappers | `MapField` + `MapKey` / `RepeatedElement` (sample `attributes`) | — |
 | `protoc-gen-puroro` field emission | Eager and lazy aliases (`Name` / `NameLazy`); singular / repeated / enum / message / oneof / map / defaults / `child_parse`; see [§3](#3-implementation-status) | Typed extensions / services |
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |
-| `TaskLazy` | Plugin emits `NameLazy` (one scan, numericals via `merge_scanned`, `WireOrSso` / span lists; the scan record does not own LEN). Sample is the same shape. Typical `task_lazy/decode` is ~1.1× eager after rematch; packed prefix skip did not move that bench. Lazy `unknown_fields()` is empty. `MessageFallible` is eager-only | [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing); lock: [`.cursor/plans/lazy-decoder.md`](.cursor/plans/lazy-decoder.md) |
+| `TaskLazy` | Plugin emits `NameLazy` (one scan, numericals via `merge_scanned`, `WireOrSso` / span lists; the scan record does not own LEN). Sample is the same shape. Typical `task_lazy/decode` is ~1.1× eager after rematch; packed prefix skip did not move that bench. Lazy `unknown_fields()` is empty. `MessageFallible` is eager-only. `PartialEq` uses eager semantics when both sides build, and body bytes when both fail. | Gaps vs eager (UTF-8 timing, discard encode, recursion, sample `validate`, …): [DESIGN.md](DESIGN.md#eager-and-lazy-semantic-gaps). Lock: [`.cursor/plans/lazy-decoder.md`](.cursor/plans/lazy-decoder.md) |
 | `Hash` / `serde` | Deferred | Opt-in features |
 | Unknown-field reject-on-decode | `(puroro.unknown_fields) = REJECT` bakes [`RejectUnknowns`](puroro-rt/src/unknown_fields.rs) (ZST; `UnrecognizedField`) | — |
 | Submessage inline | Sample singular **and** oneof nested messages use [`ProtoMessage<M>`](puroro-rt/src/fields/wire/proto_message.rs): inline slot = full `M`, boxed slot = `UnmanagedBox<M>`, getters are `&M` / `&mut M`. Repeated / map store `M` | codegen ([§17.1](#171-submessage-inline-optimisation)) |

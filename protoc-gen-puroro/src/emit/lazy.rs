@@ -243,18 +243,9 @@ fn render_eq_debug(lazy_alias: &Ident, lazy_name_str: &str) -> TokenStream {
             for #lazy_alias<A>
         {
             fn eq(&self, other: &Self) -> bool {
-                if ::puroro_rt::decode::LazyMessage::ensure_scanned(self).is_err()
-                    || ::puroro_rt::decode::LazyMessage::ensure_scanned(other).is_err()
-                {
-                    return false;
-                }
-                match (self.clone().into_eager(), other.clone().into_eager()) {
-                    (
-                        ::core::result::Result::Ok(left),
-                        ::core::result::Result::Ok(right),
-                    ) => left == right,
-                    _ => false,
-                }
+                ::puroro_rt::decode::LazyMessage::eq_with_eager(self, other, |msg| {
+                    msg.clone().into_eager()
+                })
             }
         }
 

@@ -38,7 +38,7 @@ This document specifies the **public interface** of the `puroro` Protocol Buffer
 7. [Design decisions and trade-offs](#7-design-decisions-and-trade-offs)
 8. [Future work](#8-future-work)
    - 8.0 [Per-message traits (not yet generated)](#per-message-traits-not-yet-generated)
-   - 8.1 [Specialized message implementations](#specialized-message-implementations) (`TaskLazy<A>`, `TaskView<'buf>`) — includes [lazy parse timing](#tasklaya--lazy-parse-timing)
+   - 8.1 [Specialized message implementations](#specialized-message-implementations) (`TaskLazy<A>`, `TaskView<'buf>`) — includes [lazy parse timing](#tasklaya--lazy-parse-timing) and [eager / lazy semantic gaps](#eager-and-lazy-semantic-gaps)
    - 8.2 [Other future work](#other-future-work)
 
 ---
@@ -66,7 +66,7 @@ The puroro project comprises several crates and tools with distinct roles:
 
 | Feature | Design intent | Implementation status |
 |---|---|---|
-| `utf8_validation` (`VERIFY` / `NONE`) | Generated decode paths honour the per-field Editions setting. `NONE` uses bytes views (`&[u8]`), not `&str`. | **Done** — `ProtoString` (`VERIFY`, `&str`) vs `ProtoStringUnchecked` (`NONE`, `&[u8]`). proto2 default is `NONE`; overlay with `proto2_utf8=verify`. |
+| `utf8_validation` (`VERIFY` / `NONE`) | Generated decode paths honour the per-field Editions setting. `NONE` uses bytes views (`&[u8]`), not `&str`. `VERIFY` failure is `DecodeError::InvalidUtf8` and is not diverted into unknown fields. | **Done** — `ProtoString` (`VERIFY`, `&str`) vs `ProtoStringUnchecked` (`NONE`, `&[u8]`). proto2 default is `NONE`; overlay with `proto2_utf8=verify`. Eager merge fails immediately; lazy checks on the getter ([eager / lazy gaps](#eager-and-lazy-semantic-gaps)). |
 | Recursion limit | Nested-message `merge_from` enforces a depth limit; excess depth → `DecodeError::RecursionLimitExceeded`. | **Done** — `puroro_rt::MessageMerge::merge_from_with_depth` + `RECURSION_LIMIT` (100); user `Message::merge_from` wraps `merge_message` at depth 0. Nested catalog paths pass `depth + 1`. |
 | Deprecated groups (`SGroup` / `EGroup`) | Never generated; not preserved on decode. | Decoder may return `DecodeError::InvalidTag`, skip, or panic — round-trip fidelity for groups is **not** a goal. |
 
@@ -550,9 +550,9 @@ task.title_mut().push_str("Fix bug");
 
 Wire rule: absent when `title().is_set()` is false (EXPLICIT) or `""` (IMPLICIT).
 
-**UTF-8 validation** (Editions `utf8_validation` feature): when `VERIFY` (proto3 / edition 2023–2024 default), invalid UTF-8 in a string payload causes `DecodeError::InvalidUtf8` during decode. Generated fields use `ProtoString` and the `&str` / `StringMut` accessors above.
+**UTF-8 validation** (Editions `utf8_validation` feature): when `VERIFY` (proto3 / edition 2023–2024 default), invalid UTF-8 in a string payload is `DecodeError::InvalidUtf8`. Generated fields use `ProtoString` and the `&str` / `StringMut` accessors above. That error is a failed decode of a known field. It is not written into the unknown-field set. Closed-enum unknowns stay on the divert path: the wire value is a legal varint the schema does not name, and the spec keeps the parse successful. A `VERIFY` string is a field the schema does name, with a payload Editions require the parser to reject. Eager `decode` / `merge_from` return `InvalidUtf8`. Lazy `decode` accepts a structurally complete wire; the getter and `into_eager` return `InvalidUtf8` ([eager / lazy gaps](#eager-and-lazy-semantic-gaps)).
 
-When `NONE` (proto2 syntax default; also settable per-field in editions), wire bytes are copied without validation. Generated fields use `ProtoStringUnchecked` and the **bytes** accessor surface (`&[u8]`, `BytesMut`, `RepeatedBytesMut`) so invalid UTF-8 is never presented as `&str`. The marker stays distinct from `ProtoBytes` because a protobuf `string` may be a map key and `bytes` may not.
+When `NONE` (proto2 syntax default; also settable per-field in editions), wire bytes are copied without validation. Generated fields use `ProtoStringUnchecked` and the **bytes** accessor surface (`&[u8]`, `BytesMut`, `RepeatedBytesMut`) so invalid UTF-8 is never presented as `&str`. The marker stays distinct from `ProtoBytes` because a protobuf `string` may be a map key and `bytes` may not. Schemas that must accept non-UTF-8 strings use `NONE`. There is no lossy-`&str` mode.
 
 To keep proto2 strings as `&str` without changing the `.proto` files, pass the plugin option `proto2_utf8=verify` (`--puroro_opt=proto2_utf8=verify`). That overlays only the proto2 syntax default; editions `features.utf8_validation = NONE` stays bytes.
 
@@ -1075,7 +1075,7 @@ impl Task<Global> {
 impl<A: Allocator + Clone + Default> Default for Task<A> { … }
 ```
 
-**Derived traits.** Generated messages implement `Default` (for `A: Allocator + Clone + Default`) plus a custom `Drop` (for `A: Allocator + Clone`). `Task::new()` is a `Global`-only convenience so `Task::new()` infers (`new()` delegates to `Default`; custom allocators use `new_in` / `Task::<A>::default()`). `Clone` / `PartialEq` / `Debug` are hand-written (not `#[derive]`): `Clone` delegates to field-wise [`FieldCloneIn`](puroro-rt/src/fields/shared/field_inspect.rs) (which uses [`CloneIn`](unmanaged/) for heap payloads); `PartialEq` / `Debug` compare / format via semantic getters. Wire bytes are not deterministic across encodes. Full matrix: [IMPLEMENTATION.md §13](IMPLEMENTATION.md#13-derived-traits).
+**Derived traits.** Generated messages implement `Default` (for `A: Allocator + Clone + Default`) plus a custom `Drop` (for `A: Allocator + Clone`). `Task::new()` is a `Global`-only convenience so `Task::new()` infers (`new()` delegates to `Default`; custom allocators use `new_in` / `Task::<A>::default()`). `Clone` / `PartialEq` / `Debug` are hand-written (not `#[derive]`): `Clone` delegates to field-wise [`FieldCloneIn`](puroro-rt/src/fields/shared/field_inspect.rs) (which uses [`CloneIn`](unmanaged/) for heap payloads); eager `PartialEq` / `Debug` compare / format via semantic getters. The lazy alias compares eager values when both sides build one, and ingested body bytes when both builds fail ([eager / lazy gaps](#eager-and-lazy-semantic-gaps)). Wire bytes are not deterministic across encodes. Full matrix: [IMPLEMENTATION.md §13](IMPLEMENTATION.md#13-derived-traits).
 
 **Mutation API (`_mut`).** Mutation is unified under `_mut` accessors (RPIT). Default singular `string` / `bytes` yield `impl ::puroro::StringMut<A>` / `impl ::puroro::BytesMut<A>` (SSO; heap layout via `(puroro.string_layout)` / `(puroro.bytes_layout) = HEAP` is `impl DerefMut<Target = ::puroro::String<A>>` / `impl DerefMut<Target = Vec<u8, A>>`). Packable repeated `*_mut()` yield `impl DerefMut<Target = Vec<_, A>>` (`allocator_api2`); scalar/enum `_mut` accessors return `impl DerefMut<Target = T>`. The guard **owns** a clone of the message allocator when the payload is heap-backed. Acquiring an explicit-presence `_mut` sets the presence bit. There are no generated `set_*` / `push_*` helpers **for scalars**: append packable elements with `tag_ids_mut().push(…)`; for repeated `string` / `bytes`, use `labels_mut()` / `*_mut()` → [`RepeatedStringMut`](src/repeated.rs) / [`RepeatedBytesMut`](src/repeated.rs) (`push()` then fill the empty element); for repeated messages, `watchers_mut()` → `impl DerefMut<Target = Vec<Address<A>, A>>` (`push(addr)`). Nested singular messages use `set_assignee` / `set_origin` as move-replace. Library users of generated messages depend on `puroro` (+ the generated crate), not on `puroro-rt`.
 
@@ -1205,7 +1205,7 @@ Note: **edition 2024 defaults to `EXPLICIT` field presence**, which is the oppos
 | `repeated_field_encoding` | `PACKED` / `EXPANDED` | Affects encode format (decode always accepts both) |
 | `enum_type` | `OPEN` / `CLOSED` | Generated newtype implements `OpenEnum` vs `ClosedEnum`; field is `ProtoEnum<E, Open>` vs `ProtoEnum<E, Closed>` (unknown closed values → unknown fields) |
 | `message_encoding` | `LENGTH_PREFIXED` / `DELIMITED` | `DELIMITED` (groups) is deprecated; not generated |
-| `utf8_validation` | `VERIFY` / `NONE` | `VERIFY`: `ProtoString`; getters `&str` / `StringMut`; invalid UTF-8 → `DecodeError::InvalidUtf8`. `NONE`: `ProtoStringUnchecked`; getters `&[u8]` / `BytesMut` (proto2 syntax default). Overlay proto2 with plugin option `proto2_utf8=verify`. |
+| `utf8_validation` | `VERIFY` / `NONE` | `VERIFY`: `ProtoString`; getters `&str` / `StringMut`; invalid UTF-8 → `DecodeError::InvalidUtf8` (not an unknown-field divert). `NONE`: `ProtoStringUnchecked`; getters `&[u8]` / `BytesMut` (proto2 syntax default). Overlay proto2 with plugin option `proto2_utf8=verify`. |
 
 ### 6.4 Migration from proto2 / proto3
 
@@ -1339,7 +1339,28 @@ Child layout follows [Child parse timing](#child-parse-timing). A follow-parent 
 
 The wire blob is [`SharedWire`](puroro-rt/src/decode/shared_wire.rs): `bytes::Bytes` plus the message's `A`. Each `push` chunk is appended to that island after a successful scan. The scanner does not copy a complete LEN body; it stores a span and callers slice `_wire`. An incomplete record stays in leftover. When a later chunk completes it, leftover is already on the island from the earlier append, so the full record is one contiguous region. A lazy child keeps a handle and a span. It does not copy the LEN body. `Bytes` is the wire store because sub-slicing matters more than placing that blob in `A`. Decoded values still allocate through `A`. Typical generated `TaskLazy` decode is about 1.1× eager after the span scanner and catalog `merge_scanned` (Criterion `generated`, pinned CPU; 1.08–1.14 across runs; gaps under ~10% are noise). Skipping the packed length-prefix rematch does not move that bench — typical Task packed fields are tiny. Map ingest stays a span list, so neither rematch nor packed apply moves `map/decode_lazy`.
 
-**Encode and equality.** Encode of a finished lazy message writes the ingested wire as-is. Field order need not match an eager encode. After more than one `merge_from`, the encoded length is the concatenated ingest. `PartialEq` and `Debug` compare semantics by building the eager message. `unknown_fields()` on the lazy alias is empty. Unknown tags stay in the wire and appear on the eager message after `into_eager`.
+**Encode and equality.** Encode of a finished lazy message writes the ingested wire as-is. Field order need not match an eager encode. After more than one `merge_from`, the encoded length is the concatenated ingest. `PartialEq` compares the eager messages when both sides build one. When both sides fail that build (unfinished input, `InvalidUtf8`, and the same class of error), it compares ingested body bytes, so a lazy value stays equal to itself and to a clone that holds the same body. One success and one failure is unequal. `Debug` prints the eager message, or a non-exhaustive stub when that build fails. `unknown_fields()` on the lazy alias is empty. Unknown tags stay in the wire and appear on the eager message after `into_eager`.
+
+#### Eager and lazy semantic gaps
+
+A lazy alias is not a drop-in for the eager alias. The rows below are the behavioural gaps. They are future work. A later change may expose some of them as a generate-time or runtime option; the names in the last column are sketches, not a committed API. The UTF-8 rule stays fixed while that work is open: `VERIFY` fails the decode or the materialise, and the bad LEN is not diverted into unknown fields and is not dropped from a repeated field while its siblings are kept.
+
+| Gap | Eager | Lazy today | Future item |
+|---|---|---|---|
+| `VERIFY` timing | `decode` / `merge_from` returns `InvalidUtf8` | `decode` succeeds. The getter and `into_eager` return `InvalidUtf8`. `has_*` is presence only and can be true for a payload the getter rejects. Encode writes the bad bytes. | Option sketch `lazy_utf8=on_get` (default) or `on_ingest` (fail `merge_from`, matching eager). On-get keeps the check off the unread path. |
+| Repeated / map `VERIFY` | One bad element fails the merge | One bad element fails the whole getter. Earlier valid elements are not returned. | Same knob as the row above. Partial lists stay out of scope. |
+| Closed-enum unknown | Divert into the unknown store. The accessor is unset and returns the default. The parse succeeds. | Numericals materialise during the scan, so the accessor matches. The divert also appends the lazy unknown store, and the original tag remains in `_wire`. `unknown_fields()` shows neither. Encode emits the tag once, from `_wire`. | Keep this path for enums only. A future unknown iterator must read `_wire` or the store, not both. |
+| `unknown_fields()` | Iterates the store | Always empty. Tags stay in the wire until `into_eager`. | Option sketch: parse `_wire` for `PRESERVE`, stay empty for `DISCARD`. |
+| `DISCARD` | Encode omits unknown tags and closed-enum unknowns | Encode writes `_wire`, so those bytes are still emitted. `into_eager` applies the baked discard policy. | Lazy encode should honour the baked store, or wire passthrough stays an explicit mode. |
+| `REJECT` | Well-formed unknown tag fails the merge | Plugin scan calls `on_unrecognized_tag` and fails the same way. Handwritten `TaskLazy` uses `Ok(())` for the unknown arm; that sample is preserve-only. | Keep the plugin check. |
+| Encode shape | Canonical field order. Merged scalars are emitted once. | Original order. A second `merge_from` concatenates. `PartialEq` can hold while the bytes differ. | Option sketch `lazy_encode=wire` (default) or `canonical`. |
+| `validate` | `LEGACY_REQUIRED` presence | Plugin: the same presence check after `ensure_scanned`. It does not UTF-8-check. Sample `TaskLazy::validate` returns `Ok(())`. | Fix the sample. Optional later: `validate` also forces `VERIFY` getters. |
+| Recursion limit | Nested merge counts depth and returns `RecursionLimitExceeded` | Ingest stores a child span and does not walk it, so a too-deep message can `decode`. `into_eager` enforces the limit. | Count depth when a lazy child is parsed, or reject at ingest. |
+| Getters | Infallible | `Result<_, DecodeError>` | [`MessageFallible`](#per-message-traits-not-yet-generated), already planned. |
+| Presence query | No `has_*`. `is_set` on a stored `VERIFY` string means the bytes were valid UTF-8. | `has_*` is wire presence. | Option sketch: `has_*` means present and successfully decoded. |
+| Mutation | `_mut` / `clear_*` | None. Mutate through `into_eager`. | Lazy mutation. Encode can no longer be pure `_wire` once a slot diverges from the blob. |
+| Follow-parent child | Eager `M` | `MLazy`. A `(puroro.child_parse)` pin is one concrete type on both aliases. | A shared fallible trait has to name both layouts or split. |
+| Incomplete input | `decode` fails. There is no live half-parsed value. | `push` without `finish` is a value. Getters return `UnfinishedMessage`. `finish` with leftover is `TruncatedMessage`. | Keep the split. `decode` `Ok` means the wire ended cleanly, not that every `VERIFY` string is valid. |
 
 **Rejected.** An earlier sketch gave each field its own scan of the parent (`Uninitialized` / `WireFound` / `Parsed`, plus a per-field cursor and `tag_ids_all`). Last-wins singular getters would each walk the whole stream, so v1 does not do that. There is no public "is this field loaded?" API, no lazy `_mut`, and no getter before `finish`.
 
@@ -1378,7 +1399,7 @@ Generic code that only reads fields is meant to use `task::MessageFallible` with
 
 ### Other future work
 
-- **Unknown-field preservation opt-out.** `(puroro.unknown_fields) = DISCARD` bakes [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs) on the eager alias. File-level / package default is not wired. The lazy alias's `unknown_fields()` iterator is empty either way; unknown tags stay in the ingested wire until `into_eager`.
+- **Unknown-field preservation opt-out.** `(puroro.unknown_fields) = DISCARD` bakes [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs) on the eager alias. File-level / package default is not wired. The lazy alias's `unknown_fields()` iterator is empty either way; unknown tags stay in the ingested wire until `into_eager`. The rest of the eager / lazy split, including this one, is listed under [eager / lazy semantic gaps](#eager-and-lazy-semantic-gaps).
 - **Unknown-field reject-on-decode.** Shipped as `(puroro.unknown_fields) = REJECT` ([§4.9](#49-unknown-fields)). This failure is outside the protobuf spec. File-level / package default is not wired, same as Discard.
 - **Service / RPC definitions.** Out of scope for the runtime library.
 - **Well-known types.** `google.protobuf.Timestamp`, `Duration`, `Any`, etc.

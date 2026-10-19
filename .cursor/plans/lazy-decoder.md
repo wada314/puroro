@@ -200,7 +200,9 @@ After a field promotes to Inline/Heap it no longer depends on `_wire`.
 | Second emit / aliases (plugin later) | Incremental `push` / `finish` |
 
 Encode on a finished, unmutated lazy message may emit `_wire` (field order
-need not match eager). `PartialEq` is semantic, not wire identity. `Clone`
+need not match eager). `PartialEq` is semantic when both sides build an
+eager message. When both builds fail, it compares ingested body bytes so
+equality stays reflexive. `Clone`
 may clone `_wire` and drop unpromoted caches, or clone slots; pick one in
 step 8 and test it. Prefer: clone `_wire` + leftover/scan state + already
 applied numericals / promoted SSO; unpromoted LEN stays offsets.
@@ -376,17 +378,19 @@ packed-as-unread-slice. Island-first leftover-as-offset ingest was tried
 and reverted (no typical-bench win). Lazy `unknown_fields()` is empty;
 unknown tags stay in the wire and surface on `into_eager`.
 
-## Revisit later — VERIFY string vs closed-enum unknown
+## Locked — VERIFY failure vs closed-enum unknown
 
-`utf8_validation=VERIFY` failures are **not** locked to the closed-enum
-`UnknownClosedEnum` → `unknown_fields` path.
+`utf8_validation=VERIFY` stays a materialise / merge failure
+(`DecodeError::InvalidUtf8`). It does not divert into `unknown_fields`, and a
+repeated field does not drop only the bad element.
 
-v1 lazy `labels` (and eager repeated `string` merge) treat `InvalidUtf8` as
-a getter / merge failure for that materialise. Per-occurrence divert — skip
-the bad LEN, keep valid elements, park the raw record — should be cheap to
-add later on the materialise / `RepeatedElement` merge path. Do not treat
-the current policy as final. Same question applies to singular lazy
-`Failed` vs diverting `title` into unknowns.
+Closed-enum unknowns stay on the spec divert path (legal varint, parse
+succeeds, accessor is the default). A `VERIFY` string is a known field with
+an illegal payload. Those are different cases; the divert sketch is rejected.
+
+Eager and lazy still disagree on *when* that UTF-8 check runs, and on
+several other behaviours. The list, including option sketches, is
+[DESIGN.md — Eager and lazy semantic gaps](../../DESIGN.md#eager-and-lazy-semantic-gaps).
 
 ## Pointers
 
