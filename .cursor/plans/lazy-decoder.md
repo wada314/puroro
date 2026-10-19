@@ -8,7 +8,10 @@ alias. The per-field `FieldCache` machine is rejected; do not revive it.
 Updated (2026-10-19): `RecordScanner` emits [`ScannedRecord`](../../puroro-rt/src/decode/record.rs)
 / [`ScannedValue`](../../puroro-rt/src/decode/record.rs). LEN is `payload_len`
 only; callers slice `_wire`. Do not rebuild `protobuf_core::Field` with an
-owned LEN `AllocVec`.
+owned LEN `AllocVec`. Numerical apply uses catalog `merge_scanned` /
+`CopyWirePayload::from_scanned`. Do not rematch `Varint` / `I32` / `I64`
+through `merge_scanned_field` (re-encode then catalog `merge`). Packed LEN
+inner varints were never scanned; they still walk the island body.
 
 Still out of v1: `TaskView`, lazy mutation, `MessageFallible` on the lazy
 alias, intra-field repeated cursors, zero-copy spanning LEN, packed repeated
