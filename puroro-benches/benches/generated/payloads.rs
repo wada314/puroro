@@ -312,12 +312,10 @@ pub fn assert_payloads() {
     let webhook =
         Task::<Global>::decode(ONEOF_WEBHOOK_BYTES.as_slice()).expect("oneof webhook decode");
     assert_eq!(webhook, oneof_webhook_task());
-    assert_eq!(
-        read_oneof_case(&webhook),
-        Some(NotificationCase::WebhookId)
-    );
+    assert_eq!(read_oneof_case(&webhook), Some(NotificationCase::WebhookId));
 
-    let postal = Task::<Global>::decode(ONEOF_POSTAL_BYTES.as_slice()).expect("oneof postal decode");
+    let postal =
+        Task::<Global>::decode(ONEOF_POSTAL_BYTES.as_slice()).expect("oneof postal decode");
     assert_eq!(postal, oneof_postal_task());
     assert_eq!(read_oneof_case(&postal), Some(NotificationCase::Postal));
 

@@ -7,8 +7,8 @@
 //! just drops in fixed-size bursts after each timed burst.
 
 use ::core::time::Duration;
-use ::criterion::measurement::WallTime;
 use ::criterion::Bencher;
+use ::criterion::measurement::WallTime;
 use ::std::time::Instant;
 
 /// Live values retained per timed burst before `Drop` runs off-clock.

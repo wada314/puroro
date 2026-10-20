@@ -20,4 +20,4 @@ jobs:
           submodules: recursive
       - uses: dtolnay/rust-toolchain@nightly
       - name: Smoke-test benches
-        run: cargo bench -p puroro -- --test
+        run: cargo bench -p puroro-benches -- --test

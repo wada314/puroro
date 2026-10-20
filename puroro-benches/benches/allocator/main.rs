@@ -2,7 +2,7 @@
 //!
 //! Both sides use [`Message::new_in`] + [`Message::merge_from`] so the API path
 //! matches. The bump case drops the message (field `deallocate` is a no-op) and
-//! then [`Bump::reset`]s, which is the [DESIGN.md](../../DESIGN.md) arena
+//! then [`Bump::reset`]s, which is the [DESIGN.md](../../../DESIGN.md) arena
 //! pattern. Encode is omitted: [`Message::encode_to_vec`] always allocates the
 //! output `Vec` on `Global`.
 //!
@@ -13,8 +13,8 @@
 //!
 //! Run:
 //! ```text
-//! cargo bench -p puroro --bench allocator
-//! cargo bench -p puroro --bench allocator -- --test
+//! cargo bench -p puroro-benches --bench allocator
+//! cargo bench -p puroro-benches --bench allocator -- --test
 //! ```
 
 #[path = "../ser_de/messages.rs"]

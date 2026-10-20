@@ -11,8 +11,8 @@
 //!
 //! Run:
 //! ```text
-//! cargo bench -p puroro --bench ser_de
-//! cargo bench -p puroro --bench ser_de -- --test   # smoke only
+//! cargo bench -p puroro-benches --bench ser_de
+//! cargo bench -p puroro-benches --bench ser_de -- --test   # smoke only
 //! ```
 
 #[path = "../keep.rs"]
@@ -20,7 +20,7 @@ mod keep;
 mod messages;
 mod payloads;
 
-use ::criterion::{black_box, criterion_group, BenchmarkId, Criterion, Throughput};
+use ::criterion::{BenchmarkId, Criterion, Throughput, black_box, criterion_group};
 use ::puroro::Message;
 
 use keep::iter_keep;

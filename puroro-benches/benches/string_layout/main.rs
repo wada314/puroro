@@ -10,8 +10,8 @@
 //!
 //! Run:
 //! ```text
-//! cargo bench -p puroro --bench string_layout
-//! cargo bench -p puroro --bench string_layout -- --test
+//! cargo bench -p puroro-benches --bench string_layout
+//! cargo bench -p puroro-benches --bench string_layout -- --test
 //! ```
 
 #[path = "../keep.rs"]
@@ -23,7 +23,7 @@ use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
 use ::core::time::Duration;
 use ::criterion::measurement::WallTime;
-use ::criterion::{black_box, criterion_group, BenchmarkGroup, BenchmarkId, Criterion, Throughput};
+use ::criterion::{BenchmarkGroup, BenchmarkId, Criterion, Throughput, black_box, criterion_group};
 use ::puroro::{DecodeBuf, DecodeError, Message, String as AllocString};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{

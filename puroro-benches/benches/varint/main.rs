@@ -15,8 +15,8 @@
 //!
 //! Run:
 //! ```text
-//! cargo bench -p puroro --bench varint
-//! cargo bench -p puroro --bench varint -- --test   # smoke only
+//! cargo bench -p puroro-benches --bench varint
+//! cargo bench -p puroro-benches --bench varint -- --test   # smoke only
 //! ```
 
 use ::bytes::{Buf, BufMut};

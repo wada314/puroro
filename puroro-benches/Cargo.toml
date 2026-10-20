@@ -1,0 +1,46 @@
+[package]
+name = "puroro-benches"
+version = "0.0.0"
+edition = "2024"
+publish = false
+description = "Criterion benches for puroro (not published)"
+# `keep.rs` is a shared module, not a bench. Explicit `[[bench]]` entries below
+# are the only targets.
+autobenches = false
+
+[lints]
+workspace = true
+
+[dependencies]
+allocator-api2 = "0.2"
+bitvec = "1"
+bumpalo = { version = "3", features = ["allocator-api2"] }
+bytes = "1"
+criterion = { version = "0.5.1", features = ["html_reports"] }
+protobuf-core = { path = "../protobuf-core", version = "0.3.0" }
+puroro = { path = ".." }
+unmanaged = { path = "../unmanaged", version = "0.1.0" }
+puroro-rt = { path = "../puroro-rt" }
+puroro-sample-generated = { path = "../sample-generated" }
+rand = { version = "0.9", features = ["small_rng"] }
+rand_distr = "0.5"
+
+[[bench]]
+name = "ser_de"
+harness = false
+
+[[bench]]
+name = "varint"
+harness = false
+
+[[bench]]
+name = "string_layout"
+harness = false
+
+[[bench]]
+name = "allocator"
+harness = false
+
+[[bench]]
+name = "generated"
+harness = false
