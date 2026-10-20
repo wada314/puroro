@@ -8,9 +8,7 @@ use ::std::sync::LazyLock;
 
 use ::puroro::Message;
 
-use crate::messages::{
-    FlatScalars, Nest, PackedInts, ShortStrings, StringHeavy, Wrap, WrapInline,
-};
+use crate::messages::{FlatScalars, Nest, PackedInts, ShortStrings, StringHeavy, Wrap, WrapInline};
 
 /// Nesting depth exercised by the nested-message benches.
 pub const NEST_DEPTH: usize = 16;

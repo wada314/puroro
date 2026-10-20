@@ -33,9 +33,18 @@ cargo build
 cargo test
 cargo test -p puroro-sample-generated
 cargo test -p puroro-codegen-tests   # needs `protoc` (or `PROTOC=`); plugin via bindeps
+cargo bench -p puroro-benches -- --test
 cargo fmt --all
 cargo clippy --all-targets
 ```
+
+Criterion benches are the unpublished `puroro-benches` member (`publish = false`). Sources live in `puroro-benches/benches/`. The `puroro` package sets `autobenches = false` so Cargo does not pick those files up as its own targets. Do not move the targets back onto `puroro`. A `puroro` dev-dependency on `puroro-rt` makes `cargo publish -p puroro` wait for `puroro-rt`, which itself depends on `puroro`.
+
+Users install the plugin with `cargo install protoc-gen-puroro` (or `cargo build -p protoc-gen-puroro` plus `--plugin=`). That path does not use `-Z bindeps`. `bindeps` is only the artifact dependency in `puroro-codegen-tests`. 0.14 called `puroro-codegen` in-process from `build.rs`; it did not install this binary.
+
+The plugin writes `lib.rs` and `Cargo.toml` into `--puroro_out` (`[lib] path = "lib.rs"`). `--puroro_opt=crate_name=` sets the package name (default `generated`). Application code depends on that package and `puroro`; a proto package `library` and message `Book` is `<crate>::library::Book` from outside. Do not drop the manifest to leave a bare `lib.rs` as the only user-facing output.
+
+Dependency versions in that manifest come from `protoc-gen-puroro/build.rs`, which reads `Cargo.lock` while the plugin is compiled. Do not hardcode `puroro` / `puroro-rt` / `allocator-api2` / `bitvec` / `bytes` versions in `generate.rs`. Those crates stay build-dependencies of the plugin so `cargo install` resolves the same names.
 
 Fix new fmt/clippy issues. Do not silence lints unless this repo already does for that case. Do not edit the `protobuf-core` / `unmanaged` submodules for workspace-only lint policy unless asked.
 

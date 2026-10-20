@@ -486,13 +486,18 @@ dependencies = [
 name = "protoc-gen-puroro"
 version = "0.1.0"
 dependencies = [
+ "allocator-api2",
  "anyhow",
+ "bitvec",
  "bumpalo",
+ "bytes",
  "derive_more",
  "itertools 0.14.0",
  "prettyplease",
  "proc-macro2",
  "protobuf-core",
+ "puroro",
+ "puroro-rt",
  "quote",
  "syn 2.0.118",
  "thiserror 2.0.19",
@@ -503,11 +508,22 @@ name = "puroro"
 version = "0.15.0"
 dependencies = [
  "allocator-api2",
+ "bytes",
+ "protobuf-core",
+ "unmanaged",
+]
+
+[[package]]
+name = "puroro-benches"
+version = "0.0.0"
+dependencies = [
+ "allocator-api2",
  "bitvec",
  "bumpalo",
  "bytes",
  "criterion",
  "protobuf-core",
+ "puroro",
  "puroro-rt",
  "puroro-sample-generated",
  "rand",
