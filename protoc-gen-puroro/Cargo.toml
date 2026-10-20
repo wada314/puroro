@@ -23,6 +23,16 @@ quote = "1"
 syn = { version = "2", features = ["full", "parsing", "extra-traits"] }
 thiserror = "2"
 
+# Present so `cargo install` resolves the same crates generated code imports.
+# `build.rs` reads their versions from Cargo.lock. The plugin binary does not
+# link them.
+[build-dependencies]
+allocator-api2 = "0.2"
+bitvec = "1"
+bytes = "1"
+puroro = { path = "..", version = "0.15.0" }
+puroro-rt = { path = "../puroro-rt", version = "0.1.0" }
+
 [[bin]]
 name = "protoc-gen-puroro"
 path = "src/main.rs"

@@ -63,7 +63,7 @@ The output directory is a Cargo package. The plugin writes `library-proto/lib.rs
 
 For a proto2 file, string fields default to unchecked bytes (`&[u8]`). Pass `--puroro_opt=proto2_utf8=verify` (combine with other options as `crate_name=library-proto,proto2_utf8=verify`) when those fields should be `&str`.
 
-The generated `Cargo.toml` depends on `puroro` 0.15, `puroro-rt` 0.1, `allocator-api2`, `bitvec`, and `bytes`. `lib.rs` names those crates directly. Those versions resolve from crates.io once `puroro` 0.15.0 and `puroro-rt` 0.1.0 are uploaded. Until then, [crates.io `puroro` 0.14.1](https://crates.io/crates/puroro) is the previous API.
+The generated `Cargo.toml` depends on `puroro`, `puroro-rt`, `allocator-api2`, `bitvec`, and `bytes`. `lib.rs` names those crates directly. The version written for each one is the package version in the `Cargo.lock` that compiled this plugin binary, not a second hand-written list. For a plugin built from this tree that is `puroro` 0.15.0 and `puroro-rt` 0.1.0. Those crates resolve from crates.io once they are uploaded. Until then, [crates.io `puroro` 0.14.1](https://crates.io/crates/puroro) is the previous API.
 
 From a checkout of this repository, build the same binary and pass it to `protoc` directly:
 

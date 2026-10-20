@@ -17,17 +17,14 @@ use crate::resolved::{Arena, resolve_with};
 /// Package name written into the generated `Cargo.toml` when `crate_name` is unset.
 const DEFAULT_CRATE_NAME: &str = "generated";
 
-/// Cargo requirement strings for crates that generated `lib.rs` names directly.
-///
-/// `(package name, version requirement)`. `puroro` / `puroro-rt` track this
-/// workspace (`0.15` / `0.1`). The other three match the requirements in
-/// `puroro` and `puroro-rt`.
+/// Crates that generated `lib.rs` names directly, with the package version from
+/// the `Cargo.lock` that compiled this plugin (`build.rs`).
 const GENERATED_DEPENDENCIES: &[(&str, &str)] = &[
-    ("allocator-api2", "0.2"),
-    ("bitvec", "1"),
-    ("bytes", "1"),
-    ("puroro", "0.15"),
-    ("puroro-rt", "0.1"),
+    ("allocator-api2", env!("PURORO_GEN_DEP_ALLOCATOR_API2")),
+    ("bitvec", env!("PURORO_GEN_DEP_BITVEC")),
+    ("bytes", env!("PURORO_GEN_DEP_BYTES")),
+    ("puroro", env!("PURORO_GEN_DEP_PURORO")),
+    ("puroro-rt", env!("PURORO_GEN_DEP_PURORO_RT")),
 ];
 
 /// Generate-time knobs parsed from [`CodegenRequest`] `parameter`.
@@ -280,12 +277,38 @@ mod tests {
             let line = format!("{name} = \"{version}\"");
             assert!(manifest.content.contains(&line), "missing {line}");
         }
+        let root = ::std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("..");
+        assert_eq!(
+            env!("PURORO_GEN_DEP_PURORO"),
+            package_version(&root.join("Cargo.toml"))
+        );
+        assert_eq!(
+            env!("PURORO_GEN_DEP_PURORO_RT"),
+            package_version(&root.join("puroro-rt/Cargo.toml"))
+        );
         let lib = response
             .files
             .iter()
             .find(|file| file.name == "lib.rs")
             .expect("lib.rs");
         assert!(lib.content.contains("pub mod library"));
+    }
+
+    fn package_version(path: &::std::path::Path) -> String {
+        let text =
+            fs::read_to_string(path).unwrap_or_else(|e| panic!("read {}: {e}", path.display()));
+        let package = text
+            .split("[package]")
+            .nth(1)
+            .unwrap_or_else(|| panic!("no [package] in {}", path.display()));
+        let body = package.split('[').next().expect("package body");
+        for line in body.lines() {
+            if let Some(rest) = line.trim().strip_prefix("version = \"") {
+                let end = rest.find('"').expect("version quote");
+                return rest[..end].to_owned();
+            }
+        }
+        panic!("no package version in {}", path.display());
     }
 
     #[test]

@@ -44,6 +44,8 @@ Users install the plugin with `cargo install protoc-gen-puroro` (or `cargo build
 
 The plugin writes `lib.rs` and `Cargo.toml` into `--puroro_out` (`[lib] path = "lib.rs"`). `--puroro_opt=crate_name=` sets the package name (default `generated`). Application code depends on that package and `puroro`; a proto package `library` and message `Book` is `<crate>::library::Book` from outside. Do not drop the manifest to leave a bare `lib.rs` as the only user-facing output.
 
+Dependency versions in that manifest come from `protoc-gen-puroro/build.rs`, which reads `Cargo.lock` while the plugin is compiled. Do not hardcode `puroro` / `puroro-rt` / `allocator-api2` / `bitvec` / `bytes` versions in `generate.rs`. Those crates stay build-dependencies of the plugin so `cargo install` resolves the same names.
+
 Fix new fmt/clippy issues. Do not silence lints unless this repo already does for that case. Do not edit the `protobuf-core` / `unmanaged` submodules for workspace-only lint policy unless asked.
 
 ## Code style
