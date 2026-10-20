@@ -18,7 +18,7 @@ The interface specification is [DESIGN.md](https://github.com/wada314/puroro/blo
 
 ## This tree is 0.15, not the 0.14 crate page
 
-[crates.io `puroro` 0.14.1](https://crates.io/crates/puroro) is the previous line. Its packaged README describes `puroro-codegen`, a `build.rs` that writes `.rs` files into `src/`, and a `Foo` / `FooView` split. None of that exists here.
+[crates.io `puroro` 0.14.1](https://crates.io/crates/puroro) is the previous line. Its packaged README describes `puroro-codegen`, a `build.rs` that writes `.rs` files into `src/`, and a `Foo` / `FooView` split. None of that exists here. 0.14 called the generator in-process from that `build.rs`. It did not install a `protoc` plugin, and it did not use Cargo `-Z bindeps` to obtain a binary. The `bindeps` line in the old workspace config was unused after [`protoc-plugin-by-closure`](https://github.com/wada314/protoc-plugin-by-closure) moved to its own repository.
 
 This repository is **0.15.0**, with `puroro-rt` **0.1.0**. `puroro = "0.14"` does not build code from this tree. `puroro = "0.15"` and `puroro-rt = "0.1"` resolve after those releases are uploaded.
 
@@ -26,7 +26,7 @@ This repository is **0.15.0**, with `puroro-rt` **0.1.0**. `puroro = "0.14"` doe
 
 ## Status
 
-- Nightly is pinned by [`rust-toolchain.toml`](https://github.com/wada314/puroro/blob/master/rust-toolchain.toml) because the workspace enables Cargo `-Z bindeps`. The `puroro` library itself has no `#![feature]` flags. Edition is 2024.
+- Nightly is pinned by [`rust-toolchain.toml`](https://github.com/wada314/puroro/blob/master/rust-toolchain.toml) because `puroro-codegen-tests` builds the plugin as a Cargo artifact dependency (`-Z bindeps`). Installing or running that binary does not use `bindeps`. The `puroro` library itself has no `#![feature]` flags. Edition is 2024.
 - Every generated message is generic over one allocator `A: Allocator + Clone` from `allocator-api2`. `Global` is the ordinary choice (`Book::new()`).
 - proto2, proto3, and editions share one accessor shape. Presence, packing, and enum open/closed follow the field's features.
 - The default unknown-field policy preserves unrecognized fields and writes them back. `(puroro.unknown_fields) = REJECT` fails decode with `DecodeError::UnrecognizedField`. That option is outside the protobuf spec. A conforming parser preserves the bytes.
@@ -34,7 +34,7 @@ This repository is **0.15.0**, with `puroro-rt` **0.1.0**. `puroro = "0.14"` doe
 
 ## Generate code
 
-`protoc` must be on `PATH`. Install the plugin:
+`protoc` must be on `PATH`. Install the plugin binary with stable Cargo (edition 2024, Rust 1.85 or newer). This does not use the unstable `bindeps` feature:
 
 ```shell
 cargo install protoc-gen-puroro
@@ -55,7 +55,16 @@ mkdir -p gen
 protoc --puroro_out=gen -I . book.proto
 ```
 
-`protoc` runs `protoc-gen-puroro` from `PATH` when it sees `--puroro_out`.
+`protoc` runs `protoc-gen-puroro` from `PATH` when it sees `--puroro_out`. `cargo install` builds that executable from the `protoc-gen-puroro` package's `[[bin]]` and copies it onto `PATH`.
+
+From a checkout of this repository, build the same binary and pass it to `protoc` directly:
+
+```shell
+cargo build -p protoc-gen-puroro
+protoc --plugin=protoc-gen-puroro=$PWD/target/debug/protoc-gen-puroro --puroro_out=gen -I . book.proto
+```
+
+The codegen tests in this repository do not install the binary. [`puroro-codegen-tests`](https://github.com/wada314/puroro/blob/master/puroro-codegen-tests/Cargo.toml) lists `protoc-gen-puroro` as an artifact build-dependency (`artifact = "bin"`). Cargo then sets `CARGO_BIN_FILE_PROTOC_GEN_PURORO`, and the test `build.rs` passes that path as `--plugin`. That still needs nightly `-Z bindeps`, enabled by [`.cargo/config.toml`](https://github.com/wada314/puroro/blob/master/.cargo/config.toml). It is how this workspace compiles the plugin for its own tests. A crates.io dependency cannot use the same artifact edge: Cargo does not set `CARGO_BIN_FILE_*` for a registry package.
 
 The plugin writes a single `gen/lib.rs`. The `.proto` file name is not a Rust module name. `package library` becomes `library`, and `message Book` becomes `library::Book`.
 

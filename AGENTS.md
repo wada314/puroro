@@ -33,9 +33,14 @@ cargo build
 cargo test
 cargo test -p puroro-sample-generated
 cargo test -p puroro-codegen-tests   # needs `protoc` (or `PROTOC=`); plugin via bindeps
+cargo bench -p puroro-benches -- --test
 cargo fmt --all
 cargo clippy --all-targets
 ```
+
+Criterion benches are the unpublished `puroro-benches` member (`publish = false`). Sources live in `puroro-benches/benches/`. The `puroro` package sets `autobenches = false` so Cargo does not pick those files up as its own targets. Do not move the targets back onto `puroro`. A `puroro` dev-dependency on `puroro-rt` makes `cargo publish -p puroro` wait for `puroro-rt`, which itself depends on `puroro`.
+
+Users install the plugin with `cargo install protoc-gen-puroro` (or `cargo build -p protoc-gen-puroro` plus `--plugin=`). That path does not use `-Z bindeps`. `bindeps` is only the artifact dependency in `puroro-codegen-tests`. 0.14 called `puroro-codegen` in-process from `build.rs`; it did not install this binary.
 
 Fix new fmt/clippy issues. Do not silence lints unless this repo already does for that case. Do not edit the `protobuf-core` / `unmanaged` submodules for workspace-only lint policy unless asked.
 
