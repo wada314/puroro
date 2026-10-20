@@ -6,13 +6,13 @@
 
 This is **not an official Google product**. Google already publishes a production-quality Protocol Buffers implementation for Rust: [`google-protobuf`](https://crates.io/crates/google-protobuf). Its documentation is the [Rust reference](https://protobuf.dev/reference/rust/), and the source lives in [protocolbuffers/protobuf](https://github.com/protocolbuffers/protobuf).
 
-puroro is an independent experiment. It is pre-1.0, the API changes, and the code generator is not published. Use `google-protobuf` unless you are working on puroro itself.
+puroro is an independent experiment. It is pre-1.0 and the API changes. Use `google-protobuf` unless you are working on puroro itself.
 
 ## What this repository is
 
 `puroro` is the user-facing runtime for that experiment: [`Message`](https://github.com/wada314/puroro/blob/master/src/message.rs) (encode, decode, merge, validate, unknown fields), [`Optional`](https://github.com/wada314/puroro/blob/master/src/optional.rs) for explicit-presence fields, and the mutator traits generated code returns.
 
-`.proto` files are compiled with the `protoc-gen-puroro` plugin (`protoc --puroro_out=…`). That plugin, and the `puroro-rt` crate it emits against, are `publish = false`. They are not on crates.io. Application code that only calls generated messages should depend on the generated crate and `puroro`. It should not import `puroro-rt`.
+`.proto` files are compiled with the `protoc-gen-puroro` plugin (`protoc --puroro_out=…`). Install that crate's binary and leave it on `PATH`. Application code that only calls generated messages should depend on the generated crate and `puroro`. It should not import `puroro-rt`.
 
 The interface specification is [DESIGN.md](https://github.com/wada314/puroro/blob/master/DESIGN.md). Generator internals are [IMPLEMENTATION.md](https://github.com/wada314/puroro/blob/master/IMPLEMENTATION.md).
 
@@ -20,7 +20,7 @@ The interface specification is [DESIGN.md](https://github.com/wada314/puroro/blo
 
 [crates.io `puroro` 0.14.1](https://crates.io/crates/puroro) is the previous line. Its packaged README describes `puroro-codegen`, a `build.rs` that writes `.rs` files into `src/`, and a `Foo` / `FooView` split. None of that exists here.
 
-This repository is **0.15.0**. It is not published yet. `puroro = "0.14"` does not build code from this tree, and `puroro = "0.15"` will not resolve until a 0.15 release exists. Until then, depend on a checkout (see below).
+This repository is **0.15.0**, with `puroro-rt` **0.1.0**. `puroro = "0.14"` does not build code from this tree. `puroro = "0.15"` and `puroro-rt = "0.1"` resolve after those releases are uploaded.
 
 [docs.rs/puroro](https://docs.rs/puroro/) likewise documents 0.14.1 until 0.15 is published.
 
@@ -34,12 +34,10 @@ This repository is **0.15.0**. It is not published yet. `puroro = "0.14"` does n
 
 ## Generate code
 
-`protoc` must be on `PATH`. Clone with the `protobuf-core` and `unmanaged` submodules, then build the plugin from this repository:
+`protoc` must be on `PATH`. Install the plugin:
 
 ```shell
-git clone --recurse-submodules https://github.com/wada314/puroro.git
-cd puroro
-cargo build -p protoc-gen-puroro --release
+cargo install protoc-gen-puroro
 ```
 
 ```protobuf
@@ -54,18 +52,16 @@ message Book {
 
 ```shell
 mkdir -p gen
-protoc \
-  --plugin=protoc-gen-puroro="$PWD/target/release/protoc-gen-puroro" \
-  --puroro_out=gen \
-  -I . \
-  book.proto
+protoc --puroro_out=gen -I . book.proto
 ```
+
+`protoc` runs `protoc-gen-puroro` from `PATH` when it sees `--puroro_out`.
 
 The plugin writes a single `gen/lib.rs`. The `.proto` file name is not a Rust module name. `package library` becomes `library`, and `message Book` becomes `library::Book`.
 
 For a proto2 file, string fields default to unchecked bytes (`&[u8]`). Pass `--puroro_opt=proto2_utf8=verify` when those fields should be `&str`.
 
-Point the generated crate at this checkout. `puroro-rt` is unpublished, so a crates.io version constraint cannot replace the path dependency.
+Generated `lib.rs` depends on `puroro` and on `puroro-rt`. `puroro-rt` is published so that generated crate can name it. Application code still should not import `puroro-rt`.
 
 ```toml
 [package]
@@ -76,9 +72,11 @@ edition = "2024"
 allocator-api2 = "0.2"
 bitvec = "1"
 bytes = "1"
-puroro = { path = "../puroro" }
-puroro-rt = { path = "../puroro/puroro-rt" }
+puroro = "0.15"
+puroro-rt = "0.1"
 ```
+
+Those versions are the ones in this repository (`puroro` 0.15.0, `puroro-rt` 0.1.0). They resolve from crates.io once those releases are uploaded. Until then, [crates.io `puroro` 0.14.1](https://crates.io/crates/puroro) is the previous API.
 
 `lib.rs` names `allocator-api2`, `bitvec`, and `bytes` directly, so they have to be direct dependencies even though `puroro` also uses them.
 

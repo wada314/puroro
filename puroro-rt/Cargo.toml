@@ -1,9 +1,12 @@
 [package]
 name = "puroro-rt"
 version = "0.1.0"
+authors = ["Shohei Wada <pc@wada314.jp>"]
 edition = "2024"
+license = "Apache-2.0"
 description = "Runtime implementation for puroro-generated protobuf code (not for direct use)"
-publish = false
+repository = "https://github.com/wada314/puroro"
+readme = "README.md"
 
 [lints]
 workspace = true
@@ -14,6 +17,6 @@ bitvec = "1"
 bytes = "1"
 derive_more = { version = "2.1", default-features = false, features = ["deref", "deref_mut", "from", "into"] }
 hashbrown = "0.17"
-protobuf-core = { path = "../protobuf-core" }
-puroro = { path = ".." }
-unmanaged = { path = "../unmanaged" }
+protobuf-core = { path = "../protobuf-core", version = "0.3.0" }
+puroro = { path = "..", version = "0.15.0" }
+unmanaged = { path = "../unmanaged", version = "0.1.0" }

@@ -1,9 +1,12 @@
 [package]
 name = "protoc-gen-puroro"
 version = "0.1.0"
+authors = ["Shohei Wada <pc@wada314.jp>"]
 edition = "2024"
-publish = false
-description = "protoc plugin that emits puroro-compatible Rust code"
+license = "Apache-2.0"
+description = "protoc plugin that emits Rust code for the puroro runtime"
+repository = "https://github.com/wada314/puroro"
+readme = "README.md"
 
 [lints]
 workspace = true
@@ -15,7 +18,7 @@ derive_more = { version = "2.1", default-features = false, features = ["try_from
 itertools = "0.14"
 prettyplease = "0.2"
 proc-macro2 = "1"
-protobuf-core = { path = "../protobuf-core" }
+protobuf-core = { path = "../protobuf-core", version = "0.3.0" }
 quote = "1"
 syn = { version = "2", features = ["full", "parsing", "extra-traits"] }
 thiserror = "2"
