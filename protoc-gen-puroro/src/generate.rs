@@ -17,6 +17,19 @@ use crate::resolved::{Arena, resolve_with};
 /// Package name written into the generated `Cargo.toml` when `crate_name` is unset.
 const DEFAULT_CRATE_NAME: &str = "generated";
 
+/// Cargo requirement strings for crates that generated `lib.rs` names directly.
+///
+/// `(package name, version requirement)`. `puroro` / `puroro-rt` track this
+/// workspace (`0.15` / `0.1`). The other three match the requirements in
+/// `puroro` and `puroro-rt`.
+const GENERATED_DEPENDENCIES: &[(&str, &str)] = &[
+    ("allocator-api2", "0.2"),
+    ("bitvec", "1"),
+    ("bytes", "1"),
+    ("puroro", "0.15"),
+    ("puroro-rt", "0.1"),
+];
+
 /// Generate-time knobs parsed from [`CodegenRequest`] `parameter`.
 struct GenerateOptions {
     /// proto2 syntax default for `utf8_validation` (spec default is `NONE`).
@@ -70,10 +83,16 @@ fn parse_crate_name(value: &str) -> Result<String> {
 
 /// Manifest for the output directory. `lib.rs` is the crate root (`[lib] path`).
 ///
-/// `protoc` overwrites this file on every run. Dependency versions match the
-/// crates this plugin's generated code names (`::puroro`, `::puroro_rt`,
-/// `::allocator_api2`, `::bitvec`, `::bytes`).
+/// `protoc` overwrites this file on every run. Dependency requirements come
+/// from [`GENERATED_DEPENDENCIES`].
 fn cargo_manifest(crate_name: &str) -> ResponseFile {
+    let mut dependencies = String::new();
+    for (name, version) in GENERATED_DEPENDENCIES {
+        dependencies.push_str(name);
+        dependencies.push_str(" = \"");
+        dependencies.push_str(version);
+        dependencies.push_str("\"\n");
+    }
     ResponseFile {
         name: "Cargo.toml".to_owned(),
         content: format!(
@@ -91,12 +110,7 @@ publish = false
 path = \"lib.rs\"
 
 [dependencies]
-allocator-api2 = \"0.2\"
-bitvec = \"1\"
-bytes = \"1\"
-puroro = \"0.15\"
-puroro-rt = \"0.1\"
-"
+{dependencies}"
         ),
     }
 }
@@ -262,8 +276,10 @@ mod tests {
             .find(|file| file.name == "Cargo.toml")
             .expect("Cargo.toml");
         assert!(manifest.content.contains("name = \"library-proto\""));
-        assert!(manifest.content.contains("puroro = \"0.15\""));
-        assert!(manifest.content.contains("puroro-rt = \"0.1\""));
+        for (name, version) in GENERATED_DEPENDENCIES {
+            let line = format!("{name} = \"{version}\"");
+            assert!(manifest.content.contains(&line), "missing {line}");
+        }
         let lib = response
             .files
             .iter()
