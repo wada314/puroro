@@ -32,13 +32,15 @@ This repository is **0.15.0**, with `puroro-rt` **0.1.0**. `puroro = "0.14"` doe
 - The default unknown-field policy preserves unrecognized fields and writes them back. `(puroro.unknown_fields) = REJECT` fails decode with `DecodeError::UnrecognizedField`. That option is outside the protobuf spec. A conforming parser preserves the bytes.
 - There is no API compatibility with `prost`, `google-protobuf`, or `quick-protobuf`. Bytes on the wire still follow the protobuf encoding.
 
-## Generate code
+## Generate a crate
 
 `protoc` must be on `PATH`. Install the plugin binary with stable Cargo (edition 2024, Rust 1.85 or newer). This does not use the unstable `bindeps` feature:
 
 ```shell
 cargo install protoc-gen-puroro
 ```
+
+`cargo install` builds the `protoc-gen-puroro` executable and copies it onto `PATH`. `protoc` runs that name when it sees `--puroro_out`.
 
 ```protobuf
 syntax = "proto3";
@@ -51,52 +53,48 @@ message Book {
 ```
 
 ```shell
-mkdir -p gen
-protoc --puroro_out=gen -I . book.proto
+mkdir -p library-proto
+protoc --puroro_out=library-proto --puroro_opt=crate_name=library-proto -I . book.proto
 ```
 
-`protoc` runs `protoc-gen-puroro` from `PATH` when it sees `--puroro_out`. `cargo install` builds that executable from the `protoc-gen-puroro` package's `[[bin]]` and copies it onto `PATH`.
+The output directory is a Cargo package. The plugin writes `library-proto/lib.rs` and `library-proto/Cargo.toml`, and `protoc` overwrites both on the next run. `[lib] path = "lib.rs"` makes that file the crate root. Omit `crate_name` and the package name is `generated`.
+
+`library-proto` is the Cargo package name. Hyphens become underscores in Rust, so other crates import it as `library_proto`. `package library` is a module inside that crate, and `message Book` is `library_proto::library::Book`. The `.proto` file name is not a module name. Code that is compiled as part of `library-proto` itself writes `library::Book`.
+
+For a proto2 file, string fields default to unchecked bytes (`&[u8]`). Pass `--puroro_opt=proto2_utf8=verify` (combine with other options as `crate_name=library-proto,proto2_utf8=verify`) when those fields should be `&str`.
+
+The generated `Cargo.toml` depends on `puroro` 0.15, `puroro-rt` 0.1, `allocator-api2`, `bitvec`, and `bytes`. `lib.rs` names those crates directly. Those versions resolve from crates.io once `puroro` 0.15.0 and `puroro-rt` 0.1.0 are uploaded. Until then, [crates.io `puroro` 0.14.1](https://crates.io/crates/puroro) is the previous API.
 
 From a checkout of this repository, build the same binary and pass it to `protoc` directly:
 
 ```shell
 cargo build -p protoc-gen-puroro
-protoc --plugin=protoc-gen-puroro=$PWD/target/debug/protoc-gen-puroro --puroro_out=gen -I . book.proto
+mkdir -p library-proto
+protoc --plugin=protoc-gen-puroro=$PWD/target/debug/protoc-gen-puroro --puroro_out=library-proto --puroro_opt=crate_name=library-proto -I . book.proto
 ```
 
 The codegen tests in this repository do not install the binary. [`puroro-codegen-tests`](https://github.com/wada314/puroro/blob/master/puroro-codegen-tests/Cargo.toml) lists `protoc-gen-puroro` as an artifact build-dependency (`artifact = "bin"`). Cargo then sets `CARGO_BIN_FILE_PROTOC_GEN_PURORO`, and the test `build.rs` passes that path as `--plugin`. That still needs nightly `-Z bindeps`, enabled by [`.cargo/config.toml`](https://github.com/wada314/puroro/blob/master/.cargo/config.toml). It is how this workspace compiles the plugin for its own tests. A crates.io dependency cannot use the same artifact edge: Cargo does not set `CARGO_BIN_FILE_*` for a registry package.
 
-The plugin writes a single `gen/lib.rs`. The `.proto` file name is not a Rust module name. `package library` becomes `library`, and `message Book` becomes `library::Book`.
+## Use the generated crate from another crate
 
-For a proto2 file, string fields default to unchecked bytes (`&[u8]`). Pass `--puroro_opt=proto2_utf8=verify` when those fields should be `&str`.
-
-Generated `lib.rs` depends on `puroro` and on `puroro-rt`. `puroro-rt` is published so that generated crate can name it. Application code still should not import `puroro-rt`.
+Application code depends on the generated package and on `puroro`. It does not depend on `puroro-rt`, and it does not repeat `allocator-api2`, `bitvec`, or `bytes` unless it names those crates itself.
 
 ```toml
 [package]
-name = "library-proto"
+name = "app"
 edition = "2024"
 
 [dependencies]
-allocator-api2 = "0.2"
-bitvec = "1"
-bytes = "1"
+library-proto = { path = "../library-proto" }
 puroro = "0.15"
-puroro-rt = "0.1"
 ```
-
-Those versions are the ones in this repository (`puroro` 0.15.0, `puroro-rt` 0.1.0). They resolve from crates.io once those releases are uploaded. Until then, [crates.io `puroro` 0.14.1](https://crates.io/crates/puroro) is the previous API.
-
-`lib.rs` names `allocator-api2`, `bitvec`, and `bytes` directly, so they have to be direct dependencies even though `puroro` also uses them.
-
-## Use a generated message
 
 Field access is inherent methods on the concrete type. Codec methods live on `puroro::Message`, so a proto field named `encode` does not hide them; call those with the trait in scope.
 
 `optional string` is explicit presence: `title()` returns `Optional<&str, …>`, `title().get()` is the value or the proto default, and `title().is_set()` reports presence. Eager messages do not generate `has_title()`. A plain proto3 `uint32` is implicit: `pages()` returns `u32`.
 
 ```rust
-use library::Book;
+use library_proto::library::Book;
 use ::puroro::{Message, StringMut};
 
 let mut book = Book::new();
@@ -107,13 +105,13 @@ assert_eq!(book.title().get(), "Shore");
 assert_eq!(book.pages(), 320);
 
 let bytes = book.encode_to_vec();
-let decoded = Book::decode(&bytes[..]).unwrap();
+let decoded: Book = Book::decode(&bytes[..]).unwrap();
 assert_eq!(decoded.title().get(), "Shore");
 ```
 
-This snippet is code inside the generated crate. `StringMut` has to be in scope for `push_str`. The same pattern is covered by the in-tree [`scalars` fixture](https://github.com/wada314/puroro/blob/master/puroro-codegen-tests/fixtures/scalars/test.rs).
+The `Book` annotation on `decode` selects the default allocator (`Global`). `StringMut` has to be in scope for `push_str`. The same pattern is covered by the in-tree [`scalars` fixture](https://github.com/wada314/puroro/blob/master/puroro-codegen-tests/fixtures/scalars/test.rs).
 
-Each message also has a lazy alias (`BookLazy`) with `Result` getters and no mutators. The full accessor table is [DESIGN.md §4](https://github.com/wada314/puroro/blob/master/DESIGN.md#4-generated-code-specification).
+Each message also has a lazy alias (`BookLazy`) with `Result` getters and no mutators. From this application that type is `library_proto::library::BookLazy`. The full accessor table is [DESIGN.md §4](https://github.com/wada314/puroro/blob/master/DESIGN.md#4-generated-code-specification).
 
 ## Out of scope
 
