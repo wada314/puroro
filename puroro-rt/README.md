@@ -1,5 +1,15 @@
 # puroro-rt
 
-This crate is **not intended for manual use**.
+Runtime crate that `protoc-gen-puroro` output names directly (`::puroro_rt::…`). A generated crate depends on this package. Application code should not import it; depend on the generated crate and [`puroro`](https://github.com/wada314/puroro).
 
-It is an internal implementation detail of the [`puroro`](../) crate. Generated code and the `puroro` runtime depend on it; library users should depend on `puroro` only.
+**This is not an official Google product.** For production Rust protobuf code, use [`google-protobuf`](https://crates.io/crates/google-protobuf).
+
+```toml
+[dependencies]
+puroro = "0.15"
+puroro-rt = "0.1"
+```
+
+## License
+
+[Apache License 2.0](https://github.com/wada314/puroro/blob/master/LICENSE).

@@ -20,7 +20,7 @@ The interface specification is [DESIGN.md](https://github.com/wada314/puroro/blo
 
 [crates.io `puroro` 0.14.1](https://crates.io/crates/puroro) is the previous line. Its packaged README describes `puroro-codegen`, a `build.rs` that writes `.rs` files into `src/`, and a `Foo` / `FooView` split. None of that exists here.
 
-This repository is **0.15.0**. It is not published yet. `puroro = "0.14"` does not build code from this tree, and `puroro = "0.15"` will not resolve until a 0.15 release exists. Until then, depend on a checkout (see below).
+This repository is **0.15.0**, with `puroro-rt` **0.1.0**. `puroro = "0.14"` does not build code from this tree. `puroro = "0.15"` and `puroro-rt = "0.1"` resolve after those releases are uploaded.
 
 [docs.rs/puroro](https://docs.rs/puroro/) likewise documents 0.14.1 until 0.15 is published.
 
@@ -61,7 +61,7 @@ The plugin writes a single `gen/lib.rs`. The `.proto` file name is not a Rust mo
 
 For a proto2 file, string fields default to unchecked bytes (`&[u8]`). Pass `--puroro_opt=proto2_utf8=verify` when those fields should be `&str`.
 
-Generated `lib.rs` also depends on `puroro-rt`. That crate is not published. Point it at a checkout of this repository; a crates.io version constraint cannot replace the path dependency.
+Generated `lib.rs` depends on `puroro` and on `puroro-rt`. `puroro-rt` is published so that generated crate can name it. Application code still should not import `puroro-rt`.
 
 ```toml
 [package]
@@ -72,9 +72,11 @@ edition = "2024"
 allocator-api2 = "0.2"
 bitvec = "1"
 bytes = "1"
-puroro = { path = "../puroro" }
-puroro-rt = { path = "../puroro/puroro-rt" }
+puroro = "0.15"
+puroro-rt = "0.1"
 ```
+
+Those versions are the ones in this repository (`puroro` 0.15.0, `puroro-rt` 0.1.0). They resolve from crates.io once those releases are uploaded. Until then, [crates.io `puroro` 0.14.1](https://crates.io/crates/puroro) is the previous API.
 
 `lib.rs` names `allocator-api2`, `bitvec`, and `bytes` directly, so they have to be direct dependencies even though `puroro` also uses them.
 
