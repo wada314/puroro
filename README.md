@@ -1,5 +1,7 @@
 # puroro
 
+**This crate is AI slop.** A model wrote it, another model approved it, and the diff still called that a review.
+
 **Do not use this crate in most cases.**
 
 This is **not an official Google product**. Google already publishes a production-quality Protocol Buffers implementation for Rust: [`google-protobuf`](https://crates.io/crates/google-protobuf). Its documentation is the [Rust reference](https://protobuf.dev/reference/rust/), and the source lives in [protocolbuffers/protobuf](https://github.com/protocolbuffers/protobuf).
