@@ -1,6 +1,12 @@
-//! **puroro** — A performance-oriented Protocol Buffers runtime for Rust.
+//! **puroro** — an experimental Protocol Buffers runtime for Rust.
 //!
-//! This crate is the stable public API shared by library users and generated
+//! This is not an official Google product. Google publishes
+//! [`google-protobuf`](https://crates.io/crates/google-protobuf)
+//! ([Rust reference](https://protobuf.dev/reference/rust/)).
+//! Do not use this crate in most cases. The crates.io / GitHub landing page
+//! is the repository [`README`](https://github.com/wada314/puroro/blob/master/README.md).
+//!
+//! This crate is the public API shared by library users and generated
 //! message code:
 //!
 //! - [`Message`] — encode / decode / merge / validate / unknown fields
@@ -12,9 +18,10 @@
 //! - [`DecodeError`], [`UnknownField`], [`WireType`]
 //!
 //! Generated messages expose proto fields as **inherent methods** on the concrete
-//! type (`title()`, `title_mut()`, `has_title()`, `clear_title()`, …). Codec
-//! helpers stay on [`Message`] so proto names do not collide; call them via UFCS
-//! when needed (`Message::validate(&msg)`).
+//! type (`title()`, `title_mut()`, `clear_title()`, …). Explicit-presence getters
+//! return [`Optional`]; eager messages do not generate `has_*`. Codec helpers
+//! stay on [`Message`] so proto names do not collide; call them via UFCS when
+//! needed (`Message::validate(&msg)`).
 //!
 //! The composable field catalog and wire helpers live in the sibling
 //! **`puroro-rt`** crate. Generated code depends on it; application code that
@@ -23,11 +30,11 @@
 //! # Example
 //!
 //! ```ignore
-//! use ::puroro::Message;
+//! use ::puroro::{Message, StringMut};
 //!
 //! let mut task = Task::decode(bytes.as_slice())?;
 //! task.title_mut().push_str("hello");
-//! assert_eq!(task.title(), "hello");
+//! assert_eq!(task.title().get(), "hello");
 //! let out = task.encode_to_vec();
 //! # Ok::<(), puroro::DecodeError>(())
 //! ```
