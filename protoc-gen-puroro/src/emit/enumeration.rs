@@ -413,4 +413,14 @@ mod tests {
         let ident = variant_const_ident("Edition", "EDITION_PROTO2").unwrap();
         assert_eq!(ident.to_string(), "PROTO2");
     }
+
+    #[test]
+    fn prefix_uses_upper_snake_of_the_enum_name() {
+        let ident = variant_const_ident("XmlParser", "XML_PARSER_READY").unwrap();
+        assert_eq!(ident.to_string(), "READY");
+        let ident = variant_const_ident("XmlParser", "XMLPARSER_READY").unwrap();
+        assert_eq!(ident.to_string(), "XMLPARSER_READY");
+        let ident = variant_const_ident("Http2", "HTTP2_OK").unwrap();
+        assert_eq!(ident.to_string(), "OK");
+    }
 }

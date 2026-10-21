@@ -12,6 +12,7 @@ This document specifies the **public interface** of the `puroro` Protocol Buffer
    - [Module layout and naming](#module-layout-and-naming)
    - [Path qualification](#path-qualification)
    - [Allowed and disallowed names](#allowed-and-disallowed-names)
+   - [Case conversion](#case-conversion)
    - [Public signatures must not surface `puroro-rt`](#public-signatures-must-not-surface-puroro-rt)
    - 4.0 [Inherent accessors (current)](#40-inherent-accessors-current)
    - 4.1 [Scalar fields](#41-scalar-fields) — implicit vs explicit presence
@@ -291,7 +292,7 @@ Several generated crates each re-export `puroro`. When Cargo unifies those crate
 
 ### Allowed and disallowed names
 
-This is the name contract between a `.proto` schema and the Rust the plugin emits. It is not a rename feature. A name the plugin rejects fails code generation. A name it accepts is either emitted as written (after the case rules in [Module layout and naming](#module-layout-and-naming)) or escaped as a raw identifier. Two proto identities that land on the same module path are merged; a clash of items inside that module is left to `rustc`.
+This is the name contract between a `.proto` schema and the Rust the plugin emits. It is not a rename feature. A name the plugin rejects fails code generation. A name it accepts is either emitted as written, passed through [case conversion](#case-conversion), or escaped as a raw identifier. Two proto identities that land on the same module path are merged; a clash of items inside that module is left to `rustc`.
 
 **Simple identifier.** A proto name that becomes a Rust identifier must match `^[A-Za-z_][A-Za-z0-9_]*$` (ASCII only). The check applies to package segments, message names, enum names, enum value names, field names, oneof names, and oneof variant names. An empty name, a leading digit, a hyphen, a dot, or a non-ASCII character is rejected (`cannot use … as a Rust identifier`). Protobuf's own parser already rejects many of these; the plugin check is what the generator enforces on the names it is given.
 
@@ -304,11 +305,45 @@ This is the name contract between a `.proto` schema and the Rust the plugin emit
 | Position | How the ident is built | Example that is not supported |
 |---|---|---|
 | package segment | the segment as written | `package type` |
-| message companion module | snake_case of the message name | `message Type` (module `type`), `message Match` (module `match`) |
+| message companion module | snake_case of the message name ([case conversion](#case-conversion)) | `message Type` (module `type`), `message Match` (module `match`) |
 | enum value constant | prefix-stripped value name | a constant whose name is `type` |
 | oneof shape, case, and storage types | PascalCase of the oneof name | oneof `self` (shape type `Self`) |
 
 The message struct itself is still raw-escaped (`message type` → `struct r#type`). The companion module of that message is a separate ident and is not. Enums do not get a companion module, so `enum type` is only the raw-escaped type name.
+
+#### Case conversion
+
+`protoc-gen-puroro/src/case.rs` splits a proto name into words, then joins those words as snake_case, PascalCase, or UPPER_SNAKE. The split is ASCII-only. It is not a general Unicode inflection, and it does not check that the result is still a Rust identifier.
+
+| Derived name | Converter |
+|---|---|
+| message companion module | `to_snake_case`, then `Ident::new` |
+| `FIELD_*` / `BIT_*` constants | a `FIELD_` or `BIT_` prefix plus `to_upper_snake` |
+| enum-value prefix | `to_upper_snake(enum_name) + "_"` |
+| oneof shape type | `to_pascal_case`, then `Ident::new` |
+| oneof case and storage types | `to_pascal_case` plus `Case` or `Storage` |
+| oneof variant type | `to_pascal_case` of the variant field name, then `Ident::new` |
+| custom-default marker, layout associated types | `to_pascal_case` plus a suffix (`Default`, `Len`, …) |
+
+Package segments, the message or enum type item, field methods, and the oneof module keep the proto spelling (`escape_ident` where that helper is used). `oneof email_address` is the module `email_address` and the shape type `EmailAddress`. `oneof EmailAddress` is the module `EmailAddress` and the shape type `EmailAddress`.
+
+Word breaks are `_`, and an ASCII uppercase byte when the previous byte is ASCII lowercase (`fooBar` → `foo` + `Bar`) or the next byte is ASCII lowercase (`XMLParser` → `XML` + `Parser`). A run of capitals stays one word until that second rule fires (`IOError` → `io_error`, `XMLHttpRequest` → `xml_http_request`). Digits stay inside the current word (`Http2` → `http2`). A following capital splits only when a lowercase byte comes after it (`HTTP2Parser` → `http2_parser`). A digit is not a lowercase letter, so `A2B` stays one word (`a2b`). `iOS` splits at the lower-to-upper boundary and leaves the capital run together (`i_os`, PascalCase `IOs`).
+
+`_` is only a separator. Leading, trailing, and repeated underscores are dropped, so `Task`, `task`, `TASK`, `_task`, and `task_` are one snake_case word `task` and one UPPER_SNAKE word `TASK`. The type item keeps the proto spelling, so `Task` and `TASK` are different structs that share the companion module `task`. Two fields `foo_bar` and `fooBar` in one message both produce `FIELD_FOO_BAR`.
+
+A prefix or suffix can turn an empty or digit-leading word into a legal identifier. A field named `_` has the method `_`, the constant `FIELD_`, and a custom-default marker `Default`. The bare `Ident::new` of the converted word has no such prefix. These proto names pass the simple-identifier check and still have no supported derived ident:
+
+| Proto name | Converted word | Derived ident that is outside the supported set |
+|---|---|---|
+| message `_` or `__` | empty | companion module |
+| oneof `_` | empty | shape type (`Case` and `Storage` alone would be legal) |
+| message `_2foo` | `2foo` | companion module |
+| oneof variant `_2foo` | `2foo` | variant type |
+| field `_2foo` with a layout associated type or a custom default | `2foo` | `2fooLen`, `2fooRepeated`, `2fooMap`, `2fooMsg`, or `2fooDefault` |
+| message `Type` or `_type` | `type` | companion module |
+| oneof `self`, or a oneof variant `self` | `Self` | shape type, or the variant type |
+
+Enum values strip that UPPER_SNAKE prefix, not the enum's raw spelling. `enum XmlParser` strips `XML_PARSER_`, so `XML_PARSER_READY` becomes `READY`. `XMLPARSER_READY` keeps the full value name. `enum Http2` strips `HTTP2_`. A remainder that is not a simple identifier keeps the full name (`EDITION_2023`), as the next paragraph describes.
 
 **Enum value constants** strip a redundant `ENUM_NAME_` prefix when the remainder is still a simple identifier (`STATUS_UNSPECIFIED` on `Status` becomes `Status::UNSPECIFIED`). If the remainder would not be an identifier (`EDITION_2023` → `2023`), the full value name is kept. The constant is not raw-escaped, so a value whose constant name is a Rust keyword is outside the supported set. A value whose constant name is `_Unknown` is rejected, because the native-enum representation uses that variant for unknown numbers. A non-native enum keeps values as associated constants and does not add `_Unknown`.
 
