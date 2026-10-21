@@ -46,9 +46,11 @@ message Shelf {
 }
 ```
 
+`shelf_rs` in the command below is the directory and the Cargo package name for this example. `--puroro_out` takes whatever directory you pass. `--puroro_opt=crate_name=` sets the `[package] name`. Leave `crate_name` out and that name is `generated`. A hyphen in `crate_name` becomes an underscore in Rust (`demo-proto` becomes `demo_proto`).
+
 ```shell
-mkdir -p out
-protoc --puroro_out=out -I . shelf.proto
+mkdir -p shelf_rs
+protoc --puroro_out=shelf_rs --puroro_opt=crate_name=shelf_rs -I . shelf.proto
 ```
 
 ```text
@@ -58,53 +60,48 @@ shelf.proto
   message Shelf
     string title = 1 [default = "foo"]
             |
-            |  protoc --puroro_out=out
+            |  protoc --puroro_out=shelf_rs
+            |         --puroro_opt=crate_name=shelf_rs
             v
-out/                                directory from --puroro_out
-├── Cargo.toml                      package name: generated
+shelf_rs/                           directory from --puroro_out
+├── Cargo.toml                      package name from crate_name
 │     [dependencies]
 │       puroro
 │       puroro-rt
 │       allocator-api2
 │       bitvec
 │       bytes
-└── lib.rs                          Rust crate: generated
+└── lib.rs
       puroro                        re-export of the puroro crate
       mod demo                      package demo
         Shelf                       message Shelf
         ShelfLazy                   lazy alias of Shelf
 
-from another crate:       generated::demo::Shelf
-                          generated::puroro::Message
-from code in this crate:  demo::Shelf
+from another crate:       shelf_rs::demo::Shelf
+                          shelf_rs::puroro::Message
+from code in shelf_rs:    demo::Shelf
 
 shelf.proto is the input file. It is not a Rust module.
 ```
 
 `protoc` overwrites `lib.rs` and `Cargo.toml` on the next run. The `[dependencies]` in that `Cargo.toml` are the crates `lib.rs` calls. The plugin writes the version on each line. The root module `puroro` is that runtime crate. A schema that would place a module or type named `puroro` at that root is rejected. `package shop.puroro` is a different module (`shop::puroro`). Which other proto names are accepted is [DESIGN.md](DESIGN.md#allowed-and-disallowed-names).
 
-The package in `out/Cargo.toml` is `generated`. To choose a different one, pass `--puroro_opt=crate_name=demo-proto`. A hyphen in that option becomes an underscore in Rust (`demo_proto`).
-
 A proto2 `string` is `&[u8]` unless you pass `--puroro_opt=proto2_utf8=verify`. `title` above is an editions string, so it is `&str`. Proto3 rejects `[default = …]`.
 
 ## Use the generated crate from another crate
 
-`Shelf::new`, `title`, `get`, and `is_set` are methods on the generated type. `encode_to_vec`, `decode`, and `set` below are methods of traits in `generated::puroro`. The application `Cargo.toml` lists the generated package and does not list `puroro`.
+The application crate adds the generated package. The path is the `--puroro_out` directory. It does not add `puroro`.
 
 ```toml
-[package]
-name = "app"
-edition = "2024"
-
 [dependencies]
-generated = { path = "../out" }
+shelf_rs = { path = "../shelf_rs" }
 ```
 
-`Shelf` is the message in the diagram. `title()` returns [`Optional<&str, …>`](https://github.com/wada314/puroro/blob/master/src/optional.rs). That type follows `std::option::Option`: `is_set()` reports whether the field was set, and `get()` returns that value. When `title` is absent, `get()` returns the editions default `"foo"`. `Optional` does not convert to `Option`, because that conversion drops the default. `None` would only record that the field is absent, and `"foo"` would be gone. If the `.proto` file has a field `encode`, call the codec method as `Message::encode(&shelf)`. Another generated crate re-exports the same `puroro` when Cargo resolves one `puroro` version. Import `Message` from one of those crates.
+`Shelf::new`, `title`, `get`, and `is_set` are methods on `Shelf`. `encode_to_vec`, `decode`, and `set` are methods of traits in `shelf_rs::puroro`. `title()` returns [`Optional<&str, …>`](https://github.com/wada314/puroro/blob/master/src/optional.rs). That type follows `std::option::Option`: `is_set()` reports whether the field was set, and `get()` returns that value. When `title` is absent, `get()` returns the editions default `"foo"`. `Optional` does not convert to `Option`, because that conversion drops the default. `None` would only record that the field is absent, and `"foo"` would be gone. If the `.proto` file has a field `encode`, call the codec method as `Message::encode(&shelf)`. Another generated crate re-exports the same `puroro` when Cargo resolves one `puroro` version. Import `Message` from one of those crates.
 
 ```rust
-use generated::demo::Shelf;
-use generated::puroro::{Message, StringMut};
+use shelf_rs::demo::Shelf;
+use shelf_rs::puroro::{Message, StringMut};
 
 let mut shelf = Shelf::new();
 assert!(!shelf.title().is_set());
@@ -118,7 +115,7 @@ let decoded = Shelf::decode(&bytes[..]).unwrap();
 assert_eq!(decoded.title().get(), "Shore");
 ```
 
-`Shelf::new()` and `Shelf::decode` use the `Global` allocator. `StringMut` has to be in scope for `set`. Eager messages do not generate `has_title()`. `ShelfLazy` in the diagram has `Result` getters and no mutators. From this application that type is `generated::demo::ShelfLazy`. The full accessor table is [DESIGN.md §4](https://github.com/wada314/puroro/blob/master/DESIGN.md#4-generated-code-specification).
+`Shelf::new()` and `Shelf::decode` use the `Global` allocator. `StringMut` has to be in scope for `set`. Eager messages do not generate `has_title()`. `ShelfLazy` in the diagram has `Result` getters and no mutators. From this application that type is `shelf_rs::demo::ShelfLazy`. The full accessor table is [DESIGN.md §4](https://github.com/wada314/puroro/blob/master/DESIGN.md#4-generated-code-specification).
 
 ## Build the plugin from a checkout
 
@@ -126,8 +123,8 @@ This is for people changing puroro. The install command above is enough for othe
 
 ```shell
 cargo build -p protoc-gen-puroro
-mkdir -p out
-protoc --plugin=protoc-gen-puroro=$PWD/target/debug/protoc-gen-puroro --puroro_out=out -I . shelf.proto
+mkdir -p shelf_rs
+protoc --plugin=protoc-gen-puroro=$PWD/target/debug/protoc-gen-puroro --puroro_out=shelf_rs --puroro_opt=crate_name=shelf_rs -I . shelf.proto
 ```
 
 ## Out of scope
