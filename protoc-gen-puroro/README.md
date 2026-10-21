@@ -4,27 +4,27 @@
 
 **This is not an official Google product.** For production Rust protobuf code, use [`google-protobuf`](https://crates.io/crates/google-protobuf).
 
-Install the binary and leave it on `PATH`. `cargo install` builds the `protoc-gen-puroro` executable. It does not use Cargo's unstable `bindeps` feature:
+Install the binary and leave it on `PATH`. `cargo install` builds the `protoc-gen-puroro` executable:
 
 ```shell
 cargo install protoc-gen-puroro
-mkdir -p demo-proto
-protoc --puroro_out=demo-proto --puroro_opt=crate_name=demo-proto -I . shelf.proto
+mkdir -p out
+protoc --puroro_out=out -I . shelf.proto
 ```
 
-`protoc` runs `protoc-gen-puroro` from `PATH` when it sees `--puroro_out`. What that writes, and how `package demo` / `message Shelf` becomes `demo_proto::demo::Shelf`, is the diagram in the [puroro README](https://github.com/wada314/puroro/blob/master/README.md#generate-a-crate).
+`protoc` runs `protoc-gen-puroro` from `PATH` when it sees `--puroro_out`. The output package is `generated`. The diagram in the [puroro README](https://github.com/wada314/puroro/blob/master/README.md#generate-a-crate) shows `package demo` / `message Shelf` as `generated::demo::Shelf`.
 
-From a git checkout, build the binary and pass the path yourself:
+## Build the plugin from a checkout
+
+This is for people changing puroro. Other users stop at `cargo install`.
 
 ```shell
 cargo build -p protoc-gen-puroro
-mkdir -p demo-proto
-protoc --plugin=protoc-gen-puroro=$PWD/target/debug/protoc-gen-puroro --puroro_out=demo-proto --puroro_opt=crate_name=demo-proto -I . shelf.proto
+mkdir -p out
+protoc --plugin=protoc-gen-puroro=$PWD/target/debug/protoc-gen-puroro --puroro_out=out -I . shelf.proto
 ```
 
-`puroro-codegen-tests` in the puroro workspace does not install this binary. It builds it with an artifact dependency (`artifact = "bin"`, nightly `-Z bindeps`). That is only for those tests. A crates.io dependency cannot take this binary the same way.
-
-Application code should not depend on this crate as a library. Depend on the generated crate and `puroro`.
+Application code should not depend on this crate as a library. Depend on the generated crate. Add `puroro` when the application code refers to a `puroro` trait.
 
 ## License
 
