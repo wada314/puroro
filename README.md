@@ -57,13 +57,31 @@ mkdir -p library-proto
 protoc --puroro_out=library-proto --puroro_opt=crate_name=library-proto -I . book.proto
 ```
 
-The output directory is a Cargo package. The plugin writes `library-proto/lib.rs` and `library-proto/Cargo.toml`, and `protoc` overwrites both on the next run. `[lib] path = "lib.rs"` makes that file the crate root. Omit `crate_name` and the package name is `generated`.
+`crate_name` sets the crate name. That name is the `name` value under `[package]` in the generated `Cargo.toml`. In this command the name is `library-proto`. Hyphens in the crate name become underscores in Rust, so another crate imports it as `library_proto`. If you omit `crate_name`, that name is the string `generated`.
 
-`library-proto` is the Cargo package name. Hyphens become underscores in Rust, so other crates import it as `library_proto`. `package library` is a module inside that crate, and `message Book` is `library_proto::library::Book`. The `.proto` file name is not a module name. Code that is compiled as part of `library-proto` itself writes `library::Book`.
+The protobuf `package library` is a module inside that crate, and `message Book` is `library_proto::library::Book`. The `.proto` file name is not a module name. Code compiled as part of the `library-proto` crate writes `library::Book`.
 
-For a proto2 file, string fields default to unchecked bytes (`&[u8]`). Pass `--puroro_opt=proto2_utf8=verify` (combine with other options as `crate_name=library-proto,proto2_utf8=verify`) when those fields should be `&str`.
+The plugin writes `library-proto/lib.rs` and `library-proto/Cargo.toml`. `[lib] path = "lib.rs"` makes `lib.rs` the crate root. `lib.rs` names `puroro`, `puroro-rt`, `allocator-api2`, `bitvec`, and `bytes`, so the manifest lists those crates. Each version string is the version recorded for that crate in the `Cargo.lock` that compiled the plugin binary. A binary built from this repository's lock writes:
 
-The generated `Cargo.toml` depends on `puroro`, `puroro-rt`, `allocator-api2`, `bitvec`, and `bytes`. `lib.rs` names those crates directly. The version written for each one is the package version in the `Cargo.lock` that compiled this plugin binary, not a second hand-written list. For a plugin built from this tree that is `puroro` 0.15.0 and `puroro-rt` 0.1.0. Those crates resolve from crates.io once they are uploaded. Until then, [crates.io `puroro` 0.14.1](https://crates.io/crates/puroro) is the previous API.
+```toml
+[package]
+name = "library-proto"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+allocator-api2 = "0.2.21"
+bitvec = "1.1.1"
+bytes = "1.12.0"
+puroro = "0.15.0"
+puroro-rt = "0.1.0"
+```
+
+`name` in that file is the crate name. `puroro` 0.15.0 and `puroro-rt` 0.1.0 resolve from crates.io once those releases are uploaded. Until then, [crates.io `puroro` 0.14.1](https://crates.io/crates/puroro) is the previous API.
 
 From a checkout of this repository, build the same binary and pass it to `protoc` directly:
 
@@ -75,9 +93,15 @@ protoc --plugin=protoc-gen-puroro=$PWD/target/debug/protoc-gen-puroro --puroro_o
 
 The codegen tests in this repository do not install the binary. [`puroro-codegen-tests`](https://github.com/wada314/puroro/blob/master/puroro-codegen-tests/Cargo.toml) lists `protoc-gen-puroro` as an artifact build-dependency (`artifact = "bin"`). Cargo then sets `CARGO_BIN_FILE_PROTOC_GEN_PURORO`, and the test `build.rs` passes that path as `--plugin`. That still needs nightly `-Z bindeps`, enabled by [`.cargo/config.toml`](https://github.com/wada314/puroro/blob/master/.cargo/config.toml). It is how this workspace compiles the plugin for its own tests. A crates.io dependency cannot use the same artifact edge: Cargo does not set `CARGO_BIN_FILE_*` for a registry package.
 
+## proto2
+
+For a proto2 file, string fields default to unchecked bytes (`&[u8]`). Pass `--puroro_opt=proto2_utf8=verify` when those fields should be `&str`. Combine it with the crate name as `crate_name=library-proto,proto2_utf8=verify`.
+
 ## Use the generated crate from another crate
 
-Application code depends on the generated package and on `puroro`. It does not depend on `puroro-rt`, and it does not repeat `allocator-api2`, `bitvec`, or `bytes` unless it names those crates itself.
+Application code depends on the generated crate. `puroro-rt`, `allocator-api2`, `bitvec`, and `bytes` stay on the generated crate's manifest.
+
+The sample below imports `Message` and `StringMut` from the `puroro` crate, so this application also depends on `puroro` directly:
 
 ```toml
 [package]

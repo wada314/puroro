@@ -12,7 +12,7 @@ mkdir -p library-proto
 protoc --puroro_out=library-proto --puroro_opt=crate_name=library-proto -I . book.proto
 ```
 
-`protoc` runs `protoc-gen-puroro` from `PATH` when it sees `--puroro_out`. The output directory is a Cargo package: the plugin writes `lib.rs` and `Cargo.toml` (`[lib] path = "lib.rs"`). `--puroro_opt=crate_name=library-proto` sets the package name (the default is `generated`). `protoc` overwrites both files on every run. Another crate depends on that package and on `puroro`; a `package library` message `Book` is `library_proto::library::Book` from outside. See the [puroro README](https://github.com/wada314/puroro/blob/master/README.md#use-the-generated-crate-from-another-crate).
+`protoc` runs `protoc-gen-puroro` from `PATH` when it sees `--puroro_out`. The plugin writes `lib.rs` and `Cargo.toml` into that directory (`[lib] path = "lib.rs"`). `--puroro_opt=crate_name=library-proto` sets the crate name: the `name` value under `[package]` in that `Cargo.toml`. If you omit `crate_name`, that name is the string `generated`. Another crate depends on the generated crate and on `puroro`. A protobuf `package library` and `message Book` are `library_proto::library::Book` from outside. See the [puroro README](https://github.com/wada314/puroro/blob/master/README.md#use-the-generated-crate-from-another-crate).
 
 From a git checkout, build the binary and pass the path yourself:
 
