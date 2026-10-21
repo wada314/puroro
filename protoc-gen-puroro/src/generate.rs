@@ -243,6 +243,16 @@ mod tests {
         }])
     }
 
+    fn file_level_enum_request(enum_name: &str, package: &str) -> CodegenRequest {
+        desc::request(vec![ProtoFile {
+            enums: vec![desc::enumeration(
+                enum_name,
+                vec![desc::enum_value("UNSPECIFIED", 0)],
+            )],
+            ..desc::proto_file("empty.proto", package)
+        }])
+    }
+
     fn generate_lib(request: &CodegenRequest) -> String {
         let response = generate(request).unwrap();
         assert_eq!(response.files.len(), 2);
@@ -324,6 +334,41 @@ mod tests {
         let content = generate_lib(&empty_request("Empty"));
         assert!(content.contains("@generated"));
         assert!(content.contains("- `empty.proto`"));
+        assert!(content.contains("pub use ::puroro"));
+    }
+
+    #[test]
+    fn package_puroro_is_reserved_at_the_crate_root() {
+        let err = generate(&empty_request_with_package("Empty", "puroro")).unwrap_err();
+        assert!(err.to_string().contains("reserved"));
+    }
+
+    #[test]
+    fn file_level_message_puroro_is_reserved_at_the_crate_root() {
+        let err = generate(&empty_request("Puroro")).unwrap_err();
+        assert!(err.to_string().contains("reserved"));
+    }
+
+    #[test]
+    fn file_level_enum_puroro_is_reserved_at_the_crate_root() {
+        let err = generate(&file_level_enum_request("puroro", "")).unwrap_err();
+        assert!(err.to_string().contains("reserved"));
+    }
+
+    #[test]
+    fn file_level_enum_puroro_pascal_is_not_the_root_module() {
+        let content = generate_lib(&file_level_enum_request("Puroro", ""));
+        assert!(content.contains("pub use ::puroro"));
+        assert!(content.contains("struct Puroro"));
+        assert!(!content.contains("mod puroro"));
+    }
+
+    #[test]
+    fn nested_package_puroro_is_not_the_crate_root() {
+        let content = generate_lib(&empty_request_with_package("Empty", "shop.puroro"));
+        assert!(content.contains("pub mod shop"));
+        assert!(content.contains("pub mod puroro"));
+        assert!(content.contains("pub use ::puroro"));
     }
 
     #[test]

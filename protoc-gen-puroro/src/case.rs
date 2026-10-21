@@ -121,4 +121,44 @@ mod tests {
         assert_eq!(to_upper_snake("title"), "TITLE");
         assert_eq!(to_upper_snake("MAX_RETRIES"), "MAX_RETRIES");
     }
+
+    #[test]
+    fn underscores_are_separators_only() {
+        for name in ["Task", "task", "TASK", "_task", "task_"] {
+            assert_eq!(to_snake_case(name), "task", "{name}");
+        }
+        assert_eq!(to_snake_case("task__name"), "task_name");
+        assert_eq!(to_snake_case("_"), "");
+        assert_eq!(to_snake_case("___"), "");
+        assert_eq!(to_pascal_case("_"), "");
+        assert_eq!(to_upper_snake("_"), "");
+    }
+
+    #[test]
+    fn digits_stay_inside_a_word() {
+        assert_eq!(words("Http2").collect::<Vec<_>>(), ["Http2"]);
+        assert_eq!(to_snake_case("Http2"), "http2");
+        assert_eq!(to_snake_case("HTTP2Parser"), "http2_parser");
+        assert_eq!(to_pascal_case("http2_parser"), "Http2Parser");
+        assert_eq!(to_upper_snake("Http2Parser"), "HTTP2_PARSER");
+        // A digit is not a lowercase letter, so `A2B` does not split.
+        assert_eq!(to_snake_case("A2B"), "a2b");
+        // Stripping the leading `_` leaves a string that is not an ident.
+        assert_eq!(to_snake_case("_2foo"), "2foo");
+        assert_eq!(to_pascal_case("_2foo"), "2foo");
+        assert_eq!(to_snake_case("Type"), "type");
+        assert_eq!(to_snake_case("_type"), "type");
+        assert_eq!(to_pascal_case("self"), "Self");
+    }
+
+    #[test]
+    fn acronyms_split_only_before_a_capital_followed_by_lowercase() {
+        assert_eq!(to_snake_case("XMLParser"), "xml_parser");
+        assert_eq!(to_snake_case("IOError"), "io_error");
+        assert_eq!(to_snake_case("XMLHttpRequest"), "xml_http_request");
+        // `iOS` splits at the lowercase-to-uppercase boundary; `OS` stays one word.
+        assert_eq!(to_snake_case("iOS"), "i_os");
+        assert_eq!(to_pascal_case("iOS"), "IOs");
+        assert_eq!(to_upper_snake("iOSVersion"), "I_OS_VERSION");
+    }
 }

@@ -24,7 +24,8 @@
 //! message-local traits (`Layout`, `MessageFallible`). Those items omit the
 //! message name and are not re-exported beside the struct.
 //! Production output follows the same rule under the protobuf `package`
-//! module. This sample stays flat (no `example::v1` prefix) for readability.
+//! module, and re-exports this runtime as `puroro` at the crate root. This
+//! sample does the same. It stays flat (no `example::v1` prefix) for readability.
 //! The `*_type` files are a hand-written split so the crate root stays small;
 //! they are not a public module path.
 //!
@@ -34,6 +35,8 @@
 //! would wrongly imply the files are tool-generated.
 
 #![allow(dead_code)]
+
+pub use ::puroro;
 
 pub mod address;
 pub mod enums;
