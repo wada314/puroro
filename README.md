@@ -81,7 +81,7 @@ from code in this crate:  demo::Shelf
 shelf.proto is the input file. It is not a Rust module.
 ```
 
-`protoc` overwrites `lib.rs` and `Cargo.toml` on the next run. The `[dependencies]` in that `Cargo.toml` are the crates `lib.rs` calls. The plugin writes the version on each line. The root module `puroro` is that runtime crate. A `package puroro`, or a file-level message or enum that would occupy the root name `puroro`, is rejected. A nested package such as `shop.puroro` is a different module (`shop::puroro`).
+`protoc` overwrites `lib.rs` and `Cargo.toml` on the next run. The `[dependencies]` in that `Cargo.toml` are the crates `lib.rs` calls. The plugin writes the version on each line. The root module `puroro` is that runtime crate. A schema that would place a module or type named `puroro` at that root is rejected. `package shop.puroro` is a different module (`shop::puroro`). Which other proto names are accepted is [DESIGN.md](DESIGN.md#allowed-and-disallowed-names).
 
 The package in `out/Cargo.toml` is `generated`. To choose a different one, pass `--puroro_opt=crate_name=demo-proto`. A hyphen in that option becomes an underscore in Rust (`demo_proto`).
 

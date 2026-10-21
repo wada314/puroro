@@ -11,6 +11,7 @@ This document specifies the **public interface** of the `puroro` Protocol Buffer
 4. [Generated code specification](#4-generated-code-specification)
    - [Module layout and naming](#module-layout-and-naming)
    - [Path qualification](#path-qualification)
+   - [Allowed and disallowed names](#allowed-and-disallowed-names)
    - [Public signatures must not surface `puroro-rt`](#public-signatures-must-not-surface-puroro-rt)
    - 4.0 [Inherent accessors (current)](#40-inherent-accessors-current)
    - 4.1 [Scalar fields](#41-scalar-fields) — implicit vs explicit presence
@@ -280,13 +281,56 @@ mod _root {
 
 From inside the nested `_root` submodule, `super::super::_root` always reaches the parent's alias (the extra `super` accounts for `_root` itself). Each module therefore spells the forest root as `self::_root`, at any depth.
 
-**Reserved `_`-prefixed names** introduced by the generator (`_root`, `_common`, …) are exempt from proto-derived naming and must not be treated as public API.
+**Reserved `_`-prefixed names** introduced by the generator (`_root`, `_common`, …) are exempt from proto-derived naming and must not be treated as public API. Which proto names the generator accepts is [Allowed and disallowed names](#allowed-and-disallowed-names).
 
-**`puroro` is a keyword at the generated crate root.** Layout emits `pub use ::puroro;` there, so application code imports traits as `<crate>::puroro::Message` (and `StringMut`, `Optional`, `DecodeError`, …) without a direct `puroro` dependency. The name `puroro` in that position is not a proto module. Codegen rejects a root child module or a root type item named `puroro`: a `package` whose first segment is `puroro`, or a file-level message or enum that becomes the module or type `puroro` (`message Puroro` with an empty package, companion `puroro`). A nested module such as `package shop.puroro` (`shop::puroro`) does not use the root name and is allowed.
+**`puroro` is a keyword at the generated crate root.** Layout emits `pub use ::puroro;` there, so application code imports traits as `<crate>::puroro::Message` (and `StringMut`, `Optional`, `DecodeError`, …) without a direct `puroro` dependency. The name `puroro` in that position is not a proto module. The rejection rule is in [Allowed and disallowed names](#allowed-and-disallowed-names).
 
 Several generated crates each re-export `puroro`. When Cargo unifies those crates onto one `puroro` version, `<crate_a>::puroro::Message` and `<crate_b>::puroro::Message` are the same trait: import it from one crate and it applies to messages from the others. Importing the name `Message` from two of those paths into the same module is a name collision. Incompatible versions (for example `0.15` and `0.16` in the generated manifests) are different crates, and the trait from one does not apply to the other crate's messages.
 
 **Crate split.** Items from [§3](#3-runtime-trait-api) (`Message`, `Optional`, `HasDefault`, `DecodeError`, …) are emitted as `::puroro::…` inside the generated crate, and re-exported at the crate root as `puroro`. Field catalog types, `MessageCommon`, wire helpers, and `ProtoDefault` are emitted as `::puroro_rt::…`. A generated crate's `Cargo.toml` lists both dependencies; end-user application code should not add `puroro-rt` directly.
+
+### Allowed and disallowed names
+
+This is the name contract between a `.proto` schema and the Rust the plugin emits. It is not a rename feature. A name the plugin rejects fails code generation. A name it accepts is either emitted as written (after the case rules in [Module layout and naming](#module-layout-and-naming)) or escaped as a raw identifier. Two proto identities that land on the same module path are merged; a clash of items inside that module is left to `rustc`.
+
+**Simple identifier.** A proto name that becomes a Rust identifier must match `^[A-Za-z_][A-Za-z0-9_]*$` (ASCII only). The check applies to package segments, message names, enum names, enum value names, field names, oneof names, and oneof variant names. An empty name, a leading digit, a hyphen, a dot, or a non-ASCII character is rejected (`cannot use … as a Rust identifier`). Protobuf's own parser already rejects many of these; the plugin check is what the generator enforces on the names it is given.
+
+**Raw identifiers.** Some names are Rust keywords. `escape_ident` (`protoc-gen-puroro/src/emit/ident.rs`) emits those as raw identifiers (`r#type`). The list is `is_rust_keyword` in that file (`type`, `match`, `self`, `Self`, `crate`, `async`, `await`, `try`, `gen`, and the other keywords spelled there). `self` and `crate` are on the list, so they are escaped rather than rejected. A Rust keyword that is not on the list (`union`) is not escaped.
+
+`escape_ident` is used for the message struct, the enum type, field accessors, the oneof name, the oneof module, oneof variant names, and the type's own segment in a type path. A field named `type` is the method `r#type`.
+
+**These idents are not raw-escaped.** They are checked as simple identifiers, then built with `Ident::new`. A keyword in one of these positions is outside the supported set; the plugin does not emit `r#…` for it.
+
+| Position | How the ident is built | Example that is not supported |
+|---|---|---|
+| package segment | the segment as written | `package type` |
+| message companion module | snake_case of the message name | `message Type` (module `type`), `message Match` (module `match`) |
+| enum value constant | prefix-stripped value name | a constant whose name is `type` |
+| oneof shape, case, and storage types | PascalCase of the oneof name | oneof `self` (shape type `Self`) |
+
+The message struct itself is still raw-escaped (`message type` → `struct r#type`). The companion module of that message is a separate ident and is not. Enums do not get a companion module, so `enum type` is only the raw-escaped type name.
+
+**Enum value constants** strip a redundant `ENUM_NAME_` prefix when the remainder is still a simple identifier (`STATUS_UNSPECIFIED` on `Status` becomes `Status::UNSPECIFIED`). If the remainder would not be an identifier (`EDITION_2023` → `2023`), the full value name is kept. The constant is not raw-escaped, so a value whose constant name is a Rust keyword is outside the supported set. A value whose constant name is `_Unknown` is rejected, because the native-enum representation uses that variant for unknown numbers. A non-native enum keeps values as associated constants and does not add `_Unknown`.
+
+**`puroro` at the crate root is reserved.** Layout emits `pub use ::puroro;` as the first item of the generated crate, so `<crate>::puroro` is the runtime crate. Codegen rejects the request when the root module would contain a child module `puroro` or a type item named `puroro`. That covers:
+
+| Schema | Rust name at the crate root | Result |
+|---|---|---|
+| `package puroro` | `mod puroro` | rejected |
+| `package puroro.shop` | `mod puroro` | rejected |
+| no package, `message puroro` | type `puroro` and companion `mod puroro` | rejected |
+| no package, `message Puroro` | companion `mod puroro` (the struct is `Puroro`) | rejected |
+| no package, `enum puroro` | type `puroro` | rejected |
+| no package, `enum Puroro` | type `Puroro` | allowed; enums have no companion module |
+| `package shop.puroro` | `shop::puroro` | allowed |
+| `package shop`, `message Puroro` | `shop::Puroro`, companion `shop::puroro` | allowed |
+| a field, oneof, or enum value named `puroro` | a method or constant, not a root module | allowed |
+
+**Generator-owned names are not proto names.** Every emitted module contains a private `mod _root` used as the absolute-path alias (`self::_root`). Every message struct has a field `_common`. These names are not public API. The plugin does not currently reject a proto package, message, or field that spells `_root` or `_common`; such a schema can fail later, when the generated Rust is compiled. Do not use them. Do not document a proto-derived item as if it were `_root` or `_common`.
+
+**`crate_name` is a Cargo package name, not a proto name.** `--puroro_opt=crate_name=` must be lowercase ASCII letters, digits, `-`, or `_`, and must start with a letter. The default is `generated`. This string is the directory and the `[package] name`; it is not a Rust module inside `lib.rs`.
+
+**Left to merge or to `rustc`.** Companion modules that collide with a package segment are merged. Two messages that generate the same item name in one module are not renamed; `rustc` reports the duplicate. A keyword in an `Ident::new` position is outside the supported set, and that failure is not the reserved-`puroro` error.
 
 ### Public signatures must not surface `puroro-rt`
 
@@ -1282,7 +1326,7 @@ Groups (`SGroup` / `EGroup`) are not generated and are not stored in unknown fie
 
 ### Module layout: package-first, rename when needed
 
-Protobuf `package` is the primary Rust module hierarchy. Message structs live in the package module (or a parent message's companion). Snake_case submodules are companions for `FIELD_*` / nested types / oneofs / message-local traits (`Message`, `MessageFallible`), and items in a companion omit the message name. Companions are merged when distinct proto identities map to the same path; item-level clashes are left to `rustc`. Users who want a different path use generate-time rename options (not `.proto` options). Cross-references inside the forest use `self::_root::…`. Details: [§4 Module layout and naming](#module-layout-and-naming), [Path qualification](#path-qualification).
+Protobuf `package` is the primary Rust module hierarchy. Message structs live in the package module (or a parent message's companion). Snake_case submodules are companions for `FIELD_*` / nested types / oneofs / message-local traits (`Message`, `MessageFallible`), and items in a companion omit the message name. Companions are merged when distinct proto identities map to the same path; item-level clashes are left to `rustc`. Users who want a different path use generate-time rename options (not `.proto` options). Cross-references inside the forest use `self::_root::…`. Which proto names are accepted: [Allowed and disallowed names](#allowed-and-disallowed-names). Details: [§4 Module layout and naming](#module-layout-and-naming), [Path qualification](#path-qualification).
 
 ### `protoc` plugin as the primary codegen path
 
