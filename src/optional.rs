@@ -17,9 +17,10 @@ pub trait HasDefault<T: Copy> {
 /// Same shape as `Option<T>`: [`is_set`](Self::is_set) reports whether the
 /// field was set, and [`get`](Self::get) returns that value. An absent field
 /// still has a value. [`get`](Self::get) returns the default from the `.proto`
-/// file, including one that is not the zero value of `T`. Proto2 and editions
-/// write it as `[default = "foo"]` or `[default = 3]`; proto3 rejects that
-/// option, so the default stays the type zero (`""`, `0`, `false`). `D`
+/// file. Editions and proto2 can set that default to a value other than the
+/// zero value of `T`, with `[default = "foo"]` or `[default = 3]`. Proto3
+/// rejects that option, so the default stays the type zero (`""`, `0`,
+/// `false`). `D`
 /// carries the default ([`HasDefault::DEFAULT`]).
 ///
 /// The type does not convert to `Option<T>`. Use [`is_set`](Self::is_set) for
