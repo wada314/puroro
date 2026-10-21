@@ -23,8 +23,10 @@ pub trait HasDefault<T: Copy> {
 /// `false`). `D`
 /// carries the default ([`HasDefault::DEFAULT`]).
 ///
-/// The type does not convert to `Option<T>`. Use [`is_set`](Self::is_set) for
-/// presence and [`get`](Self::get) for the value (explicit or default).
+/// The type does not convert to `Option<T>`. That conversion drops the
+/// default: absence would be `None`, and a value such as `[default = "foo"]`
+/// would be gone. Use [`is_set`](Self::is_set) for presence and
+/// [`get`](Self::get) for the value (explicit or default).
 ///
 /// On `TaskLazy`, the getter returns `Err` before constructing `Optional` if
 /// semantic decode fails; use `has_*()` for wire presence without validation.
