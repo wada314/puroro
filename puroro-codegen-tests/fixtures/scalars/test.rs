@@ -113,6 +113,7 @@ fn unknown_field_preserved_with_knowns() {
 fn optional_string_unset_vs_empty() {
     let unset = Scalars::new();
     assert!(!unset.title().is_set());
+    assert_eq!(unset.title().get(), "");
     assert!(unset.encode_to_vec().is_empty());
 
     let mut empty = Scalars::new();

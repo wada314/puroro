@@ -10,7 +10,7 @@ puroro is an independent experiment. It is pre-1.0 and the API changes. Use `goo
 
 ## What this repository is
 
-`puroro` is the user-facing runtime for that experiment: [`Message`](https://github.com/wada314/puroro/blob/master/src/message.rs) (encode, decode, merge, validate, unknown fields), [`Optional`](https://github.com/wada314/puroro/blob/master/src/optional.rs) for explicit-presence fields, and the mutator traits generated code returns.
+`puroro` is the user-facing runtime for that experiment: [`Message`](https://github.com/wada314/puroro/blob/master/src/message.rs) (encode, decode, merge, validate, unknown fields), [`Optional`](https://github.com/wada314/puroro/blob/master/src/optional.rs) for explicit-presence fields (like `Option`, with a `[default = "foo"]` proto default), and the mutator traits generated code returns.
 
 `.proto` files are compiled with the `protoc-gen-puroro` plugin (`protoc --puroro_out=…`). Install that crate's binary and leave it on `PATH`. Application code that only calls generated messages should depend on the generated crate and `puroro`. It should not import `puroro-rt`.
 
@@ -91,13 +91,17 @@ puroro = "0.15"
 
 Field access is inherent methods on the concrete type. Codec methods live on `puroro::Message`, so a proto field named `encode` does not hide them; call those with the trait in scope.
 
-`optional string` is explicit presence: `title()` returns `Optional<&str, …>`, `title().get()` is the value or the proto default, and `title().is_set()` reports presence. Eager messages do not generate `has_title()`. A plain proto3 `uint32` is implicit: `pages()` returns `u32`.
+[`Optional`](https://github.com/wada314/puroro/blob/master/src/optional.rs) is the read type for an explicit-presence field. `optional string title` makes `title()` return `Optional<&str, …>`. It follows `std::option::Option`: `is_set()` reports whether the field was set, and `get()` returns that value. When the field is absent, `get()` still returns a value: the default from the `.proto` file. That default can be something other than the zero value of the Rust type, written `[default = "foo"]` or `[default = 3]`. `Optional` does not convert to `Option`; those two methods are the read API.
+
+Proto2 and editions accept that option. A proto2 string is `&[u8]` (`b"foo"`) unless `--puroro_opt=proto2_utf8=verify` is set. An editions string is `&str`. Proto3 rejects `[default = …]`. The sample `title` therefore reads as `""` until it is set. Eager messages do not generate `has_title()`. A plain proto3 `uint32` is implicit presence: `pages()` returns `u32`, and an absent field is `0`.
 
 ```rust
 use library_proto::library::Book;
 use ::puroro::{Message, StringMut};
 
 let mut book = Book::new();
+assert!(!book.title().is_set());
+assert_eq!(book.title().get(), "");
 book.title_mut().push_str("Shore");
 *book.pages_mut() = 320;
 assert!(book.title().is_set());
