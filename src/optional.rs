@@ -14,9 +14,17 @@ pub trait HasDefault<T: Copy> {
 
 /// Return type for explicit-presence field accessors.
 ///
-/// Wraps a fully decoded `Option<T>`: `None` = absent on wire; `Some(t)` = set.
-/// Provides [`get`](Self::get) (value or proto default) and
-/// [`is_set`](Self::is_set) (explicit presence). No conversion to `Option<T>`.
+/// Same shape as `Option<T>`: [`is_set`](Self::is_set) reports whether the
+/// field was set, and [`get`](Self::get) returns that value. An absent field
+/// still has a value. [`get`](Self::get) returns the default from the `.proto`
+/// file. Editions and proto2 can set that default to a value other than the
+/// zero value of `T`, with `[default = "foo"]` or `[default = 3]`. Proto3
+/// rejects that option, so the default stays the type zero (`""`, `0`,
+/// `false`). `D`
+/// carries the default ([`HasDefault::DEFAULT`]).
+///
+/// The type does not convert to `Option<T>`. Use [`is_set`](Self::is_set) for
+/// presence and [`get`](Self::get) for the value (explicit or default).
 ///
 /// On `TaskLazy`, the getter returns `Err` before constructing `Optional` if
 /// semantic decode fails; use `has_*()` for wire presence without validation.
@@ -34,7 +42,11 @@ impl<T: Copy, D: HasDefault<T>> Optional<T, D> {
         }
     }
 
-    /// Value or proto-declared default when not set.
+    /// Set value, or the `.proto` default when the field is absent.
+    ///
+    /// The default is [`HasDefault::DEFAULT`]: the type zero, or another
+    /// value such as `[default = "foo"]` / `[default = 3]` when the schema
+    /// declares one.
     pub fn get(&self) -> T {
         self.value.unwrap_or(D::DEFAULT)
     }
@@ -42,5 +54,38 @@ impl<T: Copy, D: HasDefault<T>> Optional<T, D> {
     /// `true` if explicitly set on the wire.
     pub fn is_set(&self) -> bool {
         self.value.is_some()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{HasDefault, Optional};
+
+    struct TitleDefault;
+    impl HasDefault<&'static str> for TitleDefault {
+        const DEFAULT: &'static str = "foo";
+    }
+
+    struct MaxRetriesDefault;
+    impl HasDefault<i32> for MaxRetriesDefault {
+        const DEFAULT: i32 = 3;
+    }
+
+    #[test]
+    fn absent_get_returns_declared_default() {
+        let title = Optional::<&str, TitleDefault>::new(None);
+        assert!(!title.is_set());
+        assert_eq!(title.get(), "foo");
+
+        let retries = Optional::<i32, MaxRetriesDefault>::new(None);
+        assert!(!retries.is_set());
+        assert_eq!(retries.get(), 3);
+    }
+
+    #[test]
+    fn set_value_hides_default() {
+        let title = Optional::<&str, TitleDefault>::new(Some("Shore"));
+        assert!(title.is_set());
+        assert_eq!(title.get(), "Shore");
     }
 }
