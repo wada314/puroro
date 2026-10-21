@@ -4,27 +4,27 @@
 
 **This is not an official Google product.** For production Rust protobuf code, use [`google-protobuf`](https://crates.io/crates/google-protobuf).
 
-Install the binary and leave it on `PATH`. `cargo install` builds the `protoc-gen-puroro` executable. It does not use Cargo's unstable `bindeps` feature:
+Install the binary and leave it on `PATH`. `cargo install` builds the `protoc-gen-puroro` executable:
 
 ```shell
 cargo install protoc-gen-puroro
-mkdir -p library-proto
-protoc --puroro_out=library-proto --puroro_opt=crate_name=library-proto -I . book.proto
+mkdir -p out
+protoc --puroro_out=out -I . shelf.proto
 ```
 
-`protoc` runs `protoc-gen-puroro` from `PATH` when it sees `--puroro_out`. The plugin writes `lib.rs` and `Cargo.toml` into that directory (`[lib] path = "lib.rs"`). `--puroro_opt=crate_name=library-proto` sets the crate name: the `name` value under `[package]` in that `Cargo.toml`. If you omit `crate_name`, that name is the string `generated`. Another crate depends on the generated crate and on `puroro`. A protobuf `package library` and `message Book` are `library_proto::library::Book` from outside. See the [puroro README](https://github.com/wada314/puroro/blob/master/README.md#use-the-generated-crate-from-another-crate).
+`protoc` runs `protoc-gen-puroro` from `PATH` when it sees `--puroro_out`. The crate name in that `Cargo.toml`, the `name` value under `[package]`, is the string `generated` unless you pass `crate_name`. The diagram in the [puroro README](https://github.com/wada314/puroro/blob/master/README.md#generate-a-crate) shows protobuf `package demo` / `message Shelf` as `generated::demo::Shelf`.
 
-From a git checkout, build the binary and pass the path yourself:
+## Build the plugin from a checkout
+
+This is for people changing puroro. Other users stop at `cargo install`.
 
 ```shell
 cargo build -p protoc-gen-puroro
-mkdir -p library-proto
-protoc --plugin=protoc-gen-puroro=$PWD/target/debug/protoc-gen-puroro --puroro_out=library-proto --puroro_opt=crate_name=library-proto -I . book.proto
+mkdir -p out
+protoc --plugin=protoc-gen-puroro=$PWD/target/debug/protoc-gen-puroro --puroro_out=out -I . shelf.proto
 ```
 
-`puroro-codegen-tests` in the puroro workspace does not install this binary. It builds it with an artifact dependency (`artifact = "bin"`, nightly `-Z bindeps`). That is only for those tests. A crates.io dependency cannot take this binary the same way.
-
-Application code should not depend on this crate as a library. Depend on the generated crate and `puroro`.
+Application code should not depend on this crate as a library. Depend on the generated crate. Runtime traits are that crate's `puroro` module.
 
 ## License
 

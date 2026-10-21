@@ -11,6 +11,8 @@ This document specifies the **public interface** of the `puroro` Protocol Buffer
 4. [Generated code specification](#4-generated-code-specification)
    - [Module layout and naming](#module-layout-and-naming)
    - [Path qualification](#path-qualification)
+   - [Allowed and disallowed names](#allowed-and-disallowed-names)
+   - [Case conversion](#case-conversion)
    - [Public signatures must not surface `puroro-rt`](#public-signatures-must-not-surface-puroro-rt)
    - 4.0 [Inherent accessors (current)](#40-inherent-accessors-current)
    - 4.1 [Scalar fields](#41-scalar-fields) — implicit vs explicit presence
@@ -78,7 +80,7 @@ The puroro project comprises several crates and tools with distinct roles:
 - **Allocator support.** Every generated message is generic over `A: Allocator + Clone` using the `allocator-api2` crate ([why `Clone` is on the struct](#why-a-clone-is-a-struct-bound)). Arena allocators (e.g. `bumpalo`) and custom pools are first-class citizens.
 - **Performance-oriented interface.** Accessors return borrowed references (`&str`, `&[u8]`, `&[T]`), never freshly allocated containers. The `encode_to_vec` / `encode_to_bytes` convenience methods allocate; `Message::encode` writes into a caller-owned buffer. Wire-body sizing / writing (`encoded_len` / `encode_raw` with `EncodeCtx`) lives on `puroro_rt::MessageEncode`, not on `Message`.
 - **Rust idioms.** Private fields accessed via generated accessor methods; `Optional<T, impl HasDefault<T>>` for explicit-presence scalar, string, and enum fields; singular nested messages return `Option<&M>` / `&mut M` (inlined children are a full `M` with their own `MessageCommon`); no `unsafe` in user-visible APIs.
-- **`puroro` for users, `puroro-rt` for generators.** Library users of generated messages depend on the generated crate and **`puroro` only**. Generated code may use `puroro-rt` internally, but **must not surface `puroro-rt` types in public signatures** (see [§4](#public-signatures-must-not-surface-puroro-rt)).
+- **`puroro` for users, `puroro-rt` for generators.** Library users of generated messages depend on the generated crate. That crate re-exports the runtime as `puroro` (`<crate>::puroro::Message`). A direct `puroro` dependency is optional. Generated code may use `puroro-rt` internally, but **must not surface `puroro-rt` types in public signatures** (see [§4](#public-signatures-must-not-surface-puroro-rt)).
 - **Implementation flexibility.** The public interface described here must remain stable even if internal storage representations change. Eager messages use per-message common bits (see [IMPLEMENTATION.md §10](IMPLEMENTATION.md#10-common-bit-indices)); the accessor API is unchanged if storage layout evolves.
 - **Nightly toolchain, minimal unstable features.** The `rust-toolchain.toml` pins nightly; no `#![feature(…)]` flags are used in this crate itself.
 
@@ -280,13 +282,94 @@ mod _root {
 
 From inside the nested `_root` submodule, `super::super::_root` always reaches the parent's alias (the extra `super` accounts for `_root` itself). Each module therefore spells the forest root as `self::_root`, at any depth.
 
-**Reserved `_`-prefixed names** introduced by the generator (`_root`, `_common`, …) are exempt from proto-derived naming and must not be treated as public API.
+**Reserved `_`-prefixed names** introduced by the generator (`_root`, `_common`, …) are exempt from proto-derived naming and must not be treated as public API. Which proto names the generator accepts is [Allowed and disallowed names](#allowed-and-disallowed-names).
 
-**Crate split.** Items from [§3](#3-runtime-trait-api) (`Message`, `Optional`, `HasDefault`, `DecodeError`, …) are emitted as `::puroro::…`. Field catalog types, `MessageCommon`, wire helpers, and `ProtoDefault` are emitted as `::puroro_rt::…`. A generated crate's `Cargo.toml` lists both dependencies; end-user application code should not add `puroro-rt` directly.
+**`puroro` is a keyword at the generated crate root.** Layout emits `pub use ::puroro;` there, so application code imports traits as `<crate>::puroro::Message` (and `StringMut`, `Optional`, `DecodeError`, …) without a direct `puroro` dependency. The name `puroro` in that position is not a proto module. The rejection rule is in [Allowed and disallowed names](#allowed-and-disallowed-names).
+
+Several generated crates each re-export `puroro`. When Cargo unifies those crates onto one `puroro` version, `<crate_a>::puroro::Message` and `<crate_b>::puroro::Message` are the same trait: import it from one crate and it applies to messages from the others. Importing the name `Message` from two of those paths into the same module is a name collision. Incompatible versions (for example `0.15` and `0.16` in the generated manifests) are different crates, and the trait from one does not apply to the other crate's messages.
+
+**Crate split.** Items from [§3](#3-runtime-trait-api) (`Message`, `Optional`, `HasDefault`, `DecodeError`, …) are emitted as `::puroro::…` inside the generated crate, and re-exported at the crate root as `puroro`. Field catalog types, `MessageCommon`, wire helpers, and `ProtoDefault` are emitted as `::puroro_rt::…`. A generated crate's `Cargo.toml` lists both dependencies; end-user application code should not add `puroro-rt` directly.
+
+### Allowed and disallowed names
+
+This is the name contract between a `.proto` schema and the Rust the plugin emits. It is not a rename feature. A name the plugin rejects fails code generation. A name it accepts is either emitted as written, passed through [case conversion](#case-conversion), or escaped as a raw identifier. Two proto identities that land on the same module path are merged; a clash of items inside that module is left to `rustc`.
+
+**Simple identifier.** A proto name that becomes a Rust identifier must match `^[A-Za-z_][A-Za-z0-9_]*$` (ASCII only). The check applies to package segments, message names, enum names, enum value names, field names, oneof names, and oneof variant names. An empty name, a leading digit, a hyphen, a dot, or a non-ASCII character is rejected (`cannot use … as a Rust identifier`). Protobuf's own parser already rejects many of these; the plugin check is what the generator enforces on the names it is given.
+
+**Raw identifiers.** Some names are Rust keywords. `escape_ident` (`protoc-gen-puroro/src/emit/ident.rs`) emits those as raw identifiers (`r#type`). The list is `is_rust_keyword` in that file (`type`, `match`, `self`, `Self`, `crate`, `async`, `await`, `try`, `gen`, and the other keywords spelled there). `self` and `crate` are on the list, so they are escaped rather than rejected. A Rust keyword that is not on the list (`union`) is not escaped.
+
+`escape_ident` is used for the message struct, the enum type, field accessors, the oneof name, the oneof module, oneof variant names, and the type's own segment in a type path. A field named `type` is the method `r#type`.
+
+**These idents are not raw-escaped.** They are checked as simple identifiers, then built with `Ident::new`. A keyword in one of these positions is outside the supported set; the plugin does not emit `r#…` for it.
+
+| Position | How the ident is built | Example that is not supported |
+|---|---|---|
+| package segment | the segment as written | `package type` |
+| message companion module | snake_case of the message name ([case conversion](#case-conversion)) | `message Type` (module `type`), `message Match` (module `match`) |
+| enum value constant | prefix-stripped value name | a constant whose name is `type` |
+| oneof shape, case, and storage types | PascalCase of the oneof name | oneof `self` (shape type `Self`) |
+
+The message struct itself is still raw-escaped (`message type` → `struct r#type`). The companion module of that message is a separate ident and is not. Enums do not get a companion module, so `enum type` is only the raw-escaped type name.
+
+#### Case conversion
+
+`protoc-gen-puroro/src/case.rs` splits a proto name into words, then joins those words as snake_case, PascalCase, or UPPER_SNAKE. The split is ASCII-only. It is not a general Unicode inflection, and it does not check that the result is still a Rust identifier.
+
+| Derived name | Converter |
+|---|---|
+| message companion module | `to_snake_case`, then `Ident::new` |
+| `FIELD_*` / `BIT_*` constants | a `FIELD_` or `BIT_` prefix plus `to_upper_snake` |
+| enum-value prefix | `to_upper_snake(enum_name) + "_"` |
+| oneof shape type | `to_pascal_case`, then `Ident::new` |
+| oneof case and storage types | `to_pascal_case` plus `Case` or `Storage` |
+| oneof variant type | `to_pascal_case` of the variant field name, then `Ident::new` |
+| custom-default marker, layout associated types | `to_pascal_case` plus a suffix (`Default`, `Len`, …) |
+
+Package segments, the message or enum type item, field methods, and the oneof module keep the proto spelling (`escape_ident` where that helper is used). `oneof email_address` is the module `email_address` and the shape type `EmailAddress`. `oneof EmailAddress` is the module `EmailAddress` and the shape type `EmailAddress`.
+
+Word breaks are `_`, and an ASCII uppercase byte when the previous byte is ASCII lowercase (`fooBar` → `foo` + `Bar`) or the next byte is ASCII lowercase (`XMLParser` → `XML` + `Parser`). A run of capitals stays one word until that second rule fires (`IOError` → `io_error`, `XMLHttpRequest` → `xml_http_request`). Digits stay inside the current word (`Http2` → `http2`). A following capital splits only when a lowercase byte comes after it (`HTTP2Parser` → `http2_parser`). A digit is not a lowercase letter, so `A2B` stays one word (`a2b`). `iOS` splits at the lower-to-upper boundary and leaves the capital run together (`i_os`, PascalCase `IOs`).
+
+`_` is only a separator. Leading, trailing, and repeated underscores are dropped, so `Task`, `task`, `TASK`, `_task`, and `task_` are one snake_case word `task` and one UPPER_SNAKE word `TASK`. The type item keeps the proto spelling, so `Task` and `TASK` are different structs that share the companion module `task`. Two fields `foo_bar` and `fooBar` in one message both produce `FIELD_FOO_BAR`.
+
+A prefix or suffix can turn an empty or digit-leading word into a legal identifier. A field named `_` has the method `_`, the constant `FIELD_`, and a custom-default marker `Default`. The bare `Ident::new` of the converted word has no such prefix. These proto names pass the simple-identifier check and still have no supported derived ident:
+
+| Proto name | Converted word | Derived ident that is outside the supported set |
+|---|---|---|
+| message `_` or `__` | empty | companion module |
+| oneof `_` | empty | shape type (`Case` and `Storage` alone would be legal) |
+| message `_2foo` | `2foo` | companion module |
+| oneof variant `_2foo` | `2foo` | variant type |
+| field `_2foo` with a layout associated type or a custom default | `2foo` | `2fooLen`, `2fooRepeated`, `2fooMap`, `2fooMsg`, or `2fooDefault` |
+| message `Type` or `_type` | `type` | companion module |
+| oneof `self`, or a oneof variant `self` | `Self` | shape type, or the variant type |
+
+Enum values strip that UPPER_SNAKE prefix, not the enum's raw spelling. `enum XmlParser` strips `XML_PARSER_`, so `XML_PARSER_READY` becomes `READY`. `XMLPARSER_READY` keeps the full value name. `enum Http2` strips `HTTP2_`. A remainder that is not a simple identifier keeps the full name (`EDITION_2023`), as the next paragraph describes.
+
+**Enum value constants** strip a redundant `ENUM_NAME_` prefix when the remainder is still a simple identifier (`STATUS_UNSPECIFIED` on `Status` becomes `Status::UNSPECIFIED`). If the remainder would not be an identifier (`EDITION_2023` → `2023`), the full value name is kept. The constant is not raw-escaped, so a value whose constant name is a Rust keyword is outside the supported set. A value whose constant name is `_Unknown` is rejected, because the native-enum representation uses that variant for unknown numbers. A non-native enum keeps values as associated constants and does not add `_Unknown`.
+
+**`puroro` at the crate root is reserved.** Layout emits `pub use ::puroro;` as the first item of the generated crate, so `<crate>::puroro` is the runtime crate. Codegen rejects the request when the root module would contain a child module `puroro` or a type item named `puroro`. That covers:
+
+| Schema | Rust name at the crate root | Result |
+|---|---|---|
+| `package puroro` | `mod puroro` | rejected |
+| `package puroro.shop` | `mod puroro` | rejected |
+| no package, `message puroro` | type `puroro` and companion `mod puroro` | rejected |
+| no package, `message Puroro` | companion `mod puroro` (the struct is `Puroro`) | rejected |
+| no package, `enum puroro` | type `puroro` | rejected |
+| no package, `enum Puroro` | type `Puroro` | allowed; enums have no companion module |
+| `package shop.puroro` | `shop::puroro` | allowed |
+| `package shop`, `message Puroro` | `shop::Puroro`, companion `shop::puroro` | allowed |
+| a field, oneof, or enum value named `puroro` | a method or constant, not a root module | allowed |
+
+**Generator-owned names are not proto names.** Every emitted module contains a private `mod _root` used as the absolute-path alias (`self::_root`). Every message struct has a field `_common`. These names are not public API. The plugin does not currently reject a proto package, message, or field that spells `_root` or `_common`; such a schema can fail later, when the generated Rust is compiled. Do not use them. Do not document a proto-derived item as if it were `_root` or `_common`.
+
+**`crate_name` is a Cargo package name, not a proto name.** `--puroro_opt=crate_name=` must be lowercase ASCII letters, digits, `-`, or `_`, and must start with a letter. The default is `generated`. This string is the directory and the `[package] name`; it is not a Rust module inside `lib.rs`.
+
+**Left to merge or to `rustc`.** Companion modules that collide with a package segment are merged. Two messages that generate the same item name in one module are not renamed; `rustc` reports the duplicate. A keyword in an `Ident::new` position is outside the supported set, and that failure is not the reserved-`puroro` error.
 
 ### Public signatures must not surface `puroro-rt`
 
-**Normative.** Application code that uses a generated message crate must compile and type-check with dependencies on **that generated crate and `puroro` only**. It must not need to `use` / name any `puroro_rt::…` item.
+**Normative.** Application code that uses a generated message crate must compile and type-check with a dependency on **that generated crate**. Runtime traits and types are `<crate>::puroro::…`. A direct `puroro` dependency is optional. The application must not need to `use` / name any `puroro_rt::…` item.
 
 Generated crates **may** (and do) depend on `puroro-rt` for field storage, wire helpers, and other generator-facing machinery. That dependency is an implementation detail of the generated crate.
 
@@ -1278,17 +1361,17 @@ Groups (`SGroup` / `EGroup`) are not generated and are not stored in unknown fie
 
 ### Module layout: package-first, rename when needed
 
-Protobuf `package` is the primary Rust module hierarchy. Message structs live in the package module (or a parent message's companion). Snake_case submodules are companions for `FIELD_*` / nested types / oneofs / message-local traits (`Message`, `MessageFallible`), and items in a companion omit the message name. Companions are merged when distinct proto identities map to the same path; item-level clashes are left to `rustc`. Users who want a different path use generate-time rename options (not `.proto` options). Cross-references inside the forest use `self::_root::…`. Details: [§4 Module layout and naming](#module-layout-and-naming), [Path qualification](#path-qualification).
+Protobuf `package` is the primary Rust module hierarchy. Message structs live in the package module (or a parent message's companion). Snake_case submodules are companions for `FIELD_*` / nested types / oneofs / message-local traits (`Message`, `MessageFallible`), and items in a companion omit the message name. Companions are merged when distinct proto identities map to the same path; item-level clashes are left to `rustc`. Users who want a different path use generate-time rename options (not `.proto` options). Cross-references inside the forest use `self::_root::…`. Which proto names are accepted: [Allowed and disallowed names](#allowed-and-disallowed-names). Details: [§4 Module layout and naming](#module-layout-and-naming), [Path qualification](#path-qualification).
 
 ### `protoc` plugin as the primary codegen path
 
 The code generator is the `protoc-gen-puroro` crate, invoked as a `protoc` plugin (`protoc --puroro_out=…`). Wrapper scripts, `build.rs` integration, or a standalone binary may exist alongside it, but the plugin interface is the reference integration point. Pipeline and emission progress: [IMPLEMENTATION.md §3](IMPLEMENTATION.md#3-implementation-status).
 
-Each successful run writes two files into the `--puroro_out` directory: `lib.rs` (the forest as that crate's root) and `Cargo.toml` (`[lib] path = "lib.rs"`, with `puroro`, `puroro-rt`, `allocator-api2`, `bitvec`, and `bytes`). Each dependency's version requirement is the version recorded for that crate in the `Cargo.lock` that compiled the plugin. `--puroro_opt=crate_name=<name>` sets the crate name, the `name` value under `[package]`. If omitted, that name is the string `generated`. `protoc` overwrites both files. An application crate depends on that crate and on `puroro`. A protobuf `package library` / `message Book` is `<crate>::library::Book` from outside that crate and `library::Book` inside it. Embedding the `.rs` file in another crate remains valid; that embedder ignores the generated manifest.
+Each successful run writes two files into the `--puroro_out` directory: `lib.rs` (the forest as that crate's root) and `Cargo.toml` (`[lib] path = "lib.rs"`, with `puroro`, `puroro-rt`, `allocator-api2`, `bitvec`, and `bytes`). Each dependency's version requirement is the version recorded for that crate in the `Cargo.lock` that compiled the plugin. `--puroro_opt=crate_name=<name>` sets the crate name, the `name` value under `[package]`. If omitted, that name is the string `generated`. `protoc` overwrites both files. `lib.rs` re-exports the runtime as `puroro`. An application crate depends on that generated crate. A protobuf `package library` / `message Book` is `<crate>::library::Book` from outside that crate and `library::Book` inside it. Embedding the `.rs` file in another crate remains valid; that embedder ignores the generated manifest and must still resolve `::puroro` from the host crate.
 
 ### `protobuf-core`, `puroro`, and `puroro-rt`
 
-`protobuf-core` holds reusable wire-format primitives (varint, tags, field readers/writers). **`puroro`** holds the stable message-level API (`Message`, `Optional`, errors) that library users and generated `impl` blocks share. **`puroro-rt`** holds the composable field catalog, wire helpers, and other generator-facing runtime pieces. Generated crates list both `puroro` and `puroro-rt` as dependencies; application code should depend on the generated crate and `puroro` only — not on `puroro-rt` or `protobuf-core` directly. Generators must also keep **`puroro-rt` out of public generated signatures** ([§4](#public-signatures-must-not-surface-puroro-rt)).
+`protobuf-core` holds reusable wire-format primitives (varint, tags, field readers/writers). **`puroro`** holds the stable message-level API (`Message`, `Optional`, errors) that library users and generated `impl` blocks share. **`puroro-rt`** holds the composable field catalog, wire helpers, and other generator-facing runtime pieces. Generated crates list both `puroro` and `puroro-rt` as dependencies and re-export `puroro` at the crate root. Application code should depend on the generated crate — not on `puroro-rt` or `protobuf-core` directly. Generators must also keep **`puroro-rt` out of public generated signatures** ([§4](#public-signatures-must-not-surface-puroro-rt)).
 
 ### `Bytes` for lazy wire storage vs `A: Allocator` for decoded values
 
