@@ -16,7 +16,7 @@ Instructions for coding agents working in this repository. Human-oriented docs s
 | `protobuf-core` | Git submodule — wire primitives |
 | `unmanaged` | Git submodule — allocator-less containers that panic on implicit `Drop` |
 
-Library users of generated messages depend on the generated crate and `puroro` only. Do not surface `puroro-rt` types in public generated signatures.
+Library users of generated messages depend on the generated crate. The plugin re-exports the runtime as `<crate>::puroro`. Do not surface `puroro-rt` types in public generated signatures. The root module name `puroro` is reserved.
 
 Lazy `RecordScanner` emits `ScannedRecord` / `ScannedValue`. LEN is a span into `_wire`, not a `protobuf_core::Field` / owned payload. Do not copy complete LEN bodies into the scan record. Numerical apply uses catalog `merge_scanned` (`CopyWirePayload::from_scanned`). Do not rematch scalars through `merge_scanned_field`. Packed LEN uses the scanned `payload_len` (`merge_packed_buf`); do not re-read the length prefix. Do not re-land island-first leftover-as-offset / `push_bytes` ingest: it did not move typical decode and duplicated leftover state.
 

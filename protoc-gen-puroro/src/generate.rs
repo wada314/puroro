@@ -324,6 +324,19 @@ mod tests {
         let content = generate_lib(&empty_request("Empty"));
         assert!(content.contains("@generated"));
         assert!(content.contains("- `empty.proto`"));
+        assert!(content.contains("pub use ::puroro"));
+    }
+
+    #[test]
+    fn package_puroro_is_reserved_at_the_crate_root() {
+        let err = generate(&empty_request_with_package("Empty", "puroro")).unwrap_err();
+        assert!(err.to_string().contains("reserved"));
+    }
+
+    #[test]
+    fn file_level_message_puroro_is_reserved_at_the_crate_root() {
+        let err = generate(&empty_request("Puroro")).unwrap_err();
+        assert!(err.to_string().contains("reserved"));
     }
 
     #[test]

@@ -24,8 +24,9 @@
 //! needed (`Message::validate(&msg)`).
 //!
 //! The composable field catalog and wire helpers live in the sibling
-//! **`puroro-rt`** crate. Generated code depends on it; application code that
-//! only uses generated messages should not need to import `puroro-rt` directly.
+//! **`puroro-rt`** crate. Generated code depends on it and re-exports this
+//! crate as `puroro` at the generated crate root. Application code that only
+//! uses generated messages should not need to import `puroro-rt` directly.
 //!
 //! # Example
 //!

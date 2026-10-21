@@ -24,7 +24,7 @@ mkdir -p out
 protoc --plugin=protoc-gen-puroro=$PWD/target/debug/protoc-gen-puroro --puroro_out=out -I . shelf.proto
 ```
 
-Application code should not depend on this crate as a library. Depend on the generated crate. Add `puroro` when the application code refers to a `puroro` trait.
+Application code should not depend on this crate as a library. Depend on the generated crate. Runtime traits are that crate's `puroro` module.
 
 ## License
 

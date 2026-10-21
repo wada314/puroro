@@ -9,7 +9,7 @@
 
 use super::ModuleForest;
 use super::ModuleNode;
-use crate::error::Result;
+use crate::error::{Error, Result};
 use crate::plugin_io::ResponseFile;
 use ::syn::parse_quote;
 use ::syn::{File, Item};
@@ -27,6 +27,7 @@ pub enum ModuleLayout {
 
 /// Render a forest according to `layout`.
 pub fn render(forest: &ModuleForest, layout: &ModuleLayout) -> Result<Vec<ResponseFile>> {
+    reject_reserved_puroro(forest.root())?;
     match layout {
         ModuleLayout::SingleFile { path } => Ok(vec![render_single_file(forest, path)]),
     }
@@ -52,6 +53,7 @@ fn render_file(root: &ModuleNode) -> File {
 fn render_node_items(node: &ModuleNode, is_forest_root: bool) -> Vec<Item> {
     let mut items = Vec::new();
     if is_forest_root {
+        items.push(puroro_reexport());
         items.extend(node.items().iter().cloned());
         items.push(root_alias_item(true));
         items.extend(node.children().iter().map(render_child_mod));
@@ -75,6 +77,40 @@ fn render_child_mod(child: &ModuleNode) -> Item {
             #(#inner_attrs)*
             #(#items)*
         }
+    }
+}
+
+/// Re-export the runtime crate at the generated crate root (`generated::puroro`).
+fn puroro_reexport() -> Item {
+    parse_quote! {
+        pub use ::puroro;
+    }
+}
+
+/// `puroro` at the forest root is the runtime re-export, not a proto module.
+fn reject_reserved_puroro(root: &ModuleNode) -> Result<()> {
+    if root.get_child("puroro").is_some() || root.items().iter().any(item_binds_puroro) {
+        return Err(Error::Codegen(
+            "`puroro` is reserved at the generated crate root; the runtime crate is re-exported as that module"
+                .to_owned(),
+        ));
+    }
+    Ok(())
+}
+
+fn item_binds_puroro(item: &Item) -> bool {
+    match item {
+        Item::Struct(item) => item.ident == "puroro",
+        Item::Enum(item) => item.ident == "puroro",
+        Item::Type(item) => item.ident == "puroro",
+        Item::Union(item) => item.ident == "puroro",
+        Item::Trait(item) => item.ident == "puroro",
+        Item::TraitAlias(item) => item.ident == "puroro",
+        Item::Fn(item) => item.sig.ident == "puroro",
+        Item::Const(item) => item.ident == "puroro",
+        Item::Static(item) => item.ident == "puroro",
+        Item::Mod(item) => item.ident == "puroro",
+        _ => false,
     }
 }
 
@@ -132,8 +168,36 @@ mod tests {
         assert_eq!(file.name, "empty.rs");
         assert!(file.content.contains("pub struct Empty"));
         assert!(file.content.contains("allow"));
+        assert!(file.content.contains("pub use ::puroro"));
         assert!(file.content.contains("mod _root"));
         assert!(file.content.contains("use super::*;"));
+    }
+
+    #[test]
+    fn root_module_named_puroro_is_rejected() {
+        let mut forest = ModuleForest::new();
+        forest.ensure_package("puroro");
+        let err = render(
+            &forest,
+            &ModuleLayout::SingleFile {
+                path: "lib.rs".into(),
+            },
+        )
+        .unwrap_err();
+        assert!(err.to_string().contains("reserved"));
+    }
+
+    #[test]
+    fn nested_module_named_puroro_is_allowed() {
+        let mut forest = ModuleForest::new();
+        forest.ensure_package("shop.puroro");
+        render(
+            &forest,
+            &ModuleLayout::SingleFile {
+                path: "lib.rs".into(),
+            },
+        )
+        .unwrap();
     }
 
     #[test]
