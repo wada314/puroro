@@ -46,7 +46,7 @@ message Shelf {
 }
 ```
 
-`bookstore` in the command below is the directory and the Cargo package name for this example. `--puroro_out` takes whatever directory you pass. `--puroro_opt=crate_name=` sets the package name. Leave `crate_name` out and that name is `generated`. A hyphen in `crate_name` becomes an underscore in Rust (`demo-proto` becomes `demo_proto`).
+`bookstore` in the command below is the directory. `--puroro_opt=crate_name=bookstore` sets the crate name: the `name` value under `[package]` in `bookstore/Cargo.toml`. Leave `crate_name` out and that name is the string `generated`. A hyphen in the crate name becomes an underscore in Rust (`demo-proto` becomes `demo_proto`).
 
 ```shell
 mkdir -p bookstore
@@ -64,7 +64,7 @@ shelf.proto
             |         --puroro_opt=crate_name=bookstore
             v
 bookstore/                          directory from --puroro_out
-├── Cargo.toml                      package name from crate_name
+├── Cargo.toml                      [package] name is the crate name
 │     [dependencies]
 │       puroro
 │       puroro-rt
@@ -84,13 +84,17 @@ from code in bookstore:   demo::Shelf
 shelf.proto is the input file. It is not a Rust module.
 ```
 
-`protoc` overwrites `lib.rs` and `Cargo.toml` on the next run. The `[dependencies]` in that `Cargo.toml` are the crates `lib.rs` calls. The plugin writes the version on each line. The root module `puroro` is that runtime crate. A schema that would place a module or type named `puroro` at that root is rejected. `package shop.puroro` is a different module (`shop::puroro`). Which other proto names are accepted is [DESIGN.md](DESIGN.md#allowed-and-disallowed-names).
+The `[dependencies]` in that `Cargo.toml` are the crates `lib.rs` calls. The plugin writes the version on each line. The root module `puroro` is that runtime crate, re-exported for application code. A schema that would place a module or type named `puroro` at that root is rejected. `package shop.puroro` is a different module (`shop::puroro`). Which other proto names are accepted is [DESIGN.md](DESIGN.md#allowed-and-disallowed-names).
 
-A proto2 `string` is `&[u8]` unless you pass `--puroro_opt=proto2_utf8=verify`. `title` above is an editions string, so it is `&str`. Proto3 rejects `[default = …]`.
+`title` above is an editions string, so it is `&str`. Proto3 rejects `[default = …]`.
+
+## proto2
+
+A proto2 `string` is `&[u8]` unless you pass `--puroro_opt=proto2_utf8=verify`. Combine it with the crate name as `crate_name=bookstore,proto2_utf8=verify`.
 
 ## Use the generated crate from another crate
 
-The application crate adds the generated package. The path is the `--puroro_out` directory. It does not add `puroro`.
+The application crate depends on the generated crate. The path is the `--puroro_out` directory. `Message` and `StringMut` come from that crate's `puroro` module.
 
 ```toml
 [dependencies]

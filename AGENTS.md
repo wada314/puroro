@@ -42,7 +42,7 @@ Criterion benches are the unpublished `puroro-benches` member (`publish = false`
 
 Users install the plugin with `cargo install protoc-gen-puroro` (or `cargo build -p protoc-gen-puroro` plus `--plugin=`). That path does not use `-Z bindeps`. `bindeps` is only the artifact dependency in `puroro-codegen-tests`. 0.14 called `puroro-codegen` in-process from `build.rs`; it did not install this binary.
 
-The plugin writes `lib.rs` and `Cargo.toml` into `--puroro_out` (`[lib] path = "lib.rs"`). `--puroro_opt=crate_name=` sets the package name (default `generated`). Application code depends on that package and `puroro`; a proto package `library` and message `Book` is `<crate>::library::Book` from outside. Do not drop the manifest to leave a bare `lib.rs` as the only user-facing output.
+The plugin writes `lib.rs` and `Cargo.toml` into `--puroro_out` (`[lib] path = "lib.rs"`). `--puroro_opt=crate_name=` sets the crate name: the `name` value under `[package]`. If omitted, that name is the string `generated`. `lib.rs` re-exports the runtime as `puroro`. Application code depends on that crate. A protobuf package `library` and message `Book` is `<crate>::library::Book` from outside. Do not drop the manifest to leave a bare `lib.rs` as the only user-facing output.
 
 Dependency versions in that manifest come from `protoc-gen-puroro/build.rs`, which reads `Cargo.lock` while the plugin is compiled. Do not hardcode `puroro` / `puroro-rt` / `allocator-api2` / `bitvec` / `bytes` versions in `generate.rs`. Those crates stay build-dependencies of the plugin so `cargo install` resolves the same names.
 

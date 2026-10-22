@@ -12,7 +12,7 @@ mkdir -p out
 protoc --puroro_out=out -I . shelf.proto
 ```
 
-`protoc` runs `protoc-gen-puroro` from `PATH` when it sees `--puroro_out`. The output package is `generated`. The diagram in the [puroro README](https://github.com/wada314/puroro/blob/master/README.md#generate-a-crate) shows `package demo` / `message Shelf` as `generated::demo::Shelf`.
+`protoc` runs `protoc-gen-puroro` from `PATH` when it sees `--puroro_out`. The crate name in that `Cargo.toml`, the `name` value under `[package]`, is the string `generated` unless you pass `crate_name`. The diagram in the [puroro README](https://github.com/wada314/puroro/blob/master/README.md#generate-a-crate) shows protobuf `package demo` / `message Shelf` as `generated::demo::Shelf`.
 
 ## Build the plugin from a checkout
 
