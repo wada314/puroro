@@ -476,7 +476,7 @@ dependencies = [
 
 [[package]]
 name = "protobuf-core"
-version = "0.2.2"
+version = "0.6.0"
 dependencies = [
  "assert_matches",
  "thiserror 1.0.69",
@@ -500,7 +500,7 @@ dependencies = [
 
 [[package]]
 name = "puroro"
-version = "0.15.0"
+version = "0.15.1"
 dependencies = [
  "allocator-api2",
  "bitvec",

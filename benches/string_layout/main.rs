@@ -23,7 +23,7 @@ use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
 use ::core::time::Duration;
 use ::criterion::measurement::WallTime;
-use ::criterion::{black_box, criterion_group, BenchmarkGroup, BenchmarkId, Criterion, Throughput};
+use ::criterion::{BenchmarkGroup, BenchmarkId, Criterion, Throughput, black_box, criterion_group};
 use ::puroro::{DecodeBuf, DecodeError, Message, String as AllocString};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
