@@ -464,10 +464,7 @@ impl<'a> Iterator for UnknownFieldsIter<'a> {
 /// Advances `buf` past a group body started with `field`, returning the body
 /// subslice (excluding start/end tags). `buf` must be positioned just after
 /// the start-group tag; on success it points just after the matching end tag.
-fn group_body_slice<'a>(
-    field: FieldNumber,
-    buf: &mut &'a [u8],
-) -> Result<&'a [u8], DecodeError> {
+fn group_body_slice<'a>(field: FieldNumber, buf: &mut &'a [u8]) -> Result<&'a [u8], DecodeError> {
     let start = *buf;
     let mut stack = ::std::vec![field];
     loop {
@@ -595,10 +592,7 @@ mod group_tests {
         encode::encode_tag(field(2), WireType::EGroup, &mut bytes);
         let mut buf = bytes.as_slice();
         let (num, wt) = decode_tag(&mut buf).unwrap();
-        assert_eq!(
-            skip_field(num, wt, &mut buf),
-            Err(DecodeError::InvalidTag)
-        );
+        assert_eq!(skip_field(num, wt, &mut buf), Err(DecodeError::InvalidTag));
     }
 
     #[test]
@@ -629,5 +623,4 @@ mod group_tests {
         // SAFETY: Global owns this store's buffer.
         unsafe { unknowns.deallocate_in(&Global) };
     }
-
 }

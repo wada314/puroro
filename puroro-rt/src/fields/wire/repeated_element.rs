@@ -25,19 +25,19 @@ use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
 use ::core::ops::{Deref, DerefMut};
 
-use ::puroro::{DecodeBuf, DecodeError, Message, WireType};
+use ::puroro::{DecodeBuf, DecodeError, Message, ScopedBuf, WireType};
 
 use crate::decode;
 use crate::message_encode::MessageEncode;
 use crate::message_merge::MessageMerge;
 use ::unmanaged::DeallocateIn;
 
-use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES};
+use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES, FieldNumber};
 
 use super::encode_type::EncodeType;
 use super::len::{LenCodec, LenScalar};
 use super::numerical::{Numerical, NumericalType};
-use super::proto_message::ProtoMessage;
+use super::proto_message::{GroupDelimited, LengthPrefixed, ProtoMessage};
 use super::wire_payload::{CopyWirePayload, WirePayload};
 
 /// Wire + storage for one element of a repeated / map field of marker `Self`.
@@ -92,7 +92,11 @@ pub trait RepeatedElementMerge<A: Allocator + Clone>: RepeatedElement {
     ///
     /// Unlike [`merge_occurrence`], packed `Len` is rejected — map-entry key /
     /// value fields are singular on the wire.
+    ///
+    /// `field` is required for group-delimited messages (`SGroup`/`EGroup`);
+    /// other markers ignore it.
     fn decode_element<B: DecodeBuf>(
+        field: FieldNumber,
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
@@ -100,7 +104,10 @@ pub trait RepeatedElementMerge<A: Allocator + Clone>: RepeatedElement {
     ) -> Result<Self::Element<A>, DecodeError>;
 
     /// Merges one wire occurrence into `push` (append semantics).
+    ///
+    /// `field` is required for group-delimited messages; other markers ignore it.
     fn merge_occurrence<B, F>(
+        field: FieldNumber,
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
@@ -235,6 +242,7 @@ impl<A: Allocator + Clone, C: NumericalType> RepeatedElementMerge<A> for Numeric
 
     #[inline]
     fn decode_element<B: DecodeBuf>(
+        _field: FieldNumber,
         wire_type: WireType,
         buf: &mut B,
         _alloc: A,
@@ -244,6 +252,7 @@ impl<A: Allocator + Clone, C: NumericalType> RepeatedElementMerge<A> for Numeric
     }
 
     fn merge_occurrence<B, F>(
+        _field: FieldNumber,
         wire_type: WireType,
         buf: &mut B,
         _alloc: A,
@@ -360,6 +369,7 @@ impl<A: Allocator + Clone, C: LenCodec> RepeatedElementMerge<A> for LenScalar<C>
 
     #[inline]
     fn decode_element<B: DecodeBuf>(
+        _field: FieldNumber,
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
@@ -373,6 +383,7 @@ impl<A: Allocator + Clone, C: LenCodec> RepeatedElementMerge<A> for LenScalar<C>
 
     #[inline]
     fn merge_occurrence<B, F>(
+        field: FieldNumber,
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
@@ -383,7 +394,7 @@ impl<A: Allocator + Clone, C: LenCodec> RepeatedElementMerge<A> for LenScalar<C>
         B: DecodeBuf,
         F: FnMut(C::Slot<A>),
     {
-        push(Self::decode_element(wire_type, buf, alloc, _depth)?);
+        push(Self::decode_element(field, wire_type, buf, alloc, _depth)?);
         Ok(())
     }
 }
@@ -414,37 +425,67 @@ impl<C: LenCodec> RepeatedElementMut for LenScalar<C> {
 // Nested message
 // ---------------------------------------------------------------------------
 
-impl<M: MessageEncode> RepeatedElement for ProtoMessage<M> {
-    /// Inline message value (not [`UnmanagedBox`](::unmanaged::UnmanagedBox)).
-    ///
-    /// Use sites must pair the same allocator: e.g.
-    /// `RepeatedField<ProtoMessage<Address<A>>, Expanded, FIELD, A>`.
-    type Element<A: Allocator> = M;
-    type RefView = M;
+macro_rules! impl_repeated_element_proto_message {
+    ($W:ty) => {
+        impl<M: MessageEncode> RepeatedElement for ProtoMessage<M, $W> {
+            /// Inline message value (not [`UnmanagedBox`](::unmanaged::UnmanagedBox)).
+            ///
+            /// Use sites must pair the same allocator: e.g.
+            /// `RepeatedField<ProtoMessage<Address<A>>, Expanded, FIELD, A>`.
+            type Element<A: Allocator> = M;
+            type RefView = M;
 
-    #[inline]
-    fn as_ref_view<A: Allocator>(elem: &M) -> &M {
-        elem
-    }
+            #[inline]
+            fn as_ref_view<A: Allocator>(elem: &M) -> &M {
+                elem
+            }
 
-    #[inline]
-    fn wire_view<'a, A: Allocator>(elem: &'a M) -> &'a M
-    where
-        Self: 'a,
-    {
-        elem
-    }
+            #[inline]
+            fn wire_view<'a, A: Allocator>(elem: &'a M) -> &'a M
+            where
+                Self: 'a,
+            {
+                elem
+            }
 
-    #[inline]
-    unsafe fn deallocate_element<A: Allocator>(elem: M, _alloc: &A) {
-        // Inline repeated elements are not behind `UnmanagedBox`; free via
-        // `Drop` / `_common.alloc` (same body as `unmanaged::DeallocateIn` on
-        // generated messages). The `alloc` parameter is unused here.
-        drop(elem);
-    }
+            #[inline]
+            unsafe fn deallocate_element<A: Allocator>(elem: M, _alloc: &A) {
+                // Inline repeated elements are not behind `UnmanagedBox`; free via
+                // `Drop` / `_common.alloc` (same body as `unmanaged::DeallocateIn` on
+                // generated messages). The `alloc` parameter is unused here.
+                drop(elem);
+            }
+        }
+
+        impl<M: MessageEncode> RepeatedVecMut for ProtoMessage<M, $W> {}
+
+        impl<M: MessageEncode> RepeatedElementMut for ProtoMessage<M, $W> {
+            type MutTarget<A: Allocator> = M;
+
+            type ElementMut<'a, A: Allocator>
+                = &'a mut M
+            where
+                Self: 'a,
+                A: 'a;
+
+            #[inline]
+            unsafe fn element_mut<'a, A: Allocator + Clone + 'a>(
+                elem: &'a mut M,
+                _alloc: A,
+            ) -> &'a mut M
+            where
+                Self: 'a,
+            {
+                elem
+            }
+        }
+    };
 }
 
-impl<A, M> RepeatedElementMerge<A> for ProtoMessage<M>
+impl_repeated_element_proto_message!(LengthPrefixed);
+impl_repeated_element_proto_message!(GroupDelimited);
+
+impl<A, M> RepeatedElementMerge<A> for ProtoMessage<M, LengthPrefixed>
 where
     A: Allocator + Clone,
     M: Message<Alloc = A> + MessageEncode + MessageMerge + ::unmanaged::DeallocateIn<A>,
@@ -456,6 +497,7 @@ where
 
     #[inline]
     fn decode_element<B: DecodeBuf>(
+        _field: FieldNumber,
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
@@ -473,6 +515,7 @@ where
 
     #[inline]
     fn merge_occurrence<B, F>(
+        field: FieldNumber,
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
@@ -483,27 +526,55 @@ where
         B: DecodeBuf,
         F: FnMut(M),
     {
-        push(Self::decode_element(wire_type, buf, alloc, depth)?);
+        push(Self::decode_element(field, wire_type, buf, alloc, depth)?);
         Ok(())
     }
 }
 
-impl<M: MessageEncode> RepeatedVecMut for ProtoMessage<M> {}
-
-impl<M: MessageEncode> RepeatedElementMut for ProtoMessage<M> {
-    type MutTarget<A: Allocator> = M;
-
-    type ElementMut<'a, A: Allocator>
-        = &'a mut M
-    where
-        Self: 'a,
-        A: 'a;
+impl<A, M> RepeatedElementMerge<A> for ProtoMessage<M, GroupDelimited>
+where
+    A: Allocator + Clone,
+    M: Message<Alloc = A> + MessageEncode + MessageMerge + ::unmanaged::DeallocateIn<A>,
+{
+    #[inline]
+    fn default_element(alloc: A) -> M {
+        M::new_in(alloc)
+    }
 
     #[inline]
-    unsafe fn element_mut<'a, A: Allocator + Clone + 'a>(elem: &'a mut M, _alloc: A) -> &'a mut M
+    fn decode_element<B: DecodeBuf>(
+        field: FieldNumber,
+        wire_type: WireType,
+        buf: &mut B,
+        alloc: A,
+        depth: usize,
+    ) -> Result<M, DecodeError> {
+        if wire_type != WireType::SGroup {
+            return Err(DecodeError::InvalidTag);
+        }
+        let mut body = ::allocator_api2::vec::Vec::new_in(alloc.clone());
+        decode::take_group_body(field, buf, &mut body)?;
+        let mut slice: &[u8] = body.as_slice();
+        let mut scoped = ScopedBuf::new(&mut slice);
+        let mut msg = M::new_in(alloc);
+        MessageMerge::merge_from_with_depth(&mut msg, &mut scoped, depth + 1)?;
+        Ok(msg)
+    }
+
+    #[inline]
+    fn merge_occurrence<B, F>(
+        field: FieldNumber,
+        wire_type: WireType,
+        buf: &mut B,
+        alloc: A,
+        depth: usize,
+        mut push: F,
+    ) -> Result<(), DecodeError>
     where
-        Self: 'a,
+        B: DecodeBuf,
+        F: FnMut(M),
     {
-        elem
+        push(Self::decode_element(field, wire_type, buf, alloc, depth)?);
+        Ok(())
     }
 }

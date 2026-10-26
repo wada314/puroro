@@ -28,7 +28,7 @@ pub use numerical::{
     ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoInt32, ProtoInt64, ProtoSFixed32, ProtoSFixed64,
     ProtoSInt32, ProtoSInt64, ProtoUInt32, ProtoUInt64,
 };
-pub use proto_message::ProtoMessage;
+pub use proto_message::{GroupDelimited, LengthPrefixed, MessageFraming, ProtoGroup, ProtoMessage};
 pub use repeated_element::RepeatedElement;
 pub use singular_type::{PayloadAccess, SingularType};
 pub use sso_bytes::{SsoBytes, SsoBytesMut};

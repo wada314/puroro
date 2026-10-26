@@ -446,9 +446,16 @@ where
         // SAFETY: an owned clone of the message allocator owns this vector's
         // buffer.
         let mut g = unsafe { self.storage.with_alloc(alloc.clone()) };
-        T::merge_occurrence(wire_type, buf, alloc, depth, |elem| {
-            g.push(elem);
-        })
+        T::merge_occurrence(
+            field_number_const::<FIELD>(),
+            wire_type,
+            buf,
+            alloc,
+            depth,
+            |elem| {
+                g.push(elem);
+            },
+        )
     }
 
     /// Appends an already-decoded element using `alloc`.
