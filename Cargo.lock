@@ -500,7 +500,7 @@ dependencies = [
 
 [[package]]
 name = "puroro"
-version = "0.16.0"
+version = "0.15.1"
 dependencies = [
  "allocator-api2",
  "bitvec",
