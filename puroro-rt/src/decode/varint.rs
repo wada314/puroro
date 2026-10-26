@@ -5,9 +5,7 @@
 //! over [`VarintDecoder`] impls to compare algorithms without runtime dispatch.
 
 use ::bytes::Buf;
-use ::protobuf_core::{
-    IteratorExtVarint, MAX_VARINT_BYTES, VARINT_CONTINUATION_BIT, VARINT_PAYLOAD_MASK,
-};
+use ::protobuf_core::{MAX_VARINT_BYTES, VARINT_CONTINUATION_BIT, VARINT_PAYLOAD_MASK};
 use ::puroro::DecodeError;
 
 /// A varint decode algorithm over [`Buf`].
@@ -26,7 +24,7 @@ pub trait VarintDecoder {
 /// a varint spans chunk boundaries. Kept for benches / comparison.
 pub struct ChunkScan;
 
-/// Previous path: feed [`protobuf_core::IteratorExtVarint`] one `get_u8` at a time.
+/// Previous path: decode one `get_u8` at a time (no chunk peek).
 pub struct ByteIterator;
 
 /// Peeks 2 wire bytes as an unaligned little-endian `u16` and decodes from that
@@ -74,23 +72,6 @@ pub struct ChunkScanHotAdapt;
 /// little-endian `u64` load (`trailing_zeros` on the MSB mask).
 pub struct ChunkScanMsb;
 
-struct BufVarintReader<'a, B: Buf> {
-    buf: &'a mut B,
-}
-
-impl<B: Buf> Iterator for BufVarintReader<'_, B> {
-    type Item = u8;
-
-    #[inline]
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.buf.has_remaining() {
-            Some(self.buf.get_u8())
-        } else {
-            None
-        }
-    }
-}
-
 /// Try to decode a full varint from a contiguous slice.
 ///
 /// - `Ok(Some((value, len)))` — complete varint of `len` bytes (1..=10)
@@ -118,10 +99,10 @@ fn try_decode_varint_from_slice(chunk: &[u8]) -> Result<Option<(u64, usize)>, De
 
 #[inline]
 fn decode_varint_byte_iterator<B: Buf>(buf: &mut B) -> Result<u64, DecodeError> {
-    match (BufVarintReader { buf }).read_varint()? {
-        Some(v) => Ok(v.to_uint64()),
-        None => Err(DecodeError::UnexpectedEof),
-    }
+    // Same algorithm as the old `IteratorExtVarint` path: consume one byte at a
+    // time with no chunk peek. `finish_varint_bytewise` from a zeroed start
+    // state is that loop.
+    finish_varint_bytewise(buf, 0, 0, 0)
 }
 
 /// Fast path for workloads where most varints are a single byte (e.g. tags).
