@@ -68,13 +68,13 @@ The puroro project comprises several crates and tools with distinct roles:
 |---|---|---|
 | `utf8_validation` (`VERIFY` / `NONE`) | Generated decode paths honour the per-field Editions setting. `NONE` uses bytes views (`&[u8]`), not `&str`. `VERIFY` failure is `DecodeError::InvalidUtf8` and is not diverted into unknown fields. | **Done** — `ProtoString` (`VERIFY`, `&str`) vs `ProtoStringUnchecked` (`NONE`, `&[u8]`). proto2 default is `NONE`; overlay with `proto2_utf8=verify`. Eager merge fails immediately; lazy checks on the getter ([eager / lazy gaps](#eager-and-lazy-semantic-gaps)). |
 | Recursion limit | Nested-message `merge_from` enforces a depth limit; excess depth → `DecodeError::RecursionLimitExceeded`. | **Done** — `puroro_rt::MessageMerge::merge_from_with_depth` + `RECURSION_LIMIT` (100); user `Message::merge_from` wraps `merge_message` at depth 0. Nested catalog paths pass `depth + 1`. |
-| Deprecated groups (`SGroup` / `EGroup`) | Never generated; not preserved on decode. | Decoder may return `DecodeError::InvalidTag`, skip, or panic — round-trip fidelity for groups is **not** a goal. |
+| Deprecated groups (`SGroup` / `EGroup`) | Classic `TYPE_GROUP` and Editions `message_encoding=DELIMITED` use start/end-group framing. Generated like nested messages for accessors/storage; wire differs (no LEN prefix). Unknown groups are preserved for round-trip under the default store. | **In progress** — see [§4.5](#45-nested-message-fields), [§4.9](#49-unknown-fields), [§6.3](#63-editions-feature-matrix). |
 
 ---
 
 ## 1. Goals
 
-- **Protobuf spec compliance.** Support the canonical wire format (varints, I32, I64, LEN records, packed repeated, oneofs, unknown fields) for proto2, proto3, and editions. The compliant unknown-field behavior is preserve-and-round-trip. Opt-in `DISCARD` and `REJECT` leave that rule ([§4.9](#49-unknown-fields)). Deprecated group wire types (`SGroup` / `EGroup`) are never generated; the decoder does not preserve them (see [§0](#0-project-architecture)).
+- **Protobuf spec compliance.** Support the canonical wire format (varints, I32, I64, LEN records, group start/end tags, packed repeated, oneofs, unknown fields) for proto2, proto3, and editions. The compliant unknown-field behavior is preserve-and-round-trip, including unrecognized group spans. Opt-in `DISCARD` and `REJECT` leave that rule ([§4.9](#49-unknown-fields)). Classic groups and Editions `DELIMITED` message encoding are generated ([§4.5](#45-nested-message-fields)).
 - **Allocator support.** Every generated message is generic over `A: Allocator + Clone` using the `allocator-api2` crate ([why `Clone` is on the struct](#why-a-clone-is-a-struct-bound)). Arena allocators (e.g. `bumpalo`) and custom pools are first-class citizens.
 - **Performance-oriented interface.** Accessors return borrowed references (`&str`, `&[u8]`, `&[T]`), never freshly allocated containers. The `encode_to_vec` / `encode_to_bytes` convenience methods allocate; `Message::encode` writes into a caller-owned buffer. Wire-body sizing / writing (`encoded_len` / `encode_raw` with `EncodeCtx`) lives on `puroro_rt::MessageEncode`, not on `Message`.
 - **Rust idioms.** Private fields accessed via generated accessor methods; `Optional<T, impl HasDefault<T>>` for explicit-presence scalar, string, and enum fields; singular nested messages return `Option<&M>` / `&mut M` (inlined children are a full `M` with their own `MessageCommon`); no `unsafe` in user-visible APIs.
@@ -94,17 +94,20 @@ tag        := varint   where lower 3 bits = wire_type, upper bits = field_number
 value      := varint         for wire_type 0 (VARINT)
             | 8 bytes LE     for wire_type 1 (I64)
             | len + payload  for wire_type 2 (LEN)
+            | (empty)        for wire_type 3 (SGROUP) — body follows until matching EGROUP
+            | (empty)        for wire_type 4 (EGROUP)
             | 4 bytes LE     for wire_type 5 (I32)
 ```
 
-Wire types 3 and 4 (SGROUP / EGROUP) are deprecated. The encoder must never emit them. The decoder does not preserve group payloads for round-trip; encountering a group tag may be rejected with an error or otherwise ignored (see [§0](#0-project-architecture)).
+Wire types 3 and 4 (SGROUP / EGROUP) are deprecated but still part of the wire format. A group with field number `N` is `N:SGROUP`, then nested fields (any wire types, including nested groups), then a matching `N:EGROUP`. There is no length prefix for the aggregate. A mismatched end-group field number is a malformed message. Classic proto2 `group` syntax and Editions `features.message_encoding = DELIMITED` both use this framing ([§4.5](#45-nested-message-fields)).
 
 | Protobuf type | Wire type |
 |---|---|
 | `int32`, `int64`, `uint32`, `uint64`, `sint32`, `sint64`, `bool`, `enum` | VARINT |
 | `fixed32`, `sfixed32`, `float` | I32 |
 | `fixed64`, `sfixed64`, `double` | I64 |
-| `string`, `bytes`, embedded messages, packed repeated | LEN |
+| `string`, `bytes`, length-prefixed embedded messages, packed repeated | LEN |
+| Classic groups; Editions `DELIMITED` message fields | SGROUP … EGROUP |
 
 ---
 
@@ -671,6 +674,17 @@ pub fn clear_assignee(&mut self);
 
 **Merge semantics:** when the same message field appears more than once on the wire, occurrences are *merged* rather than replaced. This implements protobuf's "concatenated bytes = merged message" property. Oneof message variants (`postal`) use the same `&Address` / `&mut Address`; see [§4.7](#47-oneof-fields).
 
+#### Group / `DELIMITED` message encoding
+
+Two schema forms share the same wire framing and the same generated accessor shape as a nested message:
+
+| Schema | Descriptor | Wire |
+|---|---|---|
+| Classic proto2 `group Name = N { … }` | `FieldDescriptorProto.type = TYPE_GROUP`; nested message type named after the group | `N:SGROUP` … fields … `N:EGROUP` |
+| Editions `M field = N [features.message_encoding = DELIMITED]` | `TYPE_MESSAGE` + `message_encoding = DELIMITED` | same start/end-group tags |
+
+Public accessors, storage (`SingularField` / repeated / oneof), merge-into-singular, and child-parse options match ordinary nested messages ([above](#45-nested-message-fields)). The difference is **framing only**: encode emits `SGroup` then the child body then `EGroup` (no length varint); decode after an `SGroup` tag merges child fields until the matching `EGroup` (nested groups allowed; a wrong end-group number is `DecodeError::InvalidTag`). Groups are never packed. Length-prefixed nested messages inside a group body stay `LEN`-framed.
+
 #### Child parse timing
 
 Every proto message emits both an eager type (`Task`) and a lazy type (`TaskLazy`). Which one a caller holds is a Rust type choice. `(puroro.child_parse)` does not make that choice. It chooses the **nested** message's layout. The signatures above are the default: an eager parent stores an eager child, and a lazy parent stores a lazy child.
@@ -931,7 +945,7 @@ All generated messages expose unrecognised fields (and closed-enum unknowns dive
 fn unknown_fields(&self) -> impl Iterator<Item = UnknownField<'_>> + '_;
 ```
 
-[`UnknownField`](src/unknown.rs) carries the field number and an [`UnknownPayload`](src/unknown.rs) (`Varint` / `Fixed64` / `Bytes` / `Fixed32`). `wire_type()` is derived from the payload. The same field number may appear more than once.
+[`UnknownField`](src/unknown.rs) carries the field number and an [`UnknownPayload`](src/unknown.rs) (`Varint` / `Fixed64` / `Bytes` / `Fixed32` / `Group`). `wire_type()` is derived from the payload. The same field number may appear more than once. A `Group` payload is the raw inner wire bytes between a matched `SGroup` / `EGroup` pair (not including the start/end tags themselves); encode re-emits start tag + payload + end tag. Nested groups inside that span stay intact as opaque bytes.
 
 This shape is the **common public contract**: it does not require contiguous wire storage, so future policies (discard, alternate layouts, custom handlers) can keep the same accessor. A common-trait `as_bytes()` is intentionally not provided.
 
@@ -1204,7 +1218,7 @@ Note: **edition 2024 defaults to `EXPLICIT` field presence**, which is the oppos
 | `field_presence` | `IMPLICIT` / `EXPLICIT` / `LEGACY_REQUIRED` | Presence query methods generated or not; `validate()` for `LEGACY_REQUIRED` |
 | `repeated_field_encoding` | `PACKED` / `EXPANDED` | Affects encode format (decode always accepts both) |
 | `enum_type` | `OPEN` / `CLOSED` | Generated newtype implements `OpenEnum` vs `ClosedEnum`; field is `ProtoEnum<E, Open>` vs `ProtoEnum<E, Closed>` (unknown closed values → unknown fields) |
-| `message_encoding` | `LENGTH_PREFIXED` / `DELIMITED` | `DELIMITED` (groups) is deprecated; not generated |
+| `message_encoding` | `LENGTH_PREFIXED` / `DELIMITED` | `LENGTH_PREFIXED` (default): `LEN` framing. `DELIMITED`: group start/end framing; same accessors as a nested message ([§4.5](#45-nested-message-fields)) |
 | `utf8_validation` | `VERIFY` / `NONE` | `VERIFY`: `ProtoString`; getters `&str` / `StringMut`; invalid UTF-8 → `DecodeError::InvalidUtf8` (not an unknown-field divert). `NONE`: `ProtoStringUnchecked`; getters `&[u8]` / `BytesMut` (proto2 syntax default). Overlay proto2 with plugin option `proto2_utf8=verify`. |
 
 ### 6.4 Migration from proto2 / proto3
@@ -1274,7 +1288,7 @@ puroro is a greenfield design. Generated types, trait names, and module layout a
 
 ### Deprecated group wire types
 
-Groups (`SGroup` / `EGroup`) are not generated and are not stored in unknown fields. If a decoder encounters a group tag on the wire, it may return `DecodeError::InvalidTag`, skip the field, or panic — preserving group payloads for round-trip is explicitly out of scope.
+Groups remain deprecated in the language guides but are still on the wire. puroro generates classic `TYPE_GROUP` and Editions `DELIMITED` fields, preserves unrecognized group spans under the default unknown store, and rejects malformed end-group tags. Skip-only APIs without a preserve path are avoided: consuming a group body is designed together with reading or copying it ([§4.5](#45-nested-message-fields), [§4.9](#49-unknown-fields)).
 
 ### Module layout: package-first, rename when needed
 
