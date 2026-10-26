@@ -23,17 +23,17 @@ mod keep;
 mod payloads;
 
 use ::allocator_api2::alloc::Global;
-use ::criterion::{black_box, criterion_group, BatchSize, BenchmarkId, Criterion, Throughput};
+use ::criterion::{BatchSize, BenchmarkId, Criterion, Throughput, black_box, criterion_group};
 use ::puroro::{Message, StringMut};
 use ::puroro_sample_generated::{Marker, Point, Task, TaskLazy};
 
 use keep::iter_keep;
 
 use payloads::{
-    lookup_map, lookup_map_lazy, map_heavy_task, oneof_email_task, oneof_postal_task,
-    oneof_webhook_task, read_all, read_all_lazy, read_one, read_one_lazy, read_oneof_case,
-    switch_oneof, typical_task, MAP_BYTES, MAP_LEN, ONEOF_EMAIL_BYTES, ONEOF_POSTAL_BYTES,
-    ONEOF_WEBHOOK_BYTES, TYPICAL_BYTES, UNKNOWN_BYTES, UNKNOWN_LEN,
+    MAP_BYTES, MAP_LEN, ONEOF_EMAIL_BYTES, ONEOF_POSTAL_BYTES, ONEOF_WEBHOOK_BYTES, TYPICAL_BYTES,
+    UNKNOWN_BYTES, UNKNOWN_LEN, lookup_map, lookup_map_lazy, map_heavy_task, oneof_email_task,
+    oneof_postal_task, oneof_webhook_task, read_all, read_all_lazy, read_one, read_one_lazy,
+    read_oneof_case, switch_oneof, typical_task,
 };
 
 fn bench_task(c: &mut Criterion) {

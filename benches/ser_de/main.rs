@@ -20,7 +20,7 @@ mod keep;
 mod messages;
 mod payloads;
 
-use ::criterion::{black_box, criterion_group, BenchmarkId, Criterion, Throughput};
+use ::criterion::{BenchmarkId, Criterion, Throughput, black_box, criterion_group};
 use ::puroro::Message;
 
 use keep::iter_keep;
