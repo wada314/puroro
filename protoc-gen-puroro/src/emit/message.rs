@@ -7,7 +7,9 @@
 
 use super::defaults;
 use super::ident::{escape_ident, is_simple_ident, to_pascal_case};
-use super::layout::{self, LayoutAssoc, LayoutAssocKind, LenAccess, MessageApply};
+use super::layout::{
+    self, LayoutAssoc, LayoutAssocKind, LenAccess, MessageApply, MessageApplyKind,
+};
 use super::oneof::{self, OneofEmit, OneofVariantEmit};
 use super::type_path::{fqn_to_enum_root_path, fqn_to_message_lazy_path, fqn_to_message_root_path};
 use crate::default_value::CustomDefault;
@@ -15,9 +17,9 @@ use crate::descriptor::UnknownFieldsPolicy;
 use crate::descriptor::features::EnumType;
 use crate::error::{Error, Result};
 use crate::field_kind::{
-    FieldKind, MessageFieldPlan, MessageMember, PlannedField, PlannedLayout, PlannedOneof,
-    PlannedPresence, RepeatedEncodingKind, ResolvedChildParse, StringCatalogMarker, WireTypeKind,
-    bit_array_byte_len, lazy_kind_bit_const,
+    FieldKind, MessageFieldPlan, MessageFraming, MessageMember, PlannedField, PlannedLayout,
+    PlannedOneof, PlannedPresence, RepeatedEncodingKind, ResolvedChildParse, StringCatalogMarker,
+    WireTypeKind, bit_array_byte_len, lazy_kind_bit_const,
 };
 use crate::module_tree::nested_root_alias;
 use crate::resolved::Message as ResolvedMessage;
@@ -702,7 +704,7 @@ fn emit_oneof_variant(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
     };
 
     let views = wire_views(wire)?;
-    let is_message = matches!(wire, WireTypeKind::Message(_));
+    let is_message = wire.as_message().is_some();
     let is_bool = matches!(wire, WireTypeKind::Bool);
     let mut_style = SingularMutStyle::from_layout(wire, layout);
     let variant_pascal = to_pascal_case(field.name());
@@ -725,13 +727,13 @@ fn emit_oneof_variant(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
             eager_layout,
         ));
     }
-    if let WireTypeKind::Message(child) = wire {
+    if let WireTypeKind::Message { ty: child, framing } = wire {
         let pin = resolve_child_pin(field.name(), child, field.child_parse())?;
-        message_apply = Some(pin.singular_apply());
+        message_apply = Some(pin.singular_apply(*framing));
         if let Some(assoc) = pin.follow() {
             layout_assoc = Some(assoc.clone());
         }
-        if let Some(ty) = pin.oneof_marker() {
+        if let Some(ty) = pin.oneof_marker(*framing) {
             marker = ty;
         }
         if let Some((_, lazy)) = pin.lazy_pin() {
@@ -795,15 +797,15 @@ fn emit_repeated(field: &PlannedField<'_>) -> Result<RepeatedEmit> {
     let mut slice_elem_ty = views.slice_elem;
     let mut layout = None;
     let mut message_apply = None;
-    if let WireTypeKind::Message(child) = wire {
+    if let WireTypeKind::Message { ty: child, framing } = wire {
         // A message element is not a span list. Follow-parent only changes
         // the element type; storage stays `RepeatedReady`.
         let pin = resolve_child_pin(name, child, field.child_parse())?;
-        message_apply = Some(pin.repeated_apply());
+        message_apply = Some(pin.repeated_apply(*framing));
         if let Some(assoc) = pin.follow() {
             layout = Some(assoc.clone());
         }
-        if let Some(ty) = pin.field_marker() {
+        if let Some(ty) = pin.field_marker(*framing) {
             marker = ty;
         }
         if let Some((_, lazy)) = pin.lazy_pin() {
@@ -852,19 +854,19 @@ fn emit_map(field: &PlannedField<'_>) -> Result<MapEmit> {
     let mut map_value_bound = value_marker.clone();
     let mut value_view = value_views.map_value;
     let mut layouts = Vec::new();
-    if let WireTypeKind::Message(child) = value {
+    if let WireTypeKind::Message { ty: child, framing } = value {
         let pin = resolve_child_pin(name, child, field.child_parse())?;
         if let Some(assoc) = pin.follow() {
             let assoc_name = &assoc.assoc;
             // The `Layout` bound names the assoc on `Self`. The field
             // marker names it on the message's `L` parameter.
-            map_value_bound = parse_quote! { ::puroro_rt::ProtoMessage<Self::#assoc_name> };
+            map_value_bound = proto_message_marker(*framing, parse_quote! { Self::#assoc_name });
             layouts.push(assoc.clone());
         }
         if let Some((_, lazy)) = pin.lazy_pin() {
             value_view = lazy.clone();
         }
-        if let Some(ty) = pin.field_marker() {
+        if let Some(ty) = pin.field_marker(*framing) {
             value_marker = ty;
         }
         if pin.lazy_pin().is_some() {
@@ -936,7 +938,7 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
     let field_const = field.field_const();
     let number = field.number();
     let custom_default = custom_default.as_ref();
-    let is_message_wire = matches!(wire, WireTypeKind::Message(_));
+    let is_message_wire = wire.as_message().is_some();
     let required = matches!(presence, PlannedPresence::LegacyRequired { .. })
         || (matches!(presence, PlannedPresence::Message) && field.field().is_legacy_required());
     let (style, presence_ty, presence_bit) = match presence {
@@ -1028,13 +1030,13 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
         layout_ty = Some(parse_quote! { L::#assoc_name });
     }
 
-    if let WireTypeKind::Message(child) = wire {
+    if let WireTypeKind::Message { ty: child, framing } = wire {
         let pin = resolve_child_pin(name, child, field.child_parse())?;
-        message_apply_slot = Some(pin.singular_apply());
+        message_apply_slot = Some(pin.singular_apply(*framing));
         if let Some(assoc) = pin.follow() {
             layout_assoc = Some(assoc.clone());
         }
-        if let Some(ty) = pin.field_marker() {
+        if let Some(ty) = pin.field_marker(*framing) {
             marker = ty;
         }
         if let Some((eager, lazy)) = pin.lazy_pin() {
@@ -1167,44 +1169,47 @@ fn resolve_child_pin(
 }
 
 impl ChildPin {
-    fn singular_apply(&self) -> MessageApply {
-        match self {
-            Self::Follow(_) | Self::Lazy { .. } => MessageApply::SharedSingular,
-            Self::Eager { .. } => MessageApply::EagerSingular,
-        }
+    fn singular_apply(&self, framing: MessageFraming) -> MessageApply {
+        let kind = match self {
+            Self::Follow(_) | Self::Lazy { .. } => MessageApplyKind::SharedSingular,
+            Self::Eager { .. } => MessageApplyKind::EagerSingular,
+        };
+        MessageApply { kind, framing }
     }
 
-    fn repeated_apply(&self) -> MessageApply {
-        match self {
-            Self::Follow(_) | Self::Lazy { .. } => MessageApply::SharedRepeated,
-            Self::Eager { eager } => MessageApply::EagerRepeated(eager.clone()),
-        }
+    fn repeated_apply(&self, framing: MessageFraming) -> MessageApply {
+        let kind = match self {
+            Self::Follow(_) | Self::Lazy { .. } => MessageApplyKind::SharedRepeated,
+            Self::Eager { eager } => MessageApplyKind::EagerRepeated(eager.clone()),
+        };
+        MessageApply { kind, framing }
     }
 
     /// Marker on the message impl, where `L: Layout<A>` is already in scope.
     /// `None` for an eager pin: keep the marker from `wire_marker_path`.
-    fn field_marker(&self) -> Option<Type> {
+    fn field_marker(&self, framing: MessageFraming) -> Option<Type> {
         match self {
             Self::Follow(assoc) => {
                 let name = &assoc.assoc;
-                Some(parse_quote! { ::puroro_rt::ProtoMessage<L::#name> })
+                Some(proto_message_marker(framing, parse_quote! { L::#name }))
             }
-            Self::Lazy { lazy, .. } => Some(parse_quote! { ::puroro_rt::ProtoMessage<#lazy> }),
+            Self::Lazy { lazy, .. } => Some(proto_message_marker(framing, lazy.as_ref().clone())),
             Self::Eager { .. } => None,
         }
     }
 
     /// Marker inside a oneof module. The follow-parent path names `super::Layout`
     /// because the type alias has no `L: Layout<A>` bound.
-    fn oneof_marker(&self) -> Option<Type> {
+    fn oneof_marker(&self, framing: MessageFraming) -> Option<Type> {
         match self {
             Self::Follow(assoc) => {
                 let name = &assoc.assoc;
-                Some(parse_quote! {
-                    ::puroro_rt::ProtoMessage<<L as super::Layout<A>>::#name>
-                })
+                Some(proto_message_marker(
+                    framing,
+                    parse_quote! { <L as super::Layout<A>>::#name },
+                ))
             }
-            other => other.field_marker(),
+            other => other.field_marker(framing),
         }
     }
 
@@ -1478,11 +1483,19 @@ fn wire_marker_path(wire: &WireTypeKind<'_>) -> Result<Type> {
             };
             parse_quote! { ::puroro_rt::ProtoEnum<#path, #kind> }
         }
-        WireTypeKind::Message(m) => {
+        WireTypeKind::Message { ty: m, framing } => {
             let path = fqn_to_message_root_path(m)?;
-            parse_quote! { ::puroro_rt::ProtoMessage<#path<A>> }
+            proto_message_marker(*framing, parse_quote! { #path<A> })
         }
     })
+}
+
+/// `ProtoMessage<M>` or `ProtoGroup<M>` from nested-message framing.
+fn proto_message_marker(framing: MessageFraming, inner: Type) -> Type {
+    match framing {
+        MessageFraming::LengthPrefixed => parse_quote! { ::puroro_rt::ProtoMessage<#inner> },
+        MessageFraming::Group => parse_quote! { ::puroro_rt::ProtoGroup<#inner> },
+    }
 }
 
 pub(super) fn new_in_field_tokens(fields: &[FieldEmit]) -> Vec<TokenStream> {
@@ -1744,7 +1757,7 @@ fn wire_views(wire: &WireTypeKind<'_>) -> Result<WireViews> {
             let path = fqn_to_enum_root_path(ty)?;
             copy_views(parse_quote! { #path })
         }
-        WireTypeKind::Message(m) => {
+        WireTypeKind::Message { ty: m, .. } => {
             let path = fqn_to_message_root_path(m)?;
             let ty: Type = parse_quote! { #path<A> };
             WireViews {

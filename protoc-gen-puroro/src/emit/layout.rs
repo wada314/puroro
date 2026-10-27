@@ -2,6 +2,7 @@
 
 use super::parse;
 use crate::error::Result;
+use crate::field_kind::MessageFraming;
 use crate::module_tree::nested_root_alias;
 use ::proc_macro2::{Ident, TokenStream};
 use ::quote::quote;
@@ -16,20 +17,27 @@ pub(super) enum LenAccess {
     Bytes,
 }
 
-/// How a lazy parent records one message LEN.
+/// How a lazy parent records one nested message (LEN or group body).
 ///
 /// Singular and repeated differ in the slot method (`&mut` merge vs append),
 /// so each shape is its own variant. An eager repeated child names the type
-/// used to construct one value per LEN.
+/// used to construct one value per span. [`MessageFraming`] selects
+/// `scanned_len_span` vs `scanned_group_span`.
 #[derive(Clone)]
-pub(super) enum MessageApply {
+pub(super) struct MessageApply {
+    pub kind: MessageApplyKind,
+    pub framing: MessageFraming,
+}
+
+#[derive(Clone)]
+pub(super) enum MessageApplyKind {
     /// Singular or oneof child implements `LazyMessage`.
     SharedSingular,
     /// Repeated child implements `LazyMessage`.
     SharedRepeated,
-    /// Singular or oneof child is the eager type. Decode the LEN into the slot.
+    /// Singular or oneof child is the eager type. Decode the body into the slot.
     EagerSingular,
-    /// Repeated child is the eager type. Construct one value per LEN and push it.
+    /// Repeated child is the eager type. Construct one value per span and push it.
     EagerRepeated(Box<Type>),
 }
 

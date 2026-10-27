@@ -77,7 +77,7 @@ fn parse_default_lit(field_name: &str, raw: &str, wire: &WireTypeKind<'_>) -> Re
         WireTypeKind::String { .. } => Ok(DefaultLit::Str(raw.to_owned())),
         WireTypeKind::Bytes { .. } => unescape_c_bytes(field_name, raw).map(DefaultLit::Bytes),
         WireTypeKind::Enum { ty, .. } => parse_enum(field_name, raw, ty),
-        WireTypeKind::Message(_) => Err(Error::Codegen(format!(
+        WireTypeKind::Message { .. } => Err(Error::Codegen(format!(
             "field `{field_name}`: message fields cannot have default values"
         ))),
     }

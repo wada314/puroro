@@ -142,7 +142,10 @@ fn run_protoc(
     extra_includes: &[PathBuf],
 ) {
     let mut cmd = Command::new(protoc);
-    cmd.arg(format!("--plugin=protoc-gen-puroro={}", plugin.display()))
+    // protoc 24.x still gates `edition = "…"` behind this flag; newer releases
+    // keep accepting it after editions left experimental.
+    cmd.arg("--experimental_editions")
+        .arg(format!("--plugin=protoc-gen-puroro={}", plugin.display()))
         .arg(format!("--puroro_out={}", case_out.display()))
         .arg(format!("-I{}", case.dir.display()));
     for dir in extra_includes {

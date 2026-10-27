@@ -718,22 +718,25 @@ fn message_apply_arm(
     companion: &Ident,
     apply: &MessageApply,
 ) -> TokenStream {
-    let body = match apply {
-        MessageApply::SharedSingular => quote! {
+    use super::layout::MessageApplyKind;
+    use crate::field_kind::MessageFraming;
+
+    let body = match &apply.kind {
+        MessageApplyKind::SharedSingular => quote! {
             let root = self._common.lazy.scan.shared().clone_handle();
             #slot.merge_shared(&root, span, &mut self._common)
         },
-        MessageApply::SharedRepeated => quote! {
+        MessageApplyKind::SharedRepeated => quote! {
             let root = self._common.lazy.scan.shared().clone_handle();
             #slot.merge_shared(&root, span, &self._common)
         },
-        MessageApply::EagerSingular => quote! {
+        MessageApplyKind::EagerSingular => quote! {
             let payload = span.slice(self._common.lazy.scan.wire())?;
             let child = #slot.bind_mut(&mut self._common).get_mut();
             ::puroro::Message::merge_from(child, &mut &payload[..])?;
             ::core::result::Result::Ok(())
         },
-        MessageApply::EagerRepeated(child_ty) => quote! {
+        MessageApplyKind::EagerRepeated(child_ty) => quote! {
             let payload = span.slice(self._common.lazy.scan.wire())?;
             let mut child = #child_ty::new_in(self._common.alloc.clone());
             ::puroro::Message::merge_from(&mut child, &mut &payload[..])?;
@@ -741,9 +744,15 @@ fn message_apply_arm(
             ::core::result::Result::Ok(())
         },
     };
+    let span_fn = match apply.framing {
+        MessageFraming::LengthPrefixed => {
+            quote! { ::puroro_rt::decode::scanned_len_span }
+        }
+        MessageFraming::Group => quote! { ::puroro_rt::decode::scanned_group_span },
+    };
     quote! {
         #companion::#field_const => {
-            let span = ::puroro_rt::decode::scanned_len_span(origin, rec)?;
+            let span = #span_fn(origin, rec)?;
             #body
         }
     }

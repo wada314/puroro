@@ -18,6 +18,8 @@ use crate::default_value::CustomDefault;
 use crate::descriptor::features::{EnumType, RepeatedFieldEncoding, Utf8Validation};
 use crate::resolved::{Enum, Field, Message, SingularPresence, TypeRef};
 
+pub use crate::resolved::MessageFraming;
+
 /// Catalog shape for one generated field (struct member or oneof variant).
 #[derive(Debug, Clone)]
 pub enum FieldKind<'a> {
@@ -61,7 +63,10 @@ pub enum WireTypeKind<'a> {
     SFixed64,
     SInt32,
     SInt64,
-    Message(&'a Message<'a>),
+    Message {
+        ty: &'a Message<'a>,
+        framing: MessageFraming,
+    },
     Enum {
         ty: &'a Enum<'a>,
         openness: EnumType,
@@ -167,7 +172,10 @@ impl<'a> WireTypeKind<'a> {
             TypeRef::SFixed64 => Self::SFixed64,
             TypeRef::SInt32 => Self::SInt32,
             TypeRef::SInt64 => Self::SInt64,
-            TypeRef::Message(m) => Self::Message(m),
+            TypeRef::Message(m) => Self::Message {
+                ty: m,
+                framing: field.message_framing(),
+            },
             TypeRef::Enum(e) => Self::Enum {
                 ty: e,
                 openness: e.openness(),
@@ -175,10 +183,26 @@ impl<'a> WireTypeKind<'a> {
         }
     }
 
+    /// Nested message type when this wire is a message / group field.
+    pub fn as_message(self) -> Option<&'a Message<'a>> {
+        match self {
+            Self::Message { ty, .. } => Some(ty),
+            _ => None,
+        }
+    }
+
+    /// Framing when this wire is a message / group field.
+    pub fn message_framing(self) -> Option<MessageFraming> {
+        match self {
+            Self::Message { framing, .. } => Some(framing),
+            _ => None,
+        }
+    }
+
     /// Whether the type may use packed repeated wire encoding.
     pub fn is_packable(self) -> bool {
         match self {
-            Self::String { .. } | Self::Bytes { .. } | Self::Message(_) => false,
+            Self::String { .. } | Self::Bytes { .. } | Self::Message { .. } => false,
             Self::Double
             | Self::Float
             | Self::Int64

@@ -1,7 +1,7 @@
 //! Build a [`FileSet`](super::FileSet) inside a caller-owned [`Arena`](super::Arena).
 
 use super::{
-    Arena, Enum, EnumValue, Field, FieldOccurrence, File, FileSet, Message, Oneof,
+    Arena, Enum, EnumValue, Field, FieldOccurrence, File, FileSet, Message, MessageFraming, Oneof,
     SingularPresence, TypeRef,
 };
 use crate::descriptor::features::{
@@ -283,13 +283,6 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
         file: &ProtoFile,
         oneof_remap: &OneofRemap,
     ) -> Result<Field<'a>> {
-        if field.type_ == FieldType::Group {
-            return Err(Error::Codegen(format!(
-                "field `{owner_fqn}.{}`: deprecated group fields are not supported",
-                field.name
-            )));
-        }
-
         if matches!(file.syntax, Syntax::Editions(_)) {
             field
                 .features
@@ -297,17 +290,8 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
         }
 
         let features = FinalizedFeatureSet::resolve_field(file, field, self.proto2_utf8);
-
-        if matches!(field.type_, FieldType::Message)
-            && features.message_encoding == MessageEncoding::Delimited
-        {
-            return Err(Error::Codegen(format!(
-                "field `{owner_fqn}.{}`: features.message_encoding=DELIMITED is not supported",
-                field.name
-            )));
-        }
-
         let type_ref = self.resolve_type_ref(field, owner_fqn)?;
+        let message_framing = message_framing_for(field, &features, &type_ref);
 
         Ok(Field {
             name: field.name.clone(),
@@ -322,6 +306,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             message_layout: field.message_layout,
             child_parse: field.child_parse,
             legacy_required: features.field_presence == FieldPresence::LegacyRequired,
+            message_framing,
         })
     }
 
@@ -342,16 +327,21 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             FieldType::SFixed64 => TypeRef::SFixed64,
             FieldType::SInt32 => TypeRef::SInt32,
             FieldType::SInt64 => TypeRef::SInt64,
-            FieldType::Message => {
+            FieldType::Message | FieldType::Group => {
+                let kind = if field.type_ == FieldType::Group {
+                    "group"
+                } else {
+                    "message"
+                };
                 let type_name = field.type_name.as_ref().ok_or_else(|| {
                     Error::Codegen(format!(
-                        "field `{owner_fqn}.{}` has message type but no type_name",
+                        "field `{owner_fqn}.{}` has {kind} type but no type_name",
                         field.name
                     ))
                 })?;
                 let target = self.lookup_message(type_name).ok_or_else(|| {
                     Error::Codegen(format!(
-                        "field `{owner_fqn}.{}` references unknown message type `{type_name}`",
+                        "field `{owner_fqn}.{}` references unknown {kind} type `{type_name}`",
                         field.name
                     ))
                 })?;
@@ -372,7 +362,6 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
                 })?;
                 TypeRef::Enum(target)
             }
-            FieldType::Group => unreachable!("rejected above"),
         })
     }
 
@@ -478,7 +467,7 @@ impl FieldOccurrence {
             return Self::Singular(SingularPresence::Oneof);
         }
 
-        if field.type_ == FieldType::Message {
+        if matches!(field.type_, FieldType::Message | FieldType::Group) {
             return Self::Singular(SingularPresence::Message);
         }
 
@@ -487,6 +476,22 @@ impl FieldOccurrence {
             FieldPresence::Implicit => SingularPresence::Implicit,
             FieldPresence::LegacyRequired => SingularPresence::LegacyRequired,
         })
+    }
+}
+
+/// Classic `TYPE_GROUP` and Editions `DELIMITED` share start/end-group framing.
+fn message_framing_for(
+    field: &FieldDesc,
+    features: &FinalizedFeatureSet,
+    type_ref: &TypeRef<'_>,
+) -> MessageFraming {
+    if !matches!(type_ref, TypeRef::Message(_)) {
+        return MessageFraming::LengthPrefixed;
+    }
+    if field.type_ == FieldType::Group || features.message_encoding == MessageEncoding::Delimited {
+        MessageFraming::Group
+    } else {
+        MessageFraming::LengthPrefixed
     }
 }
 
@@ -1061,8 +1066,9 @@ mod tests {
     }
 
     #[test]
-    fn editions_delimited_message_encoding_errors() {
+    fn editions_delimited_message_encoding_resolves_group_framing() {
         use crate::descriptor::features::MessageEncoding;
+        use crate::resolved::MessageFraming;
 
         let arena = Arena::new();
         let files = [proto_file(
@@ -1084,19 +1090,29 @@ mod tests {
             ],
             vec![],
         )];
-        let err = resolve(&arena, &files).unwrap_err();
-        assert!(err.to_string().contains("DELIMITED"));
+        let file_set = resolve(&arena, &files).unwrap();
+        let outer = lookup_message(&file_set, ".ed.Outer").unwrap();
+        let field = outer.fields().next().unwrap();
+        assert!(matches!(field.type_ref(), TypeRef::Message(_)));
+        assert_eq!(field.message_framing(), MessageFraming::Group);
+        assert_eq!(
+            field.occurrence(),
+            FieldOccurrence::Singular(SingularPresence::Message)
+        );
     }
 
     #[test]
-    fn group_field_is_rejected() {
+    fn group_field_resolves_like_message_with_group_framing() {
+        use crate::resolved::MessageFraming;
+
         let arena = Arena::new();
         let files = [proto_file(
             "p2",
             Syntax::Proto2,
             vec![MessageDesc {
+                // Classic `group G = 1 { … }` nests the type under the parent.
                 fields: vec![FieldDesc {
-                    type_name: Some(ProtoFqn::parse(".p2.G")),
+                    type_name: Some(ProtoFqn::parse(".p2.M.G")),
                     ..desc::field("g", 1, FieldType::Group)
                 }],
                 nested_messages: vec![desc::message("G")],
@@ -1104,8 +1120,16 @@ mod tests {
             }],
             vec![],
         )];
-        let err = resolve(&arena, &files).unwrap_err();
-        assert!(err.to_string().contains("group"), "unexpected error: {err}");
+        let file_set = resolve(&arena, &files).unwrap();
+        let m = lookup_message(&file_set, ".p2.M").unwrap();
+        let field = m.fields().next().unwrap();
+        assert!(matches!(field.type_ref(), TypeRef::Message(_)));
+        assert_eq!(field.message_framing(), MessageFraming::Group);
+        assert_eq!(
+            field.occurrence(),
+            FieldOccurrence::Singular(SingularPresence::Message)
+        );
+        assert!(lookup_message(&file_set, ".p2.M.G").is_some());
     }
 
     #[test]
