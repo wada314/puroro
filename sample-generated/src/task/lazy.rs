@@ -6,12 +6,15 @@
 //! `into_eager` re-merges `_wire` into [`Task`](crate::Task).
 
 use ::allocator_api2::alloc::{Allocator, Global};
+use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::{Buf, BufMut};
 use ::core::fmt::{self, Debug, Formatter};
 use ::core::iter;
 use ::core::ops::Deref;
 use ::puroro::{DecodeBuf, DecodeError, HasDefault, MapRef, Message, Optional, RECURSION_LIMIT};
-use ::puroro_rt::decode::{LazyMessage, LazyScan, ScannedRecord, scanned_len_span};
+use ::puroro_rt::decode::{
+    LazyMessage, LazyScan, ScannedRecord, scanned_len_span, take_group_body,
+};
 use ::puroro_rt::{
     CloneIn, DeallocateIn, DefaultIn, EncodeCtx, FieldCloneIn, InteriorBitArray, LazyMessageCommon,
     MapField, MergeBound, MessageEncode, MessageMerge, OneofGroup, OneofSlot, RepeatedField,
@@ -617,8 +620,8 @@ impl<A: Allocator + Clone> MessageMerge for TaskLazy<A> {
         match bound {
             MergeBound::Message => self.ingest_buf(buf),
             MergeBound::Group(group) => {
-                let mut body = ::allocator_api2::vec::Vec::new_in(self._common.alloc.clone());
-                ::puroro_rt::decode::take_group_body(group, buf, &mut body)?;
+                let mut body = AllocVec::new_in(self._common.alloc.clone());
+                take_group_body(group, buf, &mut body)?;
                 let mut slice: &[u8] = body.as_slice();
                 self.ingest_buf(&mut slice)
             }

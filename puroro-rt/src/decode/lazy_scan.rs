@@ -4,6 +4,7 @@ use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::BufMut;
 use ::core::cell::Cell;
+use ::core::cmp::PartialEq;
 use ::core::ptr;
 use ::puroro::DecodeError;
 use ::std::vec::Vec;
@@ -322,7 +323,7 @@ pub trait LazyMessage<A: Allocator + Clone> {
     /// is unfinished, or building the eager message fails, including
     /// `DecodeError::InvalidUtf8`), compare ingested body bytes so equality
     /// stays reflexive. One success and one failure is not equal.
-    fn eq_with_eager<E: ::core::cmp::PartialEq>(
+    fn eq_with_eager<E: PartialEq>(
         &self,
         other: &Self,
         to_eager: impl Fn(&Self) -> Result<E, DecodeError>,

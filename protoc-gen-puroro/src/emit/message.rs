@@ -520,14 +520,14 @@ pub(super) fn render_items(
                 }
                 while ::bytes::Buf::has_remaining(buf) {
                     let (field_number, wire_type) = ::puroro_rt::decode::decode_tag(buf)?;
-                    if let ::puroro_rt::MergeBound::Group(g) = bound {
-                        if wire_type == ::puroro::WireType::EGroup {
-                            return if field_number == g {
-                                ::core::result::Result::Ok(())
-                            } else {
-                                ::core::result::Result::Err(::puroro::DecodeError::InvalidTag)
-                            };
-                        }
+                    if let ::puroro_rt::MergeBound::Group(g) = bound
+                        && wire_type == ::puroro::WireType::EGroup
+                    {
+                        return if field_number == g {
+                            ::core::result::Result::Ok(())
+                        } else {
+                            ::core::result::Result::Err(::puroro::DecodeError::InvalidTag)
+                        };
                     }
                     match field_number.as_u32() {
                         #(#merge_arms)*

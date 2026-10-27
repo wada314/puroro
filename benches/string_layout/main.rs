@@ -168,14 +168,14 @@ macro_rules! impl_eight_string_message {
                 }
                 while buf.has_remaining() {
                     let (field_number, wire_type) = decode_tag(buf)?;
-                    if let MergeBound::Group(g) = bound {
-                        if wire_type == WireType::EGroup {
-                            return if field_number == g {
-                                Ok(())
-                            } else {
-                                Err(DecodeError::InvalidTag)
-                            };
-                        }
+                    if let MergeBound::Group(g) = bound
+                        && wire_type == WireType::EGroup
+                    {
+                        return if field_number == g {
+                            Ok(())
+                        } else {
+                            Err(DecodeError::InvalidTag)
+                        };
                     }
                     match field_number.as_u32() {
                         1 => self

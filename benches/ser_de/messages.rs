@@ -136,14 +136,14 @@ impl<A: Allocator + Clone> MessageMerge for FlatScalars<A> {
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
-            if let MergeBound::Group(g) = bound {
-                if wire_type == WireType::EGroup {
-                    return if field_number == g {
-                        Ok(())
-                    } else {
-                        Err(DecodeError::InvalidTag)
-                    };
-                }
+            if let MergeBound::Group(g) = bound
+                && wire_type == WireType::EGroup
+            {
+                return if field_number == g {
+                    Ok(())
+                } else {
+                    Err(DecodeError::InvalidTag)
+                };
             }
             match field_number.as_u32() {
                 1 => self
@@ -319,14 +319,14 @@ impl<A: Allocator + Clone> MessageMerge for Nest<A> {
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
-            if let MergeBound::Group(g) = bound {
-                if wire_type == WireType::EGroup {
-                    return if field_number == g {
-                        Ok(())
-                    } else {
-                        Err(DecodeError::InvalidTag)
-                    };
-                }
+            if let MergeBound::Group(g) = bound
+                && wire_type == WireType::EGroup
+            {
+                return if field_number == g {
+                    Ok(())
+                } else {
+                    Err(DecodeError::InvalidTag)
+                };
             }
             match field_number.as_u32() {
                 1 => self
@@ -470,14 +470,14 @@ impl<A: Allocator + Clone> MessageMerge for Leaf<A> {
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
-            if let MergeBound::Group(g) = bound {
-                if wire_type == WireType::EGroup {
-                    return if field_number == g {
-                        Ok(())
-                    } else {
-                        Err(DecodeError::InvalidTag)
-                    };
-                }
+            if let MergeBound::Group(g) = bound
+                && wire_type == WireType::EGroup
+            {
+                return if field_number == g {
+                    Ok(())
+                } else {
+                    Err(DecodeError::InvalidTag)
+                };
             }
             match field_number.as_u32() {
                 1 => self
@@ -625,14 +625,14 @@ macro_rules! impl_wrap_message {
                 }
                 while buf.has_remaining() {
                     let (field_number, wire_type) = decode_tag(buf)?;
-                    if let MergeBound::Group(g) = bound {
-                        if wire_type == WireType::EGroup {
-                            return if field_number == g {
-                                Ok(())
-                            } else {
-                                Err(DecodeError::InvalidTag)
-                            };
-                        }
+                    if let MergeBound::Group(g) = bound
+                        && wire_type == WireType::EGroup
+                    {
+                        return if field_number == g {
+                            Ok(())
+                        } else {
+                            Err(DecodeError::InvalidTag)
+                        };
                     }
                     match field_number.as_u32() {
                         1 => self
@@ -782,14 +782,14 @@ impl<A: Allocator + Clone> MessageMerge for PackedInts<A> {
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
-            if let MergeBound::Group(g) = bound {
-                if wire_type == WireType::EGroup {
-                    return if field_number == g {
-                        Ok(())
-                    } else {
-                        Err(DecodeError::InvalidTag)
-                    };
-                }
+            if let MergeBound::Group(g) = bound
+                && wire_type == WireType::EGroup
+            {
+                return if field_number == g {
+                    Ok(())
+                } else {
+                    Err(DecodeError::InvalidTag)
+                };
             }
             match field_number.as_u32() {
                 1 => self
@@ -970,14 +970,14 @@ impl<A: Allocator + Clone> MessageMerge for StringHeavy<A> {
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
-            if let MergeBound::Group(g) = bound {
-                if wire_type == WireType::EGroup {
-                    return if field_number == g {
-                        Ok(())
-                    } else {
-                        Err(DecodeError::InvalidTag)
-                    };
-                }
+            if let MergeBound::Group(g) = bound
+                && wire_type == WireType::EGroup
+            {
+                return if field_number == g {
+                    Ok(())
+                } else {
+                    Err(DecodeError::InvalidTag)
+                };
             }
             match field_number.as_u32() {
                 1 => self
@@ -1149,14 +1149,14 @@ impl<A: Allocator + Clone> MessageMerge for ShortStrings<A> {
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
-            if let MergeBound::Group(g) = bound {
-                if wire_type == WireType::EGroup {
-                    return if field_number == g {
-                        Ok(())
-                    } else {
-                        Err(DecodeError::InvalidTag)
-                    };
-                }
+            if let MergeBound::Group(g) = bound
+                && wire_type == WireType::EGroup
+            {
+                return if field_number == g {
+                    Ok(())
+                } else {
+                    Err(DecodeError::InvalidTag)
+                };
             }
             match field_number.as_u32() {
                 1 => self

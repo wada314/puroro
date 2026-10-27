@@ -23,6 +23,7 @@ pub use self::varint::{
 };
 
 use ::allocator_api2::alloc::Allocator;
+use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::Buf;
 use ::protobuf_core::{FieldNumber, Varint};
 use ::puroro::wire_type;
@@ -232,7 +233,7 @@ impl GroupBodyOut for DiscardGroupBody {
     fn write_bytes(&mut self, _bytes: &[u8]) {}
 }
 
-impl<A: Allocator> GroupBodyOut for ::allocator_api2::vec::Vec<u8, A> {
+impl<A: Allocator> GroupBodyOut for AllocVec<u8, A> {
     #[inline]
     fn write_tag(&mut self, field: FieldNumber, wire_type: WireType) {
         encode::write_tag_to_vec(field, wire_type, self);
@@ -524,7 +525,7 @@ mod group_tests {
     use ::protobuf_core::FieldNumber;
 
     use super::{
-        decode_tag, iter_unknown_fields, skip_field, skip_field_and_save, take_group_body,
+        AllocVec, decode_tag, iter_unknown_fields, skip_field, skip_field_and_save, take_group_body,
     };
     use crate::encode;
     use crate::unknown_fields::UnknownFields;
@@ -574,11 +575,11 @@ mod group_tests {
         let mut buf = bytes.as_slice();
         let (num, wt) = decode_tag(&mut buf).unwrap();
         assert_eq!(wt, WireType::SGroup);
-        let mut body = ::allocator_api2::vec::Vec::new_in(Global);
+        let mut body = AllocVec::new_in(Global);
         take_group_body(num, &mut buf, &mut body).unwrap();
         assert!(buf.is_empty());
         // body is field 2 = 150 only
-        let mut expected = ::allocator_api2::vec::Vec::new_in(Global);
+        let mut expected = AllocVec::new_in(Global);
         encode::write_tag_to_vec(field(2), WireType::Varint, &mut expected);
         encode::write_varint_to_vec(::protobuf_core::Varint::from_uint64(150), &mut expected);
         assert_eq!(body.as_slice(), expected.as_slice());
@@ -610,7 +611,7 @@ mod group_tests {
         assert_eq!(fields[0].wire_type(), WireType::SGroup);
         match fields[0].payload() {
             UnknownPayload::Group(body) => {
-                let mut expected = ::allocator_api2::vec::Vec::new_in(Global);
+                let mut expected = AllocVec::new_in(Global);
                 encode::write_tag_to_vec(field(2), WireType::Varint, &mut expected);
                 encode::write_varint_to_vec(
                     ::protobuf_core::Varint::from_uint64(150),
