@@ -26,7 +26,7 @@ use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode
 use crate::fields::shared::{DefaultIn, FieldDeallocate, MessageCommon, MessageCommonAlloc};
 use crate::fields::wire::len::{ProtoBytes, ProtoString, ProtoStringUnchecked};
 use crate::fields::wire::numerical::{Numerical, NumericalType};
-use crate::fields::wire::proto_message::ProtoMessage;
+use crate::fields::wire::proto_message::{GroupDelimited, LengthPrefixed, ProtoMessage};
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedVecMut,
 };
@@ -542,29 +542,37 @@ where
     Ok(())
 }
 
-impl<M, E, const FIELD: u32, A> RepeatedField<ProtoMessage<M>, E, FIELD, A>
-where
-    M: MessageEncode + LazyMessage<A> + DefaultIn<A>,
-    E: RepeatedEncoding<ProtoMessage<M>, A>,
-    A: Allocator + Clone,
-{
-    /// Append one still-lazy child that records `span` on the island-root buffer.
-    ///
-    /// Does not walk the child's tags. The child's first field getter parses
-    /// stored regions. Distinct from singular last-wins: each occurrence is a
-    /// new list element (same as eager repeated message).
-    pub fn merge_shared<Cx: MessageCommonAlloc<Alloc = A>>(
-        &mut self,
-        root: &SharedWire<A>,
-        span: WireSpan,
-        common: &Cx,
-    ) -> Result<(), DecodeError> {
-        let mut child = M::default_in(common.clone_alloc());
-        child.merge_shared(root, span)?;
-        self.push_in(child, common.clone_alloc());
-        Ok(())
-    }
+macro_rules! impl_repeated_merge_shared_proto_message {
+    ($W:ty) => {
+        impl<M, E, const FIELD: u32, A> RepeatedField<ProtoMessage<M, $W>, E, FIELD, A>
+        where
+            M: MessageEncode + LazyMessage<A> + DefaultIn<A>,
+            E: RepeatedEncoding<ProtoMessage<M, $W>, A>,
+            A: Allocator + Clone,
+        {
+            /// Append one still-lazy child that records `span` on the island-root buffer.
+            ///
+            /// Does not walk the child's tags. The child's first field getter parses
+            /// stored regions. Distinct from singular last-wins: each occurrence is a
+            /// new list element (same as eager repeated message). Works for
+            /// length-prefixed and group-delimited children.
+            pub fn merge_shared<Cx: MessageCommonAlloc<Alloc = A>>(
+                &mut self,
+                root: &SharedWire<A>,
+                span: WireSpan,
+                common: &Cx,
+            ) -> Result<(), DecodeError> {
+                let mut child = M::default_in(common.clone_alloc());
+                child.merge_shared(root, span)?;
+                self.push_in(child, common.clone_alloc());
+                Ok(())
+            }
+        }
+    };
 }
+
+impl_repeated_merge_shared_proto_message!(LengthPrefixed);
+impl_repeated_merge_shared_proto_message!(GroupDelimited);
 
 impl<T, E, const FIELD: u32, A, P> FieldPartialEq<MessageCommon<P, A>>
     for RepeatedField<T, E, FIELD, A>

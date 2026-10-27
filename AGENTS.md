@@ -18,7 +18,7 @@ Instructions for coding agents working in this repository. Human-oriented docs s
 
 Library users of generated messages depend on the generated crate and `puroro` only. Do not surface `puroro-rt` types in public generated signatures.
 
-Lazy `RecordScanner` emits `ScannedRecord` / `ScannedValue`. LEN is a span into `_wire`, not a `protobuf_core::Field` / owned payload. Do not copy complete LEN bodies into the scan record. Numerical apply uses catalog `merge_scanned` (`CopyWirePayload::from_scanned`). Do not rematch scalars through `merge_scanned_field`. Packed LEN uses the scanned `payload_len` (`merge_packed_buf`); do not re-read the length prefix. Do not re-land island-first leftover-as-offset / `push_bytes` ingest: it did not move typical decode and duplicated leftover state.
+Lazy `RecordScanner` emits `ScannedRecord` / `ScannedValue`. LEN and group bodies are spans into `_wire`, not a `protobuf_core::Field` / owned payload (`ScannedValue::Len` / `Group { payload_len }`; group excludes start/end tags). Do not copy complete LEN or group bodies into the scan record. Numerical apply uses catalog `merge_scanned` (`CopyWirePayload::from_scanned`). Do not rematch scalars through `merge_scanned_field`. Packed LEN uses the scanned `payload_len` (`merge_packed_buf`); do not re-read the length prefix. Known lazy groups use `scanned_group_span` + `merge_shared` (not `merge_scanned_field`, which returns `InvalidTag` for `Group`). Do not re-land island-first leftover-as-offset / `push_bytes` ingest: it did not move typical decode and duplicated leftover state.
 
 ## Setup
 

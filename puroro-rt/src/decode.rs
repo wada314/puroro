@@ -12,8 +12,8 @@ mod varint;
 
 pub use self::lazy_scan::{Eager, Lazy, LazyMessage, LazyScan, MessageScan};
 pub use self::record::{
-    RecordScanner, ScannedRecord, ScannedValue, WireSpan, merge_scanned_field, scanned_len_payload,
-    scanned_len_span,
+    RecordScanner, ScannedRecord, ScannedValue, WireSpan, merge_scanned_field, scanned_group_span,
+    scanned_len_payload, scanned_len_span,
 };
 pub use self::shared_wire::SharedWire;
 pub use self::varint::{
