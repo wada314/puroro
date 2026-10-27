@@ -4,12 +4,12 @@ use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
-use ::puroro::{DecodeBuf, DecodeError, Message};
+use ::puroro::{DecodeBuf, DecodeError, Message, WireType};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
     Boxed, EncodeCtx, Explicit, FieldDeallocate, FieldEncode, Implicit, Inline, InlineOrHeap,
-    Message as MessagePresence, MessageCommon, MessageEncode, MessageMerge, Packed, ProtoBytes,
-    ProtoInt32, ProtoMessage, ProtoString, ProtoUInt64, RepeatedField, SingularField,
+    MergeBound, Message as MessagePresence, MessageCommon, MessageEncode, MessageMerge, Packed,
+    ProtoBytes, ProtoInt32, ProtoMessage, ProtoString, ProtoUInt64, RepeatedField, SingularField,
 };
 
 macro_rules! drop_fields {
@@ -125,16 +125,26 @@ impl<A: Allocator + Clone> MessageEncode for FlatScalars<A> {
 }
 
 impl<A: Allocator + Clone> MessageMerge for FlatScalars<A> {
-    fn merge_from_with_depth<B: DecodeBuf>(
+    fn merge_from_bounded<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
         depth: usize,
+        bound: MergeBound,
     ) -> Result<(), DecodeError> {
         if depth >= ::puroro::RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
+            if let MergeBound::Group(g) = bound
+                && wire_type == WireType::EGroup
+            {
+                return if field_number == g {
+                    Ok(())
+                } else {
+                    Err(DecodeError::InvalidTag)
+                };
+            }
             match field_number.as_u32() {
                 1 => self
                     .a
@@ -177,7 +187,10 @@ impl<A: Allocator + Clone> MessageMerge for FlatScalars<A> {
                 )?,
             }
         }
-        Ok(())
+        match bound {
+            MergeBound::Message => Ok(()),
+            MergeBound::Group(_) => Err(DecodeError::UnexpectedEof),
+        }
     }
 }
 
@@ -295,16 +308,26 @@ impl<A: Allocator + Clone> MessageEncode for Nest<A> {
 }
 
 impl<A: Allocator + Clone> MessageMerge for Nest<A> {
-    fn merge_from_with_depth<B: DecodeBuf>(
+    fn merge_from_bounded<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
         depth: usize,
+        bound: MergeBound,
     ) -> Result<(), DecodeError> {
         if depth >= ::puroro::RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
+            if let MergeBound::Group(g) = bound
+                && wire_type == WireType::EGroup
+            {
+                return if field_number == g {
+                    Ok(())
+                } else {
+                    Err(DecodeError::InvalidTag)
+                };
+            }
             match field_number.as_u32() {
                 1 => self
                     .child
@@ -323,7 +346,10 @@ impl<A: Allocator + Clone> MessageMerge for Nest<A> {
                 )?,
             }
         }
-        Ok(())
+        match bound {
+            MergeBound::Message => Ok(()),
+            MergeBound::Group(_) => Err(DecodeError::UnexpectedEof),
+        }
     }
 }
 
@@ -433,16 +459,26 @@ impl<A: Allocator + Clone> MessageEncode for Leaf<A> {
 }
 
 impl<A: Allocator + Clone> MessageMerge for Leaf<A> {
-    fn merge_from_with_depth<B: DecodeBuf>(
+    fn merge_from_bounded<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
         depth: usize,
+        bound: MergeBound,
     ) -> Result<(), DecodeError> {
         if depth >= ::puroro::RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
+            if let MergeBound::Group(g) = bound
+                && wire_type == WireType::EGroup
+            {
+                return if field_number == g {
+                    Ok(())
+                } else {
+                    Err(DecodeError::InvalidTag)
+                };
+            }
             match field_number.as_u32() {
                 1 => self
                     .value
@@ -457,7 +493,10 @@ impl<A: Allocator + Clone> MessageMerge for Leaf<A> {
                 )?,
             }
         }
-        Ok(())
+        match bound {
+            MergeBound::Message => Ok(()),
+            MergeBound::Group(_) => Err(DecodeError::UnexpectedEof),
+        }
     }
 }
 
@@ -575,16 +614,26 @@ macro_rules! impl_wrap_message {
         }
 
         impl<A: Allocator + Clone> MessageMerge for $ty<A> {
-            fn merge_from_with_depth<B: DecodeBuf>(
+            fn merge_from_bounded<B: DecodeBuf>(
                 &mut self,
                 buf: &mut B,
                 depth: usize,
+                bound: MergeBound,
             ) -> Result<(), DecodeError> {
                 if depth >= ::puroro::RECURSION_LIMIT {
                     return Err(DecodeError::RecursionLimitExceeded);
                 }
                 while buf.has_remaining() {
                     let (field_number, wire_type) = decode_tag(buf)?;
+                    if let MergeBound::Group(g) = bound
+                        && wire_type == WireType::EGroup
+                    {
+                        return if field_number == g {
+                            Ok(())
+                        } else {
+                            Err(DecodeError::InvalidTag)
+                        };
+                    }
                     match field_number.as_u32() {
                         1 => self
                             .child
@@ -603,7 +652,10 @@ macro_rules! impl_wrap_message {
                         )?,
                     }
                 }
-                Ok(())
+                match bound {
+                    MergeBound::Message => Ok(()),
+                    MergeBound::Group(_) => Err(DecodeError::UnexpectedEof),
+                }
             }
         }
 
@@ -719,16 +771,26 @@ impl<A: Allocator + Clone> MessageEncode for PackedInts<A> {
 }
 
 impl<A: Allocator + Clone> MessageMerge for PackedInts<A> {
-    fn merge_from_with_depth<B: DecodeBuf>(
+    fn merge_from_bounded<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
         depth: usize,
+        bound: MergeBound,
     ) -> Result<(), DecodeError> {
         if depth >= ::puroro::RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
+            if let MergeBound::Group(g) = bound
+                && wire_type == WireType::EGroup
+            {
+                return if field_number == g {
+                    Ok(())
+                } else {
+                    Err(DecodeError::InvalidTag)
+                };
+            }
             match field_number.as_u32() {
                 1 => self
                     .values
@@ -743,7 +805,10 @@ impl<A: Allocator + Clone> MessageMerge for PackedInts<A> {
                 )?,
             }
         }
-        Ok(())
+        match bound {
+            MergeBound::Message => Ok(()),
+            MergeBound::Group(_) => Err(DecodeError::UnexpectedEof),
+        }
     }
 }
 
@@ -894,16 +959,26 @@ impl<A: Allocator + Clone> MessageEncode for StringHeavy<A> {
 }
 
 impl<A: Allocator + Clone> MessageMerge for StringHeavy<A> {
-    fn merge_from_with_depth<B: DecodeBuf>(
+    fn merge_from_bounded<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
         depth: usize,
+        bound: MergeBound,
     ) -> Result<(), DecodeError> {
         if depth >= ::puroro::RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
+            if let MergeBound::Group(g) = bound
+                && wire_type == WireType::EGroup
+            {
+                return if field_number == g {
+                    Ok(())
+                } else {
+                    Err(DecodeError::InvalidTag)
+                };
+            }
             match field_number.as_u32() {
                 1 => self
                     .s0
@@ -934,7 +1009,10 @@ impl<A: Allocator + Clone> MessageMerge for StringHeavy<A> {
                 )?,
             }
         }
-        Ok(())
+        match bound {
+            MergeBound::Message => Ok(()),
+            MergeBound::Group(_) => Err(DecodeError::UnexpectedEof),
+        }
     }
 }
 
@@ -1060,16 +1138,26 @@ impl<A: Allocator + Clone> MessageEncode for ShortStrings<A> {
 }
 
 impl<A: Allocator + Clone> MessageMerge for ShortStrings<A> {
-    fn merge_from_with_depth<B: DecodeBuf>(
+    fn merge_from_bounded<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
         depth: usize,
+        bound: MergeBound,
     ) -> Result<(), DecodeError> {
         if depth >= ::puroro::RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
+            if let MergeBound::Group(g) = bound
+                && wire_type == WireType::EGroup
+            {
+                return if field_number == g {
+                    Ok(())
+                } else {
+                    Err(DecodeError::InvalidTag)
+                };
+            }
             match field_number.as_u32() {
                 1 => self
                     .s0
@@ -1112,7 +1200,10 @@ impl<A: Allocator + Clone> MessageMerge for ShortStrings<A> {
                 )?,
             }
         }
-        Ok(())
+        match bound {
+            MergeBound::Message => Ok(()),
+            MergeBound::Group(_) => Err(DecodeError::UnexpectedEof),
+        }
     }
 }
 

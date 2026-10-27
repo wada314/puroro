@@ -114,32 +114,36 @@ where
             }
         };
         match field_number.as_u32() {
-            KEY_FIELD => match K::decode_element(wire_type, buf, alloc.clone(), depth) {
-                Ok(next) => {
-                    if let Some(old) = key.replace(next) {
-                        // SAFETY: message allocator owns replaced key payloads.
-                        unsafe { K::deallocate_element(old, &alloc) };
+            KEY_FIELD => {
+                match K::decode_element(field_number, wire_type, buf, alloc.clone(), depth) {
+                    Ok(next) => {
+                        if let Some(old) = key.replace(next) {
+                            // SAFETY: message allocator owns replaced key payloads.
+                            unsafe { K::deallocate_element(old, &alloc) };
+                        }
+                    }
+                    Err(e) => {
+                        discard_partial_entry::<K, V, A>(key, value, &alloc);
+                        return Err(e);
                     }
                 }
-                Err(e) => {
-                    discard_partial_entry::<K, V, A>(key, value, &alloc);
-                    return Err(e);
-                }
-            },
-            VALUE_FIELD => match V::decode_element(wire_type, buf, alloc.clone(), depth) {
-                Ok(next) => {
-                    if let Some(old) = value.replace(next) {
-                        // SAFETY: message allocator owns replaced value payloads.
-                        unsafe { V::deallocate_element(old, &alloc) };
+            }
+            VALUE_FIELD => {
+                match V::decode_element(field_number, wire_type, buf, alloc.clone(), depth) {
+                    Ok(next) => {
+                        if let Some(old) = value.replace(next) {
+                            // SAFETY: message allocator owns replaced value payloads.
+                            unsafe { V::deallocate_element(old, &alloc) };
+                        }
+                    }
+                    Err(e) => {
+                        discard_partial_entry::<K, V, A>(key, value, &alloc);
+                        return Err(e);
                     }
                 }
-                Err(e) => {
-                    discard_partial_entry::<K, V, A>(key, value, &alloc);
-                    return Err(e);
-                }
-            },
+            }
             _ => {
-                if let Err(e) = decode::skip_field(wire_type, buf) {
+                if let Err(e) = decode::skip_field(field_number, wire_type, buf) {
                     discard_partial_entry::<K, V, A>(key, value, &alloc);
                     return Err(e);
                 }

@@ -115,30 +115,37 @@ impl<A: Allocator, C: BytesLikeLenCodec> ProtoRefDebug<A> for LenScalar<C> {
 }
 
 /// Nested messages: bound is `M: PartialEq` / `Debug` (no `A: 'static` HRTB).
-impl<M, A> ProtoRefEq<A> for ProtoMessage<M>
-where
-    M: MessageEncode + PartialEq,
-    A: Allocator,
-{
-    #[inline]
-    fn option_eq<'a>(lhs: Option<&'a M>, rhs: Option<&'a M>) -> bool
-    where
-        A: 'a,
-    {
-        lhs == rhs
-    }
+macro_rules! impl_proto_ref_ops_message {
+    ($W:ty) => {
+        impl<M, A> ProtoRefEq<A> for ProtoMessage<M, $W>
+        where
+            M: MessageEncode + PartialEq,
+            A: Allocator,
+        {
+            #[inline]
+            fn option_eq<'a>(lhs: Option<&'a M>, rhs: Option<&'a M>) -> bool
+            where
+                A: 'a,
+            {
+                lhs == rhs
+            }
+        }
+
+        impl<M, A> ProtoRefDebug<A> for ProtoMessage<M, $W>
+        where
+            M: MessageEncode + Debug,
+            A: Allocator,
+        {
+            #[inline]
+            fn fmt_ref<'a>(value: &&'a M, f: &mut Formatter<'_>) -> FmtResult
+            where
+                A: 'a,
+            {
+                Debug::fmt(*value, f)
+            }
+        }
+    };
 }
 
-impl<M, A> ProtoRefDebug<A> for ProtoMessage<M>
-where
-    M: MessageEncode + Debug,
-    A: Allocator,
-{
-    #[inline]
-    fn fmt_ref<'a>(value: &&'a M, f: &mut Formatter<'_>) -> FmtResult
-    where
-        A: 'a,
-    {
-        Debug::fmt(*value, f)
-    }
-}
+impl_proto_ref_ops_message!(super::proto_message::LengthPrefixed);
+impl_proto_ref_ops_message!(super::proto_message::GroupDelimited);

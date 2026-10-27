@@ -1,0 +1,13 @@
+edition = "2023";
+
+package groups_editions;
+
+message Inner {
+  int32 n = 1;
+}
+
+message Outer {
+  Inner delimited = 1 [features.message_encoding = DELIMITED];
+  repeated Inner items = 2 [features.message_encoding = DELIMITED];
+  Inner prefixed = 3; // LENGTH_PREFIXED default
+}

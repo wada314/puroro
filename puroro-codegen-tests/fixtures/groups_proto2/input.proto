@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package groups_proto2;
+
+message Holder {
+  optional group OptionalItem = 1 {
+    optional int32 id = 1;
+    optional string label = 2;
+  }
+  repeated group RepeatedItem = 2 {
+    optional int32 n = 1;
+  }
+}

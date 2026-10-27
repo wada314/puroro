@@ -26,7 +26,7 @@ use crate::decode;
 use crate::fields::wire::len::{BytesLikeLenCodec, LenScalar, ProtoString};
 use crate::fields::wire::numerical::ProtoBool;
 use crate::fields::wire::numerical::{BoolCodec, NumericalType};
-use crate::fields::wire::proto_message::ProtoMessage;
+use crate::fields::wire::proto_message::{GroupDelimited, LengthPrefixed, ProtoMessage};
 use crate::fields::wire::singular_type::{PayloadAccess, PayloadMerge, SingularType};
 use crate::fields::wire::sso_buf::{InlineBuf, SsoBuf, SsoHeap, pack_inline_buf};
 use crate::fields::wire::sso_bytes::{SsoBytes, SsoBytesMut, pack_written as pack_written_bytes};
@@ -279,87 +279,111 @@ where
     }
 }
 
-impl<M, A: Allocator> ValueLayout<ProtoMessage<M>, A> for Boxed
-where
-    M: MessageEncode + DeallocateIn<A>,
-{
-    type Slot = UnmanagedBox<M, A>;
+macro_rules! impl_boxed_value_layout_proto_message {
+    ($W:ty) => {
+        impl<M, A: Allocator> ValueLayout<ProtoMessage<M, $W>, A> for Boxed
+        where
+            M: MessageEncode + DeallocateIn<A>,
+        {
+            type Slot = UnmanagedBox<M, A>;
 
-    #[inline]
-    fn is_proto_empty<Cx>(_slot: &UnmanagedBox<M, A>, _common: &Cx) -> bool
-    where
-        Cx: MessageBindingMut<A>,
-    {
-        false
-    }
+            #[inline]
+            fn is_proto_empty<Cx>(_slot: &UnmanagedBox<M, A>, _common: &Cx) -> bool
+            where
+                Cx: MessageBindingMut<A>,
+            {
+                false
+            }
 
-    #[inline]
-    fn clear<VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
-    where
-        VS: ValueSlot<UnmanagedBox<M, A>, A>,
-        I: SlotInitMut,
-        Cx: MessageBindingMut<A>,
-        A: Clone,
-        UnmanagedBox<M, A>: DefaultIn<A>,
-    {
-        let alloc = common.clone_alloc();
-        if let Some(old) = ValueSlot::with_mut(slot, init, common).take_clear() {
-            // SAFETY: `clear` contract — `common` is this field's parent.
-            unsafe { DeallocateIn::deallocate_in(old, &alloc) };
+            #[inline]
+            fn clear<VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
+            where
+                VS: ValueSlot<UnmanagedBox<M, A>, A>,
+                I: SlotInitMut,
+                Cx: MessageBindingMut<A>,
+                A: Clone,
+                UnmanagedBox<M, A>: DefaultIn<A>,
+            {
+                let alloc = common.clone_alloc();
+                if let Some(old) = ValueSlot::with_mut(slot, init, common).take_clear() {
+                    // SAFETY: `clear` contract — `common` is this field's parent.
+                    unsafe { DeallocateIn::deallocate_in(old, &alloc) };
+                }
+            }
+
+            #[inline]
+            fn deallocate_slot<VS, Cx>(slot: VS, initialized: bool, common: &Cx)
+            where
+                VS: ValueSlot<UnmanagedBox<M, A>, A>,
+                Cx: MessageBindingMut<A>,
+            {
+                if let Some(v) = slot.take_value(initialized) {
+                    // SAFETY: `deallocate_slot` contract — `common` is this field's parent.
+                    unsafe { DeallocateIn::deallocate_in(v, common.alloc()) };
+                }
+            }
         }
-    }
 
-    #[inline]
-    fn deallocate_slot<VS, Cx>(slot: VS, initialized: bool, common: &Cx)
-    where
-        VS: ValueSlot<UnmanagedBox<M, A>, A>,
-        Cx: MessageBindingMut<A>,
-    {
-        if let Some(v) = slot.take_value(initialized) {
-            // SAFETY: `deallocate_slot` contract — `common` is this field's parent.
-            unsafe { DeallocateIn::deallocate_in(v, common.alloc()) };
+        impl<M, A: Allocator> ValueLayoutGet<ProtoMessage<M, $W>, A> for Boxed
+        where
+            M: MessageEncode + DeallocateIn<A>,
+        {
+            #[inline]
+            fn get<'a, Cx>(slot: &'a UnmanagedBox<M, A>, _common: &'a Cx) -> &'a M
+            where
+                Cx: MessageBindingMut<A>,
+            {
+                Deref::deref(slot)
+            }
         }
-    }
+
+        impl<M, A: Allocator> ValueLayoutMut<ProtoMessage<M, $W>, A> for Boxed
+        where
+            M: MessageEncode + DeallocateIn<A>,
+        {
+            type Mut<'a>
+                = &'a mut M
+            where
+                M: 'a,
+                A: 'a;
+
+            #[inline]
+            fn with_mut<'a, VS, I, Cx>(slot: &'a mut VS, init: I, common: &'a mut Cx) -> &'a mut M
+            where
+                VS: ValueSlot<UnmanagedBox<M, A>, A>,
+                I: SlotInitMut,
+                Cx: MessageBindingMut<A>,
+                M: 'a,
+                A: 'a + Clone,
+                UnmanagedBox<M, A>: DefaultIn<A>,
+            {
+                DerefMut::deref_mut(ValueSlot::with_mut(slot, init, common).get_mut())
+            }
+        }
+
+        impl<M, A: Allocator + Clone> ValueLayoutClone<ProtoMessage<M, $W>, A> for Boxed
+        where
+            M: MessageEncode + DeallocateIn<A> + CloneIn<A>,
+        {
+            #[inline]
+            fn clone_slot<VS, Cx>(slot: &VS, initialized: bool, _common: &Cx, alloc: A) -> VS
+            where
+                VS: ValueSlot<UnmanagedBox<M, A>, A>,
+                Cx: MessageBindingMut<A>,
+            {
+                VS::from_optional(
+                    slot.get_value(initialized)
+                        .map(|v| CloneIn::clone_in(v, alloc)),
+                )
+            }
+        }
+    };
 }
 
-impl<M, A: Allocator> ValueLayoutGet<ProtoMessage<M>, A> for Boxed
-where
-    M: MessageEncode + DeallocateIn<A>,
-{
-    #[inline]
-    fn get<'a, Cx>(slot: &'a UnmanagedBox<M, A>, _common: &'a Cx) -> &'a M
-    where
-        Cx: MessageBindingMut<A>,
-    {
-        Deref::deref(slot)
-    }
-}
+impl_boxed_value_layout_proto_message!(LengthPrefixed);
+impl_boxed_value_layout_proto_message!(GroupDelimited);
 
-impl<M, A: Allocator> ValueLayoutMut<ProtoMessage<M>, A> for Boxed
-where
-    M: MessageEncode + DeallocateIn<A>,
-{
-    type Mut<'a>
-        = &'a mut M
-    where
-        M: 'a,
-        A: 'a;
-
-    #[inline]
-    fn with_mut<'a, VS, I, Cx>(slot: &'a mut VS, init: I, common: &'a mut Cx) -> &'a mut M
-    where
-        VS: ValueSlot<UnmanagedBox<M, A>, A>,
-        I: SlotInitMut,
-        Cx: MessageBindingMut<A>,
-        M: 'a,
-        A: 'a + Clone,
-        UnmanagedBox<M, A>: DefaultIn<A>,
-    {
-        DerefMut::deref_mut(ValueSlot::with_mut(slot, init, common).get_mut())
-    }
-}
-
-impl<M, A: Allocator> ValueLayoutMerge<ProtoMessage<M>, A> for Boxed
+impl<M, A: Allocator> ValueLayoutMerge<ProtoMessage<M, LengthPrefixed>, A> for Boxed
 where
     M: MessageEncode + MessageMerge + DeallocateIn<A>,
 {
@@ -391,20 +415,33 @@ where
     }
 }
 
-impl<M, A: Allocator + Clone> ValueLayoutClone<ProtoMessage<M>, A> for Boxed
+impl<M, A: Allocator> ValueLayoutMerge<ProtoMessage<M, GroupDelimited>, A> for Boxed
 where
-    M: MessageEncode + DeallocateIn<A> + CloneIn<A>,
+    M: MessageEncode + MessageMerge + DeallocateIn<A>,
 {
     #[inline]
-    fn clone_slot<VS, Cx>(slot: &VS, initialized: bool, _common: &Cx, alloc: A) -> VS
+    fn merge<VS, I, Cx, B>(
+        slot: &mut VS,
+        init: I,
+        common: &mut Cx,
+        wire_type: ::puroro::WireType,
+        buf: &mut B,
+        field: FieldNumber,
+        depth: usize,
+    ) -> Result<(), DecodeError>
     where
         VS: ValueSlot<UnmanagedBox<M, A>, A>,
+        I: SlotInitMut,
         Cx: MessageBindingMut<A>,
+        B: DecodeBuf,
+        A: Clone,
+        UnmanagedBox<M, A>: DefaultIn<A>,
     {
-        VS::from_optional(
-            slot.get_value(initialized)
-                .map(|v| CloneIn::clone_in(v, alloc)),
-        )
+        if wire_type != WireType::SGroup {
+            return Err(DecodeError::InvalidTag);
+        }
+        let child = ValueSlot::with_mut(slot, init, common).get_mut();
+        MessageMerge::merge_group_body(DerefMut::deref_mut(child), buf, depth + 1, field)
     }
 }
 

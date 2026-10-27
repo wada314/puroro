@@ -307,17 +307,29 @@ fn render_codec_impls(lazy_alias: &Ident, validate_body: &TokenStream) -> TokenS
         impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::MessageMerge
             for #lazy_alias<A>
         {
-            fn merge_from_with_depth<B: ::puroro::DecodeBuf>(
+            fn merge_from_bounded<B: ::puroro::DecodeBuf>(
                 &mut self,
                 buf: &mut B,
                 depth: usize,
+                bound: ::puroro_rt::MergeBound,
             ) -> ::core::result::Result<(), ::puroro::DecodeError> {
                 if depth >= ::puroro::RECURSION_LIMIT {
                     return ::core::result::Result::Err(
                         ::puroro::DecodeError::RecursionLimitExceeded,
                     );
                 }
-                self.ingest_buf(buf)
+                match bound {
+                    ::puroro_rt::MergeBound::Message => self.ingest_buf(buf),
+                    ::puroro_rt::MergeBound::Group(group) => {
+                        // Lazy ingest has no field match arms; copy the group
+                        // body (same helper as unknown preserve) then ingest.
+                        let mut body =
+                            ::allocator_api2::vec::Vec::new_in(self._common.alloc.clone());
+                        ::puroro_rt::decode::take_group_body(group, buf, &mut body)?;
+                        let mut slice: &[u8] = body.as_slice();
+                        self.ingest_buf(&mut slice)
+                    }
+                }
             }
         }
 
@@ -718,22 +730,25 @@ fn message_apply_arm(
     companion: &Ident,
     apply: &MessageApply,
 ) -> TokenStream {
-    let body = match apply {
-        MessageApply::SharedSingular => quote! {
+    use super::layout::MessageApplyKind;
+    use crate::field_kind::MessageFraming;
+
+    let body = match &apply.kind {
+        MessageApplyKind::SharedSingular => quote! {
             let root = self._common.lazy.scan.shared().clone_handle();
             #slot.merge_shared(&root, span, &mut self._common)
         },
-        MessageApply::SharedRepeated => quote! {
+        MessageApplyKind::SharedRepeated => quote! {
             let root = self._common.lazy.scan.shared().clone_handle();
             #slot.merge_shared(&root, span, &self._common)
         },
-        MessageApply::EagerSingular => quote! {
+        MessageApplyKind::EagerSingular => quote! {
             let payload = span.slice(self._common.lazy.scan.wire())?;
             let child = #slot.bind_mut(&mut self._common).get_mut();
             ::puroro::Message::merge_from(child, &mut &payload[..])?;
             ::core::result::Result::Ok(())
         },
-        MessageApply::EagerRepeated(child_ty) => quote! {
+        MessageApplyKind::EagerRepeated(child_ty) => quote! {
             let payload = span.slice(self._common.lazy.scan.wire())?;
             let mut child = #child_ty::new_in(self._common.alloc.clone());
             ::puroro::Message::merge_from(&mut child, &mut &payload[..])?;
@@ -741,9 +756,15 @@ fn message_apply_arm(
             ::core::result::Result::Ok(())
         },
     };
+    let span_fn = match apply.framing {
+        MessageFraming::LengthPrefixed => {
+            quote! { ::puroro_rt::decode::scanned_len_span }
+        }
+        MessageFraming::Group => quote! { ::puroro_rt::decode::scanned_group_span },
+    };
     quote! {
         #companion::#field_const => {
-            let span = ::puroro_rt::decode::scanned_len_span(origin, rec)?;
+            let span = #span_fn(origin, rec)?;
             #body
         }
     }

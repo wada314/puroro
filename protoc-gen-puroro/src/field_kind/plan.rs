@@ -299,8 +299,8 @@ fn plan_field<'a>(
         }
         FieldOccurrence::Singular(presence) => {
             let wire = WireTypeKind::from_field(field);
-            let inline_nested = matches!(wire, WireTypeKind::Message(_))
-                && storage.is_inline(owner, field.number());
+            let inline_nested =
+                wire.as_message().is_some() && storage.is_inline(owner, field.number());
             // Oneof variants keep `Oneof` presence (no extra bit). Non-oneof
             // inlined children need an Explicit / LegacyRequired presence bit.
             let planned_presence = if inline_nested && !matches!(presence, SingularPresence::Oneof)
@@ -314,7 +314,7 @@ fn plan_field<'a>(
             } else {
                 PlannedPresence::from_singular(presence, field.name(), next_bit)
             };
-            let layout = if matches!(wire, WireTypeKind::Message(_)) {
+            let layout = if wire.as_message().is_some() {
                 if inline_nested {
                     PlannedLayout::Inline
                 } else {
@@ -447,7 +447,7 @@ fn validate_map_value_wire(value: &WireTypeKind<'_>, _field_name: &str) -> Resul
         | WireTypeKind::String { .. }
         | WireTypeKind::Bytes { .. }
         | WireTypeKind::Enum { .. }
-        | WireTypeKind::Message(_) => Ok(()),
+        | WireTypeKind::Message { .. } => Ok(()),
     }
 }
 
@@ -1143,7 +1143,7 @@ mod tests {
         };
         match origin.kind() {
             FieldKind::Singular {
-                wire: WireTypeKind::Message(_),
+                wire: WireTypeKind::Message { .. },
                 presence: PlannedPresence::Explicit { bit: 0, bit_const },
                 layout: PlannedLayout::Inline,
                 custom_default: None,

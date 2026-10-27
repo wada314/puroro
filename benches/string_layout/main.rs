@@ -24,11 +24,11 @@ use ::bytes::{Buf, BufMut};
 use ::core::time::Duration;
 use ::criterion::measurement::WallTime;
 use ::criterion::{BenchmarkGroup, BenchmarkId, Criterion, Throughput, black_box, criterion_group};
-use ::puroro::{DecodeBuf, DecodeError, Message, String as AllocString};
+use ::puroro::{DecodeBuf, DecodeError, Message, String as AllocString, WireType};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
     EncodeCtx, Explicit, FieldDeallocate, FieldEncode, INLINE_CAP, Inline, InlineOrHeap,
-    MessageCommon, MessageEncode, MessageMerge, ProtoString, SingularField,
+    MergeBound, MessageCommon, MessageEncode, MessageMerge, ProtoString, SingularField,
 };
 
 use keep::iter_keep;
@@ -157,16 +157,26 @@ macro_rules! impl_eight_string_message {
         }
 
         impl<A: Allocator + Clone> MessageMerge for $ty<A> {
-            fn merge_from_with_depth<B: DecodeBuf>(
+            fn merge_from_bounded<B: DecodeBuf>(
                 &mut self,
                 buf: &mut B,
                 depth: usize,
+                bound: MergeBound,
             ) -> Result<(), DecodeError> {
                 if depth >= ::puroro::RECURSION_LIMIT {
                     return Err(DecodeError::RecursionLimitExceeded);
                 }
                 while buf.has_remaining() {
                     let (field_number, wire_type) = decode_tag(buf)?;
+                    if let MergeBound::Group(g) = bound
+                        && wire_type == WireType::EGroup
+                    {
+                        return if field_number == g {
+                            Ok(())
+                        } else {
+                            Err(DecodeError::InvalidTag)
+                        };
+                    }
                     match field_number.as_u32() {
                         1 => self
                             .s0
@@ -209,7 +219,10 @@ macro_rules! impl_eight_string_message {
                         )?,
                     }
                 }
-                Ok(())
+                match bound {
+                    MergeBound::Message => Ok(()),
+                    MergeBound::Group(_) => Err(DecodeError::UnexpectedEof),
+                }
             }
         }
 

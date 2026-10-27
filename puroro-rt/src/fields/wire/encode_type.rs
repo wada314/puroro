@@ -20,7 +20,7 @@ use crate::message_encode::{EncodeCtx, MessageEncode};
 
 use super::len::{LenCodec, LenScalar};
 use super::numerical::{Numerical, NumericalType};
-use super::proto_message::ProtoMessage;
+use super::proto_message::{GroupDelimited, LengthPrefixed, ProtoMessage};
 use super::wire_payload::WirePayload;
 
 /// Encode facet of a protobuf **type** marker (`ProtoInt32`, `ProtoString`, …).
@@ -75,8 +75,13 @@ where
         WireType::Varint | WireType::Int32 | WireType::Int64 | WireType::Len => {
             encode::encoded_len_tag(field, T::WIRE_TYPE) + T::payload_len::<A>(value, ctx)
         }
-        WireType::SGroup | WireType::EGroup => {
-            unreachable!("generated markers never use group wire types")
+        WireType::SGroup => {
+            encode::encoded_len_tag(field, WireType::SGroup)
+                + T::payload_len::<A>(value, ctx)
+                + encode::encoded_len_tag(field, WireType::EGroup)
+        }
+        WireType::EGroup => {
+            unreachable!("EGroup is never a field marker WIRE_TYPE")
         }
     }
 }
@@ -98,8 +103,13 @@ pub(crate) fn encode_field<'a, T, A, B>(
             encode::encode_tag(field, T::WIRE_TYPE, buf);
             T::encode_payload::<A, B>(value, ctx, buf);
         }
-        WireType::SGroup | WireType::EGroup => {
-            unreachable!("generated markers never use group wire types")
+        WireType::SGroup => {
+            encode::encode_tag(field, WireType::SGroup, buf);
+            T::encode_payload::<A, B>(value, ctx, buf);
+            encode::encode_tag(field, WireType::EGroup, buf);
+        }
+        WireType::EGroup => {
+            unreachable!("EGroup is never a field marker WIRE_TYPE")
         }
     }
 }
@@ -163,7 +173,7 @@ impl<C: LenCodec> EncodeType for LenScalar<C> {
     }
 }
 
-impl<M: MessageEncode> EncodeType for ProtoMessage<M> {
+impl<M: MessageEncode> EncodeType for ProtoMessage<M, LengthPrefixed> {
     type View<'a, A: Allocator>
         = &'a M
     where
@@ -190,6 +200,35 @@ impl<M: MessageEncode> EncodeType for ProtoMessage<M> {
     {
         let n = ctx.body_len_for(value);
         encode::encode_varint(Varint::from_uint64(n as u64), buf);
+        value.encode_raw(ctx, buf);
+    }
+}
+
+impl<M: MessageEncode> EncodeType for ProtoMessage<M, GroupDelimited> {
+    type View<'a, A: Allocator>
+        = &'a M
+    where
+        Self: 'a,
+        A: 'a;
+
+    const WIRE_TYPE: WireType = WireType::SGroup;
+
+    #[inline]
+    fn payload_len<'a, A: Allocator>(value: &'a M, ctx: &mut EncodeCtx) -> usize
+    where
+        Self: 'a,
+    {
+        // Body only; start/end tags are added by `encode_field`.
+        ctx.body_len_for(value)
+    }
+
+    #[inline]
+    fn encode_payload<'a, A, B>(value: &'a M, ctx: &mut EncodeCtx, buf: &mut B)
+    where
+        Self: 'a,
+        A: Allocator,
+        B: BufMut,
+    {
         value.encode_raw(ctx, buf);
     }
 }

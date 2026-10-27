@@ -47,7 +47,7 @@ use crate::fields::shared::{
 use crate::fields::wire::encode_type::{encode_field, encoded_len_field};
 use crate::fields::wire::len::{BytesLikeLenCodec, LenScalar, ProtoString};
 use crate::fields::wire::numerical::{BoolCodec, Numerical, NumericalType, ProtoBool};
-use crate::fields::wire::proto_message::ProtoMessage;
+use crate::fields::wire::proto_message::{GroupDelimited, LengthPrefixed, ProtoMessage};
 use crate::fields::wire::proto_ref_ops::{ProtoRefDebug, ProtoRefEq};
 use crate::fields::wire::singular_type::{PayloadAccess, SingularType};
 use crate::fields::wire::wire_or_sso::{WireOrSso, WireOrSsoKind, WireOrSsoStore};
@@ -656,52 +656,62 @@ where
     }
 }
 
-impl<M, P, const FIELD: u32, A, D> SingularField<ProtoMessage<M>, P, FIELD, A, Inline, D>
-where
-    M: crate::MessageEncode + LazyMessage<A> + crate::DeallocateBound<A>,
-    P: FieldPresence,
-    A: Allocator + Clone,
-    <ProtoMessage<M> as crate::PayloadAccess>::Slot<A>: AddressableSlot + DefaultIn<A>,
-    P::ValueSlot<<Inline as ValueLayout<ProtoMessage<M>, A>>::Slot>:
-        ValueSlot<<Inline as ValueLayout<ProtoMessage<M>, A>>::Slot, A>,
-{
-    /// Ensure the child exists, then record `span` on the island-root buffer.
-    ///
-    /// Does not walk the child's tags (`MessageMerge` / ingest). The child's
-    /// first field getter parses stored regions.
-    pub fn merge_shared<Cx: MessageBindingMut<A>>(
-        &mut self,
-        root: &SharedWire<A>,
-        span: WireSpan,
-        common: &mut Cx,
-    ) -> Result<(), DecodeError> {
-        let child: &mut M = self.bind_mut(common).get_mut();
-        child.merge_shared(root, span)
-    }
+macro_rules! impl_singular_merge_shared_proto_message {
+    ($W:ty) => {
+        impl<M, P, const FIELD: u32, A, D>
+            SingularField<ProtoMessage<M, $W>, P, FIELD, A, Inline, D>
+        where
+            M: crate::MessageEncode + LazyMessage<A> + crate::DeallocateBound<A>,
+            P: FieldPresence,
+            A: Allocator + Clone,
+            <ProtoMessage<M, $W> as crate::PayloadAccess>::Slot<A>: AddressableSlot + DefaultIn<A>,
+            P::ValueSlot<<Inline as ValueLayout<ProtoMessage<M, $W>, A>>::Slot>:
+                ValueSlot<<Inline as ValueLayout<ProtoMessage<M, $W>, A>>::Slot, A>,
+        {
+            /// Ensure the child exists, then record `span` on the island-root buffer.
+            ///
+            /// Does not walk the child's tags (`MessageMerge` / ingest). The child's
+            /// first field getter parses stored regions. Works for length-prefixed and
+            /// group-delimited children (`scanned_len_span` / `scanned_group_span`).
+            pub fn merge_shared<Cx: MessageBindingMut<A>>(
+                &mut self,
+                root: &SharedWire<A>,
+                span: WireSpan,
+                common: &mut Cx,
+            ) -> Result<(), DecodeError> {
+                let child: &mut M = self.bind_mut(common).get_mut();
+                child.merge_shared(root, span)
+            }
+        }
+
+        impl<M, P, const FIELD: u32, A, D> SingularField<ProtoMessage<M, $W>, P, FIELD, A, Boxed, D>
+        where
+            M: crate::MessageEncode + LazyMessage<A> + crate::DeallocateIn<A> + DefaultIn<A>,
+            P: FieldPresence,
+            A: Allocator + Clone,
+            P::ValueSlot<<Boxed as ValueLayout<ProtoMessage<M, $W>, A>>::Slot>:
+                ValueSlot<<Boxed as ValueLayout<ProtoMessage<M, $W>, A>>::Slot, A>,
+        {
+            /// Ensure the child exists, then record `span` on the island-root buffer.
+            ///
+            /// Does not walk the child's tags (`MessageMerge` / ingest). The child's
+            /// first field getter parses stored regions. Works for length-prefixed and
+            /// group-delimited children (`scanned_len_span` / `scanned_group_span`).
+            pub fn merge_shared<Cx: MessageBindingMut<A>>(
+                &mut self,
+                root: &SharedWire<A>,
+                span: WireSpan,
+                common: &mut Cx,
+            ) -> Result<(), DecodeError> {
+                let child: &mut M = self.bind_mut(common).get_mut();
+                child.merge_shared(root, span)
+            }
+        }
+    };
 }
 
-impl<M, P, const FIELD: u32, A, D> SingularField<ProtoMessage<M>, P, FIELD, A, Boxed, D>
-where
-    M: crate::MessageEncode + LazyMessage<A> + crate::DeallocateIn<A> + DefaultIn<A>,
-    P: FieldPresence,
-    A: Allocator + Clone,
-    P::ValueSlot<<Boxed as ValueLayout<ProtoMessage<M>, A>>::Slot>:
-        ValueSlot<<Boxed as ValueLayout<ProtoMessage<M>, A>>::Slot, A>,
-{
-    /// Ensure the child exists, then record `span` on the island-root buffer.
-    ///
-    /// Does not walk the child's tags (`MessageMerge` / ingest). The child's
-    /// first field getter parses stored regions.
-    pub fn merge_shared<Cx: MessageBindingMut<A>>(
-        &mut self,
-        root: &SharedWire<A>,
-        span: WireSpan,
-        common: &mut Cx,
-    ) -> Result<(), DecodeError> {
-        let child: &mut M = self.bind_mut(common).get_mut();
-        child.merge_shared(root, span)
-    }
-}
+impl_singular_merge_shared_proto_message!(LengthPrefixed);
+impl_singular_merge_shared_proto_message!(GroupDelimited);
 
 impl<P, const FIELD: u32, A, const KIND: usize, D>
     SingularField<ProtoString, P, FIELD, A, WireOrSso<KIND>, D>

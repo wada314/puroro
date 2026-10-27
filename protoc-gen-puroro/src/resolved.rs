@@ -24,6 +24,15 @@ use crate::descriptor::{
 };
 use ::std::fmt;
 
+/// Wire framing for a nested message field (`LEN` vs start/end group).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MessageFraming {
+    /// `features.message_encoding=LENGTH_PREFIXED` / ordinary `TYPE_MESSAGE`.
+    LengthPrefixed,
+    /// Classic `TYPE_GROUP` or `features.message_encoding=DELIMITED`.
+    Group,
+}
+
 /// Cardinality + singular presence after resolve.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FieldOccurrence {
@@ -110,6 +119,8 @@ pub struct Field<'a> {
     child_parse: Option<ChildParse>,
     /// proto2 / editions `LEGACY_REQUIRED` (needed when inlining a message).
     legacy_required: bool,
+    /// Nested message wire framing (`LEN` vs group). Ignored for scalars.
+    message_framing: MessageFraming,
 }
 
 /// Resolved type of a field.
@@ -299,6 +310,14 @@ impl<'a> Field<'a> {
     /// Whether this field is proto2 / editions `LEGACY_REQUIRED`.
     pub fn is_legacy_required(&self) -> bool {
         self.legacy_required
+    }
+
+    /// Nested message wire framing (`LEN` vs classic group / Editions `DELIMITED`).
+    ///
+    /// Scalars keep [`MessageFraming::LengthPrefixed`]; only message / group
+    /// fields use [`MessageFraming::Group`].
+    pub fn message_framing(&self) -> MessageFraming {
+        self.message_framing
     }
 }
 

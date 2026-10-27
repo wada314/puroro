@@ -4,11 +4,12 @@ use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
-use ::puroro::{DecodeBuf, DecodeError, Message};
+use ::puroro::{DecodeBuf, DecodeError, Message, WireType};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    EncodeCtx, Expanded, Explicit, FieldDeallocate, FieldEncode, MessageCommon, MessageEncode,
-    MessageMerge, Packed, ProtoDouble, ProtoFixed32, ProtoFloat, RepeatedField, SingularField,
+    EncodeCtx, Expanded, Explicit, FieldDeallocate, FieldEncode, MergeBound, MessageCommon,
+    MessageEncode, MessageMerge, Packed, ProtoDouble, ProtoFixed32, ProtoFloat, RepeatedField,
+    SingularField,
 };
 
 /// Minimal message exercising singular + packed + expanded fixed fields.
@@ -82,16 +83,26 @@ impl<A: Allocator + Clone> MessageEncode for FixedDemo<A> {
 }
 
 impl<A: Allocator + Clone> MessageMerge for FixedDemo<A> {
-    fn merge_from_with_depth<B: DecodeBuf>(
+    fn merge_from_bounded<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
         depth: usize,
+        bound: MergeBound,
     ) -> Result<(), DecodeError> {
         if depth >= ::puroro::RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
+            if let MergeBound::Group(g) = bound
+                && wire_type == WireType::EGroup
+            {
+                return if field_number == g {
+                    Ok(())
+                } else {
+                    Err(DecodeError::InvalidTag)
+                };
+            }
             match field_number.as_u32() {
                 1 => self
                     .code
@@ -118,7 +129,10 @@ impl<A: Allocator + Clone> MessageMerge for FixedDemo<A> {
                 )?,
             }
         }
-        Ok(())
+        match bound {
+            MergeBound::Message => Ok(()),
+            MergeBound::Group(_) => Err(DecodeError::UnexpectedEof),
+        }
     }
 }
 

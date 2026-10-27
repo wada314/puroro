@@ -31,8 +31,13 @@ impl FeatureSet {
     /// Trap explicit overrides of features resolve / codegen do not apply yet.
     ///
     /// Consumed today: `field_presence`, `enum_type`, `repeated_field_encoding`,
-    /// `utf8_validation`, and `message_encoding` (LENGTH_PREFIXED only).
+    /// `utf8_validation`, and `message_encoding` (`LENGTH_PREFIXED` / `DELIMITED`).
+    ///
+    /// `json_format` / `enforce_naming_style` / `default_symbol_visibility` are
+    /// dropped while decoding [`FeatureSet`] (protoc may populate edition
+    /// defaults on every options message); they never reach this check.
     pub(crate) fn reject_unimplemented_overrides(&self, context: &str) {
+        let _ = context;
         if self.json_format.is_some() {
             unimplemented!(
                 "editions features.json_format override is not implemented yet ({context})"
@@ -197,13 +202,29 @@ pub enum RepeatedFieldEncoding {
     Expanded = 2,
 }
 
-/// `FeatureSet.utf8_validation` (wire value 1 is reserved; targets: file, field).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFrom)]
-#[try_from(repr)]
+/// `FeatureSet.utf8_validation` (targets: file, field).
+///
+/// Spec wire values are `VERIFY = 2` and `NONE = 3` (`1` is reserved). Older
+/// `protoc` (24.x) still emits `1` as the edition default for verify; accept it
+/// as [`Verify`](Self::Verify).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(i32)]
 pub enum Utf8Validation {
     Verify = 2,
     None = 3,
+}
+
+impl TryFrom<i32> for Utf8Validation {
+    type Error = i32;
+
+    fn try_from(value: i32) -> Result<Self, Self::Error> {
+        match value {
+            // Reserved / historical VERIFY from protoc before the renumber.
+            1 | 2 => Ok(Self::Verify),
+            3 => Ok(Self::None),
+            other => Err(other),
+        }
+    }
 }
 
 /// `FeatureSet.message_encoding` (targets: file, field).

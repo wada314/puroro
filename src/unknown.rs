@@ -46,9 +46,6 @@ impl<'a> UnknownField<'a> {
 }
 
 /// Payload of an unknown field, discriminated by wire type.
-///
-/// Deprecated group wire types (`SGroup` / `EGroup`) are never preserved and
-/// therefore have no variant here.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UnknownPayload<'a> {
     /// Wire type VARINT.
@@ -59,6 +56,10 @@ pub enum UnknownPayload<'a> {
     Bytes(&'a [u8]),
     /// Wire type I32 (fixed32 / sfixed32 / float bit pattern).
     Fixed32(u32),
+    /// Group body bytes between a matched `SGroup` / `EGroup` pair (tags not
+    /// included). Nested groups inside the span stay intact as opaque bytes.
+    /// Encode re-emits start tag + this body + end tag.
+    Group(&'a [u8]),
 }
 
 impl UnknownPayload<'_> {
@@ -70,6 +71,7 @@ impl UnknownPayload<'_> {
             Self::Fixed64(_) => WireType::Int64,
             Self::Bytes(_) => WireType::Len,
             Self::Fixed32(_) => WireType::Int32,
+            Self::Group(_) => WireType::SGroup,
         }
     }
 }

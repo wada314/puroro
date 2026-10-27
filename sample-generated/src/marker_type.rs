@@ -13,13 +13,13 @@ use core::mem;
 use core::ops::ControlFlow;
 use core::ops::DerefMut;
 
-use puroro::{DecodeBuf, DecodeError, Message};
+use puroro::{DecodeBuf, DecodeError, Message, WireType};
 use puroro_rt::decode::{decode_tag, skip_field_and_save_in};
 use puroro_rt::{
     CloneFieldsVisitor, CloneIn, DebugStructVisitor, DiscardUnknowns, EncodeCtx, EncodeRawVisitor,
     EncodedLenVisitor, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut,
-    FieldVisitor, FieldVisitorMut, Implicit, MessageCommon, MessageEncode, MessageMerge,
-    ProtoInt32, SingularField,
+    FieldVisitor, FieldVisitorMut, Implicit, MergeBound, MessageCommon, MessageEncode,
+    MessageMerge, ProtoInt32, SingularField,
 };
 
 use crate::marker::FIELD_N;
@@ -175,16 +175,26 @@ impl<A: Allocator + Clone> MessageEncode for Marker<A> {
 }
 
 impl<A: Allocator + Clone> MessageMerge for Marker<A> {
-    fn merge_from_with_depth<B: DecodeBuf>(
+    fn merge_from_bounded<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
         depth: usize,
+        bound: MergeBound,
     ) -> Result<(), DecodeError> {
         if depth >= ::puroro::RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
+            if let MergeBound::Group(g) = bound
+                && wire_type == WireType::EGroup
+            {
+                return if field_number == g {
+                    Ok(())
+                } else {
+                    Err(DecodeError::InvalidTag)
+                };
+            }
             match field_number.as_u32() {
                 FIELD_N => {
                     self.n
@@ -200,7 +210,10 @@ impl<A: Allocator + Clone> MessageMerge for Marker<A> {
                 )?,
             }
         }
-        Ok(())
+        match bound {
+            MergeBound::Message => Ok(()),
+            MergeBound::Group(_) => Err(DecodeError::UnexpectedEof),
+        }
     }
 }
 

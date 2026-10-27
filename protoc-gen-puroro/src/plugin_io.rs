@@ -138,6 +138,7 @@ fn decode_file_descriptor(bytes: &[u8]) -> Result<ProtoFile> {
         let mut package = String::new();
         let mut syntax_raw: Option<String> = None;
         let mut edition_raw: Option<i32> = None;
+        let mut edition_name: Option<String> = None;
         let mut features = FeatureSet::default();
         let mut dependency = Vec::new();
         let mut messages = Vec::new();
@@ -160,13 +161,15 @@ fn decode_file_descriptor(bytes: &[u8]) -> Result<ProtoFile> {
                 8 => features = decode_options_features("FileOptions", 50, expect_len(&field)?)?,
                 // optional string syntax = 12;
                 12 => syntax_raw = Some(expect_string(&field)?),
+                // Legacy `optional string edition = 13` (protoc 24.x).
+                13 => edition_name = Some(expect_string(&field)?),
                 // optional Edition edition = 14;
                 14 => edition_raw = Some(expect_int32(&field)?),
                 _ => {}
             }
         }
 
-        let syntax = resolve_syntax(syntax_raw.as_deref(), edition_raw)?;
+        let syntax = resolve_syntax(syntax_raw.as_deref(), edition_raw, edition_name.as_deref())?;
 
         Ok(ProtoFile {
             name,
@@ -180,23 +183,40 @@ fn decode_file_descriptor(bytes: &[u8]) -> Result<ProtoFile> {
     })
 }
 
-fn resolve_syntax(syntax_raw: Option<&str>, edition_raw: Option<i32>) -> Result<Syntax> {
+fn resolve_syntax(
+    syntax_raw: Option<&str>,
+    edition_raw: Option<i32>,
+    edition_name: Option<&str>,
+) -> Result<Syntax> {
     match syntax_raw {
         None | Some("") | Some("proto2") => Ok(Syntax::Proto2),
         Some("proto3") => Ok(Syntax::Proto3),
         Some("editions") => {
-            let raw = edition_raw.ok_or_else(|| {
-                Error::Codegen(
+            let edition = if let Some(raw) = edition_raw {
+                Edition::try_from(raw).map_err(|_| {
+                    Error::Codegen(format!("unsupported protobuf edition value `{raw}`"))
+                })?
+            } else if let Some(name) = edition_name {
+                edition_from_name(name)?
+            } else {
+                return Err(Error::Codegen(
                     "FileDescriptorProto.syntax is \"editions\" but edition is missing".into(),
-                )
-            })?;
-            let edition = Edition::try_from(raw).map_err(|_| {
-                Error::Codegen(format!("unsupported protobuf edition value `{raw}`"))
-            })?;
+                ));
+            };
             Ok(Syntax::Editions(edition))
         }
         Some(other) => Err(Error::Codegen(format!(
             "unsupported FileDescriptorProto.syntax `{other}`"
+        ))),
+    }
+}
+
+fn edition_from_name(name: &str) -> Result<Edition> {
+    match name {
+        "2023" => Ok(Edition::Edition2023),
+        "2024" => Ok(Edition::Edition2024),
+        other => Err(Error::Codegen(format!(
+            "unsupported protobuf edition name `{other}`"
         ))),
     }
 }
@@ -446,12 +466,13 @@ fn decode_feature_set(bytes: &[u8]) -> Result<FeatureSet> {
                 4 => features.utf8_validation = Some(expect_enum(&field)?),
                 // optional MessageEncoding message_encoding = 5;
                 5 => features.message_encoding = Some(expect_enum(&field)?),
-                // optional JsonFormat json_format = 6;
-                6 => features.json_format = Some(expect_enum(&field)?),
-                // optional EnforceNamingStyle enforce_naming_style = 7;
-                7 => features.enforce_naming_style = Some(expect_enum(&field)?),
-                // optional DefaultSymbolVisibility default_symbol_visibility = 8;
-                8 => features.default_symbol_visibility = Some(expect_enum(&field)?),
+                // json_format (6), enforce_naming_style (7), and
+                // default_symbol_visibility (8) are not applied yet. Skip so
+                // protoc's fully-populated edition FeatureSet (which always
+                // includes defaults) does not look like a user override.
+                6..=8 => {
+                    let _ = expect_int32(&field)?;
+                }
                 // Language-specific FeatureSet extensions (e.g. 1000+) are LEN.
                 _ => {}
             }
