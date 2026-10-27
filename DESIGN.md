@@ -685,6 +685,8 @@ Two schema forms share the same wire framing and the same generated accessor sha
 
 Public accessors, storage (`SingularField` / repeated / oneof), merge-into-singular, and child-parse options match ordinary nested messages ([above](#45-nested-message-fields)). The difference is **framing only**: encode emits `SGroup` then the child body then `EGroup` (no length varint); decode after an `SGroup` tag merges child fields until the matching `EGroup` (nested groups allowed; a wrong end-group number is `DecodeError::InvalidTag`). Groups are never packed. Length-prefixed nested messages inside a group body stay `LEN`-framed.
 
+**Eager decode does not copy the group body.** After the opening `SGroup` tag is consumed, [`ProtoGroup`](puroro-rt/src/fields/wire/proto_message.rs) calls [`MessageMerge::merge_group_body`](puroro-rt/src/message_merge.rs) on the **same** `DecodeBuf`. The child loop uses [`MergeBound::Group`](puroro-rt/src/message_merge.rs): stop when the matching `EGroup` is consumed (inclusive). Nested groups recurse the same way. `take_group_body` remains for unknown preserve / skip and for **lazy** ingest (lazy has no per-field merge arms, so it still copies the body then `ingest_buf`).
+
 #### Child parse timing
 
 Every proto message emits both an eager type (`Task`) and a lazy type (`TaskLazy`). Which one a caller holds is a Rust type choice. `(puroro.child_parse)` does not make that choice. It chooses the **nested** message's layout. The signatures above are the default: an eager parent stores an eager child, and a lazy parent stores a lazy child.

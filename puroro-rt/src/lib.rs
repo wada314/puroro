@@ -58,4 +58,4 @@ pub use fields::wire::{
     SsoStringMut, WireOrSsoKind, WireOrSsoSlot,
 };
 pub use message_encode::{EncodeCtx, MessageEncode, encode_message, encode_message_to_vec};
-pub use message_merge::{MessageMerge, merge_message};
+pub use message_merge::{MergeBound, MessageMerge, merge_message};

@@ -509,16 +509,26 @@ pub(super) fn render_items(
         impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::MessageMerge
             for #name<A>
         {
-            fn merge_from_with_depth<B: ::puroro::DecodeBuf>(
+            fn merge_from_bounded<B: ::puroro::DecodeBuf>(
                 &mut self,
                 buf: &mut B,
                 depth: usize,
+                bound: ::puroro_rt::MergeBound,
             ) -> ::core::result::Result<(), ::puroro::DecodeError> {
                 if depth >= ::puroro::RECURSION_LIMIT {
                     return ::core::result::Result::Err(::puroro::DecodeError::RecursionLimitExceeded);
                 }
                 while ::bytes::Buf::has_remaining(buf) {
                     let (field_number, wire_type) = ::puroro_rt::decode::decode_tag(buf)?;
+                    if let ::puroro_rt::MergeBound::Group(g) = bound {
+                        if wire_type == ::puroro::WireType::EGroup {
+                            return if field_number == g {
+                                ::core::result::Result::Ok(())
+                            } else {
+                                ::core::result::Result::Err(::puroro::DecodeError::InvalidTag)
+                            };
+                        }
+                    }
                     match field_number.as_u32() {
                         #(#merge_arms)*
                         _ => {
@@ -532,7 +542,12 @@ pub(super) fn render_items(
                         }
                     }
                 }
-                ::core::result::Result::Ok(())
+                match bound {
+                    ::puroro_rt::MergeBound::Message => ::core::result::Result::Ok(()),
+                    ::puroro_rt::MergeBound::Group(_) => {
+                        ::core::result::Result::Err(::puroro::DecodeError::UnexpectedEof)
+                    }
+                }
             }
         }
 

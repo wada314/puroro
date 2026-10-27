@@ -12,13 +12,13 @@ use core::mem;
 use core::ops::ControlFlow;
 use core::ops::DerefMut;
 
-use puroro::{DecodeBuf, DecodeError, HasDefault, Message, Optional};
+use puroro::{DecodeBuf, DecodeError, HasDefault, Message, Optional, WireType};
 use puroro_rt::decode::{decode_tag, skip_field_and_save};
 use puroro_rt::{
     CloneFieldsVisitor, CloneIn, DebugStructVisitor, EncodeCtx, EncodeRawVisitor,
     EncodedLenVisitor, Explicit, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor,
-    FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, MessageCommon, MessageEncode, MessageMerge,
-    ProtoInt32, ProtoMessage, SingularField,
+    FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, MergeBound, MessageCommon, MessageEncode,
+    MessageMerge, ProtoInt32, ProtoMessage, SingularField,
 };
 
 use crate::Address;
@@ -225,16 +225,26 @@ impl<A: Allocator + Clone> MessageEncode for Student<A> {
 }
 
 impl<A: Allocator + Clone> MessageMerge for Student<A> {
-    fn merge_from_with_depth<B: DecodeBuf>(
+    fn merge_from_bounded<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
         depth: usize,
+        bound: MergeBound,
     ) -> Result<(), DecodeError> {
         if depth >= ::puroro::RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
+            if let MergeBound::Group(g) = bound {
+                if wire_type == WireType::EGroup {
+                    return if field_number == g {
+                        Ok(())
+                    } else {
+                        Err(DecodeError::InvalidTag)
+                    };
+                }
+            }
             match field_number.as_u32() {
                 FIELD_YEAR => {
                     self.year
@@ -260,7 +270,10 @@ impl<A: Allocator + Clone> MessageMerge for Student<A> {
                 )?,
             }
         }
-        Ok(())
+        match bound {
+            MergeBound::Message => Ok(()),
+            MergeBound::Group(_) => Err(DecodeError::UnexpectedEof),
+        }
     }
 }
 

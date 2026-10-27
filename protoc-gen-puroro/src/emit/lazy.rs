@@ -307,17 +307,29 @@ fn render_codec_impls(lazy_alias: &Ident, validate_body: &TokenStream) -> TokenS
         impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::MessageMerge
             for #lazy_alias<A>
         {
-            fn merge_from_with_depth<B: ::puroro::DecodeBuf>(
+            fn merge_from_bounded<B: ::puroro::DecodeBuf>(
                 &mut self,
                 buf: &mut B,
                 depth: usize,
+                bound: ::puroro_rt::MergeBound,
             ) -> ::core::result::Result<(), ::puroro::DecodeError> {
                 if depth >= ::puroro::RECURSION_LIMIT {
                     return ::core::result::Result::Err(
                         ::puroro::DecodeError::RecursionLimitExceeded,
                     );
                 }
-                self.ingest_buf(buf)
+                match bound {
+                    ::puroro_rt::MergeBound::Message => self.ingest_buf(buf),
+                    ::puroro_rt::MergeBound::Group(group) => {
+                        // Lazy ingest has no field match arms; copy the group
+                        // body (same helper as unknown preserve) then ingest.
+                        let mut body =
+                            ::allocator_api2::vec::Vec::new_in(self._common.alloc.clone());
+                        ::puroro_rt::decode::take_group_body(group, buf, &mut body)?;
+                        let mut slice: &[u8] = body.as_slice();
+                        self.ingest_buf(&mut slice)
+                    }
+                }
             }
         }
 

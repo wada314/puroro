@@ -210,7 +210,7 @@ Live plugin emits both aliases for every message (`Name` = `NameImpl<A, Eager>`,
 | [`oneof.rs`](puroro-rt/src/fields/oneof.rs) | `OneofSlot` / `OneofGroup` / `after_deallocate` |
 | [`oneof_variant.rs`](puroro-rt/src/fields/oneof_variant.rs) | `OneofVariant` payload helpers |
 | [`message_encode.rs`](puroro-rt/src/message_encode.rs) | `MessageEncode` / `EncodeCtx` / `encode_message` |
-| [`message_merge.rs`](puroro-rt/src/message_merge.rs) | `MessageMerge` / `merge_message` |
+| [`message_merge.rs`](puroro-rt/src/message_merge.rs) | `MessageMerge` / `MergeBound` / `merge_message` / `merge_group_body` |
 | [`decode.rs`](puroro-rt/src/decode.rs) | Tag / skip / unknown-field helpers |
 | [`decode/lazy_scan.rs`](puroro-rt/src/decode/lazy_scan.rs) | `Eager` / `Lazy<A>` / `MessageScan` / `LazyScan` / `LazyMessage` |
 | [`decode/record.rs`](puroro-rt/src/decode/record.rs) | `RecordScanner` / `ScannedRecord` / `ScannedValue` (incl. `Group { payload_len }`) / `scanned_len_span` / `scanned_group_span` / `merge_scanned_field` (LEN reconstruct helper; groups use `merge_shared`; numerics use catalog `merge_scanned`) |
@@ -673,7 +673,7 @@ FIELD_PRIORITY => self
     .merge(wire_type, buf, depth)?,
 ```
 
-Nested LEN payloads use `Buf::take(len)` before child `merge_from`.
+Nested LEN payloads use `DecodeBuf::push_limit` / `pop_limit` before child `merge_from_with_depth`. Group-framed children (`ProtoGroup`) call `merge_group_body` on the same buf (`MergeBound::Group`); the generated eager loop returns on the matching `EGroup` without copying the body first. Lazy `merge_from_bounded(Group)` still `take_group_body` then `ingest_buf`.
 
 ### Validation
 

@@ -440,12 +440,8 @@ where
         if wire_type != WireType::SGroup {
             return Err(DecodeError::InvalidTag);
         }
-        let mut body = ::allocator_api2::vec::Vec::new_in(common.clone_alloc());
-        decode::take_group_body(field, buf, &mut body)?;
-        let mut slice: &[u8] = body.as_slice();
-        let mut scoped = ::puroro::ScopedBuf::new(&mut slice);
         let child = ValueSlot::with_mut(slot, init, common).get_mut();
-        MessageMerge::merge_from_with_depth(DerefMut::deref_mut(child), &mut scoped, depth + 1)
+        MessageMerge::merge_group_body(DerefMut::deref_mut(child), buf, depth + 1, field)
     }
 }
 

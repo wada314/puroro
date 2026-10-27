@@ -9,11 +9,12 @@ use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::Buf;
 use ::bytes::BufMut;
-use ::puroro::{DecodeBuf, DecodeError, Message, RECURSION_LIMIT};
+use ::puroro::{DecodeBuf, DecodeError, Message, RECURSION_LIMIT, WireType};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    Boxed, EncodeCtx, FieldCloneIn, FieldDeallocate, FieldEncode, Message as MessagePresence,
-    MessageCommon, MessageEncode, MessageMerge, ProtoMessage, SingularField,
+    Boxed, EncodeCtx, FieldCloneIn, FieldDeallocate, FieldEncode, MergeBound,
+    Message as MessagePresence, MessageCommon, MessageEncode, MessageMerge, ProtoMessage,
+    SingularField,
 };
 
 /// Self-referential message: optional `child` of the same type (field 1).
@@ -74,16 +75,26 @@ impl<A: Allocator + Clone> MessageEncode for Nest<A> {
 }
 
 impl<A: Allocator + Clone> MessageMerge for Nest<A> {
-    fn merge_from_with_depth<B: DecodeBuf>(
+    fn merge_from_bounded<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
         depth: usize,
+        bound: MergeBound,
     ) -> Result<(), DecodeError> {
         if depth >= RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
+            if let MergeBound::Group(g) = bound {
+                if wire_type == WireType::EGroup {
+                    return if field_number == g {
+                        Ok(())
+                    } else {
+                        Err(DecodeError::InvalidTag)
+                    };
+                }
+            }
             match field_number.as_u32() {
                 1 => self
                     .child
@@ -98,7 +109,10 @@ impl<A: Allocator + Clone> MessageMerge for Nest<A> {
                 )?,
             }
         }
-        Ok(())
+        match bound {
+            MergeBound::Message => Ok(()),
+            MergeBound::Group(_) => Err(DecodeError::UnexpectedEof),
+        }
     }
 }
 

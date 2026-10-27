@@ -25,7 +25,7 @@ use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
 use ::core::ops::{Deref, DerefMut};
 
-use ::puroro::{DecodeBuf, DecodeError, Message, ScopedBuf, WireType};
+use ::puroro::{DecodeBuf, DecodeError, Message, WireType};
 
 use crate::decode;
 use crate::message_encode::MessageEncode;
@@ -552,12 +552,8 @@ where
         if wire_type != WireType::SGroup {
             return Err(DecodeError::InvalidTag);
         }
-        let mut body = ::allocator_api2::vec::Vec::new_in(alloc.clone());
-        decode::take_group_body(field, buf, &mut body)?;
-        let mut slice: &[u8] = body.as_slice();
-        let mut scoped = ScopedBuf::new(&mut slice);
         let mut msg = M::new_in(alloc);
-        MessageMerge::merge_from_with_depth(&mut msg, &mut scoped, depth + 1)?;
+        MessageMerge::merge_group_body(&mut msg, buf, depth + 1, field)?;
         Ok(msg)
     }
 

@@ -19,7 +19,7 @@ use ::allocator_api2::alloc::Allocator;
 use ::core::marker::PhantomData;
 use ::protobuf_core::FieldNumber;
 
-use ::puroro::{DecodeBuf, DecodeError, ScopedBuf, WireType};
+use ::puroro::{DecodeBuf, DecodeError, WireType};
 
 use crate::decode;
 use crate::fields::shared::{
@@ -223,12 +223,7 @@ impl<M: MessageEncode + MessageMerge> PayloadMerge for ProtoMessage<M, GroupDeli
         if wire_type != WireType::SGroup {
             return Err(DecodeError::InvalidTag);
         }
-        // Copy body then merge: same `take_group_body` path as unknown preserve.
-        let mut body = ::allocator_api2::vec::Vec::new_in(common.clone_alloc());
-        decode::take_group_body(field, buf, &mut body)?;
-        let mut slice: &[u8] = body.as_slice();
-        let mut scoped = ScopedBuf::new(&mut slice);
         let child = ValueSlot::with_mut(slot, init, common).get_mut();
-        MessageMerge::merge_from_with_depth(child, &mut scoped, depth + 1)
+        MessageMerge::merge_group_body(child, buf, depth + 1, field)
     }
 }

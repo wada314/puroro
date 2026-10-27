@@ -12,8 +12,8 @@ use ::core::iter;
 use ::puroro::{DecodeBuf, DecodeError, Message, RECURSION_LIMIT};
 use ::puroro_rt::decode::{LazyMessage, LazyScan, ScannedRecord};
 use ::puroro_rt::{
-    CloneIn, DeallocateIn, DefaultIn, EncodeCtx, FieldCloneIn, LazyMessageCommon, MessageEncode,
-    MessageMerge, SingularField,
+    CloneIn, DeallocateIn, DefaultIn, EncodeCtx, FieldCloneIn, LazyMessageCommon, MergeBound,
+    MessageEncode, MessageMerge, SingularField,
 };
 use ::std::vec::Vec;
 
@@ -198,15 +198,24 @@ impl<A: Allocator + Clone> MessageEncode for PointLazy<A> {
 }
 
 impl<A: Allocator + Clone> MessageMerge for PointLazy<A> {
-    fn merge_from_with_depth<B: DecodeBuf>(
+    fn merge_from_bounded<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
         depth: usize,
+        bound: MergeBound,
     ) -> Result<(), DecodeError> {
         if depth >= RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
-        self.ingest_buf(buf)
+        match bound {
+            MergeBound::Message => self.ingest_buf(buf),
+            MergeBound::Group(group) => {
+                let mut body = ::allocator_api2::vec::Vec::new_in(self._common.alloc.clone());
+                ::puroro_rt::decode::take_group_body(group, buf, &mut body)?;
+                let mut slice: &[u8] = body.as_slice();
+                self.ingest_buf(&mut slice)
+            }
+        }
     }
 }
 
