@@ -340,9 +340,9 @@ where
         unsafe { self.field.storage.with_alloc(alloc) }
     }
 
-    /// Minimal container mutator ([`RepeatedContainerMut`](super::container::RepeatedContainerMut)).
+    /// Minimal container mutator ([`RepeatedContainerMut`](::puroro::RepeatedContainerMut)).
     ///
-    /// Works for string / bytes as well as scalars and messages: [`push`](super::container::RepeatedContainerMut::push)
+    /// Works for string / bytes as well as scalars and messages: [`push`](::puroro::RepeatedContainerMut::push)
     /// appends a default element and returns a singular-style mut handle.
     pub fn container_mut(self) -> RepeatedElementsMut<'f, T, A>
     where

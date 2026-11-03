@@ -32,8 +32,8 @@ use super::{
 /// Marker for payloads stored as addressable `T` / [`MaybeUninit<T>`] in the
 /// field slot.
 ///
-/// Blanket over all `T`. Callers must deref [`ManuallyDrop`] field wrappers
-/// before invoking [`ValueSlot`] methods so resolution does not treat the
+/// Blanket over all `T`. Callers must deref [`ManuallyDrop`](::core::mem::ManuallyDrop) field wrappers
+/// before invoking `ValueSlot` methods so resolution does not treat the
 /// wrapper as the slot type.
 pub trait AddressableSlot {}
 

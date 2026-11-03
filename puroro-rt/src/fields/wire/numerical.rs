@@ -85,7 +85,7 @@ macro_rules! varint_numerical {
         #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
         pub struct $codec;
 
-        /// Protobuf type marker (see [`Numerical`] visibility note).
+        /// Protobuf type marker (see `Numerical` visibility note).
         pub type $alias = Numerical<$codec>;
 
         impl NumericalType for $codec {
@@ -215,7 +215,7 @@ macro_rules! fixed32_numerical {
         #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
         pub struct $codec;
 
-        /// Protobuf type marker (see [`Numerical`] visibility note).
+        /// Protobuf type marker (see `Numerical` visibility note).
         pub type $alias = Numerical<$codec>;
 
         impl NumericalType for $codec {
@@ -240,7 +240,7 @@ macro_rules! fixed64_numerical {
         #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
         pub struct $codec;
 
-        /// Protobuf type marker (see [`Numerical`] visibility note).
+        /// Protobuf type marker (see `Numerical` visibility note).
         pub type $alias = Numerical<$codec>;
 
         impl NumericalType for $codec {

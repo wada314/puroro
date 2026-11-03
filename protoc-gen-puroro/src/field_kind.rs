@@ -1,6 +1,6 @@
 //! Proto field → catalog [`FieldKind`] IR.
 //!
-//! [`plan::plan_fields`] walks a resolved [`Message`](crate::resolved::Message),
+//! [`plan::plan_fields`] walks a resolved [`Message`],
 //! assigns common bit indices (ascending field number, one pass),
 //! and produces a [`MessageFieldPlan`] ready for catalog emission.
 //!
@@ -119,7 +119,7 @@ pub enum PlannedLayout {
         /// e.g. `BIT_DONE_VALUE`
         bit_const: String,
     },
-    /// Singular `string` / `bytes` — heap/inline bit for [`InlineOrHeap`] (`true` = heap).
+    /// Singular `string` / `bytes` — heap/inline bit for `InlineOrHeap` (`true` = heap).
     InlineOrHeap {
         /// Index of the `MessageCommon` bit (`1` = heap arm, `0` = inline).
         heap_bit: usize,

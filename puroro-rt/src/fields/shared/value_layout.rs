@@ -38,11 +38,11 @@ use crate::message_merge::MessageMerge;
 /// Where a singular field's logical value is stored.
 ///
 /// Associated [`Slot`](Self::Slot) is the physical storage for this `(T, L)`
-/// pair. Infallible views live on [`ValueLayoutGet`]; mutable `_mut` handles
-/// live on [`ValueLayoutMut`].
+/// pair. Infallible views live on `ValueLayoutGet`; mutable `_mut` handles
+/// live on `ValueLayoutMut`.
 pub trait ValueLayout<T: SingularType, A: Allocator>: Copy {
     /// Physical value stored in the singular field slot (excluding
-    /// [`MessageCommon`] bits).
+    /// [`MessageCommon`](crate::MessageCommon) bits).
     type Slot: AddressableSlot;
 
     fn is_proto_empty<Cx>(slot: &Self::Slot, common: &Cx) -> bool
@@ -51,7 +51,7 @@ pub trait ValueLayout<T: SingularType, A: Allocator>: Copy {
 
     /// Clears the logical value and slot presence / payload.
     ///
-    /// `common` must be this field's parent [`MessageCommon`] (same pairing as
+    /// `common` must be this field's parent [`MessageCommon`](crate::MessageCommon) (same pairing as
     /// [`deallocate_slot`](Self::deallocate_slot)).
     fn clear<VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
     where
@@ -63,7 +63,7 @@ pub trait ValueLayout<T: SingularType, A: Allocator>: Copy {
 
     /// Message / oneof teardown for this field's value slot.
     ///
-    /// `common` must be the parent [`MessageCommon`] that allocated `slot`
+    /// `common` must be the parent [`MessageCommon`](crate::MessageCommon) that allocated `slot`
     /// (same instance generated `Drop` passes as `&self._common`). The type
     /// system does not prove this pairing; a different message's common is
     /// unsound. SSO layouts also read the heap bit from this `common`.
@@ -408,7 +408,7 @@ where
     }
 }
 
-/// Logical `bool` packed at `VALUE_BIT` in [`MessageCommon`]'s bitvec.
+/// Logical `bool` packed at `VALUE_BIT` in [`MessageCommon`](crate::MessageCommon)'s bitvec.
 ///
 /// Used only with [`ProtoBool`]. The field slot remains a ZST; the value lives
 /// in bits. [`Inline`](Inline) + [`ProtoBool`] stores a plain `bool` in the slot
@@ -533,7 +533,7 @@ impl<A: Allocator + Clone, const VALUE_BIT: usize> ValueLayoutClone<ProtoBool, A
     }
 }
 
-/// Polarity of [`InlineOrHeap`]'s `HEAP_BIT` in [`MessageCommon`].
+/// Polarity of [`InlineOrHeap`]'s `HEAP_BIT` in [`MessageCommon`](crate::MessageCommon).
 ///
 /// - [`SSO_HEAP`] (`true`): slot holds a heap [`UnmanagedString`]
 /// - [`SSO_INLINE`] (`false`): slot holds the inline buffer
@@ -546,7 +546,7 @@ pub const SSO_INLINE: bool = false;
 /// `MessageCommon` bit `HEAP_BIT` is the sole arm discriminant for the untagged
 /// slot: [`SSO_HEAP`] when the heap arm is live, [`SSO_INLINE`] when inline.
 /// Short / empty heap states are allowed when installed via
-/// [`pack_heap`](crate::fields::wire::sso_string::pack_heap).
+/// `pack_heap`.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct InlineOrHeap<const HEAP_BIT: usize>;
 

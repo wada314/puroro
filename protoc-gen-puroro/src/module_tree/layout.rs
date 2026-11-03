@@ -1,4 +1,4 @@
-//! Physical layout of a [`ModuleForest`](super::ModuleForest) into plugin files.
+//! Physical layout of a [`ModuleForest`] into plugin files.
 //!
 //! Layout never splits `mod` blocks that appear inside [`ModuleNode::items`](super::ModuleNode::items);
 //! only forest `children` are eligible for file splitting.

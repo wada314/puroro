@@ -95,7 +95,7 @@ impl FieldPresence for Implicit {
 }
 
 /// Marker for a singular nested-message field — presence is the slot itself
-/// ([`Option`](core::option::Option) via [`ValueSlot`](super::value_slot::ValueSlot)),
+/// ([`Option`](core::option::Option) via a `ValueSlot`),
 /// not a message bitfield. Emit / `is_set` consult the caller callback (absent =
 /// empty). Used for nested messages via [`ProtoMessage`](crate::ProtoMessage).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
@@ -130,7 +130,7 @@ impl FieldPresence for Message {
 }
 
 /// Marker for a **oneof variant** field — presence is tracked by the enclosing
-/// [`OneofSlot`](super::oneof::OneofSlot), not by this wrapper. Always emits on
+/// [`OneofSlot`](crate::OneofSlot), not by this wrapper. Always emits on
 /// the wire when the variant is active (even when the payload is empty / type-zero).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct Oneof;

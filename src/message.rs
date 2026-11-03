@@ -26,8 +26,8 @@ pub const RECURSION_LIMIT: usize = 100;
 /// (e.g. [`Message::validate`]).
 ///
 /// Wire body sizing / writing (`encoded_len` / `encode_raw` with an encode
-/// context) lives on [`puroro_rt::MessageEncode`] — not on this trait. Depth-aware
-/// merge lives on [`puroro_rt::MessageMerge`]. Generated code implements
+/// context) lives on `puroro_rt::MessageEncode` — not on this trait. Depth-aware
+/// merge lives on `puroro_rt::MessageMerge`. Generated code implements
 /// [`encode`](Self::encode) / [`encode_to_vec`](Self::encode_to_vec) /
 /// [`merge_from`](Self::merge_from) as thin wrappers;
 /// [`encode_to_bytes`](Self::encode_to_bytes) / [`decode`](Self::decode) are
@@ -61,12 +61,12 @@ pub trait Message: Sized {
     ///
     /// The caller owns the destination buffer (and thus its allocator /
     /// capacity strategy). Generated impls forward to
-    /// [`puroro_rt::encode_message`].
+    /// `puroro_rt::encode_message`.
     fn encode<B: BufMut>(&self, buf: &mut B);
 
     /// Encodes into a new `Vec<u8>`.
     ///
-    /// Generated impls forward to [`puroro_rt::encode_message_to_vec`] (pre-sizes
+    /// Generated impls forward to `puroro_rt::encode_message_to_vec` (pre-sizes
     /// via `encoded_len`). Prefer this over [`encode`](Self::encode) into an
     /// empty `Vec` when allocating a fresh buffer.
     fn encode_to_vec(&self) -> Vec<u8>;
@@ -78,7 +78,7 @@ pub trait Message: Sized {
 
     /// Reads fields from `buf` and merges them into `self`.
     ///
-    /// Generated impls forward to [`puroro_rt::merge_message`] (depth `0`).
+    /// Generated impls forward to `puroro_rt::merge_message` (depth `0`).
     ///
     /// Merge semantics (identical across proto2, proto3, editions):
     /// - Singular scalar: last value seen wins.

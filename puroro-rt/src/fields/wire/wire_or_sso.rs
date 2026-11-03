@@ -54,7 +54,7 @@ union WireOrSsoUnion<H> {
 
 const _: () = assert!(mem::size_of::<WireOrSsoUnion<()>>() == mem::size_of::<usize>() * 3);
 
-/// Interior-mutable lazy LEN slot (same width as [`SsoBuf`](super::sso_buf::SsoBuf)).
+/// Interior-mutable lazy LEN slot (same width as `SsoBuf`).
 pub struct WireOrSsoSlot<H> {
     inner: UnsafeCell<WireOrSsoUnion<H>>,
 }

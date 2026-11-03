@@ -227,7 +227,7 @@ pub(crate) fn save_unknown_varint_field<A: Allocator + Clone, U: UnknownStore<A>
 /// Iterates unknown fields stored as a contiguous partial protobuf stream.
 ///
 /// The buffer is expected to be written only by [`skip_field_and_save`] and
-/// [`save_unknown_varint_field`]. On truncated or otherwise corrupt input the
+/// `save_unknown_varint_field`. On truncated or otherwise corrupt input the
 /// iterator ends (infallible for callers).
 #[inline]
 pub fn iter_unknown_fields(bytes: &[u8]) -> UnknownFieldsIter<'_> {

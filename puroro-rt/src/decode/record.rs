@@ -181,7 +181,7 @@ impl<A: Allocator + Clone> RecordScanner<A> {
 /// Feeds a scanned record into catalog `merge` by reconstructing a wire body.
 ///
 /// Generated lazy apply does **not** use this for numerics — those go through
-/// catalog `merge_scanned` / [`CopyWirePayload::from_scanned`](crate::fields::wire::wire_payload::CopyWirePayload::from_scanned).
+/// catalog `merge_scanned` / `CopyWirePayload::from_scanned`.
 /// Numerics here still re-encode the small value (tests / leftover callers).
 /// LEN / packed slices `wire` after the tag (length prefix included).
 /// Pass a [`SharedWire`](super::shared_wire::SharedWire) handle slice, not
