@@ -1,0 +1,53 @@
+name: Rust
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prefer HTTPS for git submodules
+        run: git config --global url."https://github.com/".insteadOf git@github.com:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt, clippy
+      - name: Install protoc
+        run: |
+          # Edition 2024 fixtures need protoc >= 32.1.
+          PROTOC_VER=32.1
+          PROTOC_ZIP=protoc-${PROTOC_VER}-linux-x86_64.zip
+          curl -fsSL -o "$PROTOC_ZIP" \
+            "https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VER}/$PROTOC_ZIP"
+          sudo unzip -o "$PROTOC_ZIP" -d /usr/local bin/protoc
+          sudo unzip -o "$PROTOC_ZIP" -d /usr/local 'include/*'
+          rm -f "$PROTOC_ZIP"
+          protoc --version
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Clippy
+        # Skip fixture-generated sources and unpublished archive/bench crates.
+        run: >
+          cargo clippy --locked --all-targets --workspace
+          --exclude puroro-codegen-tests
+          --exclude puroro-benches
+          --exclude address-view-spike
+          -- -D warnings
+      - name: Test (includes doctests)
+        run: cargo test --locked --workspace --exclude puroro-codegen-tests --exclude puroro-benches
+      - name: Codegen fixture tests
+        run: cargo test --locked -p puroro-codegen-tests
+      - name: Docs
+        # Soft build only: many pre-existing rustdoc link warnings remain.
+        # Doctest samples are covered by `cargo test` above.
+        run: >
+          cargo doc --locked --no-deps
+          -p puroro -p puroro-rt -p protoc-gen-puroro -p puroro-sample-generated

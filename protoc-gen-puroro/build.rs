@@ -104,10 +104,10 @@ fn record(
     if !WANTED.contains(&name.as_str()) {
         return;
     }
-    if let Some(prev) = versions.insert(name.clone(), version.clone()) {
-        if prev != version {
-            panic!("{name} appears as both {prev} and {version} in Cargo.lock");
-        }
+    if let Some(prev) = versions.insert(name.clone(), version.clone())
+        && prev != version
+    {
+        panic!("{name} appears as both {prev} and {version} in Cargo.lock");
     }
 }
 

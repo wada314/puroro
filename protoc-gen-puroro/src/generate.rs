@@ -183,7 +183,7 @@ mod tests {
     use ::protobuf_core::{AsRefExtProtobuf, Field, FieldNumber, FieldValue, WriteExtProtobuf};
     use ::std::env;
     use ::std::fs;
-    use ::std::path::PathBuf;
+    use ::std::path::{Path, PathBuf};
     use ::std::process::{self, Command};
     use ::std::thread;
 
@@ -288,7 +288,7 @@ mod tests {
             let line = format!("{name} = \"{version}\"");
             assert!(manifest.content.contains(&line), "missing {line}");
         }
-        let root = ::std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("..");
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("..");
         assert_eq!(
             env!("PURORO_GEN_DEP_PURORO"),
             package_version(&root.join("Cargo.toml"))
@@ -305,7 +305,7 @@ mod tests {
         assert!(lib.content.contains("pub mod library"));
     }
 
-    fn package_version(path: &::std::path::Path) -> String {
+    fn package_version(path: &Path) -> String {
         let text =
             fs::read_to_string(path).unwrap_or_else(|e| panic!("read {}: {e}", path.display()));
         let package = text
