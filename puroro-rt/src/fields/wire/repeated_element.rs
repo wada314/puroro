@@ -120,7 +120,7 @@ pub trait RepeatedElementMerge<A: Allocator + Clone>: RepeatedElement {
         B: DecodeBuf,
         F: FnMut(Self::Element<A>);
 
-    /// Merge one already-parsed [`FieldValue`] into `push` (no length-prefix refeed).
+    /// Merge one already-parsed [`FieldValue`] into `push`.
     fn merge_occurrence_parsed<F>(
         value: &FieldValue<&[u8]>,
         alloc: A,

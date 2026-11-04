@@ -567,7 +567,7 @@ where
         )
     }
 
-    /// Merge from a parsed [`FieldValue`] without rebuilding a length prefix.
+    /// Merge from a parsed [`FieldValue`].
     pub fn merge_parsed(self, value: &FieldValue<&[u8]>, depth: usize) -> Result<(), DecodeError>
     where
         A: Clone,

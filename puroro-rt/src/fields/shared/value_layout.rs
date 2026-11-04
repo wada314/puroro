@@ -102,7 +102,7 @@ pub trait ValueLayoutMerge<T: SingularType, A: Allocator>: ValueLayout<T, A> {
         A: Clone,
         Self::Slot: DefaultIn<A>;
 
-    /// Merge from a [`protobuf_core`] [`FieldValue`] (no length-prefix refeed).
+    /// Merge from a [`protobuf_core`] [`FieldValue`].
     fn merge_parsed<VS, I, Cx>(
         slot: &mut VS,
         init: I,

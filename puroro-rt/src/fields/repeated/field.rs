@@ -385,7 +385,7 @@ where
             .merge_from_wire(wire_type, buf, self.common.clone_alloc(), depth)
     }
 
-    /// Merge from a parsed [`FieldValue`] without rebuilding a length prefix.
+    /// Merge from a parsed [`FieldValue`].
     pub fn merge_parsed(self, value: &FieldValue<&[u8]>, depth: usize) -> Result<(), DecodeError>
     where
         T: RepeatedElementMerge<A>,

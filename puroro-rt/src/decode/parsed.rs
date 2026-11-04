@@ -1,8 +1,8 @@
-//! Adapt [`protobuf_core`] field iterators to catalog merges without re-encoding.
+//! Adapt [`protobuf_core`] field iterators to catalog `merge_parsed`.
 //!
 //! Contiguous eager decode walks [`AsRefExtProtobuf`] fields and feeds
-//! [`FieldValue`]s into `merge_parsed` on catalog views. Unknowns are saved
-//! from the parsed [`Field`] directly.
+//! [`FieldValue`]s into catalog views. Unknowns are saved from the parsed
+//! [`Field`] directly.
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::Buf;

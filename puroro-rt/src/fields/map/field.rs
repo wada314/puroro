@@ -599,7 +599,7 @@ where
         Ok(())
     }
 
-    /// Merge from a parsed map-entry [`FieldValue`] (no length-prefix refeed).
+    /// Merge from a parsed map-entry [`FieldValue`].
     pub fn merge_parsed(
         &mut self,
         value: &FieldValue<&[u8]>,

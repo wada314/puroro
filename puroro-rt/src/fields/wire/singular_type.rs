@@ -180,7 +180,7 @@ pub trait PayloadMerge: PayloadAccess {
         Cx: MessageBindingMut<A>,
         B: DecodeBuf;
 
-    /// Merge from a parsed [`FieldValue`] without rebuilding a length prefix.
+    /// Merge from a parsed [`FieldValue`].
     fn merge_parsed<A, VS, I, Cx>(
         slot: &mut VS,
         init: I,
