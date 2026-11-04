@@ -37,10 +37,11 @@ cargo bench -p puroro-benches -- --test
 cargo fmt --all
 cargo clippy --all-targets --workspace \
   --exclude puroro-codegen-tests --exclude puroro-benches --exclude address-view-spike
-cargo doc --no-deps -p puroro -p puroro-rt -p protoc-gen-puroro -p puroro-sample-generated
+RUSTDOCFLAGS='-D warnings' cargo doc --no-deps \
+  -p puroro -p puroro-rt -p protoc-gen-puroro -p puroro-sample-generated
 ```
 
-`cargo test` also runs rustdoc examples (doctests). CI (`.github/workflows/rust.yml`) runs fmt, clippy (`-D warnings`, excluding generated/archive/bench crates), tests, codegen fixtures, and a soft `cargo doc` build. Do not turn on `RUSTDOCFLAGS=-D warnings` for first-party crates yet: many broken intra-doc links remain. Bench smoke stays in `.github/workflows/benches.yml`.
+`cargo test` also runs rustdoc examples (doctests). CI (`.github/workflows/rust.yml`) runs fmt, clippy (`-D warnings`, excluding generated/archive/bench crates), tests, codegen fixtures, and `cargo doc` with `RUSTDOCFLAGS=-D warnings` for the first-party packages above. Bench smoke stays in `.github/workflows/benches.yml`.
 
 Criterion benches are the unpublished `puroro-benches` member (`publish = false`). Sources live in `puroro-benches/benches/`. The `puroro` package sets `autobenches = false` so Cargo does not pick those files up as its own targets. Do not move the targets back onto `puroro`. A `puroro` dev-dependency on `puroro-rt` makes `cargo publish -p puroro` wait for `puroro-rt`, which itself depends on `puroro`.
 
