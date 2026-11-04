@@ -708,6 +708,29 @@ pub(super) fn render_merge_arms(oneof: &OneofEmit, companion: &Ident) -> Vec<Tok
         .collect()
 }
 
+pub(super) fn render_parsed_merge_arms(oneof: &OneofEmit, companion: &Ident) -> Vec<TokenStream> {
+    let group = &oneof.name;
+    oneof
+        .variants
+        .iter()
+        .map(|v| {
+            let field_const = &v.field_const;
+            quote! {
+                #companion::#field_const => {
+                    let (wire_type, mut body) =
+                        ::puroro_rt::decode::parsed_wire_body(&field.value)?;
+                    let mut scoped = ::puroro::ScopedBuf::new(&mut body);
+                    self.#group
+                        .bind_mut(&mut self._common)
+                        .variant_mut::<{ #companion::#field_const }>()
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, &mut scoped, depth)?;
+                }
+            }
+        })
+        .collect()
+}
+
 /// `FIELD_*` constants for each variant.
 pub(super) fn render_field_consts(oneof: &OneofEmit) -> Vec<Item> {
     oneof

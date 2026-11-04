@@ -11,8 +11,12 @@ use core::mem;
 use core::ops::ControlFlow;
 use core::ops::DerefMut;
 
+use puroro::ScopedBuf;
 use puroro::{DecodeBuf, DecodeError, Message};
-use puroro_rt::decode::{decode_tag, skip_field_and_save};
+use puroro_rt::decode::{
+    decode_tag, parsed_wire_body, save_parsed_field_in, skip_field_and_save,
+    try_for_each_contiguous_field,
+};
 use puroro_rt::{
     CloneFieldsVisitor, CloneIn, DebugStructVisitor, Eager, EncodeCtx, EncodeRawVisitor,
     EncodedLenVisitor, Explicit, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor,
@@ -303,6 +307,49 @@ impl<A: Allocator + Clone> MessageMerge for Address<A> {
     ) -> Result<(), DecodeError> {
         if depth >= ::puroro::RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
+        }
+        if try_for_each_contiguous_field(buf, |field| {
+            match field.field_number.as_u32() {
+                FIELD_STREET => {
+                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
+                    let mut scoped = ScopedBuf::new(&mut body);
+                    self.street
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, &mut scoped, depth)?;
+                }
+                FIELD_CITY => {
+                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
+                    let mut scoped = ScopedBuf::new(&mut body);
+                    self.city
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, &mut scoped, depth)?;
+                }
+                FIELD_POSTAL_CODE => {
+                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
+                    let mut scoped = ScopedBuf::new(&mut body);
+                    self.postal_code.bind_mut(&mut self._common).merge(
+                        wire_type,
+                        &mut scoped,
+                        depth,
+                    )?;
+                }
+                FIELD_LATITUDE => {
+                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
+                    let mut scoped = ScopedBuf::new(&mut body);
+                    self.latitude.bind_mut(&mut self._common).merge(
+                        wire_type,
+                        &mut scoped,
+                        depth,
+                    )?;
+                }
+                _ => {
+                    let alloc = self._common.alloc.clone();
+                    save_parsed_field_in(field, &mut *self._common.unknown_fields, alloc)?;
+                }
+            }
+            Ok(())
+        })? {
+            return Ok(());
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;

@@ -6,11 +6,15 @@
 //! plus [`WireType`].
 
 mod lazy_scan;
+mod parsed;
 mod record;
 mod shared_wire;
 mod varint;
 
 pub use self::lazy_scan::{Eager, Lazy, LazyMessage, LazyScan, MessageScan};
+pub use self::parsed::{
+    ParsedWireBody, parsed_wire_body, save_parsed_field_in, try_for_each_contiguous_field,
+};
 pub use self::record::{
     RecordScanner, ScannedRecord, ScannedValue, WireSpan, merge_scanned_field, scanned_len_payload,
     scanned_len_span,

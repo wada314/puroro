@@ -283,6 +283,7 @@ pub(super) fn render_items(
     let visit_pair_mut = render_visit_calls(&fields, VisitKind::PairMut);
     let visit_mut = render_visit_calls(&fields, VisitKind::Mut);
     let merge_arms = render_merge_arms(&fields, companion);
+    let parsed_merge_arms = render_parsed_merge_arms(&fields, companion);
     let validate_body = render_validate(&fields);
     let oneof_modules = render_oneof_modules(
         &fields,
@@ -514,6 +515,22 @@ pub(super) fn render_items(
             ) -> ::core::result::Result<(), ::puroro::DecodeError> {
                 if depth >= ::puroro::RECURSION_LIMIT {
                     return ::core::result::Result::Err(::puroro::DecodeError::RecursionLimitExceeded);
+                }
+                if ::puroro_rt::decode::try_for_each_contiguous_field(buf, |field| {
+                    match field.field_number.as_u32() {
+                        #(#parsed_merge_arms)*
+                        _ => {
+                            let alloc = self._common.alloc.clone();
+                            ::puroro_rt::decode::save_parsed_field_in(
+                                field,
+                                &mut *self._common.unknown_fields,
+                                alloc,
+                            )?;
+                        }
+                    }
+                    ::core::result::Result::Ok(())
+                })? {
+                    return ::core::result::Result::Ok(());
                 }
                 while ::bytes::Buf::has_remaining(buf) {
                     let (field_number, wire_type) = ::puroro_rt::decode::decode_tag(buf)?;
@@ -1804,6 +1821,30 @@ fn render_merge_arms(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStream
                 self.#name
                     .bind_mut(&mut self._common)
                     .merge(wire_type, buf, depth)?;
+            }
+        });
+    }
+    arms
+}
+
+/// Merge arms for the contiguous [`protobuf_core`] FieldIter path.
+fn render_parsed_merge_arms(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStream> {
+    let mut arms = Vec::new();
+    for field in fields {
+        if let FieldEmit::Oneof(o) = field {
+            arms.extend(oneof::render_parsed_merge_arms(o, companion));
+            continue;
+        }
+        let name = field.name();
+        let field_const = field.field_const();
+        arms.push(quote! {
+            #companion::#field_const => {
+                let (wire_type, mut body) =
+                    ::puroro_rt::decode::parsed_wire_body(&field.value)?;
+                let mut scoped = ::puroro::ScopedBuf::new(&mut body);
+                self.#name
+                    .bind_mut(&mut self._common)
+                    .merge(wire_type, &mut scoped, depth)?;
             }
         });
     }
