@@ -1,6 +1,6 @@
 //! Message-body encode surface used by the field catalog and generated code.
 //!
-//! This is intentionally **not** part of the user-facing [`puroro::Message`](::puroro::Message)
+//! This is intentionally **not** part of the user-facing [`puroro::Message`]
 //! trait. Library users call [`Message::encode`](::puroro::Message::encode) /
 //! [`Message::encode_to_vec`](::puroro::Message::encode_to_vec); generated
 //! impls forward those to [`encode_message`] / [`encode_message_to_vec`].
@@ -51,7 +51,7 @@ impl EncodeCtx {
 ///
 /// Implemented by generated messages and hand-written test / bench messages.
 /// Nested-message catalog code ([`ProtoMessage`](crate::ProtoMessage)) bounds on
-/// this trait, not on [`puroro::Message`](::puroro::Message).
+/// this trait, not on [`puroro::Message`].
 ///
 /// User-facing [`Message::encode`](::puroro::Message::encode) /
 /// [`Message::encode_to_vec`](::puroro::Message::encode_to_vec) are thin

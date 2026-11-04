@@ -67,7 +67,7 @@ pub trait FieldVisitor<C> {
 
 /// Pair / shared visitor — generated `visit_field_pairs` (e.g. [`PartialEq`]).
 ///
-/// Not part of the public message API. The [`FieldPartialEq`] bound on `F` is
+/// Not part of the public message API. The `FieldPartialEq` bound on `F` is
 /// intentional: catalog field types are heterogeneous, so a generic walk needs
 /// the capability on the field argument (same pattern as
 /// [`FieldPairVisitorMut`] / [`FieldVisitor`]).
@@ -151,7 +151,7 @@ impl<'a, C> FieldPairVisitor<C> for FieldEqVisitor<'a, C> {
 /// [`FieldVisitorMut`] that [`FieldDeallocate::deallocate`]s every field.
 ///
 /// Stores the common context as a raw pointer so it can be built from
-/// `&message._common` before [`visit_fields_mut`] mutably borrows field slots.
+/// `&message._common` before `visit_fields_mut` mutably borrows field slots.
 pub struct FieldDeallocVisitor<C> {
     common: *const C,
 }
@@ -304,7 +304,7 @@ where
 
 /// Adapts [`fmt::DebugStruct`] as a [`FieldVisitor`].
 ///
-/// Owns the [`DebugStruct`] so generated `Debug` can call [`finish`](Self::finish)
+/// Owns the [`DebugStruct`](::std::fmt::DebugStruct) so generated `Debug` can call [`finish`](Self::finish)
 /// without overlapping borrows.
 pub struct DebugStructVisitor<'a, 'b, 'c, C> {
     ds: fmt::DebugStruct<'a, 'b>,

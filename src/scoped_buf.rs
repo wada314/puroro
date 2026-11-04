@@ -12,8 +12,8 @@ use crate::error::DecodeError;
 /// Buffer used by nested decode: a [`Buf`] that can push / pop LEN scopes.
 ///
 /// The only implementor is [`ScopedBuf`]. [`Message::merge_from`](crate::Message::merge_from)
-/// wraps an arbitrary `Buf` into a [`ScopedBuf`] before calling
-/// [`merge_from_with_depth`](crate::Message::merge_from_with_depth).
+/// wraps an arbitrary `Buf` into a [`ScopedBuf`] before the runtime calls
+/// `MessageMerge::merge_from_with_depth`.
 pub trait DecodeBuf: Buf {
     /// Restrict subsequent reads to the next `len` bytes of the current scope.
     ///

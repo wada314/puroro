@@ -6,7 +6,7 @@ use ::core::ops::DerefMut;
 /// Shared view of a `map<K, V>` field.
 ///
 /// `K` is the key view type (`str`, `[u8]`, `i32`, …) — not an owned buffer type.
-/// [`V`] is the shared value (`i32`, `str`, message `M`, …).
+/// `V` is the shared value (`i32`, `str`, message `M`, …).
 /// [`get`](Self::get) returns [`None`] when the key is absent — not because the
 /// value is “unset” in the singular-presence sense.
 ///
@@ -28,7 +28,7 @@ pub trait MapRef<K: ?Sized, V: ?Sized> {
 
 /// Mutable view of a `map<K, V>` field (pairs with [`MapRef`]).
 ///
-/// [`V`] is the shared value (`i32`, `str`, message `M`, …).
+/// `V` is the shared value (`i32`, `str`, message `M`, …).
 /// [`MutTarget`](Self::MutTarget) is the `_mut` target (`i32`, [`crate::String`]`<A>`, `M`, …).
 ///
 /// Set values via [`entry_mut`](Self::entry_mut) then assign / fill

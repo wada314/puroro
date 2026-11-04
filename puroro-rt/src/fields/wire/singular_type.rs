@@ -46,7 +46,7 @@ use super::wire_payload::CopyWirePayload;
 
 /// Singular protobuf **type** marker (e.g. `ProtoInt32`, `ProtoString`).
 ///
-/// Extends [`EncodeType`] so [`SingularField`](crate::fields::singular::field::SingularField)
+/// Extends `EncodeType` so [`SingularField`](crate::fields::singular::field::SingularField)
 /// can require a proto type without taking a storage layout. Slot / mutator
 /// types are on [`ValueLayout`](crate::fields::shared::value_layout::ValueLayout):
 /// - [`Inline`](crate::fields::shared::value_layout::Inline) + [`PayloadAccess`]:
@@ -59,7 +59,7 @@ use super::wire_payload::CopyWirePayload;
 /// - [`InlineOrHeap`](crate::fields::shared::value_layout::InlineOrHeap):
 ///   [`SsoString`](super::sso_string::SsoString) / [`SsoBytes`](super::sso_bytes::SsoBytes)
 ///
-/// Getter views use [`EncodeType::View`] (same type as tagged encode).
+/// Getter views use `EncodeType::View` (same type as tagged encode).
 pub trait SingularType: EncodeType {}
 
 /// Inline payload access for markers whose value lives in the field slot.
@@ -73,7 +73,7 @@ pub trait SingularType: EncodeType {}
 /// [`BitPacked`](crate::fields::shared::value_layout::BitPacked) instead.
 pub trait PayloadAccess: SingularType {
     /// Physical value stored in the singular field slot (excluding
-    /// [`MessageCommon`] bits).
+    /// [`MessageCommon`](crate::MessageCommon) bits).
     type Slot<A: Allocator>: AddressableSlot;
 
     /// Mutable handle returned by `_mut` accessors (`&mut i32`, `StringGuard`, …).
@@ -117,7 +117,7 @@ pub trait PayloadAccess: SingularType {
     /// Writes `value`, ensuring slot presence when applicable.
     ///
     /// Any previous payload is released with `common.alloc`. `common` must be
-    /// the parent [`MessageCommon`] that owns the existing slot (same pairing
+    /// the parent [`MessageCommon`](crate::MessageCommon) that owns the existing slot (same pairing
     /// as [`ValueLayout::deallocate_slot`](crate::fields::shared::value_layout::ValueLayout::deallocate_slot)).
     fn write<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx, value: Self::Written<A>)
     where
@@ -130,7 +130,7 @@ pub trait PayloadAccess: SingularType {
     /// Clears the logical value and slot presence / payload.
     ///
     /// Releases the previous payload with `common.alloc`. `common` must be the
-    /// parent [`MessageCommon`] that owns the slot.
+    /// parent [`MessageCommon`](crate::MessageCommon) that owns the slot.
     fn clear<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
     where
         A: Allocator + Clone,

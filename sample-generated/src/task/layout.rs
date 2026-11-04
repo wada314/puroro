@@ -35,7 +35,7 @@ use super::{
 
 /// Catalog kinds that change between eager `Task` and lazy `TaskLazy`.
 pub trait Layout<A: Allocator>: Sized {
-    /// Presence / SSO / lazy-kind bits packed into [`MessageCommon`].
+    /// Presence / SSO / lazy-kind bits packed into [`MessageCommon`](::puroro_rt::MessageCommon).
     type Bits: Default + Clone + BitStorage;
 
     /// Singular string / bytes slot (`InlineOrHeap<{SSO}>` or `WireOrSso<{KIND}>`).

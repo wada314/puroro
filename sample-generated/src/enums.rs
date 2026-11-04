@@ -3,7 +3,7 @@
 //! Protobuf enums are newtypes over `i32`, not Rust enums: multiple proto
 //! value names may share the same integer (`allow_alias`), and the wire
 //! carries only the number. Open vs closed is a type-level distinction via
-//! [`OpenEnum`] / [`ClosedEnum`] and [`ProtoEnum<E, Open|Closed>`].
+//! [`OpenEnum`] / [`ClosedEnum`] and [`ProtoEnum`](::puroro_rt::ProtoEnum)`<E, Open|Closed>`.
 //!
 //! Unknown-value semantics follow
 //! [Enum Behavior](https://protobuf.dev/programming-guides/enum/).

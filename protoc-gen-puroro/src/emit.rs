@@ -3,7 +3,7 @@
 //! Current scope: file-level and nested enums/messages with singular / repeated
 //! scalar / string / bytes / bool / enum / message fields, real oneofs, and
 //! maps with legal keys and Copy scalar / bool values. Orchestration (resolve,
-//! target selection, forest install, layout) lives in [`crate::generate`].
+//! target selection, forest install, layout) lives in [`mod@crate::generate`].
 
 use crate::descriptor::ProtoFqn;
 use crate::error::{Error, Result};

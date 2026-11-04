@@ -1,7 +1,7 @@
 //! `protoc-gen-puroro` — library entry points for the puroro code generator.
 //!
 //! The binary is a thin stdin/stdout wrapper around [`run_plugin`]. Tests and
-//! future `build.rs` / CLI wrappers should call [`generate`] / [`generate_from_bytes`]
+//! future `build.rs` / CLI wrappers should call [`generate`](crate::generate::generate) / [`generate_from_bytes`]
 //! (or the descriptor / resolved helpers) directly.
 
 pub mod case;

@@ -5,8 +5,8 @@
 //! drop implicitly) and must not leak into the public API:
 //!
 //! - [`Notification`] — canonical **shape** enum; variant payloads are type
-//!   parameters. [`NotificationStorage`] is a `pub(crate)` alias of this shape.
-//! - [`NotificationStorage`] — field-wrapper payloads; implements [`OneofGroup`],
+//!   parameters. `NotificationStorage` is a `pub(crate)` alias of this shape.
+//! - `NotificationStorage` — field-wrapper payloads; implements [`OneofGroup`],
 //!   [`OneofDeallocate`], encode glue. Never public.
 //! - [`NotificationCase`] — a payload-less, `Copy` discriminant of which variant
 //!   is active.
@@ -16,7 +16,7 @@
 //! [`SingularFieldAccess::Mut`](::puroro_rt::SingularFieldAccess) on each
 //! variant field alias. There are no public Ref/Mut aliases.
 //!
-//! Group bound views come from `puroro-rt` ([`OneofView`] /
+//! Group bound views come from `puroro-rt` ([`OneofView`](::puroro_rt::OneofView) /
 //! [`OneofViewMut`](::puroro_rt::OneofViewMut)), not per-oneof generated structs.
 //!
 //! This group is deliberately **heterogeneous** to show every field kind:
@@ -24,7 +24,7 @@
 //! | variant | proto | field wrapper | `Ref` payload | `Mut` payload |
 //! |---|---|---|---|---|
 //! | `email_address` / `phone_number` | `string` | [`SingularField`] (+ `ProtoDefault`) | `&str` | string guard |
-//! | `webhook_id` | `int32` `[default = -1]` | [`SingularField`] + [`WebhookIdDefault`] | `i32` (by value) | `&mut i32` |
+//! | `webhook_id` | `int32` `[default = -1]` | [`SingularField`] + `WebhookIdDefault` | `i32` (by value) | `&mut i32` |
 //! | `postal` | `Address` message | [`SingularField`] + [`ProtoMessage`] (inlined `M`) | `&Address<A>` | `&mut Address<A>` |
 //! | `urgent` | `bool` | [`SingularField`] + [`ProtoBool`] | `bool` | `SingularFieldAccess::Mut` (named bit handle) |
 //!
@@ -35,13 +35,13 @@
 //!
 //! The scalar variant owns no heap, so its `OneofDeallocate` arm is a no-op; the
 //! LEN and message variants free their storage through the message allocator.
-//! After that, [`OneofGroup::after_deallocate`](::puroro_rt::OneofGroup::after_deallocate)
+//! After that, [`OneofGroup::after_deallocate`]
 //! clears **every** bit this group owns (email/phone SSO, `urgent` value) —
 //! not a per-case match, and not a contiguous parent range that would
 //! clobber `done` / `flag`. Inlined `postal` keeps its bits on `Address`.
 //!
 //! Variant proto field numbers are fixed for this generated oneof, so
-//! [`NotificationStorage`] is *not* parametrised by them: each variant's field
+//! `NotificationStorage` is *not* parametrised by them: each variant's field
 //! wrapper references the parent message module's named `FIELD_*` constant
 //! (via `super::FIELD_*`) directly, keeping a single source of truth.
 //!

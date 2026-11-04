@@ -47,14 +47,14 @@ pub struct ChunkScan2;
 ///
 /// On a terminating first byte, advances and returns without building an
 /// `Option` / re-scanning the slice. If it continues, keeps the partial payload
-/// and finishes with [`finish_varint_bytewise`] (no re-read of byte 0).
+/// and finishes with `finish_varint_bytewise` (no re-read of byte 0).
 pub struct ChunkScanLikely1;
 
 /// Hand-unrolled paths for 1..=4 byte varints, then the generic chunk scan.
 pub struct ChunkScan4;
 
 /// When `chunk.len() >= N`, scan the first `N` bytes with a bounds-light loop
-/// (see [`try_decode_varint_hot`]). Smaller `N` favors short varints; `N == 10`
+/// (see `try_decode_varint_hot`). Smaller `N` favors short varints; `N == 10`
 /// covers the full protobuf varint width.
 pub struct ChunkScanHot2;
 /// Hot window of 4 bytes. See [`ChunkScanHot2`].
