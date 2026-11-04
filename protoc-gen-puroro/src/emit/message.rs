@@ -1839,12 +1839,9 @@ fn render_parsed_merge_arms(fields: &[FieldEmit], companion: &Ident) -> Vec<Toke
         let field_const = field.field_const();
         arms.push(quote! {
             #companion::#field_const => {
-                let (wire_type, mut body) =
-                    ::puroro_rt::decode::parsed_wire_body(&field.value)?;
-                let mut scoped = ::puroro::ScopedBuf::new(&mut body);
                 self.#name
                     .bind_mut(&mut self._common)
-                    .merge(wire_type, &mut scoped, depth)?;
+                    .merge_parsed(&field.value, depth)?;
             }
         });
     }

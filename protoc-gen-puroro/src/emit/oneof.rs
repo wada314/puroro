@@ -717,14 +717,11 @@ pub(super) fn render_parsed_merge_arms(oneof: &OneofEmit, companion: &Ident) -> 
             let field_const = &v.field_const;
             quote! {
                 #companion::#field_const => {
-                    let (wire_type, mut body) =
-                        ::puroro_rt::decode::parsed_wire_body(&field.value)?;
-                    let mut scoped = ::puroro::ScopedBuf::new(&mut body);
                     self.#group
                         .bind_mut(&mut self._common)
                         .variant_mut::<{ #companion::#field_const }>()
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, &mut scoped, depth)?;
+                        .merge_parsed(&field.value, depth)?;
                 }
             }
         })

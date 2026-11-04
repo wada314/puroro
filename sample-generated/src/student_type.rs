@@ -12,11 +12,9 @@ use core::mem;
 use core::ops::ControlFlow;
 use core::ops::DerefMut;
 
-use puroro::ScopedBuf;
 use puroro::{DecodeBuf, DecodeError, HasDefault, Message, Optional};
 use puroro_rt::decode::{
-    decode_tag, parsed_wire_body, save_parsed_field_in, skip_field_and_save,
-    try_for_each_contiguous_field,
+    decode_tag, save_parsed_field_in, skip_field_and_save, try_for_each_contiguous_field,
 };
 use puroro_rt::{
     CloneFieldsVisitor, CloneIn, DebugStructVisitor, EncodeCtx, EncodeRawVisitor,
@@ -240,27 +238,19 @@ impl<A: Allocator + Clone> MessageMerge for Student<A> {
         if try_for_each_contiguous_field(buf, |field| {
             match field.field_number.as_u32() {
                 FIELD_YEAR => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     self.year
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, &mut scoped, depth)?;
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_LOCATION => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
-                    self.location.bind_mut(&mut self._common).merge(
-                        wire_type,
-                        &mut scoped,
-                        depth,
-                    )?;
+                    self.location
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_HOME => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     self.home
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, &mut scoped, depth)?;
+                        .merge_parsed(&field.value, depth)?;
                 }
                 _ => {
                     let alloc = self._common.alloc.clone();

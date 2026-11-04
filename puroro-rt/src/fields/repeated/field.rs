@@ -13,6 +13,7 @@ use ::core::mem::ManuallyDrop;
 use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::BufMut;
+use ::protobuf_core::FieldValue;
 use ::puroro::{DecodeBuf, DecodeError, WireType};
 use ::unmanaged::CloneIn;
 use ::unmanaged::DeallocateIn;
@@ -383,6 +384,16 @@ where
         self.field
             .merge_from_wire(wire_type, buf, self.common.clone_alloc(), depth)
     }
+
+    /// Merge from a parsed [`FieldValue`] without rebuilding a length prefix.
+    pub fn merge_parsed(self, value: &FieldValue<&[u8]>, depth: usize) -> Result<(), DecodeError>
+    where
+        T: RepeatedElementMerge<A>,
+        A: Clone,
+    {
+        self.field
+            .merge_from_parsed(value, self.common.clone_alloc(), depth)
+    }
 }
 
 impl<'f, 'c, C, E, const FIELD: u32, A, Cx> RepeatedFieldMut<'f, 'c, Numerical<C>, E, FIELD, A, Cx>
@@ -447,6 +458,25 @@ where
         // buffer.
         let mut g = unsafe { self.storage.with_alloc(alloc.clone()) };
         T::merge_occurrence(wire_type, buf, alloc, depth, |elem| {
+            g.push(elem);
+        })
+    }
+
+    /// Appends one already-parsed occurrence using `alloc`.
+    pub fn merge_from_parsed(
+        &mut self,
+        value: &FieldValue<&[u8]>,
+        alloc: A,
+        depth: usize,
+    ) -> Result<(), DecodeError>
+    where
+        T: RepeatedElementMerge<A>,
+        A: Clone,
+    {
+        // SAFETY: an owned clone of the message allocator owns this vector's
+        // buffer.
+        let mut g = unsafe { self.storage.with_alloc(alloc.clone()) };
+        T::merge_occurrence_parsed(value, alloc, depth, |elem| {
             g.push(elem);
         })
     }

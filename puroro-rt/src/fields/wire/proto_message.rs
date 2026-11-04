@@ -15,7 +15,7 @@ use ::allocator_api2::alloc::Allocator;
 use ::core::marker::PhantomData;
 use ::protobuf_core::FieldNumber;
 
-use ::puroro::{DecodeBuf, DecodeError, WireType};
+use ::puroro::{DecodeBuf, DecodeError, ScopedBuf, WireType};
 
 use crate::decode;
 use crate::fields::shared::{
@@ -163,5 +163,30 @@ impl<M: MessageEncode + MessageMerge> PayloadMerge for ProtoMessage<M> {
         let mut guard = buf.push_limit_guard(len)?;
         let child = ValueSlot::with_mut(slot, init, common).get_mut();
         MessageMerge::merge_from_with_depth(child, &mut *guard, depth + 1)
+    }
+
+    #[inline]
+    fn merge_parsed<A, VS, I, Cx>(
+        slot: &mut VS,
+        init: I,
+        common: &mut Cx,
+        value: &::protobuf_core::FieldValue<&[u8]>,
+        _field: FieldNumber,
+        depth: usize,
+    ) -> Result<(), DecodeError>
+    where
+        A: Allocator + Clone,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
+        VS: ValueSlot<Self::Slot<A>, A>,
+        I: SlotInitMut,
+        Cx: MessageBindingMut<A>,
+    {
+        let ::protobuf_core::FieldValue::Len(payload) = value else {
+            return Err(DecodeError::InvalidTag);
+        };
+        let mut body = *payload;
+        let mut scoped = ScopedBuf::new(&mut body);
+        let child = ValueSlot::with_mut(slot, init, common).get_mut();
+        MessageMerge::merge_from_with_depth(child, &mut scoped, depth + 1)
     }
 }

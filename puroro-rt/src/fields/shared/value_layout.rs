@@ -13,8 +13,8 @@ use ::bitvec::{
 };
 use ::bytes::Buf;
 use ::core::ops::{Deref, DerefMut};
-use ::protobuf_core::FieldNumber;
-use ::puroro::{DecodeBuf, DecodeError, WireType};
+use ::protobuf_core::{FieldNumber, FieldValue};
+use ::puroro::{DecodeBuf, DecodeError, ScopedBuf, WireType};
 use ::unmanaged::{CloneIn, DeallocateIn, UnmanagedBox, UnmanagedString, UnmanagedVec};
 
 use super::{
@@ -99,6 +99,22 @@ pub trait ValueLayoutMerge<T: SingularType, A: Allocator>: ValueLayout<T, A> {
         I: SlotInitMut,
         Cx: MessageBindingMut<A>,
         B: DecodeBuf,
+        A: Clone,
+        Self::Slot: DefaultIn<A>;
+
+    /// Merge from a [`protobuf_core`] [`FieldValue`] (no length-prefix refeed).
+    fn merge_parsed<VS, I, Cx>(
+        slot: &mut VS,
+        init: I,
+        common: &mut Cx,
+        value: &FieldValue<&[u8]>,
+        field: FieldNumber,
+        depth: usize,
+    ) -> Result<(), DecodeError>
+    where
+        VS: ValueSlot<Self::Slot, A>,
+        I: SlotInitMut,
+        Cx: MessageBindingMut<A>,
         A: Clone,
         Self::Slot: DefaultIn<A>;
 }
@@ -277,6 +293,25 @@ where
     {
         T::merge(slot, init, common, wire_type, buf, field, depth)
     }
+
+    #[inline]
+    fn merge_parsed<VS, I, Cx>(
+        slot: &mut VS,
+        init: I,
+        common: &mut Cx,
+        value: &FieldValue<&[u8]>,
+        field: FieldNumber,
+        depth: usize,
+    ) -> Result<(), DecodeError>
+    where
+        VS: ValueSlot<T::Slot<A>, A>,
+        I: SlotInitMut,
+        Cx: MessageBindingMut<A>,
+        A: Clone,
+        T::Slot<A>: DefaultIn<A>,
+    {
+        T::merge_parsed(slot, init, common, value, field, depth)
+    }
 }
 
 impl<M, A: Allocator> ValueLayout<ProtoMessage<M>, A> for Boxed
@@ -388,6 +423,31 @@ where
         let mut guard = buf.push_limit_guard(len)?;
         let child = ValueSlot::with_mut(slot, init, common).get_mut();
         MessageMerge::merge_from_with_depth(DerefMut::deref_mut(child), &mut *guard, depth + 1)
+    }
+
+    #[inline]
+    fn merge_parsed<VS, I, Cx>(
+        slot: &mut VS,
+        init: I,
+        common: &mut Cx,
+        value: &FieldValue<&[u8]>,
+        _field: FieldNumber,
+        depth: usize,
+    ) -> Result<(), DecodeError>
+    where
+        VS: ValueSlot<UnmanagedBox<M, A>, A>,
+        I: SlotInitMut,
+        Cx: MessageBindingMut<A>,
+        A: Clone,
+        UnmanagedBox<M, A>: DefaultIn<A>,
+    {
+        let FieldValue::Len(payload) = value else {
+            return Err(DecodeError::InvalidTag);
+        };
+        let mut body = *payload;
+        let mut scoped = ScopedBuf::new(&mut body);
+        let child = ValueSlot::with_mut(slot, init, common).get_mut();
+        MessageMerge::merge_from_with_depth(DerefMut::deref_mut(child), &mut scoped, depth + 1)
     }
 }
 
@@ -505,6 +565,38 @@ impl<A: Allocator, const VALUE_BIT: usize> ValueLayoutMerge<ProtoBool, A> for Bi
         Self::Slot: DefaultIn<A>,
     {
         match BoolCodec::from_wire_body(VarintPayload::decode(wire_type, buf)?) {
+            Ok(new) => {
+                let _ = ValueSlot::with_mut(slot, init, common).get_mut();
+                common.set_bit(VALUE_BIT, new);
+                Ok(())
+            }
+            Err(DecodeError::UnknownClosedEnum { raw }) => {
+                let alloc = common.clone_alloc();
+                decode::save_unknown_varint_field(field, raw, common.unknown_fields_mut(), alloc);
+                Ok(())
+            }
+            Err(e) => Err(e),
+        }
+    }
+
+    #[inline]
+    fn merge_parsed<VS, I, Cx>(
+        slot: &mut VS,
+        init: I,
+        common: &mut Cx,
+        value: &FieldValue<&[u8]>,
+        field: FieldNumber,
+        _depth: usize,
+    ) -> Result<(), DecodeError>
+    where
+        VS: ValueSlot<(), A>,
+        I: SlotInitMut,
+        Cx: MessageBindingMut<A>,
+        A: Clone,
+        Self::Slot: DefaultIn<A>,
+    {
+        let scanned = decode::field_value_to_scanned(value)?;
+        match BoolCodec::from_wire_body(VarintPayload::from_scanned(&scanned)?) {
             Ok(new) => {
                 let _ = ValueSlot::with_mut(slot, init, common).get_mut();
                 common.set_bit(VALUE_BIT, new);
@@ -693,6 +785,32 @@ impl<A: Allocator, const HEAP_BIT: usize> ValueLayoutMerge<ProtoString, A>
         Self::set_heap(common, new_is_heap);
         Ok(())
     }
+
+    #[inline]
+    fn merge_parsed<VS, I, Cx>(
+        slot: &mut VS,
+        init: I,
+        common: &mut Cx,
+        value: &FieldValue<&[u8]>,
+        _field: FieldNumber,
+        _depth: usize,
+    ) -> Result<(), DecodeError>
+    where
+        VS: ValueSlot<SsoString<A>, A>,
+        I: SlotInitMut,
+        Cx: MessageBindingMut<A>,
+        A: Clone,
+        Self::Slot: DefaultIn<A>,
+    {
+        let FieldValue::Len(payload) = value else {
+            return Err(DecodeError::InvalidTag);
+        };
+        let (new, new_is_heap) = decode_sso_from_payload(payload, common.clone_alloc())?;
+        let old_is_heap = Self::is_heap(common);
+        install_sso_packed(slot, init, common, new, old_is_heap);
+        Self::set_heap(common, new_is_heap);
+        Ok(())
+    }
 }
 
 impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayoutClone<ProtoString, A>
@@ -835,6 +953,32 @@ impl<A: Allocator, const HEAP_BIT: usize, C: BytesLikeLenCodec> ValueLayoutMerge
         Self::set_heap(common, new_is_heap);
         Ok(())
     }
+
+    #[inline]
+    fn merge_parsed<VS, I, Cx>(
+        slot: &mut VS,
+        init: I,
+        common: &mut Cx,
+        value: &FieldValue<&[u8]>,
+        _field: FieldNumber,
+        _depth: usize,
+    ) -> Result<(), DecodeError>
+    where
+        VS: ValueSlot<SsoBytes<A>, A>,
+        I: SlotInitMut,
+        Cx: MessageBindingMut<A>,
+        A: Clone,
+        Self::Slot: DefaultIn<A>,
+    {
+        let FieldValue::Len(payload) = value else {
+            return Err(DecodeError::InvalidTag);
+        };
+        let (new, new_is_heap) = decode_sso_bytes_from_payload(payload, common.clone_alloc())?;
+        let old_is_heap = Self::is_heap(common);
+        install_sso_packed(slot, init, common, new, old_is_heap);
+        Self::set_heap(common, new_is_heap);
+        Ok(())
+    }
 }
 
 impl<A: Allocator + Clone, const HEAP_BIT: usize, C: BytesLikeLenCodec>
@@ -948,6 +1092,31 @@ fn decode_sso_packed<B: Buf, A: Allocator + Clone>(
     }
 }
 
+/// Like [`decode_sso_packed`], but the LEN length prefix is already consumed.
+fn decode_sso_from_payload<A: Allocator + Clone>(
+    payload: &[u8],
+    alloc: A,
+) -> Result<(SsoString<A>, bool), DecodeError> {
+    use ::core::str;
+
+    match take_sso_payload(payload, alloc.clone())? {
+        SsoLenRead::Inline(inline) => {
+            if str::from_utf8(inline.as_bytes()).is_err() {
+                return Err(DecodeError::InvalidUtf8);
+            }
+            Ok((pack_inline_buf(inline), false))
+        }
+        SsoLenRead::Heap(bytes) => match UnmanagedString::from_utf8(bytes) {
+            Ok(s) => Ok(pack_written(s, alloc)),
+            Err(bytes) => {
+                // SAFETY: `alloc` owns the buffer we just built.
+                unsafe { bytes.deallocate(&alloc) };
+                Err(DecodeError::InvalidUtf8)
+            }
+        },
+    }
+}
+
 /// Decodes one LEN bytes payload into a packed SSO slot, preferring inline when short.
 fn decode_sso_bytes_packed<B: Buf, A: Allocator + Clone>(
     buf: &mut B,
@@ -956,5 +1125,33 @@ fn decode_sso_bytes_packed<B: Buf, A: Allocator + Clone>(
     match read_sso_len(buf, alloc.clone())? {
         SsoLenRead::Inline(inline) => Ok((pack_inline_buf(inline), false)),
         SsoLenRead::Heap(bytes) => Ok(pack_written_bytes(bytes, alloc)),
+    }
+}
+
+/// Like [`decode_sso_bytes_packed`], but the LEN length prefix is already consumed.
+fn decode_sso_bytes_from_payload<A: Allocator + Clone>(
+    payload: &[u8],
+    alloc: A,
+) -> Result<(SsoBytes<A>, bool), DecodeError> {
+    match take_sso_payload(payload, alloc.clone())? {
+        SsoLenRead::Inline(inline) => Ok((pack_inline_buf(inline), false)),
+        SsoLenRead::Heap(bytes) => Ok(pack_written_bytes(bytes, alloc)),
+    }
+}
+
+fn take_sso_payload<A: Allocator + Clone>(
+    payload: &[u8],
+    alloc: A,
+) -> Result<SsoLenRead<A>, DecodeError> {
+    let len = payload.len();
+    if len <= INLINE_CAP {
+        let mut inline = InlineBuf::empty();
+        inline.write_at(0, payload);
+        inline.len = len as u8;
+        Ok(SsoLenRead::Inline(inline))
+    } else {
+        let mut vec = AllocVec::<u8, A>::with_capacity_in(len, alloc);
+        vec.extend_from_slice(payload);
+        Ok(SsoLenRead::Heap(UnmanagedVec::from_vec(vec)))
     }
 }

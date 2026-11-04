@@ -19,6 +19,7 @@ use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::{Buf, BufMut};
 use ::hashbrown::hash_map::Iter as HashMapIter;
 use ::hashbrown::{DefaultHashBuilder, Equivalent, HashMap};
+use ::protobuf_core::FieldValue;
 use ::puroro::{DecodeBuf, DecodeError, MapMut, MapRef, ScopedBuf, WireType};
 use ::unmanaged::{CloneIn, ToOwnedIn};
 
@@ -586,6 +587,25 @@ where
         let (key, value) = decode_map_entry::<K, V, A, _>(&mut *guard, alloc, depth)?;
         self.insert(key, value);
         Ok(())
+    }
+
+    /// Merge from a parsed map-entry [`FieldValue`] (no length-prefix refeed).
+    pub fn merge_parsed(
+        &mut self,
+        value: &FieldValue<&[u8]>,
+        depth: usize,
+    ) -> Result<(), DecodeError>
+    where
+        K: RepeatedElementMerge<A>,
+        V: RepeatedElementMerge<A>,
+        A: Clone,
+        K::Element<A>: Eq + Hash,
+    {
+        let FieldValue::Len(payload) = value else {
+            return Err(DecodeError::InvalidTag);
+        };
+        let alloc = self.common.clone_alloc();
+        self.field.merge_entry_body(&mut &payload[..], alloc, depth)
     }
 }
 

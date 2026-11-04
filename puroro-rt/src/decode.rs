@@ -13,7 +13,7 @@ mod varint;
 
 pub use self::lazy_scan::{Eager, Lazy, LazyMessage, LazyScan, MessageScan};
 pub use self::parsed::{
-    ParsedWireBody, parsed_wire_body, save_parsed_field_in, try_for_each_contiguous_field,
+    field_value_to_scanned, save_parsed_field_in, try_for_each_contiguous_field,
 };
 pub use self::record::{
     RecordScanner, ScannedRecord, ScannedValue, WireSpan, merge_scanned_field, scanned_len_payload,
@@ -27,6 +27,7 @@ pub use self::varint::{
 };
 
 use ::allocator_api2::alloc::Allocator;
+use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::Buf;
 use ::protobuf_core::{FieldNumber, Varint};
 use ::puroro::wire_type;
@@ -81,6 +82,16 @@ pub(crate) fn decode_bytes_in<B: Buf, A: Allocator>(
     Ok(LenPayload::decode_in(WireType::Len, buf, alloc)?.into_vec())
 }
 
+/// Copy an already-split LEN payload into an [`UnmanagedVec`].
+pub(crate) fn decode_bytes_from_payload<A: Allocator + Clone>(
+    payload: &[u8],
+    alloc: A,
+) -> Result<UnmanagedVec<u8, A>, DecodeError> {
+    let mut vec = AllocVec::<u8, A>::with_capacity_in(payload.len(), alloc);
+    vec.extend_from_slice(payload);
+    Ok(UnmanagedVec::from_vec(vec))
+}
+
 /// Decodes one LEN payload as UTF-8 into an [`UnmanagedString<A>`].
 ///
 /// Invalid UTF-8 returns [`DecodeError::InvalidUtf8`]. Used for
@@ -97,6 +108,22 @@ pub(crate) fn decode_string_in<B: Buf, A: Allocator + Clone>(
         Ok(s) => Ok(s),
         Err(bytes) => {
             // SAFETY: `alloc` owns the buffer produced by `decode_in`.
+            unsafe { bytes.deallocate(&alloc) };
+            Err(DecodeError::InvalidUtf8)
+        }
+    }
+}
+
+/// UTF-8-check an already-split LEN payload into an [`UnmanagedString`].
+pub(crate) fn decode_string_from_payload<A: Allocator + Clone>(
+    payload: &[u8],
+    alloc: A,
+) -> Result<UnmanagedString<A>, DecodeError> {
+    let bytes = decode_bytes_from_payload(payload, alloc.clone())?;
+    match UnmanagedString::from_utf8(bytes) {
+        Ok(s) => Ok(s),
+        Err(bytes) => {
+            // SAFETY: `alloc` owns the buffer from `decode_bytes_from_payload`.
             unsafe { bytes.deallocate(&alloc) };
             Err(DecodeError::InvalidUtf8)
         }

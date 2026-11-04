@@ -10,11 +10,9 @@ use core::fmt;
 use core::mem;
 use core::ops::ControlFlow;
 
-use puroro::ScopedBuf;
 use puroro::{DecodeBuf, DecodeError, HasDefault, Message, Optional};
 use puroro_rt::decode::{
-    decode_tag, parsed_wire_body, save_parsed_field_in, skip_field_and_save,
-    try_for_each_contiguous_field,
+    decode_tag, save_parsed_field_in, skip_field_and_save, try_for_each_contiguous_field,
 };
 use puroro_rt::{
     CloneFieldsVisitor, CloneIn, DebugStructVisitor, EncodeCtx, EncodeRawVisitor,
@@ -217,20 +215,14 @@ impl<A: Allocator + Clone> MessageMerge for School<A> {
         if try_for_each_contiguous_field(buf, |field| {
             match field.field_number.as_u32() {
                 FIELD_NAME => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     self.name
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, &mut scoped, depth)?;
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_STUDENT => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
-                    self.student.bind_mut(&mut self._common).merge(
-                        wire_type,
-                        &mut scoped,
-                        depth,
-                    )?;
+                    self.student
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
                 }
                 _ => {
                     let alloc = self._common.alloc.clone();

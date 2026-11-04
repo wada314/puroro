@@ -25,14 +25,14 @@ use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
 use ::core::ops::{Deref, DerefMut};
 
-use ::puroro::{DecodeBuf, DecodeError, Message, WireType};
+use ::puroro::{DecodeBuf, DecodeError, Message, ScopedBuf, WireType};
 
 use crate::decode;
 use crate::message_encode::MessageEncode;
 use crate::message_merge::MessageMerge;
 use ::unmanaged::DeallocateIn;
 
-use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES};
+use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES, FieldValue};
 
 use super::encode_type::EncodeType;
 use super::len::{LenCodec, LenScalar};
@@ -109,6 +109,16 @@ pub trait RepeatedElementMerge<A: Allocator + Clone>: RepeatedElement {
     ) -> Result<(), DecodeError>
     where
         B: DecodeBuf,
+        F: FnMut(Self::Element<A>);
+
+    /// Merge one already-parsed [`FieldValue`] into `push` (no length-prefix refeed).
+    fn merge_occurrence_parsed<F>(
+        value: &FieldValue<&[u8]>,
+        alloc: A,
+        depth: usize,
+        push: F,
+    ) -> Result<(), DecodeError>
+    where
         F: FnMut(Self::Element<A>);
 }
 
@@ -275,6 +285,29 @@ impl<A: Allocator + Clone, C: NumericalType> RepeatedElementMerge<A> for Numeric
             }
         }
     }
+
+    #[inline]
+    fn merge_occurrence_parsed<F>(
+        value: &FieldValue<&[u8]>,
+        _alloc: A,
+        _depth: usize,
+        mut push: F,
+    ) -> Result<(), DecodeError>
+    where
+        F: FnMut(C::NativeType),
+    {
+        match value {
+            FieldValue::Len(payload) => {
+                let mut body = *payload;
+                Numerical::<C>::merge_packed_buf(&mut body, push)
+            }
+            other => {
+                let scanned = decode::field_value_to_scanned(other)?;
+                push(C::from_wire_body(C::WireBody::from_scanned(&scanned)?)?);
+                Ok(())
+            }
+        }
+    }
 }
 
 impl<C: NumericalType> PackableRepeatedElement for Numerical<C> {
@@ -386,6 +419,23 @@ impl<A: Allocator + Clone, C: LenCodec> RepeatedElementMerge<A> for LenScalar<C>
         push(Self::decode_element(wire_type, buf, alloc, _depth)?);
         Ok(())
     }
+
+    #[inline]
+    fn merge_occurrence_parsed<F>(
+        value: &FieldValue<&[u8]>,
+        alloc: A,
+        _depth: usize,
+        mut push: F,
+    ) -> Result<(), DecodeError>
+    where
+        F: FnMut(C::Slot<A>),
+    {
+        let FieldValue::Len(payload) = value else {
+            return Err(DecodeError::InvalidTag);
+        };
+        push(C::decode_payload(payload, alloc)?);
+        Ok(())
+    }
 }
 
 impl<C: LenCodec> RepeatedElementMut for LenScalar<C> {
@@ -484,6 +534,27 @@ where
         F: FnMut(M),
     {
         push(Self::decode_element(wire_type, buf, alloc, depth)?);
+        Ok(())
+    }
+
+    #[inline]
+    fn merge_occurrence_parsed<F>(
+        value: &FieldValue<&[u8]>,
+        alloc: A,
+        depth: usize,
+        mut push: F,
+    ) -> Result<(), DecodeError>
+    where
+        F: FnMut(M),
+    {
+        let FieldValue::Len(payload) = value else {
+            return Err(DecodeError::InvalidTag);
+        };
+        let mut body = *payload;
+        let mut scoped = ScopedBuf::new(&mut body);
+        let mut msg = M::new_in(alloc);
+        MessageMerge::merge_from_with_depth(&mut msg, &mut scoped, depth + 1)?;
+        push(msg);
         Ok(())
     }
 }

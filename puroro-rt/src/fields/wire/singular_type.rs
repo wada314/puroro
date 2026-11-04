@@ -179,6 +179,22 @@ pub trait PayloadMerge: PayloadAccess {
         I: SlotInitMut,
         Cx: MessageBindingMut<A>,
         B: DecodeBuf;
+
+    /// Merge from a parsed [`FieldValue`] without rebuilding a length prefix.
+    fn merge_parsed<A, VS, I, Cx>(
+        slot: &mut VS,
+        init: I,
+        common: &mut Cx,
+        value: &::protobuf_core::FieldValue<&[u8]>,
+        field: FieldNumber,
+        depth: usize,
+    ) -> Result<(), DecodeError>
+    where
+        A: Allocator + Clone,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
+        VS: ValueSlot<Self::Slot<A>, A>,
+        I: SlotInitMut,
+        Cx: MessageBindingMut<A>;
 }
 
 // ---------------------------------------------------------------------------
@@ -319,6 +335,37 @@ where
             Err(e) => Err(e),
         }
     }
+
+    #[inline]
+    fn merge_parsed<A, VS, I, Cx>(
+        slot: &mut VS,
+        init: I,
+        common: &mut Cx,
+        value: &::protobuf_core::FieldValue<&[u8]>,
+        field: FieldNumber,
+        _depth: usize,
+    ) -> Result<(), DecodeError>
+    where
+        A: Allocator + Clone,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
+        VS: ValueSlot<Self::Slot<A>, A>,
+        I: SlotInitMut,
+        Cx: MessageBindingMut<A>,
+    {
+        let scanned = decode::field_value_to_scanned(value)?;
+        match C::from_wire_body(C::WireBody::from_scanned(&scanned)?) {
+            Ok(new) => {
+                Self::write(slot, init, common, new);
+                Ok(())
+            }
+            Err(DecodeError::UnknownClosedEnum { raw }) => {
+                let alloc = common.clone_alloc();
+                decode::save_unknown_varint_field(field, raw, common.unknown_fields_mut(), alloc);
+                Ok(())
+            }
+            Err(e) => Err(e),
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -440,6 +487,30 @@ impl<C: LenCodec> PayloadMerge for LenScalar<C> {
             return Err(DecodeError::InvalidTag);
         }
         let new = C::decode_in(buf, common.clone_alloc())?;
+        Self::write(slot, init, common, new);
+        Ok(())
+    }
+
+    #[inline]
+    fn merge_parsed<A, VS, I, Cx>(
+        slot: &mut VS,
+        init: I,
+        common: &mut Cx,
+        value: &::protobuf_core::FieldValue<&[u8]>,
+        _field: FieldNumber,
+        _depth: usize,
+    ) -> Result<(), DecodeError>
+    where
+        A: Allocator + Clone,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
+        VS: ValueSlot<Self::Slot<A>, A>,
+        I: SlotInitMut,
+        Cx: MessageBindingMut<A>,
+    {
+        let ::protobuf_core::FieldValue::Len(payload) = value else {
+            return Err(DecodeError::InvalidTag);
+        };
+        let new = C::decode_payload(payload, common.clone_alloc())?;
         Self::write(slot, init, common, new);
         Ok(())
     }

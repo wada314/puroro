@@ -61,6 +61,12 @@ pub trait LenCodec: Sized {
         alloc: A,
     ) -> Result<Self::Slot<A>, DecodeError>;
 
+    /// Decode from an already-split LEN payload (no length prefix on `payload`).
+    fn decode_payload<A: Allocator + Clone>(
+        payload: &[u8],
+        alloc: A,
+    ) -> Result<Self::Slot<A>, DecodeError>;
+
     /// # Safety
     ///
     /// `alloc` must own `slot`'s buffer.
@@ -141,6 +147,14 @@ impl LenCodec for StringCodec {
     }
 
     #[inline]
+    fn decode_payload<A: Allocator + Clone>(
+        payload: &[u8],
+        alloc: A,
+    ) -> Result<UnmanagedString<A>, DecodeError> {
+        decode::decode_string_from_payload(payload, alloc)
+    }
+
+    #[inline]
     unsafe fn slot_with_alloc<'a, A: Allocator + Clone + 'a>(
         slot: &'a mut UnmanagedString<A>,
         alloc: A,
@@ -182,6 +196,14 @@ impl LenCodec for UncheckedStringCodec {
     }
 
     #[inline]
+    fn decode_payload<A: Allocator + Clone>(
+        payload: &[u8],
+        alloc: A,
+    ) -> Result<UnmanagedVec<u8, A>, DecodeError> {
+        BytesCodec::decode_payload(payload, alloc)
+    }
+
+    #[inline]
     unsafe fn slot_with_alloc<'a, A: Allocator + Clone + 'a>(
         slot: &'a mut UnmanagedVec<u8, A>,
         alloc: A,
@@ -220,6 +242,14 @@ impl LenCodec for BytesCodec {
         alloc: A,
     ) -> Result<UnmanagedVec<u8, A>, DecodeError> {
         decode::decode_bytes_in(buf, alloc)
+    }
+
+    #[inline]
+    fn decode_payload<A: Allocator + Clone>(
+        payload: &[u8],
+        alloc: A,
+    ) -> Result<UnmanagedVec<u8, A>, DecodeError> {
+        decode::decode_bytes_from_payload(payload, alloc)
     }
 
     #[inline]

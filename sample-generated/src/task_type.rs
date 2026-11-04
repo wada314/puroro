@@ -16,14 +16,12 @@ use core::mem;
 use core::ops::ControlFlow;
 use core::ops::{Deref, DerefMut};
 
-use puroro::ScopedBuf;
 use puroro::{
     DecodeBuf, DecodeError, HasDefault, MapMut, MapRef, Message, OneofView, OneofViewMut, Optional,
     RepeatedStringMut,
 };
 use puroro_rt::decode::{
-    decode_tag, parsed_wire_body, save_parsed_field_in, skip_field_and_save,
-    try_for_each_contiguous_field,
+    decode_tag, save_parsed_field_in, skip_field_and_save, try_for_each_contiguous_field,
 };
 use puroro_rt::{
     BitPacked, Boxed, CloneFieldsVisitor, CloneIn, Closed, DebugStructVisitor, Eager, EncodeCtx,
@@ -786,206 +784,146 @@ impl<A: Allocator + Clone> MessageMerge for Task<A> {
         if try_for_each_contiguous_field(buf, |field| {
             match field.field_number.as_u32() {
                 FIELD_TITLE => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // title = 1, EXPLICIT string
                     self.title
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, &mut scoped, depth)?;
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_SCORE => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // score = 2, IMPLICIT int32
                     self.score
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, &mut scoped, depth)?;
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_MAX_RETRIES => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // max_retries = 3, EXPLICIT int32
-                    self.max_retries.bind_mut(&mut self._common).merge(
-                        wire_type,
-                        &mut scoped,
-                        depth,
-                    )?;
+                    self.max_retries
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_OWNER_ID => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // owner_id = 4, LEGACY_REQUIRED string
-                    self.owner_id.bind_mut(&mut self._common).merge(
-                        wire_type,
-                        &mut scoped,
-                        depth,
-                    )?;
+                    self.owner_id
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_PAYLOAD => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // payload = 5, EXPLICIT bytes
-                    self.payload.bind_mut(&mut self._common).merge(
-                        wire_type,
-                        &mut scoped,
-                        depth,
-                    )?;
+                    self.payload
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_TAG_IDS => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // tag_ids = 6, repeated int32 PACKED
-                    self.tag_ids.bind_mut(&mut self._common).merge(
-                        wire_type,
-                        &mut scoped,
-                        depth,
-                    )?;
+                    self.tag_ids
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_SCORES => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // scores = 7, repeated int32 EXPANDED
                     self.scores
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, &mut scoped, depth)?;
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_LABELS => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // labels = 8, repeated string
                     self.labels
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, &mut scoped, depth)?;
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_STATUS => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // status = 9, IMPLICIT open enum
                     self.status
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, &mut scoped, depth)?;
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_PRIORITY => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // priority = 10, EXPLICIT closed enum
-                    self.priority.bind_mut(&mut self._common).merge(
-                        wire_type,
-                        &mut scoped,
-                        depth,
-                    )?;
+                    self.priority
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_ASSIGNEE => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // assignee = 11, nested message
-                    self.assignee.bind_mut(&mut self._common).merge(
-                        wire_type,
-                        &mut scoped,
-                        depth,
-                    )?;
+                    self.assignee
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_EMAIL_ADDRESS => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // notification.email_address = 12, oneof LEN string
                     self.notification
                         .bind_mut(&mut self._common)
                         .variant_mut::<FIELD_EMAIL_ADDRESS>()
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, &mut scoped, depth)?;
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_PHONE_NUMBER => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // notification.phone_number = 13, oneof LEN string
                     self.notification
                         .bind_mut(&mut self._common)
                         .variant_mut::<FIELD_PHONE_NUMBER>()
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, &mut scoped, depth)?;
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_WEBHOOK_ID => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // notification.webhook_id = 14, oneof VARINT int32
                     self.notification
                         .bind_mut(&mut self._common)
                         .variant_mut::<FIELD_WEBHOOK_ID>()
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, &mut scoped, depth)?;
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_POSTAL => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // notification.postal = 15, oneof nested message
                     self.notification
                         .bind_mut(&mut self._common)
                         .variant_mut::<FIELD_POSTAL>()
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, &mut scoped, depth)?;
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_DONE => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // done = 16, IMPLICIT bool
                     self.done
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, &mut scoped, depth)?;
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_FLAG => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // flag = 17, EXPLICIT bool
                     self.flag
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, &mut scoped, depth)?;
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_URGENT => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // notification.urgent = 18, oneof bool
                     self.notification
                         .bind_mut(&mut self._common)
                         .variant_mut::<FIELD_URGENT>()
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, &mut scoped, depth)?;
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_WATCHERS => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // watchers = 19, repeated Address
-                    self.watchers.bind_mut(&mut self._common).merge(
-                        wire_type,
-                        &mut scoped,
-                        depth,
-                    )?;
+                    self.watchers
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_VOTES => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // votes = 20, repeated bool PACKED
                     self.votes
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, &mut scoped, depth)?;
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_ATTRIBUTES => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // attributes = 21, map<string, int32>
-                    self.attributes.bind_mut(&mut self._common).merge(
-                        wire_type,
-                        &mut scoped,
-                        depth,
-                    )?;
+                    self.attributes
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
                 }
                 FIELD_ORIGIN => {
-                    let (wire_type, mut body) = parsed_wire_body(&field.value)?;
-                    let mut scoped = ScopedBuf::new(&mut body);
                     // origin = 22, inlined nested Point
                     self.origin
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, &mut scoped, depth)?;
+                        .merge_parsed(&field.value, depth)?;
                 }
                 _ => {
                     // unknown field — preserve in _common.unknown_fields

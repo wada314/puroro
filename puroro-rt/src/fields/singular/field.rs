@@ -21,6 +21,7 @@ use ::core::ops::Deref;
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
+use ::protobuf_core::FieldValue;
 
 use crate::defaults::ProtoDefault;
 use ::puroro::{DecodeBuf, DecodeError, HasDefault, Optional, WireType};
@@ -561,6 +562,23 @@ where
             self.common,
             wire_type,
             buf,
+            field_number_const::<FIELD>(),
+            depth,
+        )
+    }
+
+    /// Merge from a parsed [`FieldValue`] without rebuilding a length prefix.
+    pub fn merge_parsed(self, value: &FieldValue<&[u8]>, depth: usize) -> Result<(), DecodeError>
+    where
+        A: Clone,
+        L: ValueLayoutMerge<T, A>,
+        L::Slot: DefaultIn<A>,
+    {
+        L::merge_parsed(
+            &mut *self.field.value,
+            P::slot_init_mut(),
+            self.common,
+            value,
             field_number_const::<FIELD>(),
             depth,
         )
