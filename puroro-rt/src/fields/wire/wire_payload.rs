@@ -17,7 +17,7 @@
 use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::{Buf, BufMut};
-use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES, Varint};
+use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES, FieldValue, Varint};
 use ::puroro::{DecodeError, WireType};
 use ::unmanaged::UnmanagedVec;
 
@@ -48,6 +48,10 @@ pub trait CopyWirePayload: WirePayload + Copy + Sized {
     /// Uses a value the lazy scanner already decoded. Wrong wire shape is
     /// [`DecodeError::InvalidTag`].
     fn from_scanned(value: &ScannedValue) -> Result<Self, DecodeError>;
+
+    /// Uses a [`protobuf_core`] [`FieldValue`] from FieldIter (no `ScannedValue`
+    /// bridge). Groups / wrong wire shape → [`DecodeError::InvalidTag`].
+    fn from_field_value(value: &FieldValue<&[u8]>) -> Result<Self, DecodeError>;
 }
 
 /// Varint wire body (`WireType::Varint`) — [`Varint`] before proto-type mapping
@@ -89,6 +93,14 @@ impl CopyWirePayload for VarintPayload {
     fn from_scanned(value: &ScannedValue) -> Result<Self, DecodeError> {
         match *value {
             ScannedValue::Varint(v) => Ok(Self(v)),
+            _ => Err(DecodeError::InvalidTag),
+        }
+    }
+
+    #[inline]
+    fn from_field_value(value: &FieldValue<&[u8]>) -> Result<Self, DecodeError> {
+        match *value {
+            FieldValue::Varint(v) => Ok(Self(v)),
             _ => Err(DecodeError::InvalidTag),
         }
     }
@@ -139,6 +151,14 @@ impl CopyWirePayload for Fixed32Payload {
             _ => Err(DecodeError::InvalidTag),
         }
     }
+
+    #[inline]
+    fn from_field_value(value: &FieldValue<&[u8]>) -> Result<Self, DecodeError> {
+        match *value {
+            FieldValue::I32(bytes) => Ok(Self(bytes)),
+            _ => Err(DecodeError::InvalidTag),
+        }
+    }
 }
 
 /// Fixed64-family wire body (`WireType::Int64`) — 8 LE bytes (`fixed64` / `double` / …).
@@ -183,6 +203,14 @@ impl CopyWirePayload for Fixed64Payload {
     fn from_scanned(value: &ScannedValue) -> Result<Self, DecodeError> {
         match *value {
             ScannedValue::I64(bytes) => Ok(Self(bytes)),
+            _ => Err(DecodeError::InvalidTag),
+        }
+    }
+
+    #[inline]
+    fn from_field_value(value: &FieldValue<&[u8]>) -> Result<Self, DecodeError> {
+        match *value {
+            FieldValue::I64(bytes) => Ok(Self(bytes)),
             _ => Err(DecodeError::InvalidTag),
         }
     }

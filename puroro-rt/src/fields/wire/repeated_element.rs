@@ -269,8 +269,7 @@ impl<A: Allocator + Clone, C: NumericalType> RepeatedElementMerge<A> for Numeric
         _depth: usize,
     ) -> Result<C::NativeType, DecodeError> {
         // Map-entry keys/values are singular — packed Len is invalid here.
-        let scanned = decode::field_value_to_scanned(value)?;
-        C::from_wire_body(C::WireBody::from_scanned(&scanned)?)
+        C::from_wire_body(C::WireBody::from_field_value(value)?)
     }
 
     fn merge_occurrence<B, F>(

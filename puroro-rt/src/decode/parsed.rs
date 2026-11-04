@@ -9,23 +9,9 @@ use ::bytes::Buf;
 use ::protobuf_core::{Field, FieldValue, Varint};
 use ::puroro::DecodeError;
 
-use crate::decode::ScannedValue;
 use crate::encode;
 use crate::unknown_fields::UnknownStore;
 use ::puroro::WireType;
-
-/// Map a parsed scalar [`FieldValue`] into a [`ScannedValue`] for numeric merges.
-#[inline]
-pub fn field_value_to_scanned(value: &FieldValue<&[u8]>) -> Result<ScannedValue, DecodeError> {
-    match *value {
-        FieldValue::Varint(v) => Ok(ScannedValue::Varint(v)),
-        FieldValue::I32(bytes) => Ok(ScannedValue::I32(bytes)),
-        FieldValue::I64(bytes) => Ok(ScannedValue::I64(bytes)),
-        FieldValue::Len(_) | FieldValue::SGroup | FieldValue::EGroup => {
-            Err(DecodeError::InvalidTag)
-        }
-    }
-}
 
 /// Append a parsed field into an unknown-field store (preserve / discard / reject).
 ///
@@ -117,27 +103,4 @@ where
     for_each_field_in_slice(slice, on_field)?;
     buf.advance(rem);
     Ok(true)
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use ::protobuf_core::FieldValue;
-
-    #[test]
-    fn field_value_to_scanned_varint() {
-        let v = Varint::from_uint64(150);
-        assert_eq!(
-            field_value_to_scanned(&FieldValue::Varint(v)).unwrap(),
-            ScannedValue::Varint(v)
-        );
-    }
-
-    #[test]
-    fn len_is_not_a_scanned_scalar() {
-        assert!(matches!(
-            field_value_to_scanned(&FieldValue::Len(b"hi")),
-            Err(DecodeError::InvalidTag)
-        ));
-    }
 }

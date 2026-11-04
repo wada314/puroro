@@ -13,7 +13,7 @@ mod varint;
 
 pub use self::lazy_scan::{Eager, Lazy, LazyMessage, LazyScan, MessageScan};
 pub use self::parsed::{
-    contiguous_remaining, field_value_to_scanned, for_each_field_in_slice, save_parsed_field_in,
+    contiguous_remaining, for_each_field_in_slice, save_parsed_field_in,
     try_for_each_contiguous_field,
 };
 pub use self::record::{

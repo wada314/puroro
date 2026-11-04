@@ -352,8 +352,7 @@ where
         I: SlotInitMut,
         Cx: MessageBindingMut<A>,
     {
-        let scanned = decode::field_value_to_scanned(value)?;
-        match C::from_wire_body(C::WireBody::from_scanned(&scanned)?) {
+        match C::from_wire_body(C::WireBody::from_field_value(value)?) {
             Ok(new) => {
                 Self::write(slot, init, common, new);
                 Ok(())

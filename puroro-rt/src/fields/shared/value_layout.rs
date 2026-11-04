@@ -593,8 +593,7 @@ impl<A: Allocator, const VALUE_BIT: usize> ValueLayoutMerge<ProtoBool, A> for Bi
         A: Clone,
         Self::Slot: DefaultIn<A>,
     {
-        let scanned = decode::field_value_to_scanned(value)?;
-        match BoolCodec::from_wire_body(VarintPayload::from_scanned(&scanned)?) {
+        match BoolCodec::from_wire_body(VarintPayload::from_field_value(value)?) {
             Ok(new) => {
                 let _ = ValueSlot::with_mut(slot, init, common).get_mut();
                 common.set_bit(VALUE_BIT, new);
