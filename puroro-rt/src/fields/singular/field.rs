@@ -604,7 +604,7 @@ where
     Cx: MessageBindingMut<A>,
     P::ValueSlot<C::NativeType>: ValueSlot<C::NativeType, A>,
 {
-    /// Writes a scanner numeric without re-encoding it to the wire.
+    /// Writes a scanner numeric into this field.
     pub fn merge_scanned(self, value: &ScannedValue) -> Result<(), DecodeError> {
         match C::from_wire_body(C::WireBody::from_scanned(value)?) {
             Ok(new) => {
@@ -634,7 +634,7 @@ where
     Cx: MessageBindingMut<A>,
     P::ValueSlot<()>: ValueSlot<(), A>,
 {
-    /// Writes a scanner bool without re-encoding it to the wire.
+    /// Writes a scanner bool into this field.
     pub fn merge_scanned(self, value: &ScannedValue) -> Result<(), DecodeError> {
         match BoolCodec::from_wire_body(VarintPayload::from_scanned(value)?) {
             Ok(new) => {
