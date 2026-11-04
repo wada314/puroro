@@ -17,7 +17,7 @@ bitvec = "1"
 bumpalo = { version = "3", features = ["allocator-api2"] }
 bytes = "1"
 criterion = { version = "0.5.1", features = ["html_reports"] }
-protobuf-core = { path = "../protobuf-core", version = "0.3.0" }
+protobuf-core = { path = "../protobuf-core", version = "0.6.0" }
 puroro = { path = ".." }
 unmanaged = { path = "../unmanaged", version = "0.1.0" }
 puroro-rt = { path = "../puroro-rt" }
