@@ -48,8 +48,9 @@ jobs:
       - name: Codegen fixture tests
         run: cargo test --locked -p puroro-codegen-tests
       - name: Docs
-        # Soft build only: many pre-existing rustdoc link warnings remain.
         # Doctest samples are covered by `cargo test` above.
+        env:
+          RUSTDOCFLAGS: -D warnings
         run: >
           cargo doc --locked --no-deps
           -p puroro -p puroro-rt -p protoc-gen-puroro -p puroro-sample-generated
