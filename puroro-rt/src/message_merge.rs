@@ -37,10 +37,9 @@ pub trait MessageMerge {
 
     /// Merge a complete message body that is already one contiguous slice.
     ///
-    /// Eager messages walk [`protobuf_core::AsRefExtProtobuf`] fields and call
-    /// catalog `merge_parsed` — no [`ScopedBuf`] wrapper. Nested Len payloads
-    /// and map-entry bodies should call this instead of re-entering through
-    /// [`Self::merge_from_with_depth`].
+    /// Eager messages walk [`protobuf_core::AsRefExtProtobuf`] and call catalog
+    /// `merge_parsed`. Nested Len payloads and map-entry bodies should prefer
+    /// this over [`Self::merge_from_with_depth`].
     ///
     /// Hand-written / lazy impls may wrap `slice` in [`ScopedBuf`] and forward
     /// to [`Self::merge_from_with_depth`] when they have no FieldIter path yet.

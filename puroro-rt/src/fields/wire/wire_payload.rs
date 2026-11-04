@@ -49,8 +49,8 @@ pub trait CopyWirePayload: WirePayload + Copy + Sized {
     /// [`DecodeError::InvalidTag`].
     fn from_scanned(value: &ScannedValue) -> Result<Self, DecodeError>;
 
-    /// Uses a [`protobuf_core`] [`FieldValue`] from FieldIter (no `ScannedValue`
-    /// bridge). Groups / wrong wire shape → [`DecodeError::InvalidTag`].
+    /// Uses a [`protobuf_core`] [`FieldValue`] from FieldIter. Groups / wrong
+    /// wire shape → [`DecodeError::InvalidTag`].
     fn from_field_value(value: &FieldValue<&[u8]>) -> Result<Self, DecodeError>;
 }
 
