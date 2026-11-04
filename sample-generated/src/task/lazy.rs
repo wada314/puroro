@@ -614,6 +614,14 @@ impl<A: Allocator + Clone> MessageMerge for TaskLazy<A> {
         }
         self.ingest_buf(buf)
     }
+
+    fn merge_from_slice(&mut self, slice: &[u8], depth: usize) -> Result<(), DecodeError> {
+        if depth >= RECURSION_LIMIT {
+            return Err(DecodeError::RecursionLimitExceeded);
+        }
+        let mut body = slice;
+        self.ingest_buf(&mut body)
+    }
 }
 
 impl<A: Allocator + Clone> DefaultIn<A> for TaskLazy<A> {

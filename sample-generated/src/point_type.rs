@@ -15,7 +15,8 @@ use core::ops::DerefMut;
 
 use puroro::{DecodeBuf, DecodeError, Message};
 use puroro_rt::decode::{
-    decode_tag, save_parsed_field_in, skip_field_and_save, try_for_each_contiguous_field,
+    contiguous_remaining, decode_tag, for_each_field_in_slice, save_parsed_field_in,
+    skip_field_and_save,
 };
 use puroro_rt::{
     CloneFieldsVisitor, CloneIn, DebugStructVisitor, Eager, EncodeCtx, EncodeRawVisitor,
@@ -209,25 +210,10 @@ impl<A: Allocator + Clone> MessageMerge for Point<A> {
         if depth >= ::puroro::RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
-        if try_for_each_contiguous_field(buf, |field| {
-            match field.field_number.as_u32() {
-                FIELD_X => {
-                    self.x
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_Y => {
-                    self.y
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                _ => {
-                    let alloc = self._common.alloc.clone();
-                    save_parsed_field_in(field, &mut *self._common.unknown_fields, alloc)?;
-                }
-            }
-            Ok(())
-        })? {
+        if let Some(slice) = contiguous_remaining(buf) {
+            let rem = slice.len();
+            self.merge_from_slice(slice, depth)?;
+            buf.advance(rem);
             return Ok(());
         }
         while buf.has_remaining() {
@@ -253,6 +239,31 @@ impl<A: Allocator + Clone> MessageMerge for Point<A> {
             }
         }
         Ok(())
+    }
+
+    fn merge_from_slice(&mut self, slice: &[u8], depth: usize) -> Result<(), DecodeError> {
+        if depth >= ::puroro::RECURSION_LIMIT {
+            return Err(DecodeError::RecursionLimitExceeded);
+        }
+        for_each_field_in_slice(slice, |field| {
+            match field.field_number.as_u32() {
+                FIELD_X => {
+                    self.x
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_Y => {
+                    self.y
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                _ => {
+                    let alloc = self._common.alloc.clone();
+                    save_parsed_field_in(field, &mut *self._common.unknown_fields, alloc)?;
+                }
+            }
+            Ok(())
+        })
     }
 }
 

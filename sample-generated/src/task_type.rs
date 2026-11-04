@@ -21,7 +21,8 @@ use puroro::{
     RepeatedStringMut,
 };
 use puroro_rt::decode::{
-    decode_tag, save_parsed_field_in, skip_field_and_save, try_for_each_contiguous_field,
+    contiguous_remaining, decode_tag, for_each_field_in_slice, save_parsed_field_in,
+    skip_field_and_save,
 };
 use puroro_rt::{
     BitPacked, Boxed, CloneFieldsVisitor, CloneIn, Closed, DebugStructVisitor, Eager, EncodeCtx,
@@ -781,158 +782,10 @@ impl<A: Allocator + Clone> MessageMerge for Task<A> {
         if depth >= ::puroro::RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
-        if try_for_each_contiguous_field(buf, |field| {
-            match field.field_number.as_u32() {
-                FIELD_TITLE => {
-                    // title = 1, EXPLICIT string
-                    self.title
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_SCORE => {
-                    // score = 2, IMPLICIT int32
-                    self.score
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_MAX_RETRIES => {
-                    // max_retries = 3, EXPLICIT int32
-                    self.max_retries
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_OWNER_ID => {
-                    // owner_id = 4, LEGACY_REQUIRED string
-                    self.owner_id
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_PAYLOAD => {
-                    // payload = 5, EXPLICIT bytes
-                    self.payload
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_TAG_IDS => {
-                    // tag_ids = 6, repeated int32 PACKED
-                    self.tag_ids
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_SCORES => {
-                    // scores = 7, repeated int32 EXPANDED
-                    self.scores
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_LABELS => {
-                    // labels = 8, repeated string
-                    self.labels
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_STATUS => {
-                    // status = 9, IMPLICIT open enum
-                    self.status
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_PRIORITY => {
-                    // priority = 10, EXPLICIT closed enum
-                    self.priority
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_ASSIGNEE => {
-                    // assignee = 11, nested message
-                    self.assignee
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_EMAIL_ADDRESS => {
-                    // notification.email_address = 12, oneof LEN string
-                    self.notification
-                        .bind_mut(&mut self._common)
-                        .variant_mut::<FIELD_EMAIL_ADDRESS>()
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_PHONE_NUMBER => {
-                    // notification.phone_number = 13, oneof LEN string
-                    self.notification
-                        .bind_mut(&mut self._common)
-                        .variant_mut::<FIELD_PHONE_NUMBER>()
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_WEBHOOK_ID => {
-                    // notification.webhook_id = 14, oneof VARINT int32
-                    self.notification
-                        .bind_mut(&mut self._common)
-                        .variant_mut::<FIELD_WEBHOOK_ID>()
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_POSTAL => {
-                    // notification.postal = 15, oneof nested message
-                    self.notification
-                        .bind_mut(&mut self._common)
-                        .variant_mut::<FIELD_POSTAL>()
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_DONE => {
-                    // done = 16, IMPLICIT bool
-                    self.done
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_FLAG => {
-                    // flag = 17, EXPLICIT bool
-                    self.flag
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_URGENT => {
-                    // notification.urgent = 18, oneof bool
-                    self.notification
-                        .bind_mut(&mut self._common)
-                        .variant_mut::<FIELD_URGENT>()
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_WATCHERS => {
-                    // watchers = 19, repeated Address
-                    self.watchers
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_VOTES => {
-                    // votes = 20, repeated bool PACKED
-                    self.votes
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_ATTRIBUTES => {
-                    // attributes = 21, map<string, int32>
-                    self.attributes
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                FIELD_ORIGIN => {
-                    // origin = 22, inlined nested Point
-                    self.origin
-                        .bind_mut(&mut self._common)
-                        .merge_parsed(&field.value, depth)?;
-                }
-                _ => {
-                    // unknown field — preserve in _common.unknown_fields
-                    let alloc = self._common.alloc.clone();
-                    save_parsed_field_in(field, &mut *self._common.unknown_fields, alloc)?;
-                }
-            }
-            Ok(())
-        })? {
+        if let Some(slice) = contiguous_remaining(buf) {
+            let rem = slice.len();
+            self.merge_from_slice(slice, depth)?;
+            buf.advance(rem);
             return Ok(());
         }
         while buf.has_remaining() {
@@ -1093,6 +946,164 @@ impl<A: Allocator + Clone> MessageMerge for Task<A> {
             }
         }
         Ok(())
+    }
+
+    fn merge_from_slice(&mut self, slice: &[u8], depth: usize) -> Result<(), DecodeError> {
+        if depth >= ::puroro::RECURSION_LIMIT {
+            return Err(DecodeError::RecursionLimitExceeded);
+        }
+        for_each_field_in_slice(slice, |field| {
+            match field.field_number.as_u32() {
+                FIELD_TITLE => {
+                    // title = 1, EXPLICIT string
+                    self.title
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_SCORE => {
+                    // score = 2, IMPLICIT int32
+                    self.score
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_MAX_RETRIES => {
+                    // max_retries = 3, EXPLICIT int32
+                    self.max_retries
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_OWNER_ID => {
+                    // owner_id = 4, LEGACY_REQUIRED string
+                    self.owner_id
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_PAYLOAD => {
+                    // payload = 5, EXPLICIT bytes
+                    self.payload
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_TAG_IDS => {
+                    // tag_ids = 6, repeated int32 PACKED
+                    self.tag_ids
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_SCORES => {
+                    // scores = 7, repeated int32 EXPANDED
+                    self.scores
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_LABELS => {
+                    // labels = 8, repeated string
+                    self.labels
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_STATUS => {
+                    // status = 9, IMPLICIT open enum
+                    self.status
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_PRIORITY => {
+                    // priority = 10, EXPLICIT closed enum
+                    self.priority
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_ASSIGNEE => {
+                    // assignee = 11, nested message
+                    self.assignee
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_EMAIL_ADDRESS => {
+                    // notification.email_address = 12, oneof LEN string
+                    self.notification
+                        .bind_mut(&mut self._common)
+                        .variant_mut::<FIELD_EMAIL_ADDRESS>()
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_PHONE_NUMBER => {
+                    // notification.phone_number = 13, oneof LEN string
+                    self.notification
+                        .bind_mut(&mut self._common)
+                        .variant_mut::<FIELD_PHONE_NUMBER>()
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_WEBHOOK_ID => {
+                    // notification.webhook_id = 14, oneof VARINT int32
+                    self.notification
+                        .bind_mut(&mut self._common)
+                        .variant_mut::<FIELD_WEBHOOK_ID>()
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_POSTAL => {
+                    // notification.postal = 15, oneof nested message
+                    self.notification
+                        .bind_mut(&mut self._common)
+                        .variant_mut::<FIELD_POSTAL>()
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_DONE => {
+                    // done = 16, IMPLICIT bool
+                    self.done
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_FLAG => {
+                    // flag = 17, EXPLICIT bool
+                    self.flag
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_URGENT => {
+                    // notification.urgent = 18, oneof bool
+                    self.notification
+                        .bind_mut(&mut self._common)
+                        .variant_mut::<FIELD_URGENT>()
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_WATCHERS => {
+                    // watchers = 19, repeated Address
+                    self.watchers
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_VOTES => {
+                    // votes = 20, repeated bool PACKED
+                    self.votes
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_ATTRIBUTES => {
+                    // attributes = 21, map<string, int32>
+                    self.attributes
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                FIELD_ORIGIN => {
+                    // origin = 22, inlined nested Point
+                    self.origin
+                        .bind_mut(&mut self._common)
+                        .merge_parsed(&field.value, depth)?;
+                }
+                _ => {
+                    // unknown field — preserve in _common.unknown_fields
+                    let alloc = self._common.alloc.clone();
+                    save_parsed_field_in(field, &mut *self._common.unknown_fields, alloc)?;
+                }
+            }
+            Ok(())
+        })
     }
 }
 

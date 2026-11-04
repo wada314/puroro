@@ -179,6 +179,12 @@ impl<A: Allocator + Clone> MessageMerge for FlatScalars<A> {
         }
         Ok(())
     }
+
+    fn merge_from_slice(&mut self, slice: &[u8], depth: usize) -> Result<(), DecodeError> {
+        let mut body = slice;
+        let mut scoped = ::puroro::ScopedBuf::new(&mut body);
+        self.merge_from_with_depth(&mut scoped, depth)
+    }
 }
 
 impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for FlatScalars<A> {
@@ -325,6 +331,12 @@ impl<A: Allocator + Clone> MessageMerge for Nest<A> {
         }
         Ok(())
     }
+
+    fn merge_from_slice(&mut self, slice: &[u8], depth: usize) -> Result<(), DecodeError> {
+        let mut body = slice;
+        let mut scoped = ::puroro::ScopedBuf::new(&mut body);
+        self.merge_from_with_depth(&mut scoped, depth)
+    }
 }
 
 impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for Nest<A> {
@@ -458,6 +470,12 @@ impl<A: Allocator + Clone> MessageMerge for Leaf<A> {
             }
         }
         Ok(())
+    }
+
+    fn merge_from_slice(&mut self, slice: &[u8], depth: usize) -> Result<(), DecodeError> {
+        let mut body = slice;
+        let mut scoped = ::puroro::ScopedBuf::new(&mut body);
+        self.merge_from_with_depth(&mut scoped, depth)
     }
 }
 
@@ -605,6 +623,12 @@ macro_rules! impl_wrap_message {
                 }
                 Ok(())
             }
+
+            fn merge_from_slice(&mut self, slice: &[u8], depth: usize) -> Result<(), DecodeError> {
+                let mut body = slice;
+                let mut scoped = ::puroro::ScopedBuf::new(&mut body);
+                self.merge_from_with_depth(&mut scoped, depth)
+            }
         }
 
         impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for $ty<A> {
@@ -744,6 +768,12 @@ impl<A: Allocator + Clone> MessageMerge for PackedInts<A> {
             }
         }
         Ok(())
+    }
+
+    fn merge_from_slice(&mut self, slice: &[u8], depth: usize) -> Result<(), DecodeError> {
+        let mut body = slice;
+        let mut scoped = ::puroro::ScopedBuf::new(&mut body);
+        self.merge_from_with_depth(&mut scoped, depth)
     }
 }
 
@@ -936,6 +966,12 @@ impl<A: Allocator + Clone> MessageMerge for StringHeavy<A> {
         }
         Ok(())
     }
+
+    fn merge_from_slice(&mut self, slice: &[u8], depth: usize) -> Result<(), DecodeError> {
+        let mut body = slice;
+        let mut scoped = ::puroro::ScopedBuf::new(&mut body);
+        self.merge_from_with_depth(&mut scoped, depth)
+    }
 }
 
 impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for StringHeavy<A> {
@@ -1113,6 +1149,12 @@ impl<A: Allocator + Clone> MessageMerge for ShortStrings<A> {
             }
         }
         Ok(())
+    }
+
+    fn merge_from_slice(&mut self, slice: &[u8], depth: usize) -> Result<(), DecodeError> {
+        let mut body = slice;
+        let mut scoped = ::puroro::ScopedBuf::new(&mut body);
+        self.merge_from_with_depth(&mut scoped, depth)
     }
 }
 

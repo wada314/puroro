@@ -516,20 +516,12 @@ pub(super) fn render_items(
                 if depth >= ::puroro::RECURSION_LIMIT {
                     return ::core::result::Result::Err(::puroro::DecodeError::RecursionLimitExceeded);
                 }
-                if ::puroro_rt::decode::try_for_each_contiguous_field(buf, |field| {
-                    match field.field_number.as_u32() {
-                        #(#parsed_merge_arms)*
-                        _ => {
-                            let alloc = self._common.alloc.clone();
-                            ::puroro_rt::decode::save_parsed_field_in(
-                                field,
-                                &mut *self._common.unknown_fields,
-                                alloc,
-                            )?;
-                        }
-                    }
-                    ::core::result::Result::Ok(())
-                })? {
+                if let ::core::option::Option::Some(slice) =
+                    ::puroro_rt::decode::contiguous_remaining(buf)
+                {
+                    let rem = slice.len();
+                    Self::merge_from_slice(self, slice, depth)?;
+                    ::bytes::Buf::advance(buf, rem);
                     return ::core::result::Result::Ok(());
                 }
                 while ::bytes::Buf::has_remaining(buf) {
@@ -548,6 +540,30 @@ pub(super) fn render_items(
                     }
                 }
                 ::core::result::Result::Ok(())
+            }
+
+            fn merge_from_slice(
+                &mut self,
+                slice: &[u8],
+                depth: usize,
+            ) -> ::core::result::Result<(), ::puroro::DecodeError> {
+                if depth >= ::puroro::RECURSION_LIMIT {
+                    return ::core::result::Result::Err(::puroro::DecodeError::RecursionLimitExceeded);
+                }
+                ::puroro_rt::decode::for_each_field_in_slice(slice, |field| {
+                    match field.field_number.as_u32() {
+                        #(#parsed_merge_arms)*
+                        _ => {
+                            let alloc = self._common.alloc.clone();
+                            ::puroro_rt::decode::save_parsed_field_in(
+                                field,
+                                &mut *self._common.unknown_fields,
+                                alloc,
+                            )?;
+                        }
+                    }
+                    ::core::result::Result::Ok(())
+                })
             }
         }
 

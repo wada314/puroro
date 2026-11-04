@@ -66,31 +66,55 @@ pub fn save_parsed_field_in<A: Allocator + Clone, U: UnknownStore<A>>(
     Ok(())
 }
 
-/// When `buf`'s remaining bytes are one contiguous chunk, walk them with
+/// Walk already-bounded message bytes with
 /// [`protobuf_core::AsRefExtProtobuf::read_protobuf_fields`].
+#[inline]
+pub fn for_each_field_in_slice<F>(slice: &[u8], mut on_field: F) -> Result<(), DecodeError>
+where
+    F: FnMut(&Field<&[u8]>) -> Result<(), DecodeError>,
+{
+    for item in ::protobuf_core::AsRefExtProtobuf::read_protobuf_fields(slice) {
+        on_field(&item?)?;
+    }
+    Ok(())
+}
+
+/// When `buf`'s remaining bytes are one contiguous chunk, return that slice
+/// **without** advancing. Caller must [`Buf::advance`] by `slice.len()` after a
+/// successful merge (or discard).
+///
+/// Returns `Some(&[])` when `remaining == 0`. Returns `None` when remaining
+/// bytes span multiple [`Buf::chunk`]s — the caller should use the legacy tag
+/// loop.
+#[inline]
+pub fn contiguous_remaining<B: Buf>(buf: &B) -> Option<&[u8]> {
+    let rem = buf.remaining();
+    if rem == 0 {
+        return Some(&[]);
+    }
+    let chunk = buf.chunk();
+    if chunk.len() < rem {
+        return None;
+    }
+    Some(&chunk[..rem])
+}
+
+/// When `buf`'s remaining bytes are one contiguous chunk, walk them with
+/// [`for_each_field_in_slice`].
 ///
 /// Returns `Ok(true)` if this path ran (including `rem == 0`). Returns
 /// `Ok(false)` when remaining bytes span multiple [`Buf::chunk`]s — the caller
 /// should use the legacy tag loop. On success the cursor advances by `rem`.
-pub fn try_for_each_contiguous_field<B, F>(
-    buf: &mut B,
-    mut on_field: F,
-) -> Result<bool, DecodeError>
+pub fn try_for_each_contiguous_field<B, F>(buf: &mut B, on_field: F) -> Result<bool, DecodeError>
 where
     B: Buf,
     F: FnMut(&Field<&[u8]>) -> Result<(), DecodeError>,
 {
-    let rem = buf.remaining();
-    if rem == 0 {
-        return Ok(true);
-    }
-    if buf.chunk().len() < rem {
+    let Some(slice) = contiguous_remaining(buf) else {
         return Ok(false);
-    }
-    let slice = &buf.chunk()[..rem];
-    for item in ::protobuf_core::AsRefExtProtobuf::read_protobuf_fields(slice) {
-        on_field(&item?)?;
-    }
+    };
+    let rem = slice.len();
+    for_each_field_in_slice(slice, on_field)?;
     buf.advance(rem);
     Ok(true)
 }

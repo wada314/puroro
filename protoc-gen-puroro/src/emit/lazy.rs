@@ -319,6 +319,20 @@ fn render_codec_impls(lazy_alias: &Ident, validate_body: &TokenStream) -> TokenS
                 }
                 self.ingest_buf(buf)
             }
+
+            fn merge_from_slice(
+                &mut self,
+                slice: &[u8],
+                depth: usize,
+            ) -> ::core::result::Result<(), ::puroro::DecodeError> {
+                if depth >= ::puroro::RECURSION_LIMIT {
+                    return ::core::result::Result::Err(
+                        ::puroro::DecodeError::RecursionLimitExceeded,
+                    );
+                }
+                let mut body = slice;
+                self.ingest_buf(&mut body)
+            }
         }
 
         impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::DefaultIn<A>

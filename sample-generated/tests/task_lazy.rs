@@ -1113,7 +1113,9 @@ fn attributes_rejects_truncated_and_mistyped_entry() {
     let mut truncated = Vec::new();
     encode_len_bytes(FIELD_ATTRIBUTES, &short_key, &mut truncated);
     let lazy = TaskLazy::decode(&truncated[..]).unwrap();
-    assert_eq!(lazy.attributes().err(), Some(DecodeError::TruncatedMessage));
+    // FieldIter reports short Len bodies as UnexpectedEof (legacy tag loop used
+    // TruncatedMessage for the same truncated key payload).
+    assert_eq!(lazy.attributes().err(), Some(DecodeError::UnexpectedEof));
 
     let mut varint_key = Vec::new();
     // key tag (field 1, varint) — string keys are LEN.

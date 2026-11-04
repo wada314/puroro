@@ -14,7 +14,7 @@ use ::bitvec::{
 use ::bytes::Buf;
 use ::core::ops::{Deref, DerefMut};
 use ::protobuf_core::{FieldNumber, FieldValue};
-use ::puroro::{DecodeBuf, DecodeError, ScopedBuf, WireType};
+use ::puroro::{DecodeBuf, DecodeError, WireType};
 use ::unmanaged::{CloneIn, DeallocateIn, UnmanagedBox, UnmanagedString, UnmanagedVec};
 
 use super::{
@@ -444,10 +444,8 @@ where
         let FieldValue::Len(payload) = value else {
             return Err(DecodeError::InvalidTag);
         };
-        let mut body = *payload;
-        let mut scoped = ScopedBuf::new(&mut body);
         let child = ValueSlot::with_mut(slot, init, common).get_mut();
-        MessageMerge::merge_from_with_depth(DerefMut::deref_mut(child), &mut scoped, depth + 1)
+        MessageMerge::merge_from_slice(DerefMut::deref_mut(child), payload, depth + 1)
     }
 }
 

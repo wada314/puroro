@@ -25,15 +25,26 @@ pub trait MessageMerge {
     /// [`DecodeBuf::pop_limit`] on the same buffer so the
     /// concrete type does not change across recursion depths.
     ///
-    /// Generated / catalog code must pass `depth + 1` into nested
-    /// `merge_from_with_depth` calls. Returns
-    /// [`DecodeError::RecursionLimitExceeded`] when
+    /// Contiguous remaining bytes may forward to [`Self::merge_from_slice`].
+    /// Generated / catalog code must pass `depth + 1` into nested merge calls.
+    /// Returns [`DecodeError::RecursionLimitExceeded`] when
     /// `depth >= `[`puroro::RECURSION_LIMIT`].
     fn merge_from_with_depth<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
         depth: usize,
     ) -> Result<(), DecodeError>;
+
+    /// Merge a complete message body that is already one contiguous slice.
+    ///
+    /// Eager messages walk [`protobuf_core::AsRefExtProtobuf`] fields and call
+    /// catalog `merge_parsed` — no [`ScopedBuf`] wrapper. Nested Len payloads
+    /// and map-entry bodies should call this instead of re-entering through
+    /// [`Self::merge_from_with_depth`].
+    ///
+    /// Hand-written / lazy impls may wrap `slice` in [`ScopedBuf`] and forward
+    /// to [`Self::merge_from_with_depth`] when they have no FieldIter path yet.
+    fn merge_from_slice(&mut self, slice: &[u8], depth: usize) -> Result<(), DecodeError>;
 }
 
 /// Merges `buf` into `message` at depth `0` (wraps in [`ScopedBuf`]).

@@ -2,7 +2,7 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
-use ::protobuf_core::{FieldNumber, Varint};
+use ::protobuf_core::{FieldNumber, FieldValue, Varint};
 use ::puroro::{DecodeBuf, DecodeError, WireType};
 
 use super::MapKey;
@@ -150,4 +150,68 @@ where
     let key = key.unwrap_or_else(|| K::default_element(alloc.clone()));
     let value = value.unwrap_or_else(|| V::default_element(alloc));
     Ok((key, value))
+}
+
+/// Decode one map-entry body from an already-split LEN payload (FieldIter).
+pub(super) fn decode_map_entry_from_slice<K, V, A>(
+    slice: &[u8],
+    alloc: A,
+    depth: usize,
+) -> Result<DecodedEntry<K, V, A>, DecodeError>
+where
+    K: MapKey + RepeatedElementMerge<A>,
+    V: RepeatedElementMerge<A>,
+    A: Allocator + Clone,
+{
+    let mut key: Option<K::Element<A>> = None;
+    let mut value: Option<V::Element<A>> = None;
+
+    let walk = decode::for_each_field_in_slice(slice, |field| {
+        match field.field_number.as_u32() {
+            KEY_FIELD => {
+                let next = K::decode_element_parsed(&field.value, alloc.clone(), depth)?;
+                if let Some(old) = key.replace(next) {
+                    // SAFETY: message allocator owns replaced key payloads.
+                    unsafe { K::deallocate_element(old, &alloc) };
+                }
+            }
+            VALUE_FIELD => {
+                let next = V::decode_element_parsed(&field.value, alloc.clone(), depth)?;
+                if let Some(old) = value.replace(next) {
+                    // SAFETY: message allocator owns replaced value payloads.
+                    unsafe { V::deallocate_element(old, &alloc) };
+                }
+            }
+            _ => {
+                // FieldIter already consumed the unknown occurrence.
+            }
+        }
+        Ok(())
+    });
+    if let Err(e) = walk {
+        discard_partial_entry::<K, V, A>(key, value, &alloc);
+        return Err(e);
+    }
+
+    let key = key.unwrap_or_else(|| K::default_element(alloc.clone()));
+    let value = value.unwrap_or_else(|| V::default_element(alloc));
+    Ok((key, value))
+}
+
+/// Decode one map-entry from a parsed Len [`FieldValue`].
+#[inline]
+pub(super) fn decode_map_entry_parsed<K, V, A>(
+    value: &FieldValue<&[u8]>,
+    alloc: A,
+    depth: usize,
+) -> Result<DecodedEntry<K, V, A>, DecodeError>
+where
+    K: MapKey + RepeatedElementMerge<A>,
+    V: RepeatedElementMerge<A>,
+    A: Allocator + Clone,
+{
+    let FieldValue::Len(payload) = value else {
+        return Err(DecodeError::InvalidTag);
+    };
+    decode_map_entry_from_slice::<K, V, A>(payload, alloc, depth)
 }

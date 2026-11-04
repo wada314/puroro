@@ -33,7 +33,10 @@ use crate::fields::wire::repeated_element::{
 };
 use crate::message_encode::EncodeCtx;
 
-use super::entry::{decode_map_entry, encode_map_entry, entry_payload_len};
+use super::entry::{
+    decode_map_entry, decode_map_entry_from_slice, decode_map_entry_parsed, encode_map_entry,
+    entry_payload_len,
+};
 
 /// How a [`MapField`] holds entries.
 ///
@@ -233,6 +236,13 @@ where
         A: Clone,
         K::Element<A>: Eq + Hash,
     {
+        if let Some(slice) = decode::contiguous_remaining(buf) {
+            let rem = slice.len();
+            let (key, value) = decode_map_entry_from_slice::<K, V, A>(slice, alloc.clone(), depth)?;
+            buf.advance(rem);
+            self.insert_last_wins(key, value, &alloc);
+            return Ok(());
+        }
         let mut scoped = ScopedBuf::new(buf);
         let (key, value) = decode_map_entry::<K, V, A, _>(&mut scoped, alloc.clone(), depth)?;
         self.insert_last_wins(key, value, &alloc);
@@ -601,11 +611,10 @@ where
         A: Clone,
         K::Element<A>: Eq + Hash,
     {
-        let FieldValue::Len(payload) = value else {
-            return Err(DecodeError::InvalidTag);
-        };
         let alloc = self.common.clone_alloc();
-        self.field.merge_entry_body(&mut &payload[..], alloc, depth)
+        let (key, value) = decode_map_entry_parsed::<K, V, A>(value, alloc.clone(), depth)?;
+        self.insert(key, value);
+        Ok(())
     }
 }
 

@@ -25,7 +25,7 @@ use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
 use ::core::ops::{Deref, DerefMut};
 
-use ::puroro::{DecodeBuf, DecodeError, Message, ScopedBuf, WireType};
+use ::puroro::{DecodeBuf, DecodeError, Message, WireType};
 
 use crate::decode;
 use crate::message_encode::MessageEncode;
@@ -95,6 +95,15 @@ pub trait RepeatedElementMerge<A: Allocator + Clone>: RepeatedElement {
     fn decode_element<B: DecodeBuf>(
         wire_type: WireType,
         buf: &mut B,
+        alloc: A,
+        depth: usize,
+    ) -> Result<Self::Element<A>, DecodeError>;
+
+    /// Decode one singular occurrence from an already-parsed [`FieldValue`].
+    ///
+    /// Packed `Len` numerics are rejected (same contract as [`decode_element`]).
+    fn decode_element_parsed(
+        value: &FieldValue<&[u8]>,
         alloc: A,
         depth: usize,
     ) -> Result<Self::Element<A>, DecodeError>;
@@ -253,6 +262,17 @@ impl<A: Allocator + Clone, C: NumericalType> RepeatedElementMerge<A> for Numeric
         C::from_wire_body(C::WireBody::decode(wire_type, buf)?)
     }
 
+    #[inline]
+    fn decode_element_parsed(
+        value: &FieldValue<&[u8]>,
+        _alloc: A,
+        _depth: usize,
+    ) -> Result<C::NativeType, DecodeError> {
+        // Map-entry keys/values are singular — packed Len is invalid here.
+        let scanned = decode::field_value_to_scanned(value)?;
+        C::from_wire_body(C::WireBody::from_scanned(&scanned)?)
+    }
+
     fn merge_occurrence<B, F>(
         wire_type: WireType,
         buf: &mut B,
@@ -302,8 +322,7 @@ impl<A: Allocator + Clone, C: NumericalType> RepeatedElementMerge<A> for Numeric
                 Numerical::<C>::merge_packed_buf(&mut body, push)
             }
             other => {
-                let scanned = decode::field_value_to_scanned(other)?;
-                push(C::from_wire_body(C::WireBody::from_scanned(&scanned)?)?);
+                push(Self::decode_element_parsed(other, _alloc, _depth)?);
                 Ok(())
             }
         }
@@ -405,6 +424,18 @@ impl<A: Allocator + Clone, C: LenCodec> RepeatedElementMerge<A> for LenScalar<C>
     }
 
     #[inline]
+    fn decode_element_parsed(
+        value: &FieldValue<&[u8]>,
+        alloc: A,
+        _depth: usize,
+    ) -> Result<C::Slot<A>, DecodeError> {
+        let FieldValue::Len(payload) = value else {
+            return Err(DecodeError::InvalidTag);
+        };
+        C::decode_payload(payload, alloc)
+    }
+
+    #[inline]
     fn merge_occurrence<B, F>(
         wire_type: WireType,
         buf: &mut B,
@@ -424,16 +455,13 @@ impl<A: Allocator + Clone, C: LenCodec> RepeatedElementMerge<A> for LenScalar<C>
     fn merge_occurrence_parsed<F>(
         value: &FieldValue<&[u8]>,
         alloc: A,
-        _depth: usize,
+        depth: usize,
         mut push: F,
     ) -> Result<(), DecodeError>
     where
         F: FnMut(C::Slot<A>),
     {
-        let FieldValue::Len(payload) = value else {
-            return Err(DecodeError::InvalidTag);
-        };
-        push(C::decode_payload(payload, alloc)?);
+        push(Self::decode_element_parsed(value, alloc, depth)?);
         Ok(())
     }
 }
@@ -522,6 +550,20 @@ where
     }
 
     #[inline]
+    fn decode_element_parsed(
+        value: &FieldValue<&[u8]>,
+        alloc: A,
+        depth: usize,
+    ) -> Result<M, DecodeError> {
+        let FieldValue::Len(payload) = value else {
+            return Err(DecodeError::InvalidTag);
+        };
+        let mut msg = M::new_in(alloc);
+        MessageMerge::merge_from_slice(&mut msg, payload, depth + 1)?;
+        Ok(msg)
+    }
+
+    #[inline]
     fn merge_occurrence<B, F>(
         wire_type: WireType,
         buf: &mut B,
@@ -547,14 +589,7 @@ where
     where
         F: FnMut(M),
     {
-        let FieldValue::Len(payload) = value else {
-            return Err(DecodeError::InvalidTag);
-        };
-        let mut body = *payload;
-        let mut scoped = ScopedBuf::new(&mut body);
-        let mut msg = M::new_in(alloc);
-        MessageMerge::merge_from_with_depth(&mut msg, &mut scoped, depth + 1)?;
-        push(msg);
+        push(Self::decode_element_parsed(value, alloc, depth)?);
         Ok(())
     }
 }

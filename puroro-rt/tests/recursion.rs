@@ -100,6 +100,12 @@ impl<A: Allocator + Clone> MessageMerge for Nest<A> {
         }
         Ok(())
     }
+
+    fn merge_from_slice(&mut self, slice: &[u8], depth: usize) -> Result<(), DecodeError> {
+        let mut body = slice;
+        let mut scoped = ::puroro::ScopedBuf::new(&mut body);
+        self.merge_from_with_depth(&mut scoped, depth)
+    }
 }
 
 impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for Nest<A> {
