@@ -32,5 +32,5 @@ bench = false
 [dependencies]
 allocator-api2 = "0.2"
 bytes = "1"
-protobuf-core = { path = "protobuf-core", version = "0.3.0" }
+protobuf-core = { path = "protobuf-core", version = "0.6.0" }
 unmanaged = { path = "unmanaged", version = "0.1.0" }

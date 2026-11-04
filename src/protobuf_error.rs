@@ -11,9 +11,9 @@ impl From<ProtobufError> for DecodeError {
             ProtobufError::VarintTooLong | ProtobufError::VarintDowncastOutOfRange { .. } => {
                 DecodeError::InvalidVarint
             }
-            ProtobufError::InvalidWireType { .. } | ProtobufError::FieldNumberOutOfRange { .. } => {
-                DecodeError::InvalidTag
-            }
+            ProtobufError::InvalidWireType { .. }
+            | ProtobufError::FieldNumberOutOfRange { .. }
+            | ProtobufError::MismatchedEndGroup { .. } => DecodeError::InvalidTag,
         }
     }
 }
