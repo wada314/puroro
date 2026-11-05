@@ -11,7 +11,9 @@ use ::core::fmt::{self, Debug, Formatter};
 use ::core::iter;
 use ::core::ops::Deref;
 use ::puroro::{DecodeBuf, DecodeError, HasDefault, MapRef, Message, Optional, RECURSION_LIMIT};
-use ::puroro_rt::decode::{LazyMessage, LazyScan, ScannedRecord, scanned_len_span};
+use ::puroro_rt::decode::{
+    LazyMessage, LazyScan, ScannedRecord, contiguous_remaining, scanned_len_span,
+};
 use ::puroro_rt::{
     CloneIn, DeallocateIn, DefaultIn, EncodeCtx, FieldCloneIn, InteriorBitArray, LazyMessageCommon,
     MapField, MessageEncode, MessageMerge, OneofGroup, OneofSlot, RepeatedField, SingularField,
@@ -612,7 +614,21 @@ impl<A: Allocator + Clone> MessageMerge for TaskLazy<A> {
         if depth >= RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
+        if let Some(slice) = contiguous_remaining(buf) {
+            let len = slice.len();
+            self.merge_from_slice(slice, depth)?;
+            buf.advance(len);
+            return Ok(());
+        }
         self.ingest_buf(buf)
+    }
+
+    fn merge_from_slice(&mut self, slice: &[u8], depth: usize) -> Result<(), DecodeError> {
+        if depth >= RECURSION_LIMIT {
+            return Err(DecodeError::RecursionLimitExceeded);
+        }
+        let mut body = slice;
+        self.ingest_buf(&mut body)
     }
 }
 
