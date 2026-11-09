@@ -317,29 +317,7 @@ fn render_codec_impls(lazy_alias: &Ident, validate_body: &TokenStream) -> TokenS
                         ::puroro::DecodeError::RecursionLimitExceeded,
                     );
                 }
-                if let ::core::option::Option::Some(slice) =
-                    ::puroro_rt::decode::contiguous_remaining(buf)
-                {
-                    let len = slice.len();
-                    self.merge_from_slice(slice, depth)?;
-                    ::bytes::Buf::advance(buf, len);
-                    return ::core::result::Result::Ok(());
-                }
                 self.ingest_buf(buf)
-            }
-
-            fn merge_from_slice(
-                &mut self,
-                slice: &[u8],
-                depth: usize,
-            ) -> ::core::result::Result<(), ::puroro::DecodeError> {
-                if depth >= ::puroro::RECURSION_LIMIT {
-                    return ::core::result::Result::Err(
-                        ::puroro::DecodeError::RecursionLimitExceeded,
-                    );
-                }
-                let mut body = slice;
-                self.ingest_buf(&mut body)
             }
         }
 

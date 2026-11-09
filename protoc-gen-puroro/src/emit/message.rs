@@ -504,12 +504,17 @@ pub(super) fn render_items(
             }
         }
 
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> #name<A> {
-            fn merge_fields<B: ::puroro::DecodeBuf>(
+        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::MessageMerge
+            for #name<A>
+        {
+            fn merge_from_with_depth<B: ::puroro::DecodeBuf>(
                 &mut self,
                 buf: &mut B,
                 depth: usize,
             ) -> ::core::result::Result<(), ::puroro::DecodeError> {
+                if depth >= ::puroro::RECURSION_LIMIT {
+                    return ::core::result::Result::Err(::puroro::DecodeError::RecursionLimitExceeded);
+                }
                 while ::bytes::Buf::has_remaining(buf) {
                     let (field_number, wire_type) = ::puroro_rt::decode::decode_tag(buf)?;
                     match field_number.as_u32() {
@@ -526,41 +531,6 @@ pub(super) fn render_items(
                     }
                 }
                 ::core::result::Result::Ok(())
-            }
-        }
-
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::MessageMerge
-            for #name<A>
-        {
-            fn merge_from_with_depth<B: ::puroro::DecodeBuf>(
-                &mut self,
-                buf: &mut B,
-                depth: usize,
-            ) -> ::core::result::Result<(), ::puroro::DecodeError> {
-                if depth >= ::puroro::RECURSION_LIMIT {
-                    return ::core::result::Result::Err(::puroro::DecodeError::RecursionLimitExceeded);
-                }
-                if let ::core::option::Option::Some(slice) =
-                    ::puroro_rt::decode::contiguous_remaining(buf)
-                {
-                    let len = slice.len();
-                    self.merge_from_slice(slice, depth)?;
-                    ::bytes::Buf::advance(buf, len);
-                    return ::core::result::Result::Ok(());
-                }
-                self.merge_fields(buf, depth)
-            }
-
-            fn merge_from_slice(
-                &mut self,
-                slice: &[u8],
-                depth: usize,
-            ) -> ::core::result::Result<(), ::puroro::DecodeError> {
-                if depth >= ::puroro::RECURSION_LIMIT {
-                    return ::core::result::Result::Err(::puroro::DecodeError::RecursionLimitExceeded);
-                }
-                let mut buf = ::puroro_rt::decode::SliceCursor::new(slice);
-                self.merge_fields(&mut buf, depth)
             }
         }
 

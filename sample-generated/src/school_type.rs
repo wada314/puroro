@@ -11,7 +11,7 @@ use core::mem;
 use core::ops::ControlFlow;
 
 use puroro::{DecodeBuf, DecodeError, HasDefault, Message, Optional};
-use puroro_rt::decode::{SliceCursor, contiguous_remaining, decode_tag, skip_field_and_save};
+use puroro_rt::decode::{decode_tag, skip_field_and_save};
 use puroro_rt::{
     CloneFieldsVisitor, CloneIn, DebugStructVisitor, EncodeCtx, EncodeRawVisitor,
     EncodedLenVisitor, Explicit, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor,
@@ -210,26 +210,6 @@ impl<A: Allocator + Clone> MessageMerge for School<A> {
         if depth >= ::puroro::RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
-        if let Some(slice) = contiguous_remaining(buf) {
-            let len = slice.len();
-            self.merge_from_slice(slice, depth)?;
-            buf.advance(len);
-            return Ok(());
-        }
-        self.merge_fields(buf, depth)
-    }
-
-    fn merge_from_slice(&mut self, slice: &[u8], depth: usize) -> Result<(), DecodeError> {
-        if depth >= ::puroro::RECURSION_LIMIT {
-            return Err(DecodeError::RecursionLimitExceeded);
-        }
-        let mut buf = SliceCursor::new(slice);
-        self.merge_fields(&mut buf, depth)
-    }
-}
-
-impl<A: Allocator + Clone> School<A> {
-    fn merge_fields<B: DecodeBuf>(&mut self, buf: &mut B, depth: usize) -> Result<(), DecodeError> {
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
             match field_number.as_u32() {
