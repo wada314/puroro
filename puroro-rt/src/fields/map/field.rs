@@ -581,8 +581,22 @@ where
             return Err(DecodeError::InvalidTag);
         }
         let len = decode::decode_varint(buf)? as usize;
-        let mut guard = buf.push_limit_guard(len)?;
+        if buf.remaining() < len {
+            return Err(DecodeError::TruncatedMessage);
+        }
         let alloc = self.common.clone_alloc();
+        if buf.chunk().len() >= len {
+            let merged = {
+                let payload = &buf.chunk()[..len];
+                let mut cursor = decode::SliceCursor::new(payload);
+                decode_map_entry::<K, V, A, _>(&mut cursor, alloc.clone(), depth)
+            };
+            buf.advance(len);
+            let (key, value) = merged?;
+            self.insert(key, value);
+            return Ok(());
+        }
+        let mut guard = buf.push_limit_guard(len)?;
         let (key, value) = decode_map_entry::<K, V, A, _>(&mut *guard, alloc, depth)?;
         self.insert(key, value);
         Ok(())

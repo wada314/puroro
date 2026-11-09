@@ -7,6 +7,8 @@
 use ::bytes::Buf;
 use ::puroro::{DecodeBuf, DecodeError, ScopedBuf};
 
+use crate::decode::{SliceCursor, contiguous_remaining};
+
 /// Wire merge for a message body (depth-aware nested decode).
 ///
 /// Implemented by generated messages and hand-written test / bench messages.
@@ -19,29 +21,46 @@ pub trait MessageMerge {
     /// Reads fields from `buf` and merges them into `self`, threading decode
     /// nesting `depth`.
     ///
-    /// `buf` must be a [`DecodeBuf`] (normally a [`ScopedBuf`] created by
-    /// [`merge_message`]). Nested LEN frames call
-    /// [`DecodeBuf::push_limit`] /
-    /// [`DecodeBuf::pop_limit`] on the same buffer so the
-    /// concrete type does not change across recursion depths.
+    /// Generated messages run their field `match` here. [`merge_message`] calls
+    /// [`Self::merge_from_slice`] when the input is one chunk, and calls this
+    /// method on a [`ScopedBuf`] when the remainder spans chunks. A nested
+    /// length-delimited body that fits in one chunk is passed to
+    /// [`Self::merge_from_slice`] as a subslice.
     ///
-    /// Generated / catalog code must pass `depth + 1` into nested
-    /// `merge_from_with_depth` calls. Returns
-    /// [`DecodeError::RecursionLimitExceeded`] when
+    /// Returns [`DecodeError::RecursionLimitExceeded`] when
     /// `depth >= `[`puroro::RECURSION_LIMIT`].
     fn merge_from_with_depth<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
         depth: usize,
     ) -> Result<(), DecodeError>;
+
+    /// Merge one contiguous message body.
+    ///
+    /// The default puts `slice` in a [`crate::decode::SliceCursor`] and calls
+    /// [`Self::merge_from_with_depth`].
+    #[inline]
+    fn merge_from_slice(&mut self, slice: &[u8], depth: usize) -> Result<(), DecodeError> {
+        let mut cursor = SliceCursor::new(slice);
+        self.merge_from_with_depth(&mut cursor, depth)
+    }
 }
 
-/// Merges `buf` into `message` at depth `0` (wraps in [`ScopedBuf`]).
+/// Merges `buf` into `message` at depth `0`.
+///
+/// One contiguous chunk uses [`MessageMerge::merge_from_slice`]. A remainder
+/// that spans chunks is wrapped in [`ScopedBuf`].
 #[inline]
 pub fn merge_message<M: MessageMerge, B: Buf>(
     message: &mut M,
     buf: &mut B,
 ) -> Result<(), DecodeError> {
+    if let Some(slice) = contiguous_remaining(buf) {
+        let len = slice.len();
+        message.merge_from_slice(slice, 0)?;
+        buf.advance(len);
+        return Ok(());
+    }
     let mut scoped = ScopedBuf::new(buf);
     message.merge_from_with_depth(&mut scoped, 0)
 }

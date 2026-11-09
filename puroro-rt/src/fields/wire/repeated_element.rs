@@ -465,6 +465,18 @@ where
             return Err(DecodeError::InvalidTag);
         }
         let len = decode::decode_varint(buf)? as usize;
+        if buf.remaining() < len {
+            return Err(DecodeError::TruncatedMessage);
+        }
+        if buf.chunk().len() >= len {
+            let merged = {
+                let payload = &buf.chunk()[..len];
+                let mut msg = M::new_in(alloc);
+                MessageMerge::merge_from_slice(&mut msg, payload, depth + 1).map(|()| msg)
+            };
+            buf.advance(len);
+            return merged;
+        }
         let mut guard = buf.push_limit_guard(len)?;
         let mut msg = M::new_in(alloc);
         MessageMerge::merge_from_with_depth(&mut msg, &mut *guard, depth + 1)?;

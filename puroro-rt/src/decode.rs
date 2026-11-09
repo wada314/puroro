@@ -8,7 +8,10 @@
 mod lazy_scan;
 mod record;
 mod shared_wire;
+mod slice_cursor;
 mod varint;
+
+pub use self::slice_cursor::{SliceCursor, contiguous_remaining};
 
 pub use self::lazy_scan::{Eager, Lazy, LazyMessage, LazyScan, MessageScan};
 pub use self::record::{
