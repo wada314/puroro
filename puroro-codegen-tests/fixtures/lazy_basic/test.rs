@@ -41,7 +41,7 @@ fn lazy_getters_match_into_eager() {
     });
     note.labels_mut().push().push_str("a");
 
-    let lazy = NoteLazy::decode(note.encode_to_vec().as_slice()).unwrap();
+    let lazy = NoteLazy::<Global>::decode(note.encode_to_vec().as_slice()).unwrap();
     assert_eq!(lazy.score().unwrap(), 7);
     assert_eq!(lazy.title().unwrap().get(), "hi");
     assert_eq!(lazy.child().unwrap().unwrap().n().unwrap(), 1);

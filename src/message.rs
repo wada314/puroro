@@ -30,8 +30,10 @@ pub const RECURSION_LIMIT: usize = 100;
 /// merge lives on `puroro_rt::MessageMerge`. Generated code implements
 /// [`encode`](Self::encode) / [`encode_to_vec`](Self::encode_to_vec) /
 /// [`merge_from`](Self::merge_from) as thin wrappers;
-/// [`encode_to_bytes`](Self::encode_to_bytes) / [`decode`](Self::decode) are
-/// convenience defaults on top of that.
+/// [`encode_to_bytes`](Self::encode_to_bytes) / [`decode`](Self::decode) /
+/// [`validate`](Self::validate) are convenience defaults on top of that.
+/// [`validate`](Self::validate) stays [`Ok`] unless the message has
+/// `LEGACY_REQUIRED` fields.
 ///
 /// The associated [`Alloc`](Self::Alloc) is the message's single allocator type
 /// parameter. Construction / merge clone it ([`new_in`](Self::new_in) /
@@ -108,6 +110,10 @@ pub trait Message: Sized {
 
     /// Checks `LEGACY_REQUIRED` fields.
     ///
-    /// Messages with no such fields return [`Ok`].
-    fn validate(&self) -> Result<(), DecodeError>;
+    /// The default is [`Ok`]. Generated messages that declare such fields
+    /// override this. A lazy override scans stored regions before the
+    /// presence checks.
+    fn validate(&self) -> Result<(), DecodeError> {
+        Ok(())
+    }
 }

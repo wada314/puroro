@@ -2,7 +2,7 @@
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::vec::Vec as AllocVec;
-use ::bytes::BufMut;
+use ::bytes::{Buf, BufMut};
 use ::core::cell::Cell;
 use ::core::cmp::PartialEq;
 use ::core::ptr;
@@ -268,9 +268,16 @@ impl<A: Allocator + Clone> MessageScan<A> for Lazy<A> {
 /// Generated lazy message: field matching stays here; scan deferral does not.
 ///
 /// Implement [`scan`](Self::scan), [`scan_mut`](Self::scan_mut), and
-/// [`apply_record`](Self::apply_record). Getters call
-/// [`ensure_scanned`](Self::ensure_scanned); a parent nested LEN calls
-/// [`merge_shared`](Self::merge_shared).
+/// [`apply_record`](Self::apply_record). Ingest, finish, and wire-passthrough
+/// encode are provided. Getters call [`ensure_scanned`](Self::ensure_scanned);
+/// a parent nested LEN calls [`merge_shared`](Self::merge_shared).
+///
+/// [`encode`](Self::encode) and [`encode_to_vec`](Self::encode_to_vec) return
+/// [`Result`] and require a finished scan. [`puroro::Message::encode`] and
+/// [`puroro::Message::encode_to_vec`] are infallible and write through
+/// [`crate::MessageEncode`]. When both traits are in scope, call the
+/// `Result` methods with UFCS. [`puroro::Message::decode`] is the complete
+/// decode entry; generated `Message::merge_from` calls [`ingest_buf`](Self::ingest_buf).
 pub trait LazyMessage<A: Allocator + Clone> {
     fn scan(&self) -> &LazyScan<A>;
     fn scan_mut(&mut self) -> &mut LazyScan<A>;
@@ -314,6 +321,72 @@ pub trait LazyMessage<A: Allocator + Clone> {
             self.apply_record(&rec, span.offset)?;
         }
         Ok(())
+    }
+
+    /// Byte length of the ingested body.
+    ///
+    /// Fails with [`DecodeError::UnfinishedMessage`] or
+    /// [`DecodeError::TruncatedMessage`] when [`finish`](Self::finish) has not
+    /// succeeded.
+    #[inline]
+    fn encoded_len(&self) -> Result<usize, DecodeError> {
+        self.scan().encoded_len()
+    }
+
+    /// Writes the ingested body as-is.
+    ///
+    /// Same finish requirement as [`encoded_len`](Self::encoded_len). This is
+    /// not a canonical field-by-field encode.
+    #[inline]
+    fn encode<B: BufMut>(&self, buf: &mut B) -> Result<(), DecodeError> {
+        self.scan().encode(buf)
+    }
+
+    /// Encodes the ingested body into a new `Vec<u8>`.
+    ///
+    /// Same finish requirement as [`encoded_len`](Self::encoded_len).
+    fn encode_to_vec(&self) -> Result<Vec<u8>, DecodeError> {
+        let mut out = Vec::with_capacity(self.encoded_len()?);
+        self.encode(&mut out)?;
+        Ok(out)
+    }
+
+    /// Parses `chunk`, appends it to the island buffer, and applies every
+    /// complete record.
+    fn push(&mut self, chunk: &[u8]) -> Result<(), DecodeError> {
+        let (origin, records) = self.scan_mut().push(chunk)?;
+        for rec in records {
+            self.apply_record(&rec, origin)?;
+        }
+        Ok(())
+    }
+
+    /// Closes the current input stream.
+    ///
+    /// Non-empty leftover is [`DecodeError::TruncatedMessage`].
+    #[inline]
+    fn finish(&mut self) -> Result<(), DecodeError> {
+        self.scan_mut().finish()
+    }
+
+    /// Ingests one complete message: [`push`](Self::push) each non-empty
+    /// chunk, then [`finish`](Self::finish).
+    ///
+    /// A later call merges another message (scalars last-wins, repeated
+    /// appends). It does not continue an unfinished chunk sequence; use
+    /// [`push`](Self::push) for that.
+    fn ingest_buf<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+        while buf.has_remaining() {
+            let n = buf.chunk().len();
+            if n == 0 {
+                let rest = buf.copy_to_bytes(buf.remaining());
+                self.push(&rest)?;
+                break;
+            }
+            self.push(buf.chunk())?;
+            buf.advance(n);
+        }
+        self.finish()
     }
 
     /// Equality for a lazy alias.

@@ -1,5 +1,6 @@
 //! `TaskLazy` ingest: scanner, catalog merge, WireOrSso, nested lazy children.
 
+use ::allocator_api2::alloc::Global;
 use ::puroro::{
     BytesMut, DecodeError, MapMut, MapRef, Message, RECURSION_LIMIT, RepeatedStringMut, ScopedBuf,
     StringMut,
@@ -7,6 +8,7 @@ use ::puroro::{
 use ::puroro_rt::INLINE_CAP;
 use ::puroro_rt::MessageMerge;
 use ::puroro_rt::Varint;
+use ::puroro_rt::decode::LazyMessage;
 use ::puroro_rt::encode::{encode_varint_field, field_number_const};
 use ::puroro_sample_generated::address::FIELD_STREET;
 use ::puroro_sample_generated::task::{
@@ -94,7 +96,7 @@ fn last_wins_scalar_in_one_message() {
         &mut bytes,
     );
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert_eq!(lazy.score().unwrap(), 9);
 }
 
@@ -147,7 +149,7 @@ fn packed_and_expanded_mixed() {
     );
     encode_packed_int32_field(FIELD_SCORES, &[20, 30], &mut bytes);
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert_eq!(lazy.tag_ids().unwrap(), &[1, 2, 3]);
     assert_eq!(lazy.scores().unwrap(), &[10, 20, 30]);
 }
@@ -213,7 +215,7 @@ fn skips_len_records() {
         &mut bytes,
     );
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert_eq!(lazy.score().unwrap(), 7);
 }
 
@@ -238,7 +240,7 @@ fn enums_and_bools() {
     );
     encode_packed_int32_field(20, &[1, 0, 1], &mut bytes);
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert_eq!(lazy.status().unwrap().get(), Status::PENDING);
     assert_eq!(lazy.priority().unwrap().get(), Priority::HIGH);
     assert!(lazy.done().unwrap());
@@ -253,7 +255,7 @@ fn last_wins_string() {
     encode_len_bytes(FIELD_TITLE, b"first", &mut bytes);
     encode_len_bytes(FIELD_TITLE, b"second", &mut bytes);
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert!(lazy.has_title().unwrap());
     assert_eq!(lazy.title().unwrap().get(), "second");
 }
@@ -263,7 +265,7 @@ fn invalid_utf8_before_optional() {
     let mut bytes = Vec::new();
     encode_len_bytes(FIELD_TITLE, &[0xff, 0xfe], &mut bytes);
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert!(lazy.has_title().unwrap());
     assert_eq!(lazy.title().err(), Some(DecodeError::InvalidUtf8));
     // Failed is sticky: a second get does not re-read `_wire`.
@@ -274,17 +276,17 @@ fn invalid_utf8_before_optional() {
 fn invalid_utf8_lazy_eq_compares_body_bytes() {
     let mut bytes = Vec::new();
     encode_len_bytes(FIELD_TITLE, &[0xff, 0xfe], &mut bytes);
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert_eq!(lazy, lazy.clone());
-    assert_eq!(lazy, TaskLazy::decode(&bytes[..]).unwrap());
+    assert_eq!(lazy, TaskLazy::<Global>::decode(&bytes[..]).unwrap());
 
     let mut other = Vec::new();
     encode_len_bytes(FIELD_TITLE, &[0xff], &mut other);
-    assert_ne!(lazy, TaskLazy::decode(&other[..]).unwrap());
+    assert_ne!(lazy, TaskLazy::<Global>::decode(&other[..]).unwrap());
 
     let mut good = Vec::new();
     encode_len_bytes(FIELD_TITLE, b"ok", &mut good);
-    assert_ne!(lazy, TaskLazy::decode(&good[..]).unwrap());
+    assert_ne!(lazy, TaskLazy::<Global>::decode(&good[..]).unwrap());
 }
 
 #[test]
@@ -295,12 +297,12 @@ fn lazy_eq_is_semantic_when_eager_build_works() {
     let mut once = Vec::new();
     encode_len_bytes(FIELD_TITLE, b"second", &mut once);
 
-    let left = TaskLazy::decode(&repeated[..]).unwrap();
-    let right = TaskLazy::decode(&once[..]).unwrap();
+    let left = TaskLazy::<Global>::decode(&repeated[..]).unwrap();
+    let right = TaskLazy::<Global>::decode(&once[..]).unwrap();
     assert_eq!(left, right);
     assert_ne!(
-        left.encode_to_vec().unwrap(),
-        right.encode_to_vec().unwrap()
+        LazyMessage::encode_to_vec(&left).unwrap(),
+        LazyMessage::encode_to_vec(&right).unwrap()
     );
 }
 
@@ -311,7 +313,7 @@ fn unfinished_lazy_eq_is_reflexive_and_differs_from_finished() {
     let mut unfinished = TaskLazy::new();
     unfinished.push(&bytes).unwrap();
     assert_eq!(unfinished, unfinished.clone());
-    assert_ne!(unfinished, TaskLazy::decode(&bytes[..]).unwrap());
+    assert_ne!(unfinished, TaskLazy::<Global>::decode(&bytes[..]).unwrap());
 }
 
 #[test]
@@ -323,7 +325,7 @@ fn missing_string_and_bytes() {
         &mut bytes,
     );
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert!(!lazy.has_title().unwrap());
     assert!(!lazy.title().unwrap().is_set());
     assert!(!lazy.has_owner_id().unwrap());
@@ -335,7 +337,7 @@ fn empty_string_is_present() {
     let mut bytes = Vec::new();
     encode_len_bytes(FIELD_TITLE, b"", &mut bytes);
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert!(lazy.has_title().unwrap());
     assert!(lazy.title().unwrap().is_set());
     assert_eq!(lazy.title().unwrap().get(), "");
@@ -374,7 +376,7 @@ fn owner_id_and_payload() {
     encode_len_bytes(FIELD_OWNER_ID, b"user-1", &mut bytes);
     encode_len_bytes(FIELD_PAYLOAD, b"\x00\x01\xff", &mut bytes);
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert_eq!(lazy.owner_id().unwrap().get(), "user-1");
     assert_eq!(lazy.payload().unwrap().get(), &[0, 1, 0xff]);
 }
@@ -389,7 +391,7 @@ fn title_rejects_non_len_wire() {
     );
 
     assert_eq!(
-        TaskLazy::decode(&bytes[..]).err(),
+        TaskLazy::<Global>::decode(&bytes[..]).err(),
         Some(DecodeError::InvalidTag)
     );
 }
@@ -398,7 +400,7 @@ fn title_rejects_non_len_wire() {
 fn second_get_does_not_revalidate() {
     let mut bytes = Vec::new();
     encode_len_bytes(FIELD_TITLE, b"hello", &mut bytes);
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert_eq!(lazy.title().unwrap().get(), "hello");
     assert_eq!(lazy.title().unwrap().get(), "hello");
 }
@@ -408,7 +410,7 @@ fn heap_string_promotes_and_drops() {
     let long = "z".repeat(INLINE_CAP + 8);
     let mut bytes = Vec::new();
     encode_len_bytes(FIELD_TITLE, long.as_bytes(), &mut bytes);
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert_eq!(lazy.title().unwrap().get(), long);
     drop(lazy);
 }
@@ -444,7 +446,7 @@ fn assignee_occurrences_merge_during_scan() {
     encode_message_field(FIELD_ASSIGNEE, &first.encode_to_vec(), &mut bytes);
     encode_message_field(FIELD_ASSIGNEE, &second.encode_to_vec(), &mut bytes);
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     let addr = lazy.assignee().unwrap().expect("assignee present");
     assert_eq!(addr.street().unwrap().get(), "Oak");
     assert_eq!(addr.city().unwrap().get(), "Kyoto");
@@ -463,7 +465,7 @@ fn assignee_street_last_wins_across_occurrences() {
     encode_message_field(FIELD_ASSIGNEE, &first.encode_to_vec(), &mut bytes);
     encode_message_field(FIELD_ASSIGNEE, &second.encode_to_vec(), &mut bytes);
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert_eq!(
         lazy.assignee().unwrap().unwrap().street().unwrap().get(),
         "new"
@@ -481,7 +483,7 @@ fn watchers_append_one_child_per_occurrence() {
     encode_message_field(FIELD_WATCHERS, &a.encode_to_vec(), &mut bytes);
     encode_message_field(FIELD_WATCHERS, &b.encode_to_vec(), &mut bytes);
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     let watchers = lazy.watchers().unwrap();
     assert_eq!(watchers.len(), 2);
     assert_eq!(watchers[0].street().unwrap().get(), "one");
@@ -497,7 +499,7 @@ fn origin_point_numericals() {
     let mut bytes = Vec::new();
     encode_message_field(FIELD_ORIGIN, &point.encode_to_vec(), &mut bytes);
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     let origin = lazy.origin().unwrap().expect("origin present");
     assert_eq!(origin.x().unwrap(), 3);
     assert_eq!(origin.y().unwrap(), 4);
@@ -577,7 +579,7 @@ fn watchers_second_child_does_not_require_first_street() {
     encode_message_field(FIELD_WATCHERS, &a.encode_to_vec(), &mut bytes);
     encode_message_field(FIELD_WATCHERS, &b.encode_to_vec(), &mut bytes);
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     let watchers = lazy.watchers().unwrap();
     assert_eq!(watchers.len(), 2);
     assert_eq!(watchers[1].street().unwrap().get(), "two");
@@ -603,7 +605,7 @@ fn attributes_empty_map() {
         &mut bytes,
     );
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert!(lazy.attributes().unwrap().is_empty());
     assert_eq!(lazy.attributes().unwrap().get("k"), None);
 }
@@ -615,7 +617,7 @@ fn attributes_last_wins_per_key() {
     encode_map_string_i32("k", 2, &mut bytes);
     encode_map_string_i32("other", 9, &mut bytes);
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     let attrs = lazy.attributes().unwrap();
     assert_eq!(attrs.len(), 2);
     assert_eq!(attrs.get("k").copied(), Some(2));
@@ -637,7 +639,7 @@ fn attributes_missing_key_and_value_defaults() {
     encode_len_bytes(FIELD_ATTRIBUTES, &value_only, &mut bytes);
     encode_len_bytes(FIELD_ATTRIBUTES, &key_only, &mut bytes);
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     let attrs = lazy.attributes().unwrap();
     assert_eq!(attrs.len(), 2);
     assert_eq!(attrs.get("").copied(), Some(7));
@@ -649,7 +651,7 @@ fn attributes_second_get_uses_materialised_map() {
     let mut bytes = Vec::new();
     encode_map_string_i32("region", 81, &mut bytes);
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert_eq!(lazy.attributes().unwrap().get("region").copied(), Some(81));
     assert_eq!(lazy.attributes().unwrap().get("region").copied(), Some(81));
 }
@@ -696,7 +698,7 @@ fn attributes_rejects_non_len_wire() {
     );
 
     assert_eq!(
-        TaskLazy::decode(&bytes[..]).err(),
+        TaskLazy::<Global>::decode(&bytes[..]).err(),
         Some(DecodeError::InvalidTag)
     );
 }
@@ -708,7 +710,7 @@ fn labels_append_and_empty_string() {
     encode_len_bytes(FIELD_LABELS, b"", &mut bytes);
     encode_len_bytes(FIELD_LABELS, b"docs", &mut bytes);
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     let labels = lazy.labels().unwrap();
     assert_eq!(labels.len(), 3);
     assert_eq!(&*labels[0], "urgent");
@@ -756,7 +758,7 @@ fn labels_invalid_utf8() {
     encode_len_bytes(FIELD_LABELS, b"ok", &mut bytes);
     encode_len_bytes(FIELD_LABELS, &[0xff, 0xfe], &mut bytes);
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert_eq!(lazy.labels().err(), Some(DecodeError::InvalidUtf8));
     assert_eq!(lazy.labels().err(), Some(DecodeError::InvalidUtf8));
 }
@@ -769,7 +771,7 @@ fn attributes_invalid_utf8_key() {
     let mut bytes = Vec::new();
     encode_len_bytes(FIELD_ATTRIBUTES, &entry, &mut bytes);
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert_eq!(lazy.attributes().err(), Some(DecodeError::InvalidUtf8));
 }
 
@@ -814,7 +816,7 @@ fn sample_task() -> Task {
 fn into_eager_matches_eager_decode() {
     let task = sample_task();
     let bytes = task.encode_to_vec();
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert_eq!(lazy.into_eager().unwrap(), task);
 }
 
@@ -822,17 +824,17 @@ fn into_eager_matches_eager_decode() {
 fn encode_as_wire_matches_single_buffer() {
     let task = sample_task();
     let bytes = task.encode_to_vec();
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     let _ = lazy.title().unwrap();
     assert_eq!(lazy.encoded_len().unwrap(), bytes.len());
-    assert_eq!(lazy.encode_to_vec().unwrap(), bytes);
+    assert_eq!(LazyMessage::encode_to_vec(&lazy).unwrap(), bytes);
 }
 
 #[test]
 fn empty_into_eager_and_encode() {
     let lazy = TaskLazy::new();
     assert_eq!(lazy.encoded_len().unwrap(), 0);
-    assert!(lazy.encode_to_vec().unwrap().is_empty());
+    assert!(LazyMessage::encode_to_vec(&lazy).unwrap().is_empty());
     assert_eq!(lazy.into_eager().unwrap(), Task::new());
 }
 
@@ -874,16 +876,21 @@ fn address_and_point_into_eager() {
     addr.street_mut().set("Oak");
     *addr.postal_code_mut() = 100;
     let addr_bytes = addr.encode_to_vec();
-    let addr_lazy = ::puroro_sample_generated::AddressLazy::decode(&addr_bytes[..]).unwrap();
-    assert_eq!(addr_lazy.encode_to_vec().unwrap(), addr_bytes);
+    let addr_lazy =
+        ::puroro_sample_generated::AddressLazy::<Global>::decode(&addr_bytes[..]).unwrap();
+    assert_eq!(LazyMessage::encode_to_vec(&addr_lazy).unwrap(), addr_bytes);
     assert_eq!(addr_lazy.into_eager().unwrap(), addr);
 
     let mut point = Point::new();
     *point.x_mut() = 1;
     *point.y_mut() = 2;
     let point_bytes = point.encode_to_vec();
-    let point_lazy = ::puroro_sample_generated::PointLazy::decode(&point_bytes[..]).unwrap();
-    assert_eq!(point_lazy.encode_to_vec().unwrap(), point_bytes);
+    let point_lazy =
+        ::puroro_sample_generated::PointLazy::<Global>::decode(&point_bytes[..]).unwrap();
+    assert_eq!(
+        LazyMessage::encode_to_vec(&point_lazy).unwrap(),
+        point_bytes
+    );
     assert_eq!(point_lazy.into_eager().unwrap(), point);
 }
 
@@ -896,10 +903,13 @@ fn nested_child_encode_is_body_only() {
     *task.score_mut() = 9;
     task.set_assignee(addr.clone());
     let bytes = task.encode_to_vec();
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     let child = lazy.assignee().unwrap().unwrap();
-    assert_eq!(child.encode_to_vec().unwrap(), addr.encode_to_vec());
-    assert_ne!(child.encode_to_vec().unwrap(), bytes);
+    assert_eq!(
+        LazyMessage::encode_to_vec(child).unwrap(),
+        addr.encode_to_vec()
+    );
+    assert_ne!(LazyMessage::encode_to_vec(child).unwrap(), bytes);
 }
 
 #[test]
@@ -907,7 +917,7 @@ fn oneof_email_last_wins() {
     let mut bytes = Vec::new();
     encode_len_bytes(FIELD_EMAIL_ADDRESS, b"first@x", &mut bytes);
     encode_len_bytes(FIELD_EMAIL_ADDRESS, b"second@x", &mut bytes);
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert_eq!(
         lazy.notification().unwrap(),
         Some(NotificationCase::EmailAddress)
@@ -925,7 +935,7 @@ fn oneof_switch_email_to_webhook() {
         Varint::from_int32(7),
         &mut bytes,
     );
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert_eq!(
         lazy.notification().unwrap(),
         Some(NotificationCase::WebhookId)
@@ -943,7 +953,7 @@ fn oneof_switch_webhook_to_email() {
         &mut bytes,
     );
     encode_len_bytes(FIELD_EMAIL_ADDRESS, b"b@x.com", &mut bytes);
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert_eq!(
         lazy.notification().unwrap(),
         Some(NotificationCase::EmailAddress)
@@ -959,7 +969,7 @@ fn oneof_postal_and_urgent() {
     addr.street_mut().set("Oak");
     let mut bytes = Vec::new();
     encode_len_bytes(FIELD_POSTAL, &addr.encode_to_vec(), &mut bytes);
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert_eq!(lazy.notification().unwrap(), Some(NotificationCase::Postal));
     assert_eq!(
         lazy.postal().unwrap().unwrap().street().unwrap().get(),
@@ -972,7 +982,7 @@ fn oneof_postal_and_urgent() {
         Varint::from_bool(true),
         &mut urgent,
     );
-    let lazy = TaskLazy::decode(&urgent[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&urgent[..]).unwrap();
     assert_eq!(lazy.notification().unwrap(), Some(NotificationCase::Urgent));
     assert!(lazy.urgent().unwrap().get());
     assert!(lazy.postal().unwrap().is_none());
@@ -987,7 +997,7 @@ fn oneof_same_postal_occurrences_merge() {
     let mut bytes = Vec::new();
     encode_len_bytes(FIELD_POSTAL, &first.encode_to_vec(), &mut bytes);
     encode_len_bytes(FIELD_POSTAL, &second.encode_to_vec(), &mut bytes);
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     let postal = lazy.postal().unwrap().unwrap();
     assert_eq!(postal.street().unwrap().get(), "Oak");
     assert_eq!(postal.city().unwrap().get(), "Kyoto");
@@ -997,12 +1007,12 @@ fn oneof_same_postal_occurrences_merge() {
 fn oneof_phone_and_invalid_utf8_email() {
     let mut bytes = Vec::new();
     encode_len_bytes(FIELD_PHONE_NUMBER, b"555-0100", &mut bytes);
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert_eq!(lazy.phone_number().unwrap().get(), "555-0100");
 
     let mut bad = Vec::new();
     encode_len_bytes(FIELD_EMAIL_ADDRESS, &[0xff, 0xfe], &mut bad);
-    let lazy = TaskLazy::decode(&bad[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bad[..]).unwrap();
     assert_eq!(lazy.email_address().err(), Some(DecodeError::InvalidUtf8));
     assert_eq!(lazy.email_address().err(), Some(DecodeError::InvalidUtf8));
 }
@@ -1026,8 +1036,8 @@ fn lazy_partial_eq_follows_eager_fields() {
         Varint::from_int32(7),
         &mut once,
     );
-    let repeated = TaskLazy::decode(&repeated[..]).unwrap();
-    let once = TaskLazy::decode(&once[..]).unwrap();
+    let repeated = TaskLazy::<Global>::decode(&repeated[..]).unwrap();
+    let once = TaskLazy::<Global>::decode(&once[..]).unwrap();
     assert_eq!(repeated, once);
     assert_eq!(repeated.clone().score().unwrap(), 7);
 
@@ -1037,12 +1047,15 @@ fn lazy_partial_eq_follows_eager_fields() {
         Varint::from_int32(8),
         &mut other,
     );
-    assert_ne!(once, TaskLazy::decode(&other[..]).unwrap());
+    assert_ne!(once, TaskLazy::<Global>::decode(&other[..]).unwrap());
 
     let mut left = TaskLazy::new();
-    left.push(&once.encode_to_vec().unwrap()).unwrap();
+    left.push(&LazyMessage::encode_to_vec(&once).unwrap())
+        .unwrap();
     let mut right = TaskLazy::new();
-    right.push(&once.encode_to_vec().unwrap()).unwrap();
+    right
+        .push(&LazyMessage::encode_to_vec(&once).unwrap())
+        .unwrap();
     // Unfinished ingest is not a finished value, but identical bodies stay
     // equal. A finished decode of the same bytes does not.
     assert_eq!(left, right);
@@ -1054,8 +1067,8 @@ fn lazy_partial_eq_follows_eager_fields() {
     let mut street = Vec::new();
     encode_len_bytes(FIELD_STREET, b"new", &mut street);
     assert_eq!(
-        AddressLazy::decode(&streets[..]).unwrap(),
-        AddressLazy::decode(&street[..]).unwrap()
+        AddressLazy::<Global>::decode(&streets[..]).unwrap(),
+        AddressLazy::<Global>::decode(&street[..]).unwrap()
     );
 
     let mut points = Vec::new();
@@ -1072,8 +1085,8 @@ fn lazy_partial_eq_follows_eager_fields() {
     let mut point = Vec::new();
     encode_varint_field(field_number_const::<1>(), Varint::from_int32(4), &mut point);
     assert_eq!(
-        PointLazy::decode(&points[..]).unwrap(),
-        PointLazy::decode(&point[..]).unwrap()
+        PointLazy::<Global>::decode(&points[..]).unwrap(),
+        PointLazy::<Global>::decode(&point[..]).unwrap()
     );
 }
 
@@ -1086,7 +1099,7 @@ fn packed_inner_varint_truncated() {
     bytes.push(0x80);
 
     assert_eq!(
-        TaskLazy::decode(&bytes[..]).err(),
+        TaskLazy::<Global>::decode(&bytes[..]).err(),
         Some(DecodeError::UnexpectedEof)
     );
 }
@@ -1100,7 +1113,7 @@ fn nested_len_with_truncated_child() {
     let mut bytes = Vec::new();
     encode_len_bytes(FIELD_ASSIGNEE, &child, &mut bytes);
 
-    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     let addr = lazy.assignee().unwrap().expect("assignee present");
     assert_eq!(addr.street().err(), Some(DecodeError::TruncatedMessage));
 }
@@ -1112,7 +1125,7 @@ fn attributes_rejects_truncated_and_mistyped_entry() {
     short_key.extend_from_slice(&[0x0a, 0x05, b'x']);
     let mut truncated = Vec::new();
     encode_len_bytes(FIELD_ATTRIBUTES, &short_key, &mut truncated);
-    let lazy = TaskLazy::decode(&truncated[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&truncated[..]).unwrap();
     assert_eq!(lazy.attributes().err(), Some(DecodeError::TruncatedMessage));
 
     let mut varint_key = Vec::new();
@@ -1120,7 +1133,7 @@ fn attributes_rejects_truncated_and_mistyped_entry() {
     varint_key.extend_from_slice(&[0x08, 0x01]);
     let mut mistyped = Vec::new();
     encode_len_bytes(FIELD_ATTRIBUTES, &varint_key, &mut mistyped);
-    let lazy = TaskLazy::decode(&mistyped[..]).unwrap();
+    let lazy = TaskLazy::<Global>::decode(&mistyped[..]).unwrap();
     assert_eq!(lazy.attributes().err(), Some(DecodeError::InvalidTag));
 }
 
@@ -1130,14 +1143,14 @@ fn score_rejects_non_varint_wire() {
     encode_u64_varint(u64::from(FIELD_SCORE) << 3 | 5, &mut fixed);
     fixed.extend_from_slice(&1u32.to_le_bytes());
     assert_eq!(
-        TaskLazy::decode(&fixed[..]).err(),
+        TaskLazy::<Global>::decode(&fixed[..]).err(),
         Some(DecodeError::InvalidTag)
     );
 
     let mut len = Vec::new();
     encode_len_bytes(FIELD_SCORE, &[1], &mut len);
     assert_eq!(
-        TaskLazy::decode(&len[..]).err(),
+        TaskLazy::<Global>::decode(&len[..]).err(),
         Some(DecodeError::InvalidTag)
     );
 }
@@ -1165,7 +1178,7 @@ fn rejected_chunk_leaves_prior_ingest() {
 
     assert_eq!(lazy.push(&second).err(), Some(DecodeError::InvalidTag));
     assert_eq!(lazy.score().unwrap(), 4);
-    assert_eq!(lazy.encode_to_vec().unwrap(), first);
+    assert_eq!(LazyMessage::encode_to_vec(&lazy).unwrap(), first);
 
     let mut third = Vec::new();
     encode_varint_field(
@@ -1179,7 +1192,7 @@ fn rejected_chunk_leaves_prior_ingest() {
     assert_eq!(lazy.score().unwrap(), 9);
     let mut expected = first;
     expected.extend_from_slice(&third);
-    assert_eq!(lazy.encode_to_vec().unwrap(), expected);
+    assert_eq!(LazyMessage::encode_to_vec(&lazy).unwrap(), expected);
 }
 
 #[test]
@@ -1198,7 +1211,7 @@ fn encode_before_finish_is_unfinished() {
     );
     let mut out = Vec::new();
     assert_eq!(
-        lazy.encode(&mut out).err(),
+        LazyMessage::encode(&lazy, &mut out).err(),
         Some(DecodeError::UnfinishedMessage)
     );
     assert!(out.is_empty());

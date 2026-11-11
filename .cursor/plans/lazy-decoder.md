@@ -358,7 +358,7 @@ One emit template, two aliases. Second struct emission from existing
 lands here.
 
 Done (2026-10-12): sample `TaskImpl<A, L>` and the plugin's `NameImpl<A, L>`.
-`push` / `finish` are inherent on the lazy alias. Oneof and repeated string /
+`push` / `finish` / `encoded_len` / `encode` / `encode_to_vec` / `ingest_buf` are `LazyMessage` defaults. `decode` is `Message::decode`. Oneof and repeated string /
 bytes are included. `Layout` associated types cover slots that differ.
 
 ## v1 done / not done

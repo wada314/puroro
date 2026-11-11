@@ -11,6 +11,7 @@ use ::puroro::{
 };
 use ::puroro_rt::INLINE_CAP;
 use ::puroro_rt::Varint;
+use ::puroro_rt::decode::LazyMessage;
 use ::puroro_rt::encode::{encode_varint_field, field_number_const};
 use ::puroro_sample_generated::task::{Notification, NotificationCase};
 use ::puroro_sample_generated::{Address, Point, Priority, Status, Task};
@@ -920,7 +921,7 @@ fn eager_parent_lazy_assignee_roundtrip() {
         "1 Island"
     );
 
-    let body = child.encode_to_vec().unwrap();
+    let body = LazyMessage::encode_to_vec(child).unwrap();
     let eager: Address = Address::decode(&body[..]).unwrap();
     assert_eq!(eager.street().get(), "1 Island");
     assert_eq!(eager.city().get(), "Kyoto");

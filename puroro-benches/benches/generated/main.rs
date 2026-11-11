@@ -25,6 +25,7 @@ mod payloads;
 use ::allocator_api2::alloc::Global;
 use ::criterion::{BatchSize, BenchmarkId, Criterion, Throughput, black_box, criterion_group};
 use ::puroro::{Message, StringMut};
+use ::puroro_rt::decode::LazyMessage;
 use ::puroro_sample_generated::{Marker, Point, Task, TaskLazy};
 
 use keep::iter_keep;
@@ -106,13 +107,13 @@ fn bench_task_lazy(c: &mut Criterion) {
         b.iter(|| read_all_lazy(black_box(&decoded)))
     });
     group.bench_function("encode", |b| {
-        b.iter(|| black_box(&decoded).encode_to_vec().unwrap())
+        b.iter(|| LazyMessage::encode_to_vec(black_box(&decoded)).unwrap())
     });
     group.bench_function("encode_reuse", |b| {
         let mut buf = Vec::with_capacity(TYPICAL_BYTES.len());
         b.iter(|| {
             buf.clear();
-            black_box(&decoded).encode(&mut buf).unwrap();
+            LazyMessage::encode(black_box(&decoded), &mut buf).unwrap();
             black_box(buf.len())
         })
     });
