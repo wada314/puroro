@@ -33,4 +33,5 @@ pub(crate) mod oneof_variant;
 pub(crate) mod repeated;
 pub(crate) mod shared;
 pub(crate) mod singular;
+pub(crate) mod slot_index;
 pub(crate) mod wire;

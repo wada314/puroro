@@ -611,24 +611,17 @@ pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> (TokenSt
         let field_const = &v.field_const;
         let mut_target = &v.mut_target;
         let optional_ty = &v.optional_ty;
-        let group = name;
-
+        let get = super::message::record_get(companion, field_const);
+        let get_mut = super::message::field_get_mut(companion, field_const);
         if v.is_message {
             variant_getters.push(quote! {
                 pub fn #vname(&self) -> ::core::option::Option<&#mut_target> {
-                    self.record.fields.#group
-                        .bind(&self.record.common)
-                        .variant_of::<{ #companion::#field_const }>()
-                        .get()
+                    #get
                 }
             });
             variant_mutators.push(quote! {
                 pub fn #vname_mut(&mut self) -> &mut #mut_target {
-                    self.record.fields.#group
-                        .bind_mut(&mut self.record.common)
-                        .variant_mut::<{ #companion::#field_const }>()
-                        .bind_mut(&mut self.record.common)
-                        .value_mut()
+                    #get_mut
                 }
             });
         } else {
@@ -639,20 +632,13 @@ pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> (TokenSt
                 where
                     A: 'a,
                 {
-                    self.record.fields.#group
-                        .bind(&self.record.common)
-                        .variant_of::<{ #companion::#field_const }>()
-                        .optional()
+                    #get
                 }
             });
             let mut_ret = v.mut_style.return_ty(&parse_quote! { 's }, mut_target);
             variant_mutators.push(quote! {
                 pub fn #vname_mut<'s>(&'s mut self) -> #mut_ret {
-                    self.record.fields.#group
-                        .bind_mut(&mut self.record.common)
-                        .variant_mut::<{ #companion::#field_const }>()
-                        .bind_mut(&mut self.record.common)
-                        .value_mut()
+                    #get_mut
                 }
             });
         }
@@ -689,15 +675,15 @@ pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> (TokenSt
 
 /// Merge arms for every variant field number.
 pub(super) fn render_merge_arms(oneof: &OneofEmit, companion: &Ident) -> Vec<TokenStream> {
-    let group = &oneof.name;
     oneof
         .variants
         .iter()
         .map(|v| {
             let field_const = &v.field_const;
+            let slot = super::message::slot_mut_expr(companion, field_const);
             quote! {
                 #companion::#field_const => {
-                    self.#group
+                    #slot
                         .bind_mut(common)
                         .variant_mut::<{ #companion::#field_const }>()
                         .bind_mut(common)

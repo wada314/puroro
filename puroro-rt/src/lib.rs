@@ -33,6 +33,7 @@ pub use fields::oneof::{
     OneofVariantRef, OneofView, OneofViewMut,
 };
 pub use fields::oneof_variant::OneofVariant;
+pub use fields::repeated::container::RepeatedElementsMut;
 pub use fields::repeated::{
     DecodeLenBody, Expanded, Packed, RepeatedField, RepeatedFieldMut, RepeatedFieldRef,
     RepeatedLayout, RepeatedReady, RepeatedSpans,
@@ -50,6 +51,7 @@ pub use fields::shared::{
 pub use fields::singular::{
     SingularField, SingularFieldAccess, SingularFieldMut, SingularFieldRef,
 };
+pub use fields::slot_index::{HasSlot, SlotClear, SlotHas, SlotMut, SlotRead, SlotReadLazy};
 pub use fields::wire::{
     Closed, ClosedEnum, INLINE_CAP, LazyBytesSlot, LazyStringSlot, Open, OpenEnum, PayloadAccess,
     ProtoBool, ProtoBytes, ProtoDouble, ProtoEnum, ProtoEnumStorage, ProtoFixed32, ProtoFixed64,
