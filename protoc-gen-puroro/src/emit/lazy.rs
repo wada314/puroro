@@ -15,7 +15,7 @@ pub(super) fn render_items(
     lazy_alias: &Ident,
     name_str: &str,
     companion: &Ident,
-    validate_body: &TokenStream,
+    validate_body: &Option<TokenStream>,
 ) -> Result<Vec<Item>> {
     let lazy_ty = quote! { #impl_name<A, ::puroro_rt::Lazy<A>> };
     let getters = render_getters(fields, companion);
@@ -65,14 +65,6 @@ fn render_global_ctor(impl_name: &Ident) -> TokenStream {
             pub fn new() -> Self {
                 Self::new_in(::allocator_api2::alloc::Global)
             }
-
-            pub fn decode<B: ::bytes::Buf>(
-                mut buf: B,
-            ) -> ::core::result::Result<Self, ::puroro::DecodeError> {
-                let mut msg = Self::new();
-                ::puroro::Message::merge_from(&mut msg, &mut buf)?;
-                ::core::result::Result::Ok(msg)
-            }
         }
     }
 }
@@ -97,25 +89,6 @@ fn render_inherent(
 fn lazy_read_methods(getters: &[TokenStream]) -> TokenStream {
     quote! {
         #(#getters)*
-
-        pub fn encoded_len(&self) -> ::core::result::Result<usize, ::puroro::DecodeError> {
-            self._common.lazy.scan.encoded_len()
-        }
-
-        pub fn encode<B: ::bytes::BufMut>(
-            &self,
-            buf: &mut B,
-        ) -> ::core::result::Result<(), ::puroro::DecodeError> {
-            self._common.lazy.scan.encode(buf)
-        }
-
-        pub fn encode_to_vec(
-            &self,
-        ) -> ::core::result::Result<::std::vec::Vec<u8>, ::puroro::DecodeError> {
-            let mut out = ::std::vec::Vec::with_capacity(self.encoded_len()?);
-            self.encode(&mut out)?;
-            ::core::result::Result::Ok(out)
-        }
     }
 }
 
@@ -133,42 +106,6 @@ fn lazy_ingest_methods(
                     ),
                     #(#new_fields)*
                 }
-            }
-
-            pub fn push(&mut self, chunk: &[u8]) -> ::core::result::Result<(), ::puroro::DecodeError> {
-                let (origin, records) = self._common.lazy.scan.push(chunk)?;
-                for rec in records {
-                    ::puroro_rt::decode::LazyMessage::apply_record(self, &rec, origin)?;
-                }
-                ::core::result::Result::Ok(())
-            }
-
-            pub fn finish(&mut self) -> ::core::result::Result<(), ::puroro::DecodeError> {
-                self._common.lazy.scan.finish()
-            }
-
-            pub fn merge_from<B: ::bytes::Buf>(
-                &mut self,
-                buf: &mut B,
-            ) -> ::core::result::Result<(), ::puroro::DecodeError> {
-                self.ingest_buf(buf)
-            }
-
-            fn ingest_buf<B: ::bytes::Buf>(
-                &mut self,
-                buf: &mut B,
-            ) -> ::core::result::Result<(), ::puroro::DecodeError> {
-                while ::bytes::Buf::has_remaining(buf) {
-                    let n = ::bytes::Buf::chunk(buf).len();
-                    if n == 0 {
-                        let rest = ::bytes::Buf::copy_to_bytes(buf, ::bytes::Buf::remaining(buf));
-                        self.push(&rest)?;
-                        break;
-                    }
-                    self.push(::bytes::Buf::chunk(buf))?;
-                    ::bytes::Buf::advance(buf, n);
-                }
-                self.finish()
             }
 
             /// Decode `_wire` into the eager alias.
@@ -282,7 +219,16 @@ fn render_dealloc(lazy_alias: &Ident) -> TokenStream {
     }
 }
 
-fn render_codec_impls(lazy_alias: &Ident, validate_body: &TokenStream) -> TokenStream {
+fn render_codec_impls(lazy_alias: &Ident, validate_body: &Option<TokenStream>) -> TokenStream {
+    let validate_method = match validate_body {
+        Some(body) => quote! {
+            fn validate(&self) -> ::core::result::Result<(), ::puroro::DecodeError> {
+                ::puroro_rt::decode::LazyMessage::ensure_scanned(self)?;
+                #body
+            }
+        },
+        None => quote! {},
+    };
     quote! {
         impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::MessageEncode
             for #lazy_alias<A>
@@ -317,7 +263,7 @@ fn render_codec_impls(lazy_alias: &Ident, validate_body: &TokenStream) -> TokenS
                         ::puroro::DecodeError::RecursionLimitExceeded,
                     );
                 }
-                self.ingest_buf(buf)
+                ::puroro_rt::decode::LazyMessage::ingest_buf(self, buf)
             }
         }
 
@@ -357,7 +303,7 @@ fn render_codec_impls(lazy_alias: &Ident, validate_body: &TokenStream) -> TokenS
             where
                 A: ::core::clone::Clone,
             {
-                self.ingest_buf(buf)
+                ::puroro_rt::decode::LazyMessage::ingest_buf(self, buf)
             }
 
             fn unknown_fields(
@@ -366,10 +312,7 @@ fn render_codec_impls(lazy_alias: &Ident, validate_body: &TokenStream) -> TokenS
                 ::core::iter::empty()
             }
 
-            fn validate(&self) -> ::core::result::Result<(), ::puroro::DecodeError> {
-                ::puroro_rt::decode::LazyMessage::ensure_scanned(self)?;
-                #validate_body
-            }
+            #validate_method
         }
     }
 }

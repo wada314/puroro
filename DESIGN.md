@@ -194,9 +194,11 @@ pub trait Message: Sized {
         Self: Default,
         Self::Alloc: Clone;
 
-    // Infrastructure (required)
+    // Infrastructure
     fn unknown_fields(&self) -> impl Iterator<Item = UnknownField<'_>> + '_;
-    fn validate(&self) -> Result<(), DecodeError>; // Ok(()) when no LEGACY_REQUIRED
+    fn validate(&self) -> Result<(), DecodeError> {
+        Ok(())
+    } // provided; override when the message has LEGACY_REQUIRED fields
 }
 ```
 
@@ -206,7 +208,7 @@ pub trait Message: Sized {
 
 **Non-deterministic field order.** The encoder may emit known fields in any order. Two encodes of the same logical message are not guaranteed to produce identical bytes; compare with `PartialEq`, not with encode output equality. See [IMPLEMENTATION.md §12](IMPLEMENTATION.md#12-message-level-wire-io).
 
-**Name conflicts.** If a proto field is named `validate`, `unknown_fields`, `encode`, `encode_to_vec`, etc., the inherent field getter wins; use `Message::validate(&msg)` (UFCS). Lazy aliases also have inherent helpers such as `encoded_len() -> Result<usize, DecodeError>` and `has_*()`; those collide the same way and are not `Message` trait items.
+**Name conflicts.** If a proto field is named `validate`, `unknown_fields`, `encode`, `encode_to_vec`, etc., the inherent field getter wins; use `Message::validate(&msg)` (UFCS). `has_*()` on a lazy alias is inherent and collides the same way. Lazy `encoded_len()` / `encode()` / `encode_to_vec()` / `push()` / `finish()` are [`LazyMessage`](puroro-rt/src/decode/lazy_scan.rs) methods, not inherent methods and not `Message` items. `LazyMessage::encode` and `LazyMessage::encode_to_vec` return `Result` and require a finished scan. With both traits in scope, call those two by UFCS. `decode` is `Message::decode`.
 
 **Allocator.** `Alloc` is the message's single allocator type. Nested message fields construct children with `Message::new_in` under the bound `M: Message<Alloc = A>` (same `A` as the parent). An inherent `new()` for `Global` may still be emitted on the concrete type. `decode` requires `Self: Default` (typically `A: Default`); otherwise use `new_in(alloc)` then `merge_from`.
 
@@ -1407,7 +1409,7 @@ Eager and lazy are not a runtime enum inside `Task`. Slots that must differ (str
 
 `TaskLazy` is read-oriented. It has no `_mut` or `clear_*`. To mutate, call `into_eager(self) -> Result<Task<A>, DecodeError>` and use the eager API. The implementation lock, including what v1 still does not do, is [`.cursor/plans/lazy-decoder.md`](.cursor/plans/lazy-decoder.md).
 
-**When reads are valid.** `push` accepts one chunk of a single message and applies every complete record. `finish` fails if bytes remain. `merge_from` and `decode` ingest one complete message (`push`, then `finish`). A second `merge_from` is a protobuf merge, not more chunks of the first message. Getters fail until `finish`. They do not return a provisional value.
+**When reads are valid.** `LazyMessage::push` accepts one chunk of a single message and applies every complete record. `LazyMessage::finish` fails if bytes remain. `Message::merge_from` and `Message::decode` ingest one complete message (`push`, then `finish`). A second `merge_from` is a protobuf merge, not more chunks of the first message. Getters fail until `finish`. They do not return a provisional value.
 
 **What a complete record does.**
 
@@ -1439,7 +1441,7 @@ A lazy alias is not a drop-in for the eager alias. The rows below are the behavi
 | `DISCARD` | Encode omits unknown tags and closed-enum unknowns | Encode writes `_wire`, so those bytes are still emitted. `into_eager` applies the baked discard policy. | Lazy encode should honour the baked store, or wire passthrough stays an explicit mode. |
 | `REJECT` | Well-formed unknown tag fails the merge | Plugin scan calls `on_unrecognized_tag` and fails the same way. Handwritten `TaskLazy` uses `Ok(())` for the unknown arm; that sample is preserve-only. | Keep the plugin check. |
 | Encode shape | Canonical field order. Merged scalars are emitted once. | Original order. A second `merge_from` concatenates. `PartialEq` can hold while the bytes differ. | Option sketch `lazy_encode=wire` (default) or `canonical`. |
-| `validate` | `LEGACY_REQUIRED` presence | Plugin: the same presence check after `ensure_scanned`. It does not UTF-8-check. Sample `TaskLazy::validate` returns `Ok(())`. | Fix the sample. Optional later: `validate` also forces `VERIFY` getters. |
+| `validate` | `LEGACY_REQUIRED` presence | The same presence check after `LazyMessage::ensure_scanned`. It does not UTF-8-check. Messages with no such fields use the `Message::validate` default (`Ok(())`). | Optional later: `validate` also forces `VERIFY` getters. |
 | Recursion limit | Nested merge counts depth and returns `RecursionLimitExceeded` | Ingest stores a child span and does not walk it, so a too-deep message can `decode`. `into_eager` enforces the limit. | Count depth when a lazy child is parsed, or reject at ingest. |
 | Getters | Infallible | `Result<_, DecodeError>` | [`MessageFallible`](#per-message-traits-not-yet-generated), already planned. |
 | Presence query | No `has_*`. `is_set` on a stored `VERIFY` string means the bytes were valid UTF-8. | `has_*` is wire presence. | Option sketch: `has_*` means present and successfully decoded. |

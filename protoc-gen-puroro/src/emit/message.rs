@@ -284,6 +284,7 @@ pub(super) fn render_items(
     let visit_mut = render_visit_calls(&fields, VisitKind::Mut);
     let merge_arms = render_merge_arms(&fields, companion);
     let validate_body = render_validate(&fields);
+    let validate_method = eager_validate_method(validate_body.as_ref());
     let oneof_modules = render_oneof_modules(
         &fields,
         &bits_ty,
@@ -577,9 +578,7 @@ pub(super) fn render_items(
                 self._common.iter_unknown_fields()
             }
 
-            fn validate(&self) -> ::core::result::Result<(), ::puroro::DecodeError> {
-                #validate_body
-            }
+            #validate_method
         }
     })?;
     type_items.extend(super::lazy::render_items(
@@ -1810,7 +1809,7 @@ fn render_merge_arms(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStream
     arms
 }
 
-fn render_validate(fields: &[FieldEmit]) -> TokenStream {
+fn render_validate(fields: &[FieldEmit]) -> Option<TokenStream> {
     let required: Vec<_> = fields
         .iter()
         .filter_map(|f| match f {
@@ -1824,11 +1823,22 @@ fn render_validate(fields: &[FieldEmit]) -> TokenStream {
         })
         .collect();
     if required.is_empty() {
-        quote! { ::core::result::Result::Ok(()) }
+        None
     } else {
-        quote! {
+        Some(quote! {
             #(#required)*
             ::core::result::Result::Ok(())
+        })
+    }
+}
+
+fn eager_validate_method(body: Option<&TokenStream>) -> TokenStream {
+    let Some(body) = body else {
+        return quote! {};
+    };
+    quote! {
+        fn validate(&self) -> ::core::result::Result<(), ::puroro::DecodeError> {
+            #body
         }
     }
 }

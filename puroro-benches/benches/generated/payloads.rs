@@ -4,6 +4,7 @@ use ::std::sync::LazyLock;
 
 use ::allocator_api2::alloc::Global;
 use ::puroro::{BytesMut, MapMut, MapRef, Message, OneofView, RepeatedStringMut, StringMut};
+use ::puroro_rt::decode::LazyMessage;
 use ::puroro_rt::encode::encode_varint_field;
 use ::puroro_rt::{FieldNumber, Varint};
 use ::puroro_sample_generated::task::NotificationCase;
@@ -278,7 +279,7 @@ pub fn assert_payloads() {
     assert_eq!(read_one(&decoded), "Write docs".len());
 
     let lazy = TaskLazy::<Global>::decode(TYPICAL_BYTES.as_slice()).expect("typical lazy decode");
-    let lazy_bytes = lazy.encode_to_vec().expect("lazy encode");
+    let lazy_bytes = LazyMessage::encode_to_vec(&lazy).expect("lazy encode");
     let from_lazy_wire = Task::<Global>::decode(lazy_bytes.as_slice()).expect("decode lazy encode");
     assert_eq!(from_lazy_wire, typical);
     assert_eq!(read_all_lazy(&lazy), read_all(&typical));

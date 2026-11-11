@@ -85,7 +85,7 @@ fn reject_oneof_keeps_variant_and_fails_unknown() {
 #[test]
 fn reject_lazy_fails_unknown_tag() {
     let known = [0x08_u8, 0x03];
-    let lazy = RejectLazy::decode(&known[..]).expect("lazy decode");
+    let lazy: RejectLazy = RejectLazy::decode(&known[..]).expect("lazy decode");
     assert_eq!(lazy.n().expect("n").get(), 3);
 
     let wire = [0x08_u8, 0x03, 0x50, 0x05];

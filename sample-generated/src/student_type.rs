@@ -299,8 +299,4 @@ impl<A: Allocator + Clone> Message for Student<A> {
     fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
         self._common.iter_unknown_fields()
     }
-
-    fn validate(&self) -> Result<(), DecodeError> {
-        Ok(())
-    }
 }

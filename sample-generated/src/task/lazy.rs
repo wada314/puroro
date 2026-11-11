@@ -42,12 +42,6 @@ impl TaskLazy<Global> {
     pub fn new() -> Self {
         Self::new_in(Global)
     }
-
-    pub fn decode<B: Buf>(mut buf: B) -> Result<Self, DecodeError> {
-        let mut msg = Self::new();
-        msg.merge_from(&mut buf)?;
-        Ok(msg)
-    }
 }
 
 impl<A: Allocator + Clone> TaskLazy<A> {
@@ -300,22 +294,6 @@ impl<A: Allocator + Clone> TaskLazy<A> {
         self.attributes
             .bind(self._common.lazy.scan.wire(), &self._common)
     }
-
-    /// Length of the gathered `_wire`. Same as a single-buffer ingest.
-    pub fn encoded_len(&self) -> Result<usize, DecodeError> {
-        self._common.lazy.scan.encoded_len()
-    }
-
-    /// Write `_wire` as-is (not a canonical field-by-field encode).
-    pub fn encode<B: BufMut>(&self, buf: &mut B) -> Result<(), DecodeError> {
-        self._common.lazy.scan.encode(buf)
-    }
-
-    pub fn encode_to_vec(&self) -> Result<Vec<u8>, DecodeError> {
-        let mut out = Vec::with_capacity(self.encoded_len()?);
-        self.encode(&mut out)?;
-        Ok(out)
-    }
 }
 
 impl<A: Allocator + Clone> TaskLazy<A> {
@@ -341,44 +319,6 @@ impl<A: Allocator + Clone> TaskLazy<A> {
             votes: RepeatedField::new_in(alloc.clone()),
             notification: OneofSlot::new_in(alloc),
         }
-    }
-
-    /// Feed one I/O chunk. Complete numerical records are merged immediately;
-    /// singular LEN records store a span into `_wire`. Nested message LENs are
-    /// merged into a child lazy message. Map entries append a span.
-    pub fn push(&mut self, chunk: &[u8]) -> Result<(), DecodeError> {
-        let (origin, records) = self._common.lazy.scan.push(chunk)?;
-        for rec in records {
-            self.apply_record(&rec, origin)?;
-        }
-        Ok(())
-    }
-
-    /// Close the current input stream. Non-empty leftover is truncated input.
-    pub fn finish(&mut self) -> Result<(), DecodeError> {
-        self._common.lazy.scan.finish()
-    }
-
-    /// Merge one complete message body (push remaining bytes, then finish).
-    ///
-    /// A second call is a real protobuf merge: scalars last-wins, repeated
-    /// appends. Distinct from concatenating I/O chunks of a single message.
-    pub fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
-        self.ingest_buf(buf)
-    }
-
-    fn ingest_buf<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
-        while buf.has_remaining() {
-            let n = buf.chunk().len();
-            if n == 0 {
-                let rest = buf.copy_to_bytes(buf.remaining());
-                self.push(&rest)?;
-                break;
-            }
-            self.push(buf.chunk())?;
-            buf.advance(n);
-        }
-        self.finish()
     }
 
     /// Decode every field from `_wire` into an eager [`Task`].
@@ -612,7 +552,7 @@ impl<A: Allocator + Clone> MessageMerge for TaskLazy<A> {
         if depth >= RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
-        self.ingest_buf(buf)
+        LazyMessage::ingest_buf(self, buf)
     }
 }
 
@@ -645,7 +585,7 @@ impl<A: Allocator + Clone> Message for TaskLazy<A> {
     where
         A: Clone,
     {
-        self.ingest_buf(buf)
+        LazyMessage::ingest_buf(self, buf)
     }
 
     fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
@@ -653,6 +593,7 @@ impl<A: Allocator + Clone> Message for TaskLazy<A> {
     }
 
     fn validate(&self) -> Result<(), DecodeError> {
-        Ok(())
+        LazyMessage::ensure_scanned(self)?;
+        self.owner_id.validate_required(&self._common)
     }
 }
