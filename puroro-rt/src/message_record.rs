@@ -21,7 +21,6 @@ use crate::fields::shared::{
     EncodedLenVisitor, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor, FieldVisitor,
     FieldVisitorMut, MessageBindingMut, MessageCommon, UnknownStore,
 };
-use crate::fields::slot_index::{HasSlot, SlotClear, SlotHas, SlotMut, SlotRead, SlotReadLazy};
 use crate::message_encode::{EncodeCtx, MessageEncode, encode_message, encode_message_to_vec};
 use crate::message_merge::{MessageMerge, merge_message};
 use crate::{CloneIn, DeallocateIn, DefaultIn};
@@ -540,90 +539,6 @@ where
 
     fn apply_record(&mut self, rec: &ScannedRecord, origin: usize) -> Result<(), DecodeError> {
         self.fields.apply_record(&mut self.common, rec, origin)
-    }
-}
-
-impl<F, A, U> Record<F, A, Eager, U>
-where
-    A: Allocator + Clone,
-    U: UnknownStore<A>,
-    F: RecordFields<A, Eager, Unknown = U>,
-    F::Bits: Clone,
-{
-    /// Read field number `N`.
-    ///
-    /// `F` implements [`HasSlot`] for that number. The slot type chooses
-    /// `optional` / `value` / `get` / `as_slice`.
-    #[inline]
-    pub fn get<const N: u32>(
-        &self,
-    ) -> <<F as HasSlot<N>>::Slot as SlotRead<MessageCommon<F::Bits, A, U, Eager>, N>>::View<'_>
-    where
-        F: HasSlot<N>,
-        <F as HasSlot<N>>::Slot: SlotRead<MessageCommon<F::Bits, A, U, Eager>, N>,
-    {
-        <F as HasSlot<N>>::slot(&self.fields).read(&self.common)
-    }
-
-    /// Mutable handle for field number `N`.
-    #[inline]
-    pub fn get_mut<const N: u32>(
-        &mut self,
-    ) -> <<F as HasSlot<N>>::Slot as SlotMut<MessageCommon<F::Bits, A, U, Eager>, N>>::Mut<'_>
-    where
-        F: HasSlot<N>,
-        <F as HasSlot<N>>::Slot: SlotMut<MessageCommon<F::Bits, A, U, Eager>, N>,
-    {
-        <F as HasSlot<N>>::slot_mut(&mut self.fields).project_mut(&mut self.common)
-    }
-
-    /// Clear field number `N`.
-    #[inline]
-    pub fn clear<const N: u32>(&mut self)
-    where
-        F: HasSlot<N>,
-        <F as HasSlot<N>>::Slot: SlotClear<MessageCommon<F::Bits, A, U, Eager>>,
-    {
-        <F as HasSlot<N>>::slot_mut(&mut self.fields).clear_slot(&mut self.common);
-    }
-}
-
-impl<F, A, U> Record<F, A, Lazy<A>, U>
-where
-    A: Allocator + Clone,
-    U: UnknownStore<A>,
-    F: RecordFields<A, Lazy<A>, Unknown = U> + LazyRecordApply<A>,
-    F::Bits: Clone,
-{
-    /// Finish the stored scan if needed, then read field number `N`.
-    // The view is the slot projection. Naming it needs `checked_type_aliases`.
-    #[allow(clippy::type_complexity)]
-    #[inline]
-    pub fn get<const N: u32>(
-        &self,
-    ) -> Result<
-        <<F as HasSlot<N>>::Slot as SlotReadLazy<MessageCommon<F::Bits, A, U, Lazy<A>>, N>>::View<
-            '_,
-        >,
-        DecodeError,
-    >
-    where
-        F: HasSlot<N>,
-        <F as HasSlot<N>>::Slot: SlotReadLazy<MessageCommon<F::Bits, A, U, Lazy<A>>, N>,
-    {
-        LazyMessage::ensure_scanned(self)?;
-        <F as HasSlot<N>>::slot(&self.fields).read_lazy(&self.common)
-    }
-
-    /// Finish the stored scan if needed, then read the presence bit of field `N`.
-    #[inline]
-    pub fn has<const N: u32>(&self) -> Result<bool, DecodeError>
-    where
-        F: HasSlot<N>,
-        <F as HasSlot<N>>::Slot: SlotHas<MessageCommon<F::Bits, A, U, Lazy<A>>>,
-    {
-        LazyMessage::ensure_scanned(self)?;
-        Ok(<F as HasSlot<N>>::slot(&self.fields).is_present(&self.common))
     }
 }
 

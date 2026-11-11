@@ -266,7 +266,7 @@ pub(super) fn render_items(
     let struct_fields = render_struct_fields(&fields, companion);
     let has_slot_impls = render_has_slot_impls(&fields, &fields_name, companion);
     let new_in_fields = render_new_in_fields(&fields);
-    let accessors = render_accessors(&fields, companion);
+    let accessors = render_accessors(&fields, &fields_name, companion);
     let getters = &accessors.getters;
     let mutators = &accessors.mutators;
     let visit_shared = render_visit_calls(&fields, VisitKind::Shared);
@@ -523,6 +523,7 @@ pub(super) fn render_items(
     type_items.extend(super::lazy::render_items(
         &fields,
         name,
+        &fields_name,
         &lazy_alias,
         companion,
     )?);
@@ -1252,38 +1253,84 @@ fn render_struct_fields(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStr
         .collect()
 }
 
-/// `&mut` place of the slot for protobuf field number `field_const`.
-pub(super) fn slot_mut_expr(companion: &Ident, field_const: &Ident) -> TokenStream {
+/// `HasField::field_mut` on the fields struct (`self` in merge / apply).
+pub(super) fn field_mut_expr(companion: &Ident, field_const: &Ident) -> TokenStream {
     quote! {
-        <Self as ::puroro_rt::HasSlot<{ #companion::#field_const }>>::slot_mut(self)
+        <Self as ::puroro_rt::HasField<{ #companion::#field_const }>>::field_mut(self)
     }
 }
 
-fn slot_expr(companion: &Ident, field_const: &Ident) -> TokenStream {
+fn field_expr(companion: &Ident, field_const: &Ident) -> TokenStream {
     quote! {
-        <Self as ::puroro_rt::HasSlot<{ #companion::#field_const }>>::slot(self)
+        <Self as ::puroro_rt::HasField<{ #companion::#field_const }>>::field(self)
     }
 }
 
-fn field_get(companion: &Ident, field_const: &Ident) -> TokenStream {
-    quote! { self.record.get::<{ #companion::#field_const }>() }
+/// Borrowed projection inside an eager message method.
+pub(super) fn eager_field(
+    fields_name: &Ident,
+    companion: &Ident,
+    field_const: &Ident,
+) -> TokenStream {
+    message_field(
+        fields_name,
+        &quote! { ::puroro_rt::Eager },
+        companion,
+        field_const,
+        false,
+    )
 }
 
-pub(super) fn field_get_mut(companion: &Ident, field_const: &Ident) -> TokenStream {
-    quote! { self.record.get_mut::<{ #companion::#field_const }>() }
+/// Mutable projection inside an eager message method.
+pub(super) fn eager_field_mut(
+    fields_name: &Ident,
+    companion: &Ident,
+    field_const: &Ident,
+) -> TokenStream {
+    message_field(
+        fields_name,
+        &quote! { ::puroro_rt::Eager },
+        companion,
+        field_const,
+        true,
+    )
 }
 
-fn field_clear(companion: &Ident, field_const: &Ident) -> TokenStream {
-    quote! { self.record.clear::<{ #companion::#field_const }>() }
+/// Borrowed projection inside a lazy message method.
+pub(super) fn lazy_field(
+    fields_name: &Ident,
+    companion: &Ident,
+    field_const: &Ident,
+) -> TokenStream {
+    message_field(
+        fields_name,
+        &quote! { ::puroro_rt::Lazy<A> },
+        companion,
+        field_const,
+        false,
+    )
 }
 
-/// Eager or lazy `Record::get` for this field number.
-pub(super) fn record_get(companion: &Ident, field_const: &Ident) -> TokenStream {
-    field_get(companion, field_const)
-}
-
-pub(super) fn record_has(companion: &Ident, field_const: &Ident) -> TokenStream {
-    quote! { self.record.has::<{ #companion::#field_const }>() }
+fn message_field(
+    fields_name: &Ident,
+    layout: &TokenStream,
+    companion: &Ident,
+    field_const: &Ident,
+    mutable: bool,
+) -> TokenStream {
+    let method = if mutable {
+        quote! { field_mut }
+    } else {
+        quote! { field }
+    };
+    let receiver = if mutable {
+        quote! { &mut self.record.fields }
+    } else {
+        quote! { &self.record.fields }
+    };
+    quote! {
+        <#fields_name<A, #layout> as ::puroro_rt::HasField<{ #companion::#field_const }>>::#method(#receiver)
+    }
 }
 
 fn field_slot_ty(field: &FieldEmit, companion: &Ident) -> TokenStream {
@@ -1365,14 +1412,25 @@ fn render_has_slot_impls(
         match field {
             FieldEmit::Oneof(oneof) => {
                 let name = &oneof.name;
-                let slot_ty = oneof_slot_ty(oneof, companion);
+                let storage = &oneof.storage_name;
                 for variant in &oneof.variants {
-                    impls.push(has_slot_impl(
+                    let field_const = &variant.field_const;
+                    let ty = quote! {
+                        ::puroro_rt::OneofFieldRef<'a, #companion::#storage<A, L>, { #companion::#field_const }>
+                    };
+                    let mut_ty = quote! {
+                        ::puroro_rt::OneofFieldMut<'a, #companion::#storage<A, L>, { #companion::#field_const }>
+                    };
+                    let project = quote! { ::puroro_rt::OneofFieldRef::new(&self.#name) };
+                    let project_mut = quote! { ::puroro_rt::OneofFieldMut::new(&mut self.#name) };
+                    impls.push(has_field_impl(
                         fields_name,
                         companion,
-                        &variant.field_const,
-                        name,
-                        &slot_ty,
+                        field_const,
+                        &ty,
+                        &mut_ty,
+                        &project,
+                        &project_mut,
                     ));
                 }
             }
@@ -1380,13 +1438,20 @@ fn render_has_slot_impls(
                 let field_const = other
                     .field_const()
                     .expect("non-oneof field has a FIELD_* const");
+                let name = other.name();
                 let slot_ty = field_slot_ty(other, companion);
-                impls.push(has_slot_impl(
+                let ty = quote! { &'a #slot_ty };
+                let mut_ty = quote! { &'a mut #slot_ty };
+                let project = quote! { &self.#name };
+                let project_mut = quote! { &mut self.#name };
+                impls.push(has_field_impl(
                     fields_name,
                     companion,
                     field_const,
-                    other.name(),
-                    &slot_ty,
+                    &ty,
+                    &mut_ty,
+                    &project,
+                    &project_mut,
                 ));
             }
         }
@@ -1394,28 +1459,31 @@ fn render_has_slot_impls(
     impls
 }
 
-fn has_slot_impl(
+fn has_field_impl(
     fields_name: &Ident,
     companion: &Ident,
     field_const: &Ident,
-    name: &Ident,
-    slot_ty: &TokenStream,
+    ty: &TokenStream,
+    mut_ty: &TokenStream,
+    project: &TokenStream,
+    project_mut: &TokenStream,
 ) -> TokenStream {
     quote! {
         impl<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
             L: #companion::Layout<A>,
-        > ::puroro_rt::HasSlot<{ #companion::#field_const }> for #fields_name<A, L> {
-            type Slot = #slot_ty;
+        > ::puroro_rt::HasField<{ #companion::#field_const }> for #fields_name<A, L> {
+            type Ref<'a> = #ty where Self: 'a;
+            type Mut<'a> = #mut_ty where Self: 'a;
 
             #[inline]
-            fn slot(&self) -> &Self::Slot {
-                &self.#name
+            fn field<'a>(&'a self) -> Self::Ref<'a> {
+                #project
             }
 
             #[inline]
-            fn slot_mut(&mut self) -> &mut Self::Slot {
-                &mut self.#name
+            fn field_mut<'a>(&'a mut self) -> Self::Mut<'a> {
+                #project_mut
             }
         }
     }
@@ -1537,28 +1605,32 @@ struct FieldAccessors {
     mutators: Vec<TokenStream>,
 }
 
-fn render_accessors(fields: &[FieldEmit], companion: &Ident) -> FieldAccessors {
+fn render_accessors(
+    fields: &[FieldEmit],
+    fields_name: &Ident,
+    companion: &Ident,
+) -> FieldAccessors {
     let mut getters = Vec::new();
     let mut mutators = Vec::new();
     for field in fields {
         match field {
             FieldEmit::Repeated(field) => {
-                let (g, m) = render_repeated_accessors(field, companion);
+                let (g, m) = render_repeated_accessors(field, fields_name, companion);
                 getters.push(g);
                 mutators.push(m);
             }
             FieldEmit::Singular(field) => {
-                let (g, m) = render_singular_accessors(field, companion);
+                let (g, m) = render_singular_accessors(field, fields_name, companion);
                 getters.push(g);
                 mutators.push(m);
             }
             FieldEmit::Map(field) => {
-                let (g, m) = render_map_accessors(field, companion);
+                let (g, m) = render_map_accessors(field, fields_name, companion);
                 getters.push(g);
                 mutators.push(m);
             }
             FieldEmit::Oneof(o) => {
-                let (g, m) = oneof::render_accessors(o, companion);
+                let (g, m) = oneof::render_accessors(o, fields_name, companion);
                 getters.push(g);
                 mutators.push(m);
             }
@@ -1567,7 +1639,11 @@ fn render_accessors(fields: &[FieldEmit], companion: &Ident) -> FieldAccessors {
     FieldAccessors { getters, mutators }
 }
 
-fn render_map_accessors(field: &MapEmit, companion: &Ident) -> (TokenStream, TokenStream) {
+fn render_map_accessors(
+    field: &MapEmit,
+    fields_name: &Ident,
+    companion: &Ident,
+) -> (TokenStream, TokenStream) {
     let name = &field.name;
     let name_mut = Ident::new(&format!("{}_mut", field.name_str), Span::call_site());
     let clear_name = Ident::new(&format!("clear_{}", field.name_str), Span::call_site());
@@ -1575,23 +1651,23 @@ fn render_map_accessors(field: &MapEmit, companion: &Ident) -> (TokenStream, Tok
     let value_view = &field.value_view;
     // Pin MutTarget so `*entry_mut(…) = …` / `push_str` resolve through `impl Trait`.
     let mut_target = field.mut_target.as_ref().unwrap_or(value_view);
-    let get = field_get(companion, &field.field_const);
-    let get_mut = field_get_mut(companion, &field.field_const);
-    let clear = field_clear(companion, &field.field_const);
+    let get = eager_field(fields_name, companion, &field.field_const);
+    let get_mut = eager_field_mut(fields_name, companion, &field.field_const);
+    let clear = eager_field_mut(fields_name, companion, &field.field_const);
     let getter = quote! {
         pub fn #name(&self) -> impl ::puroro::MapRef<#key_view, #value_view> + '_ {
-            #get
+            #get.bind(&self.record.common)
         }
     };
     let mutator = quote! {
         pub fn #name_mut(
             &mut self,
         ) -> impl ::puroro::MapMut<#key_view, #value_view, MutTarget = #mut_target> + '_ {
-            #get_mut
+            #get_mut.bind_mut(&mut self.record.common)
         }
 
         pub fn #clear_name(&mut self) {
-            #clear;
+            #clear.bind_mut(&mut self.record.common).clear();
         }
     };
     (getter, mutator)
@@ -1599,36 +1675,37 @@ fn render_map_accessors(field: &MapEmit, companion: &Ident) -> (TokenStream, Tok
 
 fn render_repeated_accessors(
     field: &RepeatedEmit,
+    fields_name: &Ident,
     companion: &Ident,
 ) -> (TokenStream, TokenStream) {
     let name = &field.name;
     let name_mut = Ident::new(&format!("{}_mut", field.name_str), Span::call_site());
     let clear_name = Ident::new(&format!("clear_{}", field.name_str), Span::call_site());
     let elem = &field.slice_elem_ty;
-    let get = field_get(companion, &field.field_const);
-    let get_mut = field_get_mut(companion, &field.field_const);
-    let clear = field_clear(companion, &field.field_const);
+    let get = eager_field(fields_name, companion, &field.field_const);
+    let get_mut = eager_field_mut(fields_name, companion, &field.field_const);
+    let clear = eager_field_mut(fields_name, companion, &field.field_const);
     let getter = quote! {
         pub fn #name(&self) -> &[#elem] {
-            #get
+            #get.bind(&self.record.common).as_slice()
         }
     };
     let mutator_body = match field.style {
         RepeatedAccessorStyle::String => quote! {
             pub fn #name_mut(&mut self) -> impl ::puroro::RepeatedStringMut<A> + '_ {
-                #get_mut
+                #get_mut.bind_mut(&mut self.record.common).container_mut()
             }
         },
         RepeatedAccessorStyle::Bytes => quote! {
             pub fn #name_mut(&mut self) -> impl ::puroro::RepeatedBytesMut<A> + '_ {
-                #get_mut
+                #get_mut.bind_mut(&mut self.record.common).container_mut()
             }
         },
         RepeatedAccessorStyle::Slice => quote! {
             pub fn #name_mut<'s>(
                 &'s mut self,
             ) -> impl ::core::ops::DerefMut<Target = ::allocator_api2::vec::Vec<#elem, A>> + 's {
-                #get_mut
+                #get_mut.bind_mut(&mut self.record.common).values_mut()
             }
         },
     };
@@ -1636,27 +1713,31 @@ fn render_repeated_accessors(
         #mutator_body
 
         pub fn #clear_name(&mut self) {
-            #clear;
+            #clear.bind_mut(&mut self.record.common).clear();
         }
     };
     (getter, mutator)
 }
 
-fn render_singular_accessors(field: &ScalarEmit, companion: &Ident) -> (TokenStream, TokenStream) {
+fn render_singular_accessors(
+    field: &ScalarEmit,
+    fields_name: &Ident,
+    companion: &Ident,
+) -> (TokenStream, TokenStream) {
     let name = &field.name;
     let name_mut = Ident::new(&format!("{}_mut", field.name_str), Span::call_site());
     let clear_name = Ident::new(&format!("clear_{}", field.name_str), Span::call_site());
     let mut_target = &field.mut_target;
     let implicit_ty = &field.implicit_ty;
     let optional_ty = &field.optional_ty;
-    let get = field_get(companion, &field.field_const);
-    let get_mut = field_get_mut(companion, &field.field_const);
-    let clear = field_clear(companion, &field.field_const);
+    let get = eager_field(fields_name, companion, &field.field_const);
+    let get_mut = eager_field_mut(fields_name, companion, &field.field_const);
+    let clear = eager_field_mut(fields_name, companion, &field.field_const);
 
     if matches!(field.style, AccessorStyle::Message) {
         let getter = quote! {
             pub fn #name(&self) -> ::core::option::Option<&#mut_target> {
-                #get
+                #get.bind(&self.record.common).get()
             }
         };
         let set_method = if let Some(eager) = &field.set_eager {
@@ -1671,13 +1752,13 @@ fn render_singular_accessors(field: &ScalarEmit, companion: &Ident) -> (TokenStr
         };
         let mutator = quote! {
             pub fn #name_mut(&mut self) -> &mut #mut_target {
-                #get_mut
+                #get_mut.bind_mut(&mut self.record.common).get_mut()
             }
 
             #set_method
 
             pub fn #clear_name(&mut self) {
-                #clear;
+                #clear.bind_mut(&mut self.record.common).clear();
             }
         };
         return (getter, mutator);
@@ -1689,13 +1770,13 @@ fn render_singular_accessors(field: &ScalarEmit, companion: &Ident) -> (TokenStr
             where
                 A: 'a,
             {
-                #get
+                #get.bind(&self.record.common).optional()
             }
         }
     } else {
         quote! {
             pub fn #name(&self) -> #implicit_ty {
-                #get
+                #get.bind(&self.record.common).value()
             }
         }
     };
@@ -1704,11 +1785,11 @@ fn render_singular_accessors(field: &ScalarEmit, companion: &Ident) -> (TokenStr
     let mut_ret = field.mut_style.return_ty(&parse_quote! { 's }, mut_target);
     let mutator = quote! {
         pub fn #name_mut<'s>(&'s mut self) -> #mut_ret {
-            #get_mut
+            #get_mut.bind_mut(&mut self.record.common).value_mut()
         }
 
         pub fn #clear_name(&mut self) {
-            #clear;
+            #clear.bind_mut(&mut self.record.common).clear();
         }
     };
     (getter, mutator)
@@ -1834,7 +1915,7 @@ fn render_merge_arms(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStream
         let field_const = field
             .field_const()
             .expect("non-oneof field has a FIELD_* const");
-        let slot = slot_mut_expr(companion, field_const);
+        let slot = field_mut_expr(companion, field_const);
         arms.push(quote! {
             #companion::#field_const => {
                 #slot
@@ -1852,7 +1933,7 @@ fn render_validate(fields: &[FieldEmit], companion: &Ident) -> Option<TokenStrea
         .iter()
         .filter_map(|f| match f {
             FieldEmit::Singular(f) if f.required => {
-                let slot = slot_expr(companion, &f.field_const);
+                let slot = field_expr(companion, &f.field_const);
                 Some(quote! {
                     #slot.validate_required(common)?;
                 })

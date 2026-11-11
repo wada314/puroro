@@ -287,6 +287,37 @@ where
     }
 }
 
+impl<T, const BIT: usize, const FIELD: u32, A, L, D> SingularField<T, Explicit<BIT>, FIELD, A, L, D>
+where
+    T: SingularType,
+    A: Allocator,
+    L: ValueLayout<T, A>,
+    L::Slot: AddressableSlot,
+    <Explicit<BIT> as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
+{
+    /// Whether the presence bit for this field is set.
+    #[inline]
+    pub fn is_present<Cx: MessageCommonBits>(&self, common: &Cx) -> bool {
+        common.is_bit_set(BIT)
+    }
+}
+
+impl<T, const BIT: usize, const FIELD: u32, A, L, D>
+    SingularField<T, LegacyRequired<BIT>, FIELD, A, L, D>
+where
+    T: SingularType,
+    A: Allocator,
+    L: ValueLayout<T, A>,
+    L::Slot: AddressableSlot,
+    <LegacyRequired<BIT> as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
+{
+    /// Whether the presence bit for this field is set.
+    #[inline]
+    pub fn is_present<Cx: MessageCommonBits>(&self, common: &Cx) -> bool {
+        common.is_bit_set(BIT)
+    }
+}
+
 impl<T, const FIELD: u32, A, L, D> SingularField<T, Message, FIELD, A, L, D>
 where
     T: SingularType,
