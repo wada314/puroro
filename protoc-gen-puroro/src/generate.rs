@@ -377,8 +377,8 @@ mod tests {
         let content = generate_lib(&empty_request_with_package("Empty", "example.v1"));
         assert!(content.contains("pub mod empty"));
         assert!(content.contains("pub trait Layout"));
-        assert!(content.contains("pub type Empty<"));
-        assert!(content.contains("pub type EmptyLazy<"));
+        assert!(content.contains("pub struct Empty<"));
+        assert!(content.contains("pub struct EmptyLazy<"));
         assert!(!content.contains("pub use empty::Empty"));
     }
 
@@ -503,8 +503,8 @@ mod tests {
             "discard must bake DiscardUnknowns: {content}"
         );
         assert!(
-            content.contains("skip_field_and_save_in"),
-            "discard must use the generic skip: {content}"
+            content.contains("::puroro_rt::forward_record!(eager Marker)"),
+            "discard still uses the Record shell, which calls skip_field_and_save_in: {content}"
         );
     }
 

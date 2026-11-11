@@ -255,19 +255,9 @@ pub(super) fn render_items(
         bits_ty.clone()
     };
     let unknown_ty = unknown_store_ty(field_plan.unknown_fields());
-    // Struct is generic over `L`. Eager inherent methods monomorphize `L = Eager`.
-    let struct_common = quote! {
-        ::puroro_rt::MessageCommon<<L as #companion::Layout<A>>::Bits, A, #unknown_ty, L>
-    };
-    let common_ty = quote! {
-        ::puroro_rt::MessageCommon<
-            <::puroro_rt::Eager as #companion::Layout<A>>::Bits,
-            A,
-            #unknown_ty,
-            ::puroro_rt::Eager,
-        >
-    };
-    let impl_name = Ident::new(&format!("{name_str}Impl"), Span::call_site());
+    // Field struct is generic over `L`. User-facing names are `Record` aliases.
+    let fields_name = Ident::new(&format!("{name_str}Fields"), Span::call_site());
+    let lazy_name_str = format!("{name_str}Lazy");
     let lazy_alias = Ident::new(&format!("{name_str}Lazy"), Span::call_site());
 
     let bit_consts = render_bit_consts(&fields);
@@ -280,11 +270,156 @@ pub(super) fn render_items(
     let mutators = &accessors.mutators;
     let visit_shared = render_visit_calls(&fields, VisitKind::Shared);
     let visit_pair = render_visit_calls(&fields, VisitKind::Pair);
-    let visit_pair_mut = render_visit_calls(&fields, VisitKind::PairMut);
     let visit_mut = render_visit_calls(&fields, VisitKind::Mut);
+    let clone_stmts = fields
+        .iter()
+        .map(|field| {
+            let name = field.name();
+            quote! {
+                {
+                    let new = ::puroro_rt::FieldCloneIn::clone_field(
+                        &self.#name,
+                        src_common,
+                        alloc.clone(),
+                    );
+                    let mut old = ::core::mem::replace(&mut dst.#name, new);
+                    ::puroro_rt::FieldDeallocate::deallocate(&mut old, dst_common);
+                }
+            }
+        })
+        .collect::<Vec<_>>();
     let merge_arms = render_merge_arms(&fields, companion);
     let validate_body = render_validate(&fields);
-    let validate_method = eager_validate_method(validate_body.as_ref());
+    let apply_arms = super::lazy::render_apply_arms(&fields, companion);
+    let layout = quote! { L };
+    let validate_method = record_validate_method(validate_body.as_ref(), &layout);
+    let record_fields_impl = quote! {
+            impl<
+                A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
+                L: #companion::Layout<A> + ::puroro_rt::decode::MessageScan<A>,
+            > ::puroro_rt::RecordFields<A, L> for #fields_name<A, L>
+            {
+                type Bits = <#layout as #companion::Layout<A>>::Bits;
+                type Unknown = #unknown_ty;
+                type EagerMessage = #name<A>;
+
+                const EAGER_NAME: &'static str = #name_str;
+                const LAZY_NAME: &'static str = #lazy_name_str;
+
+                fn empty_bits() -> Self::Bits {
+                    <#layout as #companion::Layout<A>>::empty_bits()
+                }
+
+                fn visit_mut<
+                    V: ::puroro_rt::FieldVisitorMut<
+                        ::puroro_rt::MessageCommon<Self::Bits, A, Self::Unknown, #layout>,
+                    >,
+                >(
+                    &mut self,
+                    #[allow(unused_variables)] v: &mut V,
+                ) -> ::core::ops::ControlFlow<V::Break> {
+                    #(#visit_mut)*
+                    ::core::ops::ControlFlow::Continue(())
+                }
+
+                #validate_method
+            }
+    };
+    let construct_record_impls = [
+        quote! { ::puroro_rt::Eager },
+        quote! { ::puroro_rt::Lazy<A> },
+    ]
+    .into_iter()
+    .map(|layout| {
+        quote! {
+            impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone>
+                ::puroro_rt::ConstructRecordFields<A, #layout> for #fields_name<A, #layout>
+            {
+                #[allow(unused_variables)]
+                fn new(alloc: A) -> Self {
+                    Self {
+                        #(#new_in_fields)*
+                        _layout: ::core::marker::PhantomData,
+                    }
+                }
+            }
+        }
+    })
+    .collect::<Vec<_>>();
+    let clone_record_impls = [
+        quote! { ::puroro_rt::Eager },
+        quote! { ::puroro_rt::Lazy<A> },
+    ]
+    .into_iter()
+    .map(|layout| {
+        quote! {
+            impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone>
+                ::puroro_rt::CloneRecordFields<A, #layout> for #fields_name<A, #layout>
+            {
+                #[allow(unused_variables)]
+                fn clone_fields(
+                    &self,
+                    dst: &mut Self,
+                    src_common: &::puroro_rt::MessageCommon<Self::Bits, A, Self::Unknown, #layout>,
+                    dst_common: &::puroro_rt::MessageCommon<Self::Bits, A, Self::Unknown, #layout>,
+                    alloc: A,
+                ) {
+                    #(#clone_stmts)*
+                }
+            }
+        }
+    })
+    .collect::<Vec<_>>();
+    let eager_record_impl = quote! {
+        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone>
+            ::puroro_rt::EagerRecordFields<A> for #fields_name<A, ::puroro_rt::Eager>
+        {
+            fn visit_fields<
+                V: ::puroro_rt::FieldVisitor<
+                    ::puroro_rt::MessageCommon<Self::Bits, A, Self::Unknown, ::puroro_rt::Eager>,
+                >,
+            >(
+                &self,
+                #[allow(unused_variables)] v: &mut V,
+            ) -> ::core::ops::ControlFlow<V::Break> {
+                #(#visit_shared)*
+                ::core::ops::ControlFlow::Continue(())
+            }
+
+            fn visit_pairs<
+                V: ::puroro_rt::FieldPairVisitor<
+                    ::puroro_rt::MessageCommon<Self::Bits, A, Self::Unknown, ::puroro_rt::Eager>,
+                >,
+            >(
+                &self,
+                #[allow(unused_variables)] other: &Self,
+                #[allow(unused_variables)] v: &mut V,
+            ) -> ::core::ops::ControlFlow<V::Break> {
+                #(#visit_pair)*
+                ::core::ops::ControlFlow::Continue(())
+            }
+
+            #[allow(unused_variables)]
+            fn merge_known<B: ::puroro::DecodeBuf>(
+                &mut self,
+                common: &mut ::puroro_rt::MessageCommon<
+                    Self::Bits,
+                    A,
+                    Self::Unknown,
+                    ::puroro_rt::Eager,
+                >,
+                field_number: u32,
+                wire_type: ::puroro::WireType,
+                buf: &mut B,
+                depth: usize,
+            ) -> ::core::result::Result<bool, ::puroro::DecodeError> {
+                match field_number {
+                    #(#merge_arms)*
+                    _ => ::core::result::Result::Ok(false),
+                }
+            }
+        }
+    };
     let oneof_modules = render_oneof_modules(
         &fields,
         &bits_ty,
@@ -306,289 +441,87 @@ pub(super) fn render_items(
     let mut type_items = super::parse::parse_items(quote! {
         // @generated message body from protoc-gen-puroro.
 
-        pub struct #impl_name<
+        pub struct #fields_name<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone = ::allocator_api2::alloc::Global,
             L: #companion::Layout<A> = ::puroro_rt::Eager,
         > {
-            _common: #struct_common,
             #(#struct_fields)*
+            _layout: ::core::marker::PhantomData<(A, L)>,
         }
 
-        pub type #name<A = ::allocator_api2::alloc::Global> = #impl_name<A, ::puroro_rt::Eager>;
+        pub struct #name<
+            A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone = ::allocator_api2::alloc::Global,
+        > {
+            record: ::puroro_rt::Record<
+                #fields_name<A, ::puroro_rt::Eager>,
+                A,
+                ::puroro_rt::Eager,
+                #unknown_ty,
+            >,
+        }
 
-        pub type #lazy_alias<A = ::allocator_api2::alloc::Global> =
-            #impl_name<A, ::puroro_rt::Lazy<A>>;
+        pub struct #lazy_alias<
+            A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone = ::allocator_api2::alloc::Global,
+        > {
+            record: ::puroro_rt::Record<
+                #fields_name<A, ::puroro_rt::Lazy<A>>,
+                A,
+                ::puroro_rt::Lazy<A>,
+                #unknown_ty,
+            >,
+        }
+
+        ::puroro_rt::forward_record!(eager #name);
+        ::puroro_rt::forward_record!(lazy #lazy_alias);
+
+        #record_fields_impl
+
+        #(#construct_record_impls)*
+
+        #(#clone_record_impls)*
+
+        #eager_record_impl
 
         impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone>
-            #impl_name<A, ::puroro_rt::Eager>
+            ::puroro_rt::LazyRecordApply<A> for #fields_name<A, ::puroro_rt::Lazy<A>>
         {
-            #(#getters)*
-
-            // Internal field walks for codec / Clone / Eq / Drop — not part of the
-            // public message API (must not surface `puroro_rt` in pub signatures).
-            fn visit_fields<V: ::puroro_rt::FieldVisitor<#common_ty>>(
-                &self,
-                #[allow(unused)] v: &mut V,
-            ) -> ::core::ops::ControlFlow<V::Break> {
-                #(#visit_shared)*
-                ::core::ops::ControlFlow::Continue(())
-            }
-
-            fn visit_field_pairs<
-                V: ::puroro_rt::FieldPairVisitor<#common_ty>,
-            >(
-                &self,
-                #[allow(unused)] other: &Self,
-                #[allow(unused)] v: &mut V,
-            ) -> ::core::ops::ControlFlow<V::Break> {
-                #(#visit_pair)*
-                ::core::ops::ControlFlow::Continue(())
-            }
-
-            fn visit_field_pairs_mut<
-                V: ::puroro_rt::FieldPairVisitorMut<#common_ty>,
-            >(
-                &self,
-                #[allow(unused)] dst: &mut Self,
-                #[allow(unused)] v: &mut V,
-            ) -> ::core::ops::ControlFlow<V::Break>
-            where
-                A: ::core::clone::Clone,
-            {
-                #(#visit_pair_mut)*
-                ::core::ops::ControlFlow::Continue(())
-            }
-        }
-
-        impl<
-            A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            L: #companion::Layout<A>,
-        > #impl_name<A, L> {
-            fn visit_fields_mut<
-                V: ::puroro_rt::FieldVisitorMut<#struct_common>,
-            >(
+            #[allow(unused_variables)]
+            fn apply_record(
                 &mut self,
-                #[allow(unused)] v: &mut V,
-            ) -> ::core::ops::ControlFlow<V::Break> {
-                #(#visit_mut)*
-                ::core::ops::ControlFlow::Continue(())
-            }
-        }
-
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone>
-            #impl_name<A, ::puroro_rt::Eager>
-        {
-            pub fn new_in(alloc: A) -> Self {
-                Self {
-                    _common: ::puroro_rt::MessageCommon::new_in(
-                        <::puroro_rt::Eager as #companion::Layout<A>>::empty_bits(),
-                        alloc.clone(),
-                    ),
-                    #(#new_in_fields)*
+                common: &mut ::puroro_rt::MessageCommon<
+                    Self::Bits,
+                    A,
+                    Self::Unknown,
+                    ::puroro_rt::Lazy<A>,
+                >,
+                rec: &::puroro_rt::decode::ScannedRecord,
+                origin: usize,
+            ) -> ::core::result::Result<(), ::puroro::DecodeError> {
+                match rec.field_number.as_u32() {
+                    #(#apply_arms)*
+                    _ => common.on_unrecognized_tag(rec.field_number.as_u32()),
                 }
             }
+        }
+
+        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> #name<A> {
+            #(#getters)*
 
             #(#mutators)*
 
             /// Encodes `self` and rebuilds it as the lazy alias.
             pub fn into_lazy(self) -> #lazy_alias<A> {
-                let alloc = self._common.alloc.clone();
-                let bytes = ::puroro::Message::encode_to_vec(&self);
-                let mut lazy = #lazy_alias::new_in(alloc);
-                ::puroro::Message::merge_from(&mut lazy, &mut bytes.as_slice())
-                    .expect("self-encoded message is a valid body");
-                lazy
-            }
-        }
-
-        impl #impl_name<::allocator_api2::alloc::Global, ::puroro_rt::Eager> {
-            pub fn new() -> Self {
-                <Self as ::core::default::Default>::default()
-            }
-        }
-
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone + ::core::default::Default>
-            ::core::default::Default for #name<A>
-        {
-            fn default() -> Self {
-                Self::new_in(A::default())
-            }
-        }
-
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::CloneIn<A>
-            for #name<A>
-        {
-            fn clone_in(&self, alloc: A) -> Self {
-                let mut dst = Self::new_in(alloc.clone());
-                let mut v = ::puroro_rt::CloneFieldsVisitor::new(&self._common, &dst._common);
-                let _ = self.visit_field_pairs_mut(&mut dst, &mut v);
-                let mut old = ::core::mem::replace(&mut dst._common, self._common.clone_in(alloc));
-                old.deallocate();
-                dst
-            }
-        }
-
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::core::clone::Clone
-            for #name<A>
-        {
-            #[inline]
-            fn clone(&self) -> Self {
-                ::puroro_rt::CloneIn::clone_in(self, self._common.alloc.clone())
-            }
-        }
-
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::core::cmp::PartialEq
-            for #name<A>
-        {
-            fn eq(&self, other: &Self) -> bool {
-                matches!(
-                    self.visit_field_pairs(
-                        other,
-                        &mut ::puroro_rt::FieldEqVisitor::new(&self._common, &other._common),
-                    ),
-                    ::core::ops::ControlFlow::Continue(())
-                ) && self._common.unknown_fields_eq(&other._common)
-            }
-        }
-
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::core::fmt::Debug
-            for #name<A>
-        {
-            fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-                let mut v =
-                    ::puroro_rt::DebugStructVisitor::new(f.debug_struct(#name_str), &self._common);
-                let _ = self.visit_fields(&mut v);
-                v.finish()
-            }
-        }
-
-        impl<
-            A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            L: #companion::Layout<A>,
-        > ::core::ops::Drop for #impl_name<A, L>
-        {
-            fn drop(&mut self) {
-                let mut v = ::puroro_rt::FieldDeallocVisitor::new(&self._common);
-                let _ = self.visit_fields_mut(&mut v);
-                self._common.deallocate();
-            }
-        }
-
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::DeallocateIn<A>
-            for #name<A>
-        {
-            #[inline]
-            unsafe fn deallocate_in(self, _alloc: &A) {
-                ::core::mem::drop(self);
-            }
-        }
-
-        ::puroro_rt::impl_owned_slot_bounds!(#name);
-
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::MessageEncode
-            for #name<A>
-        {
-            fn encoded_len(&self, ctx: &mut ::puroro_rt::EncodeCtx) -> usize {
-                let mut v = ::puroro_rt::EncodedLenVisitor::new(&self._common, ctx);
-                let _ = self.visit_fields(&mut v);
-                v.len + self._common.unknown_fields.len()
-            }
-
-            fn encode_raw<B: ::bytes::BufMut>(&self, ctx: &mut ::puroro_rt::EncodeCtx, buf: &mut B) {
-                let _ = self.visit_fields(&mut ::puroro_rt::EncodeRawVisitor::new(
-                    &self._common,
-                    ctx,
-                    buf,
-                ));
-                let unknown: &[u8] = &self._common.unknown_fields;
-                ::bytes::BufMut::put_slice(buf, unknown);
-            }
-        }
-
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::MessageMerge
-            for #name<A>
-        {
-            fn merge_from_with_depth<B: ::puroro::DecodeBuf>(
-                &mut self,
-                buf: &mut B,
-                depth: usize,
-            ) -> ::core::result::Result<(), ::puroro::DecodeError> {
-                if depth >= ::puroro::RECURSION_LIMIT {
-                    return ::core::result::Result::Err(::puroro::DecodeError::RecursionLimitExceeded);
+                #lazy_alias {
+                    record: ::puroro_rt::Record::encode_lazy(self.record),
                 }
-                while ::bytes::Buf::has_remaining(buf) {
-                    let (field_number, wire_type) = ::puroro_rt::decode::decode_tag(buf)?;
-                    match field_number.as_u32() {
-                        #(#merge_arms)*
-                        _ => {
-                            ::puroro_rt::decode::skip_field_and_save_in(
-                                field_number,
-                                wire_type,
-                                buf,
-                                &mut *self._common.unknown_fields,
-                                self._common.alloc.clone(),
-                            )?;
-                        }
-                    }
-                }
-                ::core::result::Result::Ok(())
             }
-        }
-
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::DefaultIn<A>
-            for #name<A>
-        {
-            #[inline]
-            fn default_in(alloc: A) -> Self {
-                Self::new_in(alloc)
-            }
-        }
-
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro::Message for #name<A> {
-            type Alloc = A;
-
-            fn new_in(alloc: A) -> Self
-            where
-                A: ::core::clone::Clone,
-            {
-                Self::new_in(alloc)
-            }
-
-            fn encode<B: ::bytes::BufMut>(&self, buf: &mut B) {
-                ::puroro_rt::encode_message(self, buf)
-            }
-
-            fn encode_to_vec(&self) -> ::std::vec::Vec<u8> {
-                ::puroro_rt::encode_message_to_vec(self)
-            }
-
-            fn merge_from<B: ::bytes::Buf>(
-                &mut self,
-                buf: &mut B,
-            ) -> ::core::result::Result<(), ::puroro::DecodeError>
-            where
-                A: ::core::clone::Clone,
-            {
-                ::puroro_rt::merge_message(self, buf)
-            }
-
-            fn unknown_fields(
-                &self,
-            ) -> impl ::core::iter::Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
-                self._common.iter_unknown_fields()
-            }
-
-            #validate_method
         }
     })?;
     type_items.extend(super::lazy::render_items(
         &fields,
-        &impl_name,
         name,
         &lazy_alias,
-        name_str,
         companion,
-        &validate_body,
     )?);
 
     Ok(RenderedMessageItems {
@@ -1484,10 +1417,6 @@ fn wire_marker_path(wire: &WireTypeKind<'_>) -> Result<Type> {
     })
 }
 
-pub(super) fn new_in_field_tokens(fields: &[FieldEmit]) -> Vec<TokenStream> {
-    render_new_in_fields(fields)
-}
-
 fn render_new_in_fields(fields: &[FieldEmit]) -> Vec<TokenStream> {
     let last = fields.len().saturating_sub(1);
     fields
@@ -1550,14 +1479,14 @@ fn render_map_accessors(field: &MapEmit) -> (TokenStream, TokenStream) {
     let mut_target = field.mut_target.as_ref().unwrap_or(value_view);
     let getter = quote! {
         pub fn #name(&self) -> impl ::puroro::MapRef<#key_view, #value_view> + '_ {
-            self.#name.bind(&self._common)
+            self.record.fields.#name.bind(&self.record.common)
         }
     };
     let mutator = quote! {
         pub fn #name_mut(
             &mut self,
         ) -> impl ::puroro::MapMut<#key_view, #value_view, MutTarget = #mut_target> + '_ {
-            self.#name.bind_mut(&mut self._common)
+            self.record.fields.#name.bind_mut(&mut self.record.common)
         }
 
         pub fn #clear_name(&mut self) {
@@ -1574,25 +1503,25 @@ fn render_repeated_accessors(field: &RepeatedEmit) -> (TokenStream, TokenStream)
     let elem = &field.slice_elem_ty;
     let getter = quote! {
         pub fn #name(&self) -> &[#elem] {
-            self.#name.bind(&self._common).as_slice()
+            self.record.fields.#name.bind(&self.record.common).as_slice()
         }
     };
     let mutator_body = match field.style {
         RepeatedAccessorStyle::String => quote! {
             pub fn #name_mut(&mut self) -> impl ::puroro::RepeatedStringMut<A> + '_ {
-                self.#name.bind_mut(&mut self._common).container_mut()
+                self.record.fields.#name.bind_mut(&mut self.record.common).container_mut()
             }
         },
         RepeatedAccessorStyle::Bytes => quote! {
             pub fn #name_mut(&mut self) -> impl ::puroro::RepeatedBytesMut<A> + '_ {
-                self.#name.bind_mut(&mut self._common).container_mut()
+                self.record.fields.#name.bind_mut(&mut self.record.common).container_mut()
             }
         },
         RepeatedAccessorStyle::Slice => quote! {
             pub fn #name_mut<'s>(
                 &'s mut self,
             ) -> impl ::core::ops::DerefMut<Target = ::allocator_api2::vec::Vec<#elem, A>> + 's {
-                self.#name.bind_mut(&mut self._common).values_mut()
+                self.record.fields.#name.bind_mut(&mut self.record.common).values_mut()
             }
         },
     };
@@ -1600,7 +1529,7 @@ fn render_repeated_accessors(field: &RepeatedEmit) -> (TokenStream, TokenStream)
         #mutator_body
 
         pub fn #clear_name(&mut self) {
-            self.#name.bind_mut(&mut self._common).clear();
+            self.record.fields.#name.bind_mut(&mut self.record.common).clear();
         }
     };
     (getter, mutator)
@@ -1617,7 +1546,7 @@ fn render_singular_accessors(field: &ScalarEmit) -> (TokenStream, TokenStream) {
     if matches!(field.style, AccessorStyle::Message) {
         let getter = quote! {
             pub fn #name(&self) -> ::core::option::Option<&#mut_target> {
-                self.#name.bind(&self._common).get()
+                self.record.fields.#name.bind(&self.record.common).get()
             }
         };
         let set_method = if let Some(eager) = &field.set_eager {
@@ -1632,13 +1561,13 @@ fn render_singular_accessors(field: &ScalarEmit) -> (TokenStream, TokenStream) {
         };
         let mutator = quote! {
             pub fn #name_mut(&mut self) -> &mut #mut_target {
-                self.#name.bind_mut(&mut self._common).get_mut()
+                self.record.fields.#name.bind_mut(&mut self.record.common).get_mut()
             }
 
             #set_method
 
             pub fn #clear_name(&mut self) {
-                self.#name.bind_mut(&mut self._common).clear();
+                self.record.fields.#name.bind_mut(&mut self.record.common).clear();
             }
         };
         return (getter, mutator);
@@ -1650,13 +1579,13 @@ fn render_singular_accessors(field: &ScalarEmit) -> (TokenStream, TokenStream) {
             where
                 A: 'a,
             {
-                self.#name.bind(&self._common).optional()
+                self.record.fields.#name.bind(&self.record.common).optional()
             }
         }
     } else {
         quote! {
             pub fn #name(&self) -> #implicit_ty {
-                self.#name.bind(&self._common).value()
+                self.record.fields.#name.bind(&self.record.common).value()
             }
         }
     };
@@ -1665,11 +1594,11 @@ fn render_singular_accessors(field: &ScalarEmit) -> (TokenStream, TokenStream) {
     let mut_ret = field.mut_style.return_ty(&parse_quote! { 's }, mut_target);
     let mutator = quote! {
         pub fn #name_mut<'s>(&'s mut self) -> #mut_ret {
-            self.#name.bind_mut(&mut self._common).value_mut()
+            self.record.fields.#name.bind_mut(&mut self.record.common).value_mut()
         }
 
         pub fn #clear_name(&mut self) {
-            self.#name.bind_mut(&mut self._common).clear();
+            self.record.fields.#name.bind_mut(&mut self.record.common).clear();
         }
     };
     (getter, mutator)
@@ -1761,7 +1690,6 @@ fn wire_views(wire: &WireTypeKind<'_>) -> Result<WireViews> {
 enum VisitKind {
     Shared,
     Pair,
-    PairMut,
     Mut,
 }
 
@@ -1777,9 +1705,6 @@ fn render_visit_calls(fields: &[FieldEmit], kind: VisitKind) -> Vec<TokenStream>
                 },
                 VisitKind::Pair => quote! {
                     v.visit(#name_str, &self.#name, &other.#name)?;
-                },
-                VisitKind::PairMut => quote! {
-                    v.visit(#name_str, &self.#name, &mut dst.#name)?;
                 },
                 VisitKind::Mut => quote! {
                     v.visit(#name_str, &mut self.#name)?;
@@ -1801,8 +1726,9 @@ fn render_merge_arms(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStream
         arms.push(quote! {
             #companion::#field_const => {
                 self.#name
-                    .bind_mut(&mut self._common)
+                    .bind_mut(common)
                     .merge(wire_type, buf, depth)?;
+                ::core::result::Result::Ok(true)
             }
         });
     }
@@ -1816,7 +1742,7 @@ fn render_validate(fields: &[FieldEmit]) -> Option<TokenStream> {
             FieldEmit::Singular(f) if f.required => {
                 let name = &f.name;
                 Some(quote! {
-                    self.#name.validate_required(&self._common)?;
+                    self.#name.validate_required(common)?;
                 })
             }
             _ => None,
@@ -1832,12 +1758,15 @@ fn render_validate(fields: &[FieldEmit]) -> Option<TokenStream> {
     }
 }
 
-fn eager_validate_method(body: Option<&TokenStream>) -> TokenStream {
+fn record_validate_method(body: Option<&TokenStream>, layout: &TokenStream) -> TokenStream {
     let Some(body) = body else {
         return quote! {};
     };
     quote! {
-        fn validate(&self) -> ::core::result::Result<(), ::puroro::DecodeError> {
+        fn validate(
+            &self,
+            common: &::puroro_rt::MessageCommon<Self::Bits, A, Self::Unknown, #layout>,
+        ) -> ::core::result::Result<(), ::puroro::DecodeError> {
             #body
         }
     }

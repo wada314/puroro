@@ -616,18 +616,18 @@ pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> (TokenSt
         if v.is_message {
             variant_getters.push(quote! {
                 pub fn #vname(&self) -> ::core::option::Option<&#mut_target> {
-                    self.#group
-                        .bind(&self._common)
+                    self.record.fields.#group
+                        .bind(&self.record.common)
                         .variant_of::<{ #companion::#field_const }>()
                         .get()
                 }
             });
             variant_mutators.push(quote! {
                 pub fn #vname_mut(&mut self) -> &mut #mut_target {
-                    self.#group
-                        .bind_mut(&mut self._common)
+                    self.record.fields.#group
+                        .bind_mut(&mut self.record.common)
                         .variant_mut::<{ #companion::#field_const }>()
-                        .bind_mut(&mut self._common)
+                        .bind_mut(&mut self.record.common)
                         .value_mut()
                 }
             });
@@ -639,8 +639,8 @@ pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> (TokenSt
                 where
                     A: 'a,
                 {
-                    self.#group
-                        .bind(&self._common)
+                    self.record.fields.#group
+                        .bind(&self.record.common)
                         .variant_of::<{ #companion::#field_const }>()
                         .optional()
                 }
@@ -648,10 +648,10 @@ pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> (TokenSt
             let mut_ret = v.mut_style.return_ty(&parse_quote! { 's }, mut_target);
             variant_mutators.push(quote! {
                 pub fn #vname_mut<'s>(&'s mut self) -> #mut_ret {
-                    self.#group
-                        .bind_mut(&mut self._common)
+                    self.record.fields.#group
+                        .bind_mut(&mut self.record.common)
                         .variant_mut::<{ #companion::#field_const }>()
-                        .bind_mut(&mut self._common)
+                        .bind_mut(&mut self.record.common)
                         .value_mut()
                 }
             });
@@ -665,7 +665,7 @@ pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> (TokenSt
             Case = #companion::#case_name,
             Ref = #companion::#shape_name<#(#ref_tys),*>,
         > + 'a {
-            ::puroro_rt::OneofView::<#companion::#storage_name<A>>::new(&self.#name, &self._common)
+            ::puroro_rt::OneofView::<#companion::#storage_name<A>>::new(&self.record.fields.#name, &self.record.common)
         }
 
         #(#variant_getters)*
@@ -673,8 +673,8 @@ pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> (TokenSt
     let mutators = quote! {
         pub fn #name_mut<'a>(&'a mut self) -> impl ::puroro::OneofViewMut<Case = #companion::#case_name> + 'a {
             ::puroro_rt::OneofViewMut::<#companion::#storage_name<A>>::new(
-                &mut self.#name,
-                &mut self._common,
+                &mut self.record.fields.#name,
+                &mut self.record.common,
             )
         }
 
@@ -698,10 +698,11 @@ pub(super) fn render_merge_arms(oneof: &OneofEmit, companion: &Ident) -> Vec<Tok
             quote! {
                 #companion::#field_const => {
                     self.#group
-                        .bind_mut(&mut self._common)
+                        .bind_mut(common)
                         .variant_mut::<{ #companion::#field_const }>()
-                        .bind_mut(&mut self._common)
+                        .bind_mut(common)
                         .merge(wire_type, buf, depth)?;
+                    ::core::result::Result::Ok(true)
                 }
             }
         })

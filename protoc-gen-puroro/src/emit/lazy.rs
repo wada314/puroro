@@ -1,4 +1,4 @@
-//! Lazy alias inherent API and trait impls (`FooLazy` / `FooImpl<A, Lazy<A>>`).
+//! Lazy getters on `Record<FooFields<A, Lazy<A>>, …>`.
 
 use super::layout::{LayoutAssoc, LayoutAssocKind, LenAccess, MessageApply};
 use super::message::{FieldEmit, MapEmit, RepeatedEmit, ScalarEmit};
@@ -8,313 +8,28 @@ use ::proc_macro2::{Ident, TokenStream};
 use ::quote::quote;
 use ::syn::{Item, Type};
 
+/// Lazy getters on the generated lazy newtype. Shell traits live in `puroro-rt`.
 pub(super) fn render_items(
     fields: &[FieldEmit],
-    impl_name: &Ident,
     eager_alias: &Ident,
     lazy_alias: &Ident,
-    name_str: &str,
     companion: &Ident,
-    validate_body: &Option<TokenStream>,
 ) -> Result<Vec<Item>> {
-    let lazy_ty = quote! { #impl_name<A, ::puroro_rt::Lazy<A>> };
     let getters = render_getters(fields, companion);
-    let apply_arms = render_apply_arms(fields, companion);
-    let clone_fields = render_clone_fields(fields);
-    let new_fields = super::message::new_in_field_tokens(fields);
-    let lazy_name_str = format!("{name_str}Lazy");
-    let default_impl = render_default_impl(lazy_alias);
-    let global_impl = render_global_ctor(impl_name);
-    let inherent = render_inherent(&lazy_ty, &getters, &new_fields, eager_alias, companion);
-    let lazy_message = render_lazy_message(lazy_alias, &apply_arms);
-    let clone_impls = render_clone_impls(lazy_alias, &clone_fields);
-    let eq_debug = render_eq_debug(lazy_alias, &lazy_name_str);
-    let dealloc = render_dealloc(lazy_alias);
-    let codec = render_codec_impls(lazy_alias, validate_body);
-
     super::parse::parse_items(quote! {
-        #default_impl
-        #global_impl
-        #inherent
-        #lazy_message
-        #clone_impls
-        #eq_debug
-        #dealloc
-        #codec
-    })
-}
+        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> #lazy_alias<A> {
+            #(#getters)*
 
-fn render_default_impl(lazy_alias: &Ident) -> TokenStream {
-    quote! {
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone + ::core::default::Default>
-            ::core::default::Default for #lazy_alias<A>
-        {
-            fn default() -> Self {
-                Self::new_in(A::default())
-            }
-        }
-    }
-}
-
-fn render_global_ctor(impl_name: &Ident) -> TokenStream {
-    quote! {
-        impl #impl_name<
-            ::allocator_api2::alloc::Global,
-            ::puroro_rt::Lazy<::allocator_api2::alloc::Global>,
-        > {
-            pub fn new() -> Self {
-                Self::new_in(::allocator_api2::alloc::Global)
-            }
-        }
-    }
-}
-
-fn render_inherent(
-    lazy_ty: &TokenStream,
-    getters: &[TokenStream],
-    new_fields: &[TokenStream],
-    eager_alias: &Ident,
-    companion: &Ident,
-) -> TokenStream {
-    let reads = lazy_read_methods(getters);
-    let ingest = lazy_ingest_methods(new_fields, eager_alias, companion);
-    quote! {
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> #lazy_ty {
-            #reads
-            #ingest
-        }
-    }
-}
-
-fn lazy_read_methods(getters: &[TokenStream]) -> TokenStream {
-    quote! {
-        #(#getters)*
-    }
-}
-
-fn lazy_ingest_methods(
-    new_fields: &[TokenStream],
-    eager_alias: &Ident,
-    companion: &Ident,
-) -> TokenStream {
-    quote! {
-            pub fn new_in(alloc: A) -> Self {
-                Self {
-                    _common: ::puroro_rt::LazyMessageCommon::new_in(
-                        <::puroro_rt::Lazy<A> as #companion::Layout<A>>::empty_bits(),
-                        alloc.clone(),
-                    ),
-                    #(#new_fields)*
-                }
-            }
-
-            /// Decode `_wire` into the eager alias.
+            /// Decode `_wire` into the eager message.
             pub fn into_eager(
                 self,
             ) -> ::core::result::Result<#eager_alias<A>, ::puroro::DecodeError> {
-                self._common.lazy.scan.require_finished()?;
-                let mut eager = #eager_alias::new_in(self._common.alloc.clone());
-                self._common.lazy.scan.for_each_body(|chunk| {
-                    let mut buf = chunk;
-                    ::puroro::Message::merge_from(&mut eager, &mut buf)
-                })?;
-                ::core::result::Result::Ok(eager)
-            }
-    }
-}
-
-fn render_lazy_message(lazy_alias: &Ident, apply_arms: &[TokenStream]) -> TokenStream {
-    quote! {
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::decode::LazyMessage<A>
-            for #lazy_alias<A>
-        {
-            fn scan(&self) -> &::puroro_rt::decode::LazyScan<A> {
-                &self._common.lazy.scan
-            }
-
-            fn scan_mut(&mut self) -> &mut ::puroro_rt::decode::LazyScan<A> {
-                &mut self._common.lazy.scan
-            }
-
-            fn apply_record(
-                &mut self,
-                rec: &::puroro_rt::decode::ScannedRecord,
-                origin: usize,
-            ) -> ::core::result::Result<(), ::puroro::DecodeError> {
-                let _ = origin;
-                match rec.field_number.as_u32() {
-                    #(#apply_arms)*
-                    _ => self._common.on_unrecognized_tag(rec.field_number.as_u32()),
-                }
-            }
-        }
-    }
-}
-
-fn render_clone_impls(lazy_alias: &Ident, clone_fields: &[TokenStream]) -> TokenStream {
-    quote! {
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::CloneIn<A>
-            for #lazy_alias<A>
-        {
-            fn clone_in(&self, alloc: A) -> Self {
-                Self {
-                    _common: self._common.clone_in(alloc.clone()),
-                    #(#clone_fields)*
-                }
-            }
-        }
-
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::core::clone::Clone
-            for #lazy_alias<A>
-        {
-            fn clone(&self) -> Self {
-                ::puroro_rt::CloneIn::clone_in(self, self._common.alloc.clone())
-            }
-        }
-    }
-}
-
-fn render_eq_debug(lazy_alias: &Ident, lazy_name_str: &str) -> TokenStream {
-    quote! {
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::core::cmp::PartialEq
-            for #lazy_alias<A>
-        {
-            fn eq(&self, other: &Self) -> bool {
-                ::puroro_rt::decode::LazyMessage::eq_with_eager(self, other, |msg| {
-                    msg.clone().into_eager()
+                ::core::result::Result::Ok(#eager_alias {
+                    record: ::puroro_rt::Record::decode_eager(self.record)?,
                 })
             }
         }
-
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::core::fmt::Debug
-            for #lazy_alias<A>
-        {
-            fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-                if ::puroro_rt::decode::LazyMessage::ensure_scanned(self).is_err() {
-                    return f.debug_struct(#lazy_name_str).finish_non_exhaustive();
-                }
-                match self.clone().into_eager() {
-                    ::core::result::Result::Ok(eager) => ::core::fmt::Debug::fmt(&eager, f),
-                    ::core::result::Result::Err(_) => {
-                        f.debug_struct(#lazy_name_str).finish_non_exhaustive()
-                    }
-                }
-            }
-        }
-    }
-}
-
-fn render_dealloc(lazy_alias: &Ident) -> TokenStream {
-    quote! {
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::DeallocateIn<A>
-            for #lazy_alias<A>
-        {
-            #[inline]
-            unsafe fn deallocate_in(self, _alloc: &A) {
-                ::core::mem::drop(self);
-            }
-        }
-
-        ::puroro_rt::impl_owned_slot_bounds!(#lazy_alias);
-    }
-}
-
-fn render_codec_impls(lazy_alias: &Ident, validate_body: &Option<TokenStream>) -> TokenStream {
-    let validate_method = match validate_body {
-        Some(body) => quote! {
-            fn validate(&self) -> ::core::result::Result<(), ::puroro::DecodeError> {
-                ::puroro_rt::decode::LazyMessage::ensure_scanned(self)?;
-                #body
-            }
-        },
-        None => quote! {},
-    };
-    quote! {
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::MessageEncode
-            for #lazy_alias<A>
-        {
-            fn encoded_len(&self, _ctx: &mut ::puroro_rt::EncodeCtx) -> usize {
-                self._common.lazy.scan.body_len()
-            }
-
-            fn encode_raw<B: ::bytes::BufMut>(
-                &self,
-                _ctx: &mut ::puroro_rt::EncodeCtx,
-                buf: &mut B,
-            ) {
-                self._common
-                    .lazy
-                    .scan
-                    .write_bodies(buf)
-                    .expect("lazy wire span out of range");
-            }
-        }
-
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::MessageMerge
-            for #lazy_alias<A>
-        {
-            fn merge_from_with_depth<B: ::puroro::DecodeBuf>(
-                &mut self,
-                buf: &mut B,
-                depth: usize,
-            ) -> ::core::result::Result<(), ::puroro::DecodeError> {
-                if depth >= ::puroro::RECURSION_LIMIT {
-                    return ::core::result::Result::Err(
-                        ::puroro::DecodeError::RecursionLimitExceeded,
-                    );
-                }
-                ::puroro_rt::decode::LazyMessage::ingest_buf(self, buf)
-            }
-        }
-
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::DefaultIn<A>
-            for #lazy_alias<A>
-        {
-            #[inline]
-            fn default_in(alloc: A) -> Self {
-                Self::new_in(alloc)
-            }
-        }
-
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro::Message
-            for #lazy_alias<A>
-        {
-            type Alloc = A;
-
-            fn new_in(alloc: A) -> Self
-            where
-                A: ::core::clone::Clone,
-            {
-                Self::new_in(alloc)
-            }
-
-            fn encode<B: ::bytes::BufMut>(&self, buf: &mut B) {
-                ::puroro_rt::encode_message(self, buf)
-            }
-
-            fn encode_to_vec(&self) -> ::std::vec::Vec<u8> {
-                ::puroro_rt::encode_message_to_vec(self)
-            }
-
-            fn merge_from<B: ::bytes::Buf>(
-                &mut self,
-                buf: &mut B,
-            ) -> ::core::result::Result<(), ::puroro::DecodeError>
-            where
-                A: ::core::clone::Clone,
-            {
-                ::puroro_rt::decode::LazyMessage::ingest_buf(self, buf)
-            }
-
-            fn unknown_fields(
-                &self,
-            ) -> impl ::core::iter::Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
-                ::core::iter::empty()
-            }
-
-            #validate_method
-        }
-    }
+    })
 }
 
 fn render_getters(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStream> {
@@ -337,10 +52,10 @@ fn scan_guard() -> TokenStream {
 fn len_read(access: LenAccess, slot: TokenStream) -> TokenStream {
     match access {
         LenAccess::Str => quote! {
-            #slot.try_str(&self._common, self._common.lazy.scan.wire())
+            #slot.try_str(&self.record.common, self.record.common.lazy.scan.wire())
         },
         LenAccess::Bytes => quote! {
-            #slot.try_bytes(&self._common, self._common.lazy.scan.wire())
+            #slot.try_bytes(&self.record.common, self.record.common.lazy.scan.wire())
         },
     }
 }
@@ -377,13 +92,13 @@ fn singular_getter(field: &ScalarEmit, companion: &Ident) -> TokenStream {
     let name = &field.name;
     let ensured = scan_guard();
     if let Some(access) = field.len_access {
-        let read = len_read(access, quote! { self.#name });
+        let read = len_read(access, quote! { self.record.fields.#name });
         let has = field.presence_bit.as_ref().map(|(bit, _)| {
             let has_name = Ident::new(&format!("has_{}", field.name_str), name.span());
             quote! {
                 pub fn #has_name(&self) -> ::core::result::Result<bool, ::puroro::DecodeError> {
                     #ensured
-                    ::core::result::Result::Ok(self._common.is_bit_set(#companion::#bit))
+                    ::core::result::Result::Ok(self.record.common.is_bit_set(#companion::#bit))
                 }
             }
         });
@@ -402,7 +117,11 @@ fn singular_getter(field: &ScalarEmit, companion: &Ident) -> TokenStream {
     }
     if field.message_apply.is_some() {
         let view = lazy_child_view(field.layout.as_ref(), &field.mut_target, companion);
-        return message_method(name, &view, quote! { self.#name.bind(&self._common).get() });
+        return message_method(
+            name,
+            &view,
+            quote! { self.record.fields.#name.bind(&self.record.common).get() },
+        );
     }
     if field.optional_getter {
         optional_method(
@@ -410,7 +129,7 @@ fn singular_getter(field: &ScalarEmit, companion: &Ident) -> TokenStream {
             &field.optional_ty,
             quote! {
                 #ensured
-                ::core::result::Result::Ok(self.#name.bind(&self._common).optional())
+                ::core::result::Result::Ok(self.record.fields.#name.bind(&self.record.common).optional())
             },
         )
     } else {
@@ -418,7 +137,7 @@ fn singular_getter(field: &ScalarEmit, companion: &Ident) -> TokenStream {
         quote! {
             pub fn #name(&self) -> ::core::result::Result<#implicit_ty, ::puroro::DecodeError> {
                 #ensured
-                ::core::result::Result::Ok(self.#name.bind(&self._common).value())
+                ::core::result::Result::Ok(self.record.fields.#name.bind(&self.record.common).value())
             }
         }
     }
@@ -430,12 +149,12 @@ fn repeated_getter(field: &RepeatedEmit, companion: &Ident) -> TokenStream {
     let ensured = scan_guard();
     let read = if is_repeated_spans(field.layout.as_ref()) {
         quote! {
-            self.#name
-                .bind(self._common.lazy.scan.wire(), &self._common)?
+            self.record.fields.#name
+                .bind(self.record.common.lazy.scan.wire(), &self.record.common)?
                 .as_slice()
         }
     } else {
-        quote! { self.#name.bind(&self._common).as_slice() }
+        quote! { self.record.fields.#name.bind(&self.record.common).as_slice() }
     };
     quote! {
         pub fn #name(
@@ -464,8 +183,8 @@ fn map_getter(field: &MapEmit, companion: &Ident) -> TokenStream {
             ::puroro::DecodeError,
         > {
             #ensured
-            self.#name
-                .bind(self._common.lazy.scan.wire(), &self._common)
+            self.record.fields.#name
+                .bind(self.record.common.lazy.scan.wire(), &self.record.common)
         }
     }
 }
@@ -483,7 +202,7 @@ fn oneof_getters(field: &OneofEmit, companion: &Ident) -> Vec<TokenStream> {
             ::puroro::DecodeError,
         > {
             #ensured
-            ::core::result::Result::Ok(self.#name.as_ref().map(
+            ::core::result::Result::Ok(self.record.fields.#name.as_ref().map(
                 <#companion::#storage<A, ::puroro_rt::Lazy<A>> as ::puroro_rt::OneofGroup>::case,
             ))
         }
@@ -492,8 +211,8 @@ fn oneof_getters(field: &OneofEmit, companion: &Ident) -> Vec<TokenStream> {
         let vname = &variant.name;
         let field_const = &variant.field_const;
         let variant_of = quote! {
-            self.#name
-                .bind(&self._common)
+            self.record.fields.#name
+                .bind(&self.record.common)
                 .variant_of::<{ #companion::#field_const }>()
         };
         let body = if let Some(access) = variant.len_access {
@@ -535,7 +254,7 @@ fn oneof_getters(field: &OneofEmit, companion: &Ident) -> Vec<TokenStream> {
     out
 }
 
-fn render_apply_arms(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStream> {
+pub(super) fn render_apply_arms(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStream> {
     let mut arms = Vec::new();
     for field in fields {
         match field {
@@ -622,7 +341,7 @@ fn apply_arm(
         SlotApply::Len => quote! {
             #companion::#field_const => {
                 let span = ::puroro_rt::decode::scanned_len_span(origin, rec)?;
-                #slot.store_len_span(span, &mut self._common);
+                #slot.store_len_span(span, common);
                 ::core::result::Result::Ok(())
             }
         },
@@ -631,21 +350,21 @@ fn apply_arm(
                 let span = ::puroro_rt::decode::scanned_len_span(origin, rec)?;
                 #slot.store_span(
                     span,
-                    self._common.lazy.scan.wire(),
-                    &self._common,
+                    common.lazy.scan.wire(),
+                    common,
                 )
             }
         },
         SlotApply::Message(apply) => message_apply_arm(slot, field_const, companion, apply),
         SlotApply::Numerical => quote! {
             #companion::#field_const => #slot
-                .bind_mut(&mut self._common)
+                .bind_mut(common)
                 .merge_scanned(&rec.value),
         },
         SlotApply::RepeatedNumerical => quote! {
             #companion::#field_const => {
-                let wire = self._common.lazy.scan.shared().clone_handle();
-                #slot.bind_mut(&mut self._common).merge_scanned(
+                let wire = common.lazy.scan.shared().clone_handle();
+                #slot.bind_mut(common).merge_scanned(
                     rec,
                     wire.as_bytes(),
                     origin,
@@ -663,24 +382,24 @@ fn message_apply_arm(
 ) -> TokenStream {
     let body = match apply {
         MessageApply::SharedSingular => quote! {
-            let root = self._common.lazy.scan.shared().clone_handle();
-            #slot.merge_shared(&root, span, &mut self._common)
+            let root = common.lazy.scan.shared().clone_handle();
+            #slot.merge_shared(&root, span, common)
         },
         MessageApply::SharedRepeated => quote! {
-            let root = self._common.lazy.scan.shared().clone_handle();
-            #slot.merge_shared(&root, span, &self._common)
+            let root = common.lazy.scan.shared().clone_handle();
+            #slot.merge_shared(&root, span, common)
         },
         MessageApply::EagerSingular => quote! {
-            let payload = span.slice(self._common.lazy.scan.wire())?;
-            let child = #slot.bind_mut(&mut self._common).get_mut();
+            let payload = span.slice(common.lazy.scan.wire())?;
+            let child = #slot.bind_mut(common).get_mut();
             ::puroro::Message::merge_from(child, &mut &payload[..])?;
             ::core::result::Result::Ok(())
         },
         MessageApply::EagerRepeated(child_ty) => quote! {
-            let payload = span.slice(self._common.lazy.scan.wire())?;
-            let mut child = #child_ty::new_in(self._common.alloc.clone());
+            let payload = span.slice(common.lazy.scan.wire())?;
+            let mut child = #child_ty::new_in(common.alloc.clone());
             ::puroro::Message::merge_from(&mut child, &mut &payload[..])?;
-            #slot.push_in(child, self._common.alloc.clone());
+            #slot.push_in(child, common.alloc.clone());
             ::core::result::Result::Ok(())
         },
     };
@@ -701,7 +420,7 @@ fn oneof_apply(field: &OneofEmit, companion: &Ident) -> Vec<TokenStream> {
             let field_const = &variant.field_const;
             let slot = quote! {
                 self.#group
-                    .bind_mut(&mut self._common)
+                    .bind_mut(common)
                     .variant_mut::<{ #companion::#field_const }>()
             };
             let kind = if variant.len_access.is_some() {
@@ -712,27 +431,6 @@ fn oneof_apply(field: &OneofEmit, companion: &Ident) -> Vec<TokenStream> {
                 SlotApply::Numerical
             };
             apply_arm(field_const, companion, slot, kind)
-        })
-        .collect()
-}
-
-fn render_clone_fields(fields: &[FieldEmit]) -> Vec<TokenStream> {
-    // The last field moves `alloc`. Earlier fields clone it so each
-    // `clone_field` call receives an owned allocator.
-    let last = fields.len().saturating_sub(1);
-    fields
-        .iter()
-        .enumerate()
-        .map(|(i, field)| {
-            let name = field.name();
-            let alloc = if i == last {
-                quote! { alloc }
-            } else {
-                quote! { alloc.clone() }
-            };
-            quote! {
-                #name: ::puroro_rt::FieldCloneIn::clone_field(&self.#name, &self._common, #alloc),
-            }
         })
         .collect()
 }

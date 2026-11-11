@@ -19,6 +19,7 @@ pub mod encode;
 pub(crate) mod fields;
 pub mod message_encode;
 pub mod message_merge;
+pub mod message_record;
 pub(crate) mod unknown_fields;
 
 pub use ::protobuf_core::{Field, FieldNumber, Varint};
@@ -58,3 +59,7 @@ pub use fields::wire::{
 };
 pub use message_encode::{EncodeCtx, MessageEncode, encode_message, encode_message_to_vec};
 pub use message_merge::{MessageMerge, merge_message};
+pub use message_record::{
+    CloneRecordFields, ConstructRecordFields, EagerRecordFields, LazyRecordApply, Record,
+    RecordFields,
+};
