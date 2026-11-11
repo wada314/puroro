@@ -3,26 +3,36 @@
 //! Generated `*Fields` structs implement [`HasField`] once per protobuf field
 //! number. The associated type is the stored member for an ordinary field, and
 //! a oneof member view when several numbers share one [`OneofSlot`](super::oneof::OneofSlot).
-//! Generated getters call an inherent method on that value (`bind`, `optional`,
-//! `try_str`, …). Those methods are resolved on the concrete type; the
-//! projection does not have to implement a trait.
+//! [`Record::field`](crate::Record::field) binds that member to `MessageCommon`
+//! through [`BindField`] / [`BindFieldMut`]. Getters then call an inherent method
+//! on the bound view (`optional`, `value`, `get`, `as_slice`, …).
 
 use ::allocator_api2::alloc::Allocator;
 use ::puroro::{DecodeError, HasDefault, Optional};
 
+use super::map::{MapField, MapFieldMut, MapFieldRef, MapKey};
 use super::oneof::{OneofGroup, OneofSlot, OneofVariantRef};
 use super::oneof_variant::OneofVariant;
-use super::shared::{BitStorage, DefaultIn, MessageCommon, MessageCommonSharedBits, UnknownStore};
-use super::singular::{SingularField, SingularFieldMut};
+use super::repeated::encoding::RepeatedEncoding;
+use super::repeated::{RepeatedField, RepeatedFieldMut, RepeatedFieldRef};
+use super::shared::field_presence::FieldPresence;
+use super::shared::value_slot::ValueSlot;
+use super::shared::{
+    AddressableSlot, BitStorage, DefaultIn, MessageBindingMut, MessageCommon, MessageCommonAlloc,
+    MessageCommonSharedBits, UnknownStore, ValueLayout,
+};
+use super::singular::{SingularField, SingularFieldMut, SingularFieldRef};
 use super::wire::len::{BytesLikeLenCodec, LenScalar};
+use super::wire::repeated_element::RepeatedElement;
+use super::wire::singular_type::SingularType;
 use super::wire::wire_or_sso::WireOrSso;
 use crate::ProtoString;
 
 /// Map protobuf field number `N` to the value generated code reads and writes.
 ///
-/// Ordinary fields return `&SingularField` / `&RepeatedField` / `&MapField`.
-/// Oneof members return [`OneofFieldRef`] / [`OneofFieldMut`], which expose the
-/// same inherent methods (`bind`, `bind_mut`, `try_str`, `try_bytes`).
+/// On `*Fields`, ordinary numbers return `&SingularField` / `&RepeatedField` /
+/// `&MapField`, and oneof numbers return [`OneofFieldRef`] / [`OneofFieldMut`].
+/// [`Record::field`](crate::Record::field) binds that projection to `MessageCommon`.
 pub trait HasField<const N: u32> {
     /// Borrowed projection of field `N`.
     type Ref<'a>
@@ -39,6 +49,27 @@ pub trait HasField<const N: u32> {
 
     /// Mutably borrow the projection for field `N`.
     fn field_mut<'a>(&'a mut self) -> Self::Mut<'a>;
+}
+
+/// Bind a field projection to message common state for reading.
+///
+/// Implemented for the projections [`HasField`] returns from `*Fields` when
+/// `bind` takes only `common`. A wire buffer is a different method.
+pub trait BindField<'a, Cx: ?Sized> {
+    /// View produced by binding `self` to `common`.
+    type Bound;
+
+    /// Pair `self` with `common`.
+    fn bind_field(self, common: &'a Cx) -> Self::Bound;
+}
+
+/// Bind a field projection to message common state for mutation.
+pub trait BindFieldMut<'f, 'c, Cx: ?Sized> {
+    /// Mutable view produced by binding `self` to `common`.
+    type Bound;
+
+    /// Pair `self` with `common`.
+    fn bind_field_mut(self, common: &'c mut Cx) -> Self::Bound;
 }
 
 /// Read view of one oneof member, keyed by its protobuf field number.
@@ -204,5 +235,144 @@ impl<'a, E, const N: u32> OneofFieldMut<'a, E, N> {
         let field: &'a mut SingularField<T, super::shared::field_presence::Oneof, N, A, L, D> =
             self.variant(common);
         field.bind_mut(common)
+    }
+}
+
+impl<'a, T, P, const FIELD: u32, A, L, D, Cx> BindField<'a, Cx>
+    for &'a SingularField<T, P, FIELD, A, L, D>
+where
+    T: SingularType,
+    P: FieldPresence,
+    A: Allocator,
+    L: ValueLayout<T, A>,
+    L::Slot: AddressableSlot,
+    P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
+    Cx: MessageBindingMut<A> + 'a,
+{
+    type Bound = SingularFieldRef<'a, T, P, FIELD, A, L, D, Cx>;
+
+    #[inline]
+    fn bind_field(self, common: &'a Cx) -> Self::Bound {
+        SingularField::bind(self, common)
+    }
+}
+
+impl<'f, 'c, T, P, const FIELD: u32, A, L, D, Cx> BindFieldMut<'f, 'c, Cx>
+    for &'f mut SingularField<T, P, FIELD, A, L, D>
+where
+    T: SingularType,
+    P: FieldPresence,
+    A: Allocator,
+    L: ValueLayout<T, A>,
+    L::Slot: AddressableSlot,
+    P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
+    Cx: MessageBindingMut<A> + 'c,
+{
+    type Bound = SingularFieldMut<'f, 'c, T, P, FIELD, A, L, D, Cx>;
+
+    #[inline]
+    fn bind_field_mut(self, common: &'c mut Cx) -> Self::Bound {
+        SingularField::bind_mut(self, common)
+    }
+}
+
+impl<'a, T, E, const FIELD: u32, A, Cx> BindField<'a, Cx> for &'a RepeatedField<T, E, FIELD, A>
+where
+    T: RepeatedElement,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator,
+    Cx: MessageCommonAlloc<Alloc = A> + 'a,
+{
+    type Bound = RepeatedFieldRef<'a, T, E, FIELD, A, Cx>;
+
+    #[inline]
+    fn bind_field(self, common: &'a Cx) -> Self::Bound {
+        self.bind(common)
+    }
+}
+
+impl<'f, 'c, T, E, const FIELD: u32, A, Cx> BindFieldMut<'f, 'c, Cx>
+    for &'f mut RepeatedField<T, E, FIELD, A>
+where
+    T: RepeatedElement,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator,
+    Cx: MessageCommonAlloc<Alloc = A> + 'c,
+{
+    type Bound = RepeatedFieldMut<'f, 'c, T, E, FIELD, A, Cx>;
+
+    #[inline]
+    fn bind_field_mut(self, common: &'c mut Cx) -> Self::Bound {
+        self.bind_mut(common)
+    }
+}
+
+impl<'a, K, V, const FIELD: u32, A, Cx> BindField<'a, Cx> for &'a MapField<K, V, FIELD, A>
+where
+    K: MapKey,
+    V: RepeatedElement,
+    A: Allocator,
+    Cx: MessageCommonAlloc<Alloc = A> + 'a,
+{
+    type Bound = MapFieldRef<'a, K, V, FIELD, A, Cx>;
+
+    #[inline]
+    fn bind_field(self, common: &'a Cx) -> Self::Bound {
+        self.bind(common)
+    }
+}
+
+impl<'f, 'c, K, V, const FIELD: u32, A, Cx> BindFieldMut<'f, 'c, Cx>
+    for &'f mut MapField<K, V, FIELD, A>
+where
+    K: MapKey,
+    V: RepeatedElement,
+    A: Allocator,
+    Cx: MessageCommonAlloc<Alloc = A> + 'c,
+{
+    type Bound = MapFieldMut<'f, 'c, K, V, FIELD, A, Cx>;
+
+    #[inline]
+    fn bind_field_mut(self, common: &'c mut Cx) -> Self::Bound {
+        self.bind_mut(common)
+    }
+}
+
+impl<'a, E, const N: u32, Pb, A, U, L> BindField<'a, MessageCommon<Pb, A, U, L>>
+    for OneofFieldRef<'a, E, N>
+where
+    A: Allocator + 'a,
+    U: UnknownStore<A> + 'a,
+    Pb: 'a,
+    L: 'a,
+    E: OneofVariant<N>,
+{
+    type Bound = OneofVariantRef<'a, <E as OneofVariant<N>>::Value, Pb, A, U, L>;
+
+    #[inline]
+    fn bind_field(self, common: &'a MessageCommon<Pb, A, U, L>) -> Self::Bound {
+        OneofFieldRef::bind(self, common)
+    }
+}
+
+impl<'a, 'c, E, const N: u32, Pb, A, U, Ly> BindFieldMut<'a, 'c, MessageCommon<Pb, A, U, Ly>>
+    for OneofFieldMut<'a, E, N>
+where
+    A: Allocator + Clone,
+    U: UnknownStore<A>,
+    E: OneofVariant<N> + OneofGroup<Bits = Pb, Alloc = A, Unknown = U, Layout = Ly>,
+    <E as OneofVariant<N>>::Value: DefaultIn<A>,
+    &'a mut <E as OneofVariant<N>>::Value: BindFieldMut<'a, 'c, MessageCommon<Pb, A, U, Ly>>,
+{
+    type Bound = <&'a mut <E as OneofVariant<N>>::Value as BindFieldMut<
+        'a,
+        'c,
+        MessageCommon<Pb, A, U, Ly>,
+    >>::Bound;
+
+    #[inline]
+    fn bind_field_mut(self, common: &'c mut MessageCommon<Pb, A, U, Ly>) -> Self::Bound {
+        let field: &'a mut <E as OneofVariant<N>>::Value = self.variant(common);
+        BindFieldMut::bind_field_mut(field, common)
     }
 }

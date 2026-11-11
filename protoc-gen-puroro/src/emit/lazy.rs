@@ -120,15 +120,17 @@ fn singular_getter(field: &ScalarEmit, fields_name: &Ident, companion: &Ident) -
     }
     if field.message_apply.is_some() {
         let view = lazy_child_view(field.layout.as_ref(), &field.mut_target, companion);
-        return message_method(name, &view, quote! { #get.bind(&self.record.common).get() });
+        let get = super::message::bound_record_field(companion, &field.field_const, false);
+        return message_method(name, &view, quote! { #get.get() });
     }
+    let read = super::message::bound_record_field(companion, &field.field_const, false);
     if field.optional_getter {
         optional_method(
             name,
             &field.optional_ty,
             quote! {
                 #ensured
-                ::core::result::Result::Ok(#get.bind(&self.record.common).optional())
+                ::core::result::Result::Ok(#read.optional())
             },
         )
     } else {
@@ -136,7 +138,7 @@ fn singular_getter(field: &ScalarEmit, fields_name: &Ident, companion: &Ident) -
         quote! {
             pub fn #name(&self) -> ::core::result::Result<#implicit_ty, ::puroro::DecodeError> {
                 #ensured
-                ::core::result::Result::Ok(#get.bind(&self.record.common).value())
+                ::core::result::Result::Ok(#read.value())
             }
         }
     }
@@ -146,13 +148,14 @@ fn repeated_getter(field: &RepeatedEmit, fields_name: &Ident, companion: &Ident)
     let name = &field.name;
     let elem = lazy_child_view(field.layout.as_ref(), &field.slice_elem_ty, companion);
     let ensured = scan_guard();
-    let get = super::message::lazy_field(fields_name, companion, &field.field_const);
     let read = if is_repeated_spans(field.layout.as_ref()) {
+        let get = super::message::lazy_field(fields_name, companion, &field.field_const);
         quote! {
             #get.bind(self.record.common.lazy.scan.wire(), &self.record.common)?.as_slice()
         }
     } else {
-        quote! { #get.bind(&self.record.common).as_slice() }
+        let get = super::message::bound_record_field(companion, &field.field_const, false);
+        quote! { #get.as_slice() }
     };
     quote! {
         pub fn #name(
@@ -228,13 +231,11 @@ fn oneof_getters(field: &OneofEmit, fields_name: &Ident, companion: &Ident) -> V
             )
         } else if variant.message_apply.is_some() {
             let view = lazy_child_view(variant.layout.as_ref(), &variant.mut_target, companion);
-            message_method(
-                vname,
-                &view,
-                quote! { #get.bind(&self.record.common).get() },
-            )
+            let read = super::message::bound_record_field(companion, field_const, false);
+            message_method(vname, &view, quote! { #read.get() })
         } else {
             let optional_ty = &variant.optional_ty;
+            let read = super::message::bound_record_field(companion, field_const, false);
             quote! {
                 pub fn #vname(
                     &self,
@@ -243,7 +244,7 @@ fn oneof_getters(field: &OneofEmit, fields_name: &Ident, companion: &Ident) -> V
                     ::puroro::DecodeError,
                 > {
                     #ensured
-                    ::core::result::Result::Ok(#get.bind(&self.record.common).optional())
+                    ::core::result::Result::Ok(#read.optional())
                 }
             }
         };
