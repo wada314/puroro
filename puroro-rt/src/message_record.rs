@@ -45,6 +45,12 @@ where
     const EAGER_NAME: &'static str;
     /// Debug name of the lazy alias.
     const LAZY_NAME: &'static str;
+    /// `true` when the message declares a `LEGACY_REQUIRED` field.
+    ///
+    /// Lazy [`Message::validate`](puroro::Message::validate) scans stored
+    /// regions only when this is `true`. A message with no required fields
+    /// keeps the trait default and does not apply unparsed regions.
+    const CHECKS_REQUIRED: bool = false;
 
     /// Empty common bits for `L` ([`Eager`] or [`Lazy`]).
     fn empty_bits() -> Self::Bits;
@@ -650,7 +656,12 @@ where
     }
 
     fn validate(&self) -> Result<(), DecodeError> {
-        LazyMessage::ensure_scanned(self)?;
+        // Required fields are the only reason to scan here. An unfinished or
+        // unapplied lazy message with no `LEGACY_REQUIRED` field stays `Ok(())`,
+        // matching `Message::validate`'s default.
+        if F::CHECKS_REQUIRED {
+            LazyMessage::ensure_scanned(self)?;
+        }
         self.fields.validate(&self.common)
     }
 }

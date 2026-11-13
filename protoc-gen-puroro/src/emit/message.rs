@@ -441,7 +441,7 @@ pub(super) fn render_items(
     let mut type_items = super::parse::parse_items(quote! {
         // @generated message body from protoc-gen-puroro.
 
-        pub struct #fields_name<
+        pub(crate) struct #fields_name<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone = ::allocator_api2::alloc::Global,
             L: #companion::Layout<A> = ::puroro_rt::Eager,
         > {
@@ -1763,6 +1763,8 @@ fn record_validate_method(body: Option<&TokenStream>, layout: &TokenStream) -> T
         return quote! {};
     };
     quote! {
+        const CHECKS_REQUIRED: bool = true;
+
         fn validate(
             &self,
             common: &::puroro_rt::MessageCommon<Self::Bits, A, Self::Unknown, #layout>,

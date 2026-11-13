@@ -110,9 +110,9 @@ pub trait Message: Sized {
 
     /// Checks `LEGACY_REQUIRED` fields.
     ///
-    /// The default is [`Ok`]. Generated messages that declare such fields
-    /// override this. A lazy override scans stored regions before the
-    /// presence checks.
+    /// The default is [`Ok`]. A message that declares such fields checks
+    /// them. A lazy message scans stored regions before those checks. A lazy
+    /// message with no such fields does not scan.
     fn validate(&self) -> Result<(), DecodeError> {
         Ok(())
     }
