@@ -47,7 +47,7 @@ where
     const LAZY_NAME: &'static str;
     /// `true` when the message declares a `LEGACY_REQUIRED` field.
     ///
-    /// Lazy [`Message::validate`](puroro::Message::validate) scans stored
+    /// Lazy [`Message::validate`] scans stored
     /// regions only when this is `true`. A message with no required fields
     /// keeps the trait default and does not apply unparsed regions.
     const CHECKS_REQUIRED: bool = false;
