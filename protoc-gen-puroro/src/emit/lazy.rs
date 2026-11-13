@@ -1,6 +1,6 @@
 //! Lazy getters on `Record<FooFields<A, Lazy<A>>, …>`.
 
-use super::layout::{LayoutAssoc, LayoutAssocKind, LenAccess, MessageApply};
+use super::layout::{LayoutAssoc, LayoutAssocKind, MessageApply};
 use super::message::{FieldEmit, MapEmit, RepeatedEmit, ScalarEmit};
 use super::oneof::OneofEmit;
 use crate::error::Result;
@@ -12,10 +12,11 @@ use ::syn::{Item, Type};
 pub(super) fn render_items(
     fields: &[FieldEmit],
     eager_alias: &Ident,
+    fields_name: &Ident,
     lazy_alias: &Ident,
     companion: &Ident,
 ) -> Result<Vec<Item>> {
-    let getters = render_getters(fields, companion);
+    let getters = render_getters(fields, fields_name, companion);
     super::parse::parse_items(quote! {
         impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> #lazy_alias<A> {
             #(#getters)*
@@ -32,14 +33,18 @@ pub(super) fn render_items(
     })
 }
 
-fn render_getters(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStream> {
+fn render_getters(
+    fields: &[FieldEmit],
+    fields_name: &Ident,
+    companion: &Ident,
+) -> Vec<TokenStream> {
     let mut out = Vec::new();
     for field in fields {
         match field {
-            FieldEmit::Singular(field) => out.push(singular_getter(field, companion)),
-            FieldEmit::Repeated(field) => out.push(repeated_getter(field, companion)),
-            FieldEmit::Map(field) => out.push(map_getter(field, companion)),
-            FieldEmit::Oneof(field) => out.extend(oneof_getters(field, companion)),
+            FieldEmit::Singular(field) => out.push(singular_getter(field, fields_name, companion)),
+            FieldEmit::Repeated(field) => out.push(repeated_getter(field, fields_name, companion)),
+            FieldEmit::Map(field) => out.push(map_getter(field, fields_name, companion)),
+            FieldEmit::Oneof(field) => out.extend(oneof_getters(field, fields_name, companion)),
         }
     }
     out
@@ -47,17 +52,6 @@ fn render_getters(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStream> {
 
 fn scan_guard() -> TokenStream {
     quote! { ::puroro_rt::decode::LazyMessage::ensure_scanned(self)?; }
-}
-
-fn len_read(access: LenAccess, slot: TokenStream) -> TokenStream {
-    match access {
-        LenAccess::Str => quote! {
-            #slot.try_str(&self.record.common, self.record.common.lazy.scan.wire())
-        },
-        LenAccess::Bytes => quote! {
-            #slot.try_bytes(&self.record.common, self.record.common.lazy.scan.wire())
-        },
-    }
 }
 
 fn optional_method(name: &Ident, optional_ty: &Type, body: TokenStream) -> TokenStream {
@@ -88,17 +82,26 @@ fn message_method(name: &Ident, view: &TokenStream, expr: TokenStream) -> TokenS
     }
 }
 
-fn singular_getter(field: &ScalarEmit, companion: &Ident) -> TokenStream {
+fn singular_getter(field: &ScalarEmit, fields_name: &Ident, companion: &Ident) -> TokenStream {
     let name = &field.name;
     let ensured = scan_guard();
+    let get = super::message::lazy_field(fields_name, companion, &field.field_const);
     if let Some(access) = field.len_access {
-        let read = len_read(access, quote! { self.record.fields.#name });
-        let has = field.presence_bit.as_ref().map(|(bit, _)| {
+        let read = match access {
+            super::layout::LenAccess::Str => quote! {
+                #get.try_str(&self.record.common, self.record.common.lazy.scan.wire())
+            },
+            super::layout::LenAccess::Bytes => quote! {
+                #get.try_bytes(&self.record.common, self.record.common.lazy.scan.wire())
+            },
+        };
+        let has = field.presence_bit.as_ref().map(|_| {
             let has_name = Ident::new(&format!("has_{}", field.name_str), name.span());
+            let present = super::message::lazy_field(fields_name, companion, &field.field_const);
             quote! {
                 pub fn #has_name(&self) -> ::core::result::Result<bool, ::puroro::DecodeError> {
                     #ensured
-                    ::core::result::Result::Ok(self.record.common.is_bit_set(#companion::#bit))
+                    ::core::result::Result::Ok(#present.is_present(&self.record.common))
                 }
             }
         });
@@ -117,19 +120,17 @@ fn singular_getter(field: &ScalarEmit, companion: &Ident) -> TokenStream {
     }
     if field.message_apply.is_some() {
         let view = lazy_child_view(field.layout.as_ref(), &field.mut_target, companion);
-        return message_method(
-            name,
-            &view,
-            quote! { self.record.fields.#name.bind(&self.record.common).get() },
-        );
+        let get = super::message::bound_record_field(companion, &field.field_const, false);
+        return message_method(name, &view, quote! { #get.get() });
     }
+    let read = super::message::bound_record_field(companion, &field.field_const, false);
     if field.optional_getter {
         optional_method(
             name,
             &field.optional_ty,
             quote! {
                 #ensured
-                ::core::result::Result::Ok(self.record.fields.#name.bind(&self.record.common).optional())
+                ::core::result::Result::Ok(#read.optional())
             },
         )
     } else {
@@ -137,24 +138,24 @@ fn singular_getter(field: &ScalarEmit, companion: &Ident) -> TokenStream {
         quote! {
             pub fn #name(&self) -> ::core::result::Result<#implicit_ty, ::puroro::DecodeError> {
                 #ensured
-                ::core::result::Result::Ok(self.record.fields.#name.bind(&self.record.common).value())
+                ::core::result::Result::Ok(#read.value())
             }
         }
     }
 }
 
-fn repeated_getter(field: &RepeatedEmit, companion: &Ident) -> TokenStream {
+fn repeated_getter(field: &RepeatedEmit, fields_name: &Ident, companion: &Ident) -> TokenStream {
     let name = &field.name;
     let elem = lazy_child_view(field.layout.as_ref(), &field.slice_elem_ty, companion);
     let ensured = scan_guard();
     let read = if is_repeated_spans(field.layout.as_ref()) {
+        let get = super::message::lazy_field(fields_name, companion, &field.field_const);
         quote! {
-            self.record.fields.#name
-                .bind(self.record.common.lazy.scan.wire(), &self.record.common)?
-                .as_slice()
+            #get.bind(self.record.common.lazy.scan.wire(), &self.record.common)?.as_slice()
         }
     } else {
-        quote! { self.record.fields.#name.bind(&self.record.common).as_slice() }
+        let get = super::message::bound_record_field(companion, &field.field_const, false);
+        quote! { #get.as_slice() }
     };
     quote! {
         pub fn #name(
@@ -166,7 +167,7 @@ fn repeated_getter(field: &RepeatedEmit, companion: &Ident) -> TokenStream {
     }
 }
 
-fn map_getter(field: &MapEmit, companion: &Ident) -> TokenStream {
+fn map_getter(field: &MapEmit, fields_name: &Ident, companion: &Ident) -> TokenStream {
     let name = &field.name;
     let key = &field.key_view;
     let child = field
@@ -175,6 +176,7 @@ fn map_getter(field: &MapEmit, companion: &Ident) -> TokenStream {
         .find(|assoc| matches!(assoc.kind, LayoutAssocKind::Child { .. }));
     let value = lazy_child_view(child, &field.value_view, companion);
     let ensured = scan_guard();
+    let get = super::message::lazy_field(fields_name, companion, &field.field_const);
     quote! {
         pub fn #name(
             &self,
@@ -183,13 +185,12 @@ fn map_getter(field: &MapEmit, companion: &Ident) -> TokenStream {
             ::puroro::DecodeError,
         > {
             #ensured
-            self.record.fields.#name
-                .bind(self.record.common.lazy.scan.wire(), &self.record.common)
+            #get.bind(self.record.common.lazy.scan.wire(), &self.record.common)
         }
     }
 }
 
-fn oneof_getters(field: &OneofEmit, companion: &Ident) -> Vec<TokenStream> {
+fn oneof_getters(field: &OneofEmit, fields_name: &Ident, companion: &Ident) -> Vec<TokenStream> {
     let name = &field.name;
     let case_name = &field.case_name;
     let storage = &field.storage_name;
@@ -210,33 +211,31 @@ fn oneof_getters(field: &OneofEmit, companion: &Ident) -> Vec<TokenStream> {
     for variant in &field.variants {
         let vname = &variant.name;
         let field_const = &variant.field_const;
-        let variant_of = quote! {
-            self.record.fields.#name
-                .bind(&self.record.common)
-                .variant_of::<{ #companion::#field_const }>()
-        };
+        let get = super::message::lazy_field(fields_name, companion, field_const);
         let body = if let Some(access) = variant.len_access {
-            let read = len_read(access, quote! { f });
+            let read = match access {
+                super::layout::LenAccess::Str => quote! {
+                    #get.try_str(&self.record.common, self.record.common.lazy.scan.wire())
+                },
+                super::layout::LenAccess::Bytes => quote! {
+                    #get.try_bytes(&self.record.common, self.record.common.lazy.scan.wire())
+                },
+            };
             optional_method(
                 vname,
                 &variant.optional_ty,
                 quote! {
                     #ensured
-                    match #variant_of.as_field() {
-                        ::core::option::Option::Some(f) => #read,
-                        ::core::option::Option::None => {
-                            ::core::result::Result::Ok(::puroro::Optional::new(
-                                ::core::option::Option::None,
-                            ))
-                        }
-                    }
+                    #read
                 },
             )
         } else if variant.message_apply.is_some() {
             let view = lazy_child_view(variant.layout.as_ref(), &variant.mut_target, companion);
-            message_method(vname, &view, quote! { #variant_of.get() })
+            let read = super::message::bound_record_field(companion, field_const, false);
+            message_method(vname, &view, quote! { #read.get() })
         } else {
             let optional_ty = &variant.optional_ty;
+            let read = super::message::bound_record_field(companion, field_const, false);
             quote! {
                 pub fn #vname(
                     &self,
@@ -245,7 +244,7 @@ fn oneof_getters(field: &OneofEmit, companion: &Ident) -> Vec<TokenStream> {
                     ::puroro::DecodeError,
                 > {
                     #ensured
-                    ::core::result::Result::Ok(#variant_of.optional())
+                    ::core::result::Result::Ok(#read.optional())
                 }
             }
         };
@@ -261,11 +260,10 @@ pub(super) fn render_apply_arms(fields: &[FieldEmit], companion: &Ident) -> Vec<
             FieldEmit::Singular(field) => arms.push(singular_apply(field, companion)),
             FieldEmit::Repeated(field) => arms.push(repeated_apply(field, companion)),
             FieldEmit::Map(field) => {
-                let name = &field.name;
                 arms.push(apply_arm(
                     &field.field_const,
                     companion,
-                    quote! { self.#name },
+                    super::message::field_mut_expr(companion, &field.field_const),
                     SlotApply::SpanList,
                 ));
             }
@@ -287,7 +285,6 @@ enum SlotApply<'a> {
 }
 
 fn singular_apply(field: &ScalarEmit, companion: &Ident) -> TokenStream {
-    let name = &field.name;
     let kind = if field.len_access.is_some() {
         SlotApply::Len
     } else if let Some(apply) = field.message_apply.as_ref() {
@@ -295,11 +292,15 @@ fn singular_apply(field: &ScalarEmit, companion: &Ident) -> TokenStream {
     } else {
         SlotApply::Numerical
     };
-    apply_arm(&field.field_const, companion, quote! { self.#name }, kind)
+    apply_arm(
+        &field.field_const,
+        companion,
+        super::message::field_mut_expr(companion, &field.field_const),
+        kind,
+    )
 }
 
 fn repeated_apply(field: &RepeatedEmit, companion: &Ident) -> TokenStream {
-    let name = &field.name;
     let kind = if is_repeated_spans(field.layout.as_ref()) {
         SlotApply::SpanList
     } else if let Some(apply) = field.message_apply.as_ref() {
@@ -307,7 +308,12 @@ fn repeated_apply(field: &RepeatedEmit, companion: &Ident) -> TokenStream {
     } else {
         SlotApply::RepeatedNumerical
     };
-    apply_arm(&field.field_const, companion, quote! { self.#name }, kind)
+    apply_arm(
+        &field.field_const,
+        companion,
+        super::message::field_mut_expr(companion, &field.field_const),
+        kind,
+    )
 }
 
 fn lazy_child_view(
@@ -412,16 +418,14 @@ fn message_apply_arm(
 }
 
 fn oneof_apply(field: &OneofEmit, companion: &Ident) -> Vec<TokenStream> {
-    let group = &field.name;
     field
         .variants
         .iter()
         .map(|variant| {
             let field_const = &variant.field_const;
+            let slot_mut = super::message::field_mut_expr(companion, field_const);
             let slot = quote! {
-                self.#group
-                    .bind_mut(common)
-                    .variant_mut::<{ #companion::#field_const }>()
+                #slot_mut.variant(common)
             };
             let kind = if variant.len_access.is_some() {
                 SlotApply::Len

@@ -21,6 +21,7 @@ use crate::fields::shared::{
     EncodedLenVisitor, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor, FieldVisitor,
     FieldVisitorMut, MessageBindingMut, MessageCommon, UnknownStore,
 };
+use crate::fields::slot_index::{BindField, BindFieldMut, HasField};
 use crate::message_encode::{EncodeCtx, MessageEncode, encode_message, encode_message_to_vec};
 use crate::message_merge::{MessageMerge, merge_message};
 use crate::{CloneIn, DeallocateIn, DefaultIn};
@@ -158,8 +159,9 @@ where
 
 /// Generated message: common state plus [`RecordFields`].
 ///
-/// `common` and `fields` are visible to the generated crate so getters can
-/// bind slots. User code should call the generated accessors.
+/// `common` and `fields` are visible to the generated crate. [`Self::field`]
+/// binds a field number to `common` for getters. Decode still receives `fields`
+/// and `common` apart. User code should call the generated accessors.
 pub struct Record<F, A, L, U>
 where
     A: Allocator + Clone,
@@ -171,6 +173,42 @@ where
     pub common: MessageCommon<F::Bits, A, U, L>,
     #[doc(hidden)]
     pub fields: F,
+}
+
+impl<F, A, L, U> Record<F, A, L, U>
+where
+    A: Allocator + Clone,
+    L: MessageScan<A>,
+    U: UnknownStore<A>,
+    F: RecordFields<A, L, Unknown = U>,
+{
+    /// Field `N` already bound to [`Self::common`](Self::common).
+    ///
+    /// The result is the same view `*Fields`'s projection returns from `bind`.
+    /// Callers then use that view's inherent method (`optional`, `value`,
+    /// `get`, `as_slice`, …).
+    #[inline]
+    pub fn field<'a, const N: u32>(
+        &'a self,
+    ) -> <F::Ref<'a> as BindField<'a, MessageCommon<F::Bits, A, U, L>>>::Bound
+    where
+        F: HasField<N>,
+        F::Ref<'a>: BindField<'a, MessageCommon<F::Bits, A, U, L>>,
+    {
+        self.fields.field().bind_field(&self.common)
+    }
+
+    /// Mutable field `N` already bound to [`Self::common`](Self::common).
+    #[inline]
+    pub fn field_mut<'a, const N: u32>(
+        &'a mut self,
+    ) -> <F::Mut<'a> as BindFieldMut<'a, 'a, MessageCommon<F::Bits, A, U, L>>>::Bound
+    where
+        F: HasField<N>,
+        F::Mut<'a>: BindFieldMut<'a, 'a, MessageCommon<F::Bits, A, U, L>>,
+    {
+        self.fields.field_mut().bind_field_mut(&mut self.common)
+    }
 }
 
 impl<F, A, L, U> Record<F, A, L, U>
