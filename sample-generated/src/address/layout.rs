@@ -1,10 +1,10 @@
-//! Per-ingest **kinds** for [`AddressImpl`](crate::address_type::AddressImpl).
+//! Per-ingest **kinds** for [`Address`](crate::Address) / [`AddressLazy`](crate::AddressLazy).
 //!
 //! Numericals stay on the struct. This trait only names the string value
 //! slots that change (`InlineOrHeap` vs `WireOrSso`).
 //!
 //! Not a [`MessageScan`](::puroro_rt::decode::MessageScan) supertrait.
-//! [`AddressImpl`](crate::address_type::AddressImpl) requires `A: Clone` on the
+//! [`Address`](crate::Address) requires `A: Clone` on the
 //! struct, together with every other generated message.
 
 use ::allocator_api2::alloc::Allocator;

@@ -17,8 +17,8 @@
 //! `DESIGN.md` § "Path qualification".
 //!
 //! **Module layout.** Message structs are public at this crate root
-//! (`Task` / `TaskLazy` (`TaskImpl`), `Address` / `AddressLazy` (`AddressImpl`),
-//! `Point` / `PointLazy` (`PointImpl`), `School`, `Student`, `Marker`) — the parent of their
+//! (`Task` / `TaskLazy`, `Address` / `AddressLazy`,
+//! `Point` / `PointLazy`, `School`, `Student`, `Marker`) — the parent of their
 //! snake_case companion modules (`address`, `task`, `school`, `student`,
 //! `point`, `marker`) which hold `FIELD_*` / `BIT_*`, defaults, oneofs, and
 //! message-local traits (`Layout`, `MessageFallible`). Those items omit the
@@ -53,10 +53,10 @@ mod school_type;
 mod student_type;
 mod task_type;
 
-pub use address_type::{Address, AddressImpl, AddressLazy};
+pub use address_type::{Address, AddressLazy};
 pub use enums::{Priority, Status};
 pub use marker_type::Marker;
-pub use point_type::{Point, PointImpl, PointLazy};
+pub use point_type::{Point, PointLazy};
 pub use school_type::School;
 pub use student_type::Student;
-pub use task_type::{Task, TaskImpl, TaskLazy};
+pub use task_type::{Task, TaskLazy};

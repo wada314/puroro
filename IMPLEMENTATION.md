@@ -153,7 +153,7 @@ protobuf-core           Varint, Tag, WireType
 | Closed-enum unknown → `DecodeError::UnknownClosedEnum` → unknown fields, `validate_required` | **Done** |
 | Nested message via `ProtoMessage<M>` (sample `origin` / `assignee` / `postal`) | **Done** |
 | Nested message via `SingularField<ProtoMessage<…>, …>` (repeated / fixtures) | **Done** |
-| [`sample-generated`](sample-generated/) (`Task` / `TaskLazy`, `Address` / `AddressLazy`, `School`) | **Done** — hand-written normative eager and lazy output |
+| [`sample-generated`](sample-generated/) (`Task` / `TaskLazy`, `Address` / `AddressLazy`, `School`) | **Done** — hand-written `*Fields` + `Record` newtypes, matching the plugin shell |
 | `Fixed*` / float / double markers on `SingularField` / `RepeatedField` (via `NumericalType`) | **Done** |
 | Repeated catalog (`RepeatedField<T, E, FIELD>`) | **Done** |
 | `protoc-gen-puroro` plugin I/O (`CodeGeneratorRequest` / `Response`) | **Done** |
@@ -167,7 +167,7 @@ protobuf-core           Varint, Tag, WireType
 
 Each successful plugin run also writes `Cargo.toml` beside `lib.rs` (`--puroro_opt=crate_name` sets the crate name, the `name` value under `[package]`; if omitted, that name is the string `generated`; `[lib] path = "lib.rs"`). `protoc` overwrites both files.
 
-Live plugin emits both messages for every message (`Name` / `NameLazy`, each a newtype over `Record<NameFields<A, …>, …>`) via `resolved::resolve` + [`field_kind::plan_fields`](protoc-gen-puroro/src/field_kind.rs): singular / repeated / enum / message / real oneof / map / custom defaults, plus `(puroro.child_parse)` / `(puroro.message_child_parse)`. The struct bound is `A: Allocator + Clone` on the field struct and both newtypes ([DESIGN.md](DESIGN.md#why-a-clone-is-a-struct-bound)). The hand-written sample still uses one `NameImpl<A, L>`. Coverage is split across [`puroro-codegen-tests`](puroro-codegen-tests/) fixtures (`scalars`, `oneof_basic`, `map_basic`, `custom_defaults`, `utf8_validation`, `lazy_basic`, `enums_open`, `enums_closed`, `enum_aliases`, `enums_rust_enum_open`, `enums_rust_enum_closed`, …; official `descriptor.proto` / `plugin.proto` by `official_plugin`). Deliberate differences from the hand-written sample — flat module layout, short-name `use`s, omitted `@generated` headers — are documented in [§9](#9-struct-layout) / [§17.1](#171-submessage-inline-optimisation); they are not missing field features. Remaining generator gaps outside the sample surface: typed extensions, services, `FileTree` layout.
+Live plugin emits both messages for every message (`Name` / `NameLazy`, each a newtype over `Record<NameFields<A, …>, …>`) via `resolved::resolve` + [`field_kind::plan_fields`](protoc-gen-puroro/src/field_kind.rs): singular / repeated / enum / message / real oneof / map / custom defaults, plus `(puroro.child_parse)` / `(puroro.message_child_parse)`. The struct bound is `A: Allocator + Clone` on the field struct and both newtypes ([DESIGN.md](DESIGN.md#why-a-clone-is-a-struct-bound)). The hand-written sample uses the same newtypes. Coverage is split across [`puroro-codegen-tests`](puroro-codegen-tests/) fixtures (`scalars`, `oneof_basic`, `map_basic`, `custom_defaults`, `utf8_validation`, `lazy_basic`, `enums_open`, `enums_closed`, `enum_aliases`, `enums_rust_enum_open`, `enums_rust_enum_closed`, …; official `descriptor.proto` / `plugin.proto` by `official_plugin`). Deliberate differences from the hand-written sample — flat module layout, short-name `use`s, omitted `@generated` headers — are documented in [§9](#9-struct-layout) / [§17.1](#171-submessage-inline-optimisation); they are not missing field features. Remaining generator gaps outside the sample surface: typed extensions, services, `FileTree` layout.
 
 ---
 
@@ -453,42 +453,13 @@ The rows above are the **eager** layouts. On `NameLazy`, companion [`Layout`](pr
 ## 9. Struct layout
 
 ```rust
-pub struct TaskImpl<A: Allocator + Clone = Global, L: task::Layout<A> = Eager> {
-    _common: MessageCommon<L::Bits, A, UnknownFields<A>, L>,
+pub(crate) struct TaskFields<A: Allocator + Clone = Global, L: task::Layout<A> = Eager> {
     title: SingularField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }, A, L::TitleLen>,
     score: SingularField<ProtoInt32, Implicit, { FIELD_SCORE }, A>,
-    max_retries: SingularField<
-        ProtoInt32,
-        Explicit<{ BIT_MAX_RETRIES }>,
-        { FIELD_MAX_RETRIES },
-        A,
-        Inline,
-        MaxRetriesDefault,
-    >,
-    owner_id: SingularField<ProtoString, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }, A, L::OwnerIdLen>,
-    payload: SingularField<ProtoBytes, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }, A, L::PayloadLen>,
-    tag_ids: RepeatedField<ProtoInt32, Packed, { FIELD_TAG_IDS }, A>,
-    scores: RepeatedField<ProtoInt32, Expanded, { FIELD_SCORES }, A>,
-    labels: RepeatedField<ProtoString, Expanded, { FIELD_LABELS }, A, L::Repeated>,
-    status: SingularField<ProtoEnum<Status, Open>, Implicit, { FIELD_STATUS }, A>,
-    priority: SingularField<ProtoEnum<Priority, Closed>, Explicit<{ BIT_PRIORITY }>, { FIELD_PRIORITY }, A>,
-    assignee: SingularField<ProtoMessage<AddressLazy<A>>, Message, { FIELD_ASSIGNEE }, A, Boxed>, // pinned lazy
-    notification: OneofSlot<NotificationStorage<A, L>>,
-    done: SingularField<ProtoBool, Implicit, { FIELD_DONE }, A, BitPacked<{ BIT_DONE_VALUE }>>,
-    flag: SingularField<ProtoBool, Explicit<{ BIT_FLAG }>, { FIELD_FLAG }, A, BitPacked<{ BIT_FLAG_VALUE }>>,
-    watchers: RepeatedField<ProtoMessage<L::WatchersMsg>, Expanded, { FIELD_WATCHERS }, A>,
-    votes: RepeatedField<ProtoBool, Packed, { FIELD_VOTES }, A>,
-    attributes: MapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A, L::Map>,
-    origin: SingularField<ProtoMessage<L::OriginMsg>, Explicit<{ BIT_ORIGIN }>, { FIELD_ORIGIN }, A>,
+    // … remaining slots, then:
+    _layout: PhantomData<(A, L)>,
 }
 
-pub type Task<A = Global> = TaskImpl<A, Eager>;
-pub type TaskLazy<A = Global> = TaskImpl<A, Lazy<A>>;
-```
-
-That block is the hand-written sample. The plugin emits the same slots as `TaskFields<A, L>` (plus `PhantomData<(A, L)>`) and two newtypes:
-
-```rust
 pub struct Task<A: Allocator + Clone = Global> {
     record: puroro_rt::Record<TaskFields<A, Eager>, A, Eager, UnknownFields<A>>,
 }
@@ -497,9 +468,11 @@ pub struct TaskLazy<A: Allocator + Clone = Global> {
 }
 ```
 
-`record` is private. `Clone`, `Drop`, `Message`, and the other shell traits are implemented once on `Record` and forwarded by `puroro_rt::forward_record!`. Getters stay inherent on `Task` / `TaskLazy` and call `self.record.field::<{FIELD}>()` / `field_mut::<{FIELD}>()`. That projects `TaskFields` through [`HasField`](puroro-rt/src/fields/slot_index.rs) and binds `record.common`. `Record` does not implement `HasField`. `TaskFields` is `pub(crate)`. Decode still receives `fields` and `common` as separate arguments.
+The plugin and the hand-written sample both use that shell. `Clone`, `Drop`, `Message`, and the other shell traits are implemented once on `Record` and forwarded by `puroro_rt::forward_record!`. Getters stay inherent on `Task` / `TaskLazy` and call `self.record.field::<{FIELD}>()` / `field_mut::<{FIELD}>()`. That projects `TaskFields` through [`HasField`](puroro-rt/src/fields/slot_index.rs) and binds `record.common`. `Record` does not implement `HasField`. `TaskFields` is `pub(crate)`. Decode still receives `fields` and `common` as separate arguments.
 
-The storage table and the `_common` / `visit_fields` snippets below, through §13, are the hand-written `TaskImpl` shell unless a sentence names `Record`. The plugin does not emit `_common` or `visit_fields` on `Task`. `Record` owns `common` and calls `EagerRecordFields::visit_fields` / `RecordFields::visit_mut`.
+Plugin output keeps `record` private because the getters live in the same module. The sample splits lazy getters into `*/lazy.rs`, so its `record` is `pub(crate)`. The oneof group slot (`notification`) is also `pub(crate)` there: a group is not one field number, so the lazy `notification()` case read names the slot. `School`, `Student`, and `Marker` are eager-only (`forward_record!(eager …)`, no `*Lazy` alias). `task::MessageFallible` is sample-only.
+
+`Record` owns `common` and calls `EagerRecordFields::visit_fields` / `RecordFields::visit_mut`. Snippets below that write `common` are that state, not a field of `Task`.
 
 Every generated message struct is `A: Allocator + Clone` (eager and lazy). Why that bound is on the struct — owned `A` by value, lazy [`SharedWire`](puroro-rt/src/decode/shared_wire.rs) handles, and a uniform bound so callers do not observe laziness — is [DESIGN.md](DESIGN.md#why-a-clone-is-a-struct-bound). `Record`'s `Drop` frees the unknown store and walks field slots through `RecordFields::visit_mut`. Heap payloads use `unmanaged` types parameterized by `A` plus `PhantomData<A>` (no allocator *instance* in the field, except maps — see below). Protobuf markers are allocator-free; field wrappers carry `A` so slots/`DefaultIn<A>` / `DeallocateIn<A>` associate against `MessageCommon<B, A>`. Singular `bool` uses `SingularField<ProtoBool, …, A, BitPacked<VALUE_BIT>>` with ZST `Slot = ()`; the value lives in the common bits.
 
@@ -520,7 +493,7 @@ Every generated message struct is `A: Allocator + Clone` (eager and lazy). Why t
 
 Unset EXPLICIT slots are uninitialized (`MaybeUninit`); **only the bit** means "set". Singular string / bytes storage is `SsoString` / `SsoBytes` (+ `InlineOrHeap` tag bit); repeated string / bytes use `UnmanagedString` / `UnmanagedVec<u8>`.
 
-On the hand-written sample, public accessors are **one-line delegates** into catalog methods with `&self._common` / `&mut self._common`, and `Drop` walks catalog fields calling `deallocate(&self._common)`. On the plugin, those accessors call `self.record.field::<{FIELD}>()` / `field_mut::<{FIELD}>()`, and `Drop` is `Record`'s walk through `RecordFields::visit_mut`. [`FieldDeallocate`](puroro-rt/src/fields/shared/field_deallocate.rs) on [`OneofSlot`](puroro-rt/src/fields/oneof.rs) does **not** run `after_deallocate`.
+Public accessors call `self.record.field::<{FIELD}>()` / `field_mut::<{FIELD}>()`. `Drop` is `Record`'s walk through `RecordFields::visit_mut`. [`FieldDeallocate`](puroro-rt/src/fields/shared/field_deallocate.rs) on [`OneofSlot`](puroro-rt/src/fields/oneof.rs) does **not** run `after_deallocate`.
 
 ### Codegen emission per message
 
@@ -577,13 +550,13 @@ Tooling uses `@generated` to collapse/skip generated files. The checked-in [`sam
 
 **Constants** — `FIELD_*` / `BIT_*` are **module-level** `pub const` on the message companion (not associated constants). Module-level consts are valid `match` patterns; associated consts are not. Inside the message `impl` (in the parent module), arms qualify them (`task::FIELD_TITLE => …`) or `use` the companion.
 
-Every field kind merges through the same bound-view shape — `self.<field>.bind_mut(&mut self._common).merge(wire_type, buf, depth)?` (repeated and nested-message fields likewise; oneof uses `OneofSlotMut`) — so the code generator emits one form. Oneof variant arms use the **variant field name** and number.
+Every field kind merges through the same bound-view shape — `<Self as HasField<{FIELD}>>::field_mut(self).bind_mut(common).merge(wire_type, buf, depth)?` — so the code generator emits one form. Oneof variant arms use the variant's field number. `HasField` for a oneof member returns `OneofFieldMut`, whose `bind_mut` installs that variant.
 
 ---
 
 ## 10. Common bit indices
 
-Tracked bits use [`bitvec::BitArray`](https://docs.rs/bitvec) inline in the message (`BitVec` is heap-only and incompatible with custom `A`). Store them in `_common.bits` as `BitArray<[u8; N], Lsb0>`; catalog code indexes them through [`MessageCommonBits`](puroro-rt/src/fields/shared.rs) on [`MessageCommon`](puroro-rt/src/fields/shared.rs).
+Tracked bits use [`bitvec::BitArray`](https://docs.rs/bitvec) inline in the message (`BitVec` is heap-only and incompatible with custom `A`). Store them in `MessageCommon.bits` as `BitArray<[u8; N], Lsb0>`; catalog code indexes them through [`MessageCommonBits`](puroro-rt/src/fields/shared.rs) on [`MessageCommon`](puroro-rt/src/fields/shared.rs).
 
 **Assignment (one pass, ascending field number):**
 
@@ -641,7 +614,7 @@ Generated code indexes bits only through `MessageCommonBits` / inherent `Message
 
 ## 11. Constructors & allocator
 
-- **`Task::new_in(alloc)`** — plugin: `Record::new_in`, which builds empty common bits and `ConstructRecordFields::new`. Sample `TaskImpl`: default every field; `_common.bits = BitArray::ZERO`; heap fields via `*_in(alloc.clone())`, with the last heap field taking the original by move. (Building an empty `unmanaged` container does not allocate, so the clone is only used to decompose an empty `Vec`.)
+- **`Task::new_in(alloc)`** — `forward_record!` calls `Record::new_in`, which builds empty common bits and `ConstructRecordFields::new`. Heap fields take `alloc.clone()`, and the last field takes `alloc` by move. (Building an empty `unmanaged` container does not allocate, so the clone is only used to decompose an empty `Vec`.)
 - **`Task::new()`** — `A = Global` only, so `Task::new()` infers. Delegates to `Default`.
 - **`Default`** — `A: Clone + Default` → `new_in(A::default())`.
 
@@ -653,26 +626,28 @@ Runtime **`str_to_unmanaged_in(s, alloc)`** — copy bytes into an `UnmanagedStr
 
 ### Encode
 
-1. Plugin eager encode is `Record`'s `MessageEncode`: `fields.visit_fields` with [`EncodedLenVisitor`](puroro-rt/src/fields/shared/field_inspect.rs) / [`EncodeRawVisitor`](puroro-rt/src/fields/shared/field_inspect.rs) against `self.common`. Each catalog field implements [`FieldEncode`](puroro-rt/src/fields/shared/field_inspect.rs) (`encoded_len` / `encode_raw`; omit rules in [§14](#14-singular-fields)). The sample inlines that walk as `visit_fields` on `TaskImpl`.
-2. Append the unknown-store bytes (`self.common` on `Record`, `_common.unknown_fields` on the sample).
+1. Eager encode is `Record`'s `MessageEncode`: `fields.visit_fields` with [`EncodedLenVisitor`](puroro-rt/src/fields/shared/field_inspect.rs) / [`EncodeRawVisitor`](puroro-rt/src/fields/shared/field_inspect.rs) against `self.common`. Each catalog field implements [`FieldEncode`](puroro-rt/src/fields/shared/field_inspect.rs) (`encoded_len` / `encode_raw`; omit rules in [§14](#14-singular-fields)). The sample implements `EagerRecordFields::visit_fields` and lets `Record` run it.
+2. Append the unknown-store bytes on `self.common`.
 3. Message `encoded_len` must match bytes written.
 
 **Field order is not guaranteed.** Identical logical content may produce different wire bytes. Compare with `PartialEq`, not wire equality.
 
 Runtime (`puroro_rt::encode` + [`encode_type`](puroro-rt/src/fields/wire/encode_type.rs)): `encode_field` / `encoded_len_field`, plus low-level `encode_varint_field`, `encode_tag`, `encoded_len_len_field`, …
 
-The snippet is the hand-written sample. `Record` runs the same visitors on `self.fields` and `self.common`.
+`Record` runs these visitors on `self.fields` and `self.common`:
 
 ```rust
 fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
-    let mut v = EncodedLenVisitor::new(&self._common, ctx);
-    let _ = self.visit_fields(&mut v);
-    v.len + self._common.unknown_fields.len()
+    let mut v = EncodedLenVisitor::new(&self.common, ctx);
+    let _ = self.fields.visit_fields(&mut v);
+    v.len + UnknownStore::as_bytes(&*self.common.unknown_fields).len()
 }
 
 fn encode_raw<B: BufMut>(&self, ctx: &mut EncodeCtx, buf: &mut B) {
-    let _ = self.visit_fields(&mut EncodeRawVisitor::new(&self._common, ctx, buf));
-    buf.put_slice(&self._common.unknown_fields);
+    let _ = self
+        .fields
+        .visit_fields(&mut EncodeRawVisitor::new(&self.common, ctx, buf));
+    buf.put_slice(UnknownStore::as_bytes(&*self.common.unknown_fields));
 }
 ```
 
@@ -686,17 +661,19 @@ fn encode_raw<B: BufMut>(&self, ctx: &mut EncodeCtx, buf: &mut B) {
 4. Singular: last wins. Repeated: append. Map: insert entry (last-wins on key). Nested: merge sub-buffer.
 
 ```rust
-FIELD_PRIORITY => self
-    .priority
-    .bind_mut(&mut self._common)
-    .merge(wire_type, buf, depth)?,
+FIELD_PRIORITY => {
+    <Self as HasField<{ FIELD_PRIORITY }>>::field_mut(self)
+        .bind_mut(common)
+        .merge(wire_type, buf, depth)?;
+    Ok(true)
+}
 ```
 
 Nested LEN payloads use `Buf::take(len)` before child `merge_from`.
 
 ### Validation
 
-`Message::validate()` checks each `LegacyRequired` field (`owner_id.validate_required(...)` on the sample; `RecordFields::validate` on the plugin). Messages with none return `Ok(())`. A lazy message scans (`LazyMessage::ensure_scanned`) only when `RecordFields::CHECKS_REQUIRED` is `true`. `Message::decode` does **not** auto-validate.
+`Message::validate()` checks each `LegacyRequired` field through `RecordFields::validate` (`HasField::<{FIELD_OWNER_ID}>::field(self).validate_required(common)` when that field exists). Messages with none return `Ok(())`. A lazy message scans (`LazyMessage::ensure_scanned`) only when `RecordFields::CHECKS_REQUIRED` is `true`. `Message::decode` does **not** auto-validate.
 
 ---
 
@@ -707,7 +684,7 @@ Nested LEN payloads use `Buf::take(len)` before child `merge_from`.
 | Trait | Bounds | Notes |
 |---|---|---|
 | `Default` | `A: Clone + Default` | Clears presence; empty heap fields |
-| `Drop` | `A: Clone` | Plugin: `Record`'s `Drop` walks `RecordFields::visit_mut` ([`FieldDeallocate`](puroro-rt/src/fields/shared/field_deallocate.rs) per child) then frees the unknown store. Sample: `deallocate(&_common)` on every direct child, then `_common.deallocate()` |
+| `Drop` | `A: Clone` | `Record`'s `Drop` walks `RecordFields::visit_mut` ([`FieldDeallocate`](puroro-rt/src/fields/shared/field_deallocate.rs) per child) then frees the unknown store |
 | `Clone` / `CloneIn` | `A: Clone` | Field-wise [`FieldCloneIn::clone_field`](puroro-rt/src/fields/shared/field_inspect.rs); `Clone` clones `MessageCommon.alloc` and delegates |
 | `PartialEq` | `A: Clone` | Eager: semantic getter comparison (not wire bytes); float uses Rust `PartialEq`. Lazy: eager values when both sides build; ingested body bytes when both builds fail ([DESIGN.md](DESIGN.md#eager-and-lazy-semantic-gaps)) |
 | `Debug` | `A: Clone` | Field-name `debug_struct` (oneof shown as `notification` → `case`) |

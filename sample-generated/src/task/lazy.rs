@@ -1,22 +1,14 @@
-//! Inherent API for [`TaskLazy`](crate::TaskLazy) (`TaskImpl<A, Lazy<A>>`).
+//! Inherent API for [`TaskLazy`](crate::TaskLazy).
 //!
-//! Read-oriented: numericals apply during the scan; LEN fields store spans
-//! (`WireOrSso` / `RepeatedSpans` / `MapSpans` / lazy children). Getters call
-//! [`LazyMessage::ensure_scanned`](::puroro_rt::decode::LazyMessage::ensure_scanned).
-//! `into_eager` re-merges `_wire` into [`Task`](crate::Task).
+//! Numerical getters bind through [`Record::field`](puroro_rt::Record::field).
+//! String and bytes getters read spans with [`HasField::field`](puroro_rt::HasField::field).
+//! `into_eager` replays `_wire` through [`Record::decode_eager`](puroro_rt::Record::decode_eager).
 
-use ::allocator_api2::alloc::{Allocator, Global};
-use ::bytes::{Buf, BufMut};
-use ::core::fmt::{self, Debug, Formatter};
-use ::core::iter;
+use ::allocator_api2::alloc::Allocator;
 use ::core::ops::Deref;
-use ::puroro::{DecodeBuf, DecodeError, HasDefault, MapRef, Message, Optional, RECURSION_LIMIT};
-use ::puroro_rt::decode::{LazyMessage, LazyScan, ScannedRecord, scanned_len_span};
-use ::puroro_rt::{
-    CloneIn, DeallocateIn, DefaultIn, EncodeCtx, FieldCloneIn, InteriorBitArray, LazyMessageCommon,
-    MapField, MessageEncode, MessageMerge, OneofGroup, OneofSlot, RepeatedField, SingularField,
-};
-use ::std::vec::Vec;
+use ::puroro::{DecodeError, HasDefault, MapRef, Optional};
+use ::puroro_rt::decode::LazyMessage;
+use ::puroro_rt::{HasField, Lazy, OneofGroup, Record};
 
 use super::notification::NotificationStorage;
 use crate::AddressLazy;
@@ -25,33 +17,21 @@ use crate::Task;
 use crate::TaskLazy;
 use crate::enums::{Priority, Status};
 use crate::task::{
-    BIT_OWNER_ID, BIT_PAYLOAD, BIT_TITLE, FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_DONE,
-    FIELD_EMAIL_ADDRESS, FIELD_FLAG, FIELD_LABELS, FIELD_MAX_RETRIES, FIELD_ORIGIN, FIELD_OWNER_ID,
-    FIELD_PAYLOAD, FIELD_PHONE_NUMBER, FIELD_POSTAL, FIELD_PRIORITY, FIELD_SCORE, FIELD_SCORES,
-    FIELD_STATUS, FIELD_TAG_IDS, FIELD_TITLE, FIELD_URGENT, FIELD_VOTES, FIELD_WATCHERS,
-    FIELD_WEBHOOK_ID, NotificationCase,
+    FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_DONE, FIELD_EMAIL_ADDRESS, FIELD_FLAG, FIELD_LABELS,
+    FIELD_MAX_RETRIES, FIELD_ORIGIN, FIELD_OWNER_ID, FIELD_PAYLOAD, FIELD_PHONE_NUMBER,
+    FIELD_POSTAL, FIELD_PRIORITY, FIELD_SCORE, FIELD_SCORES, FIELD_STATUS, FIELD_TAG_IDS,
+    FIELD_TITLE, FIELD_URGENT, FIELD_VOTES, FIELD_WATCHERS, FIELD_WEBHOOK_ID, NotificationCase,
 };
-
-impl<A: Allocator + Clone + Default> Default for TaskLazy<A> {
-    fn default() -> Self {
-        Self::new_in(A::default())
-    }
-}
-
-impl TaskLazy<Global> {
-    pub fn new() -> Self {
-        Self::new_in(Global)
-    }
-}
+use crate::task_type::TaskFields;
 
 impl<A: Allocator + Clone> TaskLazy<A> {
     pub fn title(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        self.title
-            .try_str(&self._common, self._common.lazy.scan.wire())
+        LazyMessage::ensure_scanned(self)?;
+        <TaskFields<A, Lazy<A>> as HasField<{ FIELD_TITLE }>>::field(&self.record.fields)
+            .try_str(&self.record.common, self.record.common.lazy.scan.wire())
     }
 
     /// Wire presence only; does not UTF-8-check the payload.
@@ -59,17 +39,20 @@ impl<A: Allocator + Clone> TaskLazy<A> {
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        Ok(self._common.is_bit_set(BIT_TITLE))
+        LazyMessage::ensure_scanned(self)?;
+        Ok(
+            <TaskFields<A, Lazy<A>> as HasField<{ FIELD_TITLE }>>::field(&self.record.fields)
+                .is_present(&self.record.common),
+        )
     }
 
     pub fn owner_id(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        self.owner_id
-            .try_str(&self._common, self._common.lazy.scan.wire())
+        LazyMessage::ensure_scanned(self)?;
+        <TaskFields<A, Lazy<A>> as HasField<{ FIELD_OWNER_ID }>>::field(&self.record.fields)
+            .try_str(&self.record.common, self.record.common.lazy.scan.wire())
     }
 
     /// Wire presence only; does not UTF-8-check the payload.
@@ -77,76 +60,83 @@ impl<A: Allocator + Clone> TaskLazy<A> {
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        Ok(self._common.is_bit_set(BIT_OWNER_ID))
+        LazyMessage::ensure_scanned(self)?;
+        Ok(
+            <TaskFields<A, Lazy<A>> as HasField<{ FIELD_OWNER_ID }>>::field(&self.record.fields)
+                .is_present(&self.record.common),
+        )
     }
 
     pub fn payload(&self) -> Result<Optional<&[u8], impl HasDefault<&[u8]>>, DecodeError>
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        self.payload
-            .try_bytes(&self._common, self._common.lazy.scan.wire())
+        LazyMessage::ensure_scanned(self)?;
+        <TaskFields<A, Lazy<A>> as HasField<{ FIELD_PAYLOAD }>>::field(&self.record.fields)
+            .try_bytes(&self.record.common, self.record.common.lazy.scan.wire())
     }
 
     pub fn has_payload(&self) -> Result<bool, DecodeError>
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        Ok(self._common.is_bit_set(BIT_PAYLOAD))
+        LazyMessage::ensure_scanned(self)?;
+        Ok(
+            <TaskFields<A, Lazy<A>> as HasField<{ FIELD_PAYLOAD }>>::field(&self.record.fields)
+                .is_present(&self.record.common),
+        )
     }
 
     pub fn score(&self) -> Result<i32, DecodeError>
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        Ok(self.score.bind(&self._common).value())
+        LazyMessage::ensure_scanned(self)?;
+        Ok(self.record.field::<{ FIELD_SCORE }>().value())
     }
 
     pub fn max_retries<'a>(&'a self) -> Result<Optional<i32, impl HasDefault<i32>>, DecodeError>
     where
         A: Clone + 'a,
     {
-        self.ensure_scanned()?;
-        Ok(self.max_retries.bind(&self._common).optional())
+        LazyMessage::ensure_scanned(self)?;
+        Ok(self.record.field::<{ FIELD_MAX_RETRIES }>().optional())
     }
 
     pub fn tag_ids(&self) -> Result<&[i32], DecodeError>
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        Ok(self.tag_ids.bind(&self._common).as_slice())
+        LazyMessage::ensure_scanned(self)?;
+        Ok(self.record.field::<{ FIELD_TAG_IDS }>().as_slice())
     }
 
     pub fn scores(&self) -> Result<&[i32], DecodeError>
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        Ok(self.scores.bind(&self._common).as_slice())
+        LazyMessage::ensure_scanned(self)?;
+        Ok(self.record.field::<{ FIELD_SCORES }>().as_slice())
     }
 
     pub fn labels(&self) -> Result<&[impl Deref<Target = str>], DecodeError>
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        Ok(self
-            .labels
-            .bind(self._common.lazy.scan.wire(), &self._common)?
-            .as_slice())
+        LazyMessage::ensure_scanned(self)?;
+        Ok(
+            <TaskFields<A, Lazy<A>> as HasField<{ FIELD_LABELS }>>::field(&self.record.fields)
+                .bind(self.record.common.lazy.scan.wire(), &self.record.common)?
+                .as_slice(),
+        )
     }
 
     pub fn status<'a>(&'a self) -> Result<Optional<Status, impl HasDefault<Status>>, DecodeError>
     where
         A: Clone + 'a,
     {
-        self.ensure_scanned()?;
-        Ok(self.status.bind(&self._common).optional())
+        LazyMessage::ensure_scanned(self)?;
+        Ok(self.record.field::<{ FIELD_STATUS }>().optional())
     }
 
     pub fn priority<'a>(
@@ -155,445 +145,126 @@ impl<A: Allocator + Clone> TaskLazy<A> {
     where
         A: Clone + 'a,
     {
-        self.ensure_scanned()?;
-        Ok(self.priority.bind(&self._common).optional())
+        LazyMessage::ensure_scanned(self)?;
+        Ok(self.record.field::<{ FIELD_PRIORITY }>().optional())
     }
 
     pub fn done(&self) -> Result<bool, DecodeError>
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        Ok(self.done.bind(&self._common).value())
+        LazyMessage::ensure_scanned(self)?;
+        Ok(self.record.field::<{ FIELD_DONE }>().value())
     }
 
     pub fn flag<'a>(&'a self) -> Result<Optional<bool, impl HasDefault<bool>>, DecodeError>
     where
         A: Clone + 'a,
     {
-        self.ensure_scanned()?;
-        Ok(self.flag.bind(&self._common).optional())
+        LazyMessage::ensure_scanned(self)?;
+        Ok(self.record.field::<{ FIELD_FLAG }>().optional())
     }
 
     pub fn votes(&self) -> Result<&[bool], DecodeError>
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        Ok(self.votes.bind(&self._common).as_slice())
+        LazyMessage::ensure_scanned(self)?;
+        Ok(self.record.field::<{ FIELD_VOTES }>().as_slice())
     }
 
     pub fn assignee(&self) -> Result<Option<&AddressLazy<A>>, DecodeError>
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        Ok(self.assignee.bind(&self._common).get())
+        LazyMessage::ensure_scanned(self)?;
+        Ok(self.record.field::<{ FIELD_ASSIGNEE }>().get())
     }
 
     pub fn origin(&self) -> Result<Option<&PointLazy<A>>, DecodeError>
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        Ok(self.origin.bind(&self._common).get())
+        LazyMessage::ensure_scanned(self)?;
+        Ok(self.record.field::<{ FIELD_ORIGIN }>().get())
     }
 
     pub fn watchers(&self) -> Result<&[AddressLazy<A>], DecodeError>
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        Ok(self.watchers.bind(&self._common).as_slice())
+        LazyMessage::ensure_scanned(self)?;
+        Ok(self.record.field::<{ FIELD_WATCHERS }>().as_slice())
     }
 
     pub fn notification(&self) -> Result<Option<NotificationCase>, DecodeError>
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
+        LazyMessage::ensure_scanned(self)?;
         Ok(self
+            .record
+            .fields
             .notification
             .as_ref()
-            .map(NotificationStorage::<A, ::puroro_rt::Lazy<A>>::case))
+            .map(<NotificationStorage<A, Lazy<A>> as OneofGroup>::case))
     }
 
     pub fn email_address(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        match self
-            .notification
-            .bind(&self._common)
-            .variant_of::<FIELD_EMAIL_ADDRESS>()
-            .as_field()
-        {
-            Some(f) => f.try_str(&self._common, self._common.lazy.scan.wire()),
-            None => Ok(Optional::new(None)),
-        }
+        LazyMessage::ensure_scanned(self)?;
+        <TaskFields<A, Lazy<A>> as HasField<{ FIELD_EMAIL_ADDRESS }>>::field(&self.record.fields)
+            .try_str(&self.record.common, self.record.common.lazy.scan.wire())
     }
 
     pub fn phone_number(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        match self
-            .notification
-            .bind(&self._common)
-            .variant_of::<FIELD_PHONE_NUMBER>()
-            .as_field()
-        {
-            Some(f) => f.try_str(&self._common, self._common.lazy.scan.wire()),
-            None => Ok(Optional::new(None)),
-        }
+        LazyMessage::ensure_scanned(self)?;
+        <TaskFields<A, Lazy<A>> as HasField<{ FIELD_PHONE_NUMBER }>>::field(&self.record.fields)
+            .try_str(&self.record.common, self.record.common.lazy.scan.wire())
     }
 
     pub fn webhook_id(&self) -> Result<Optional<i32, impl HasDefault<i32>>, DecodeError>
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        Ok(self
-            .notification
-            .bind(&self._common)
-            .variant_of::<FIELD_WEBHOOK_ID>()
-            .optional())
+        LazyMessage::ensure_scanned(self)?;
+        Ok(self.record.field::<{ FIELD_WEBHOOK_ID }>().optional())
     }
 
     pub fn postal(&self) -> Result<Option<&AddressLazy<A>>, DecodeError>
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        Ok(self
-            .notification
-            .bind(&self._common)
-            .variant_of::<FIELD_POSTAL>()
-            .get())
+        LazyMessage::ensure_scanned(self)?;
+        Ok(self.record.field::<{ FIELD_POSTAL }>().get())
     }
 
     pub fn urgent(&self) -> Result<Optional<bool, impl HasDefault<bool>>, DecodeError>
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        Ok(self
-            .notification
-            .bind(&self._common)
-            .variant_of::<FIELD_URGENT>()
-            .optional())
+        LazyMessage::ensure_scanned(self)?;
+        Ok(self.record.field::<{ FIELD_URGENT }>().optional())
     }
 
     pub fn attributes(&self) -> Result<impl MapRef<str, i32> + '_, DecodeError>
     where
         A: Clone,
     {
-        self.ensure_scanned()?;
-        self.attributes
-            .bind(self._common.lazy.scan.wire(), &self._common)
-    }
-}
-
-impl<A: Allocator + Clone> TaskLazy<A> {
-    pub fn new_in(alloc: A) -> Self {
-        Self {
-            _common: LazyMessageCommon::new_in(InteriorBitArray::zero(), alloc.clone()),
-            title: SingularField::new_in(alloc.clone()),
-            owner_id: SingularField::new_in(alloc.clone()),
-            payload: SingularField::new_in(alloc.clone()),
-            assignee: SingularField::new_in(alloc.clone()),
-            origin: SingularField::new_in(alloc.clone()),
-            watchers: RepeatedField::new_in(alloc.clone()),
-            labels: RepeatedField::new_in(alloc.clone()),
-            attributes: MapField::new_in(alloc.clone()),
-            score: SingularField::new_in(alloc.clone()),
-            max_retries: SingularField::new_in(alloc.clone()),
-            tag_ids: RepeatedField::new_in(alloc.clone()),
-            scores: RepeatedField::new_in(alloc.clone()),
-            status: SingularField::new_in(alloc.clone()),
-            priority: SingularField::new_in(alloc.clone()),
-            done: SingularField::new_in(alloc.clone()),
-            flag: SingularField::new_in(alloc.clone()),
-            votes: RepeatedField::new_in(alloc.clone()),
-            notification: OneofSlot::new_in(alloc),
-        }
-    }
-
-    /// Decode every field from `_wire` into an eager [`Task`].
-    ///
-    /// Fields not yet materialised on the lazy getters are applied here because
-    /// the full ingest bytes are replayed.
-    pub fn into_eager(self) -> Result<Task<A>, DecodeError> {
-        self._common.lazy.scan.require_finished()?;
-        let mut eager = Task::new_in(self._common.alloc.clone());
-        self._common.lazy.scan.for_each_body(|chunk| {
-            let mut buf = chunk;
-            Message::merge_from(&mut eager, &mut buf)
-        })?;
-        Ok(eager)
-    }
-}
-
-impl<A: Allocator + Clone> LazyMessage<A> for TaskLazy<A> {
-    fn scan(&self) -> &LazyScan<A> {
-        &self._common.lazy.scan
-    }
-
-    fn scan_mut(&mut self) -> &mut LazyScan<A> {
-        &mut self._common.lazy.scan
-    }
-
-    fn apply_record(&mut self, rec: &ScannedRecord, origin: usize) -> Result<(), DecodeError> {
-        match rec.field_number.as_u32() {
-            FIELD_TITLE => {
-                let span = scanned_len_span(origin, rec)?;
-                self.title.store_len_span(span, &mut self._common);
-                Ok(())
-            }
-            FIELD_OWNER_ID => {
-                let span = scanned_len_span(origin, rec)?;
-                self.owner_id.store_len_span(span, &mut self._common);
-                Ok(())
-            }
-            FIELD_PAYLOAD => {
-                let span = scanned_len_span(origin, rec)?;
-                self.payload.store_len_span(span, &mut self._common);
-                Ok(())
-            }
-            FIELD_ASSIGNEE => {
-                let span = scanned_len_span(origin, rec)?;
-                let root = self._common.lazy.scan.shared().clone_handle();
-                self.assignee.merge_shared(&root, span, &mut self._common)
-            }
-            FIELD_ORIGIN => {
-                let span = scanned_len_span(origin, rec)?;
-                let root = self._common.lazy.scan.shared().clone_handle();
-                self.origin.merge_shared(&root, span, &mut self._common)
-            }
-            FIELD_WATCHERS => {
-                let span = scanned_len_span(origin, rec)?;
-                let root = self._common.lazy.scan.shared().clone_handle();
-                self.watchers.merge_shared(&root, span, &self._common)
-            }
-            FIELD_EMAIL_ADDRESS => {
-                let span = scanned_len_span(origin, rec)?;
-                self.notification
-                    .bind_mut(&mut self._common)
-                    .variant_mut::<FIELD_EMAIL_ADDRESS>()
-                    .store_len_span(span, &mut self._common);
-                Ok(())
-            }
-            FIELD_PHONE_NUMBER => {
-                let span = scanned_len_span(origin, rec)?;
-                self.notification
-                    .bind_mut(&mut self._common)
-                    .variant_mut::<FIELD_PHONE_NUMBER>()
-                    .store_len_span(span, &mut self._common);
-                Ok(())
-            }
-            FIELD_WEBHOOK_ID => self
-                .notification
-                .bind_mut(&mut self._common)
-                .variant_mut::<FIELD_WEBHOOK_ID>()
-                .bind_mut(&mut self._common)
-                .merge_scanned(&rec.value),
-            FIELD_POSTAL => {
-                let span = scanned_len_span(origin, rec)?;
-                let root = self._common.lazy.scan.shared().clone_handle();
-                self.notification
-                    .bind_mut(&mut self._common)
-                    .variant_mut::<FIELD_POSTAL>()
-                    .merge_shared(&root, span, &mut self._common)
-            }
-            FIELD_URGENT => self
-                .notification
-                .bind_mut(&mut self._common)
-                .variant_mut::<FIELD_URGENT>()
-                .bind_mut(&mut self._common)
-                .merge_scanned(&rec.value),
-            FIELD_LABELS => {
-                let span = scanned_len_span(origin, rec)?;
-                self.labels
-                    .store_span(span, self._common.lazy.scan.wire(), &self._common)
-            }
-            FIELD_ATTRIBUTES => {
-                let span = scanned_len_span(origin, rec)?;
-                self.attributes
-                    .store_span(span, self._common.lazy.scan.wire(), &self._common)
-            }
-            FIELD_SCORE => self
-                .score
-                .bind_mut(&mut self._common)
-                .merge_scanned(&rec.value),
-            FIELD_MAX_RETRIES => self
-                .max_retries
-                .bind_mut(&mut self._common)
-                .merge_scanned(&rec.value),
-            FIELD_TAG_IDS => {
-                let wire = self._common.lazy.scan.shared().clone_handle();
-                self.tag_ids
-                    .bind_mut(&mut self._common)
-                    .merge_scanned(rec, wire.as_bytes(), origin)
-            }
-            FIELD_SCORES => {
-                let wire = self._common.lazy.scan.shared().clone_handle();
-                self.scores
-                    .bind_mut(&mut self._common)
-                    .merge_scanned(rec, wire.as_bytes(), origin)
-            }
-            FIELD_STATUS => self
-                .status
-                .bind_mut(&mut self._common)
-                .merge_scanned(&rec.value),
-            FIELD_PRIORITY => self
-                .priority
-                .bind_mut(&mut self._common)
-                .merge_scanned(&rec.value),
-            FIELD_DONE => self
-                .done
-                .bind_mut(&mut self._common)
-                .merge_scanned(&rec.value),
-            FIELD_FLAG => self
-                .flag
-                .bind_mut(&mut self._common)
-                .merge_scanned(&rec.value),
-            FIELD_VOTES => {
-                let wire = self._common.lazy.scan.shared().clone_handle();
-                self.votes
-                    .bind_mut(&mut self._common)
-                    .merge_scanned(rec, wire.as_bytes(), origin)
-            }
-            _ => Ok(()),
-        }
-    }
-}
-
-impl<A: Allocator + Clone> CloneIn<A> for TaskLazy<A> {
-    fn clone_in(&self, alloc: A) -> Self {
-        Self {
-            _common: self._common.clone_in(alloc.clone()),
-            title: self.title.clone_field(&self._common, alloc.clone()),
-            score: self.score.clone_field(&self._common, alloc.clone()),
-            max_retries: self.max_retries.clone_field(&self._common, alloc.clone()),
-            owner_id: self.owner_id.clone_field(&self._common, alloc.clone()),
-            payload: self.payload.clone_field(&self._common, alloc.clone()),
-            tag_ids: self.tag_ids.clone_field(&self._common, alloc.clone()),
-            scores: self.scores.clone_field(&self._common, alloc.clone()),
-            labels: self.labels.clone_field(&self._common, alloc.clone()),
-            status: self.status.clone_field(&self._common, alloc.clone()),
-            priority: self.priority.clone_field(&self._common, alloc.clone()),
-            assignee: self.assignee.clone_field(&self._common, alloc.clone()),
-            notification: self.notification.clone_field(&self._common, alloc.clone()),
-            done: self.done.clone_field(&self._common, alloc.clone()),
-            flag: self.flag.clone_field(&self._common, alloc.clone()),
-            watchers: self.watchers.clone_field(&self._common, alloc.clone()),
-            votes: self.votes.clone_field(&self._common, alloc.clone()),
-            attributes: self.attributes.clone_field(&self._common, alloc.clone()),
-            origin: self.origin.clone_field(&self._common, alloc),
-        }
-    }
-}
-
-impl<A: Allocator + Clone> Clone for TaskLazy<A> {
-    fn clone(&self) -> Self {
-        self.clone_in(self._common.alloc.clone())
-    }
-}
-
-impl<A: Allocator + Clone> PartialEq for TaskLazy<A> {
-    fn eq(&self, other: &Self) -> bool {
-        LazyMessage::eq_with_eager(self, other, |msg| msg.clone().into_eager())
-    }
-}
-
-impl<A: Allocator + Clone> Debug for TaskLazy<A> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        if self.ensure_scanned().is_err() {
-            return f.debug_struct("TaskLazy").finish_non_exhaustive();
-        }
-        match self.clone().into_eager() {
-            Ok(eager) => Debug::fmt(&eager, f),
-            Err(_) => f.debug_struct("TaskLazy").finish_non_exhaustive(),
-        }
-    }
-}
-
-impl<A: Allocator + Clone> DeallocateIn<A> for TaskLazy<A> {
-    #[inline]
-    unsafe fn deallocate_in(self, _alloc: &A) {
-        drop(self);
-    }
-}
-
-::puroro_rt::impl_owned_slot_bounds!(TaskLazy);
-
-impl<A: Allocator + Clone> MessageEncode for TaskLazy<A> {
-    fn encoded_len(&self, _ctx: &mut EncodeCtx) -> usize {
-        self._common.lazy.scan.body_len()
-    }
-
-    fn encode_raw<B: BufMut>(&self, _ctx: &mut EncodeCtx, buf: &mut B) {
-        self._common
-            .lazy
-            .scan
-            .write_bodies(buf)
-            .expect("lazy wire span out of range");
-    }
-}
-
-impl<A: Allocator + Clone> MessageMerge for TaskLazy<A> {
-    fn merge_from_with_depth<B: DecodeBuf>(
-        &mut self,
-        buf: &mut B,
-        depth: usize,
-    ) -> Result<(), DecodeError> {
-        if depth >= RECURSION_LIMIT {
-            return Err(DecodeError::RecursionLimitExceeded);
-        }
-        LazyMessage::ingest_buf(self, buf)
-    }
-}
-
-impl<A: Allocator + Clone> DefaultIn<A> for TaskLazy<A> {
-    #[inline]
-    fn default_in(alloc: A) -> Self {
-        Self::new_in(alloc)
-    }
-}
-
-impl<A: Allocator + Clone> Message for TaskLazy<A> {
-    type Alloc = A;
-
-    fn new_in(alloc: A) -> Self
-    where
-        A: Clone,
-    {
-        Self::new_in(alloc)
-    }
-
-    fn encode<B: BufMut>(&self, buf: &mut B) {
-        ::puroro_rt::encode_message(self, buf)
-    }
-
-    fn encode_to_vec(&self) -> Vec<u8> {
-        ::puroro_rt::encode_message_to_vec(self)
-    }
-
-    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError>
-    where
-        A: Clone,
-    {
-        LazyMessage::ingest_buf(self, buf)
-    }
-
-    fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
-        iter::empty()
-    }
-
-    fn validate(&self) -> Result<(), DecodeError> {
         LazyMessage::ensure_scanned(self)?;
-        self.owner_id.validate_required(&self._common)
+        <TaskFields<A, Lazy<A>> as HasField<{ FIELD_ATTRIBUTES }>>::field(&self.record.fields)
+            .bind(self.record.common.lazy.scan.wire(), &self.record.common)
+    }
+
+    /// Decode `_wire` into the eager message.
+    pub fn into_eager(self) -> Result<Task<A>, DecodeError> {
+        Ok(Task {
+            record: Record::<_, A, Lazy<A>, _>::decode_eager(self.record)?,
+        })
     }
 }

@@ -1,23 +1,21 @@
 //! Sample of the code puroro generates for message `example.Address`
 //! (from `example.proto`). The public type is re-exported at the crate root so
 //! it sits beside companion module [`crate::address`].
+//!
+//! [`AddressFields`] holds the slots. [`Address`] / [`AddressLazy`] are
+//! newtypes over [`puroro_rt::Record`].
 
-use allocator_api2::alloc::{Allocator, Global};
-use bitvec::array::BitArray;
-use bitvec::order::Lsb0;
-use bytes::{Buf, BufMut};
-use core::fmt;
-use core::mem;
-use core::ops::ControlFlow;
-use core::ops::DerefMut;
-
-use puroro::{DecodeBuf, DecodeError, Message};
-use puroro_rt::decode::{decode_tag, skip_field_and_save};
-use puroro_rt::{
-    CloneFieldsVisitor, CloneIn, DebugStructVisitor, Eager, EncodeCtx, EncodeRawVisitor,
-    EncodedLenVisitor, Explicit, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor,
-    FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Lazy, MessageCommon, MessageEncode,
-    MessageMerge, ProtoDouble, ProtoFixed32, ProtoString, SingularField, UnknownFields,
+use ::allocator_api2::alloc::{Allocator, Global};
+use ::core::marker::PhantomData;
+use ::core::mem;
+use ::core::ops::{ControlFlow, DerefMut};
+use ::puroro::{DecodeBuf, DecodeError, WireType};
+use ::puroro_rt::decode::{MessageScan, ScannedRecord, scanned_len_span};
+use ::puroro_rt::{
+    CloneRecordFields, ConstructRecordFields, Eager, EagerRecordFields, Explicit, FieldCloneIn,
+    FieldDeallocate, FieldPairVisitor, FieldVisitor, FieldVisitorMut, HasField, Lazy,
+    LazyRecordApply, MessageCommon, ProtoDouble, ProtoFixed32, ProtoString, Record, RecordFields,
+    SingularField, UnknownFields,
 };
 
 use crate::address::{
@@ -25,224 +23,85 @@ use crate::address::{
     FIELD_POSTAL_CODE, FIELD_STREET,
 };
 
-// ---------------------------------------------------------------------------
-// Message struct
-// ---------------------------------------------------------------------------
-
-pub struct AddressImpl<A: Allocator + Clone = Global, L: address::Layout<A> = Eager> {
-    pub(crate) _common: MessageCommon<L::Bits, A, UnknownFields<A>, L>,
-    pub(crate) street:
-        SingularField<ProtoString, Explicit<{ BIT_STREET }>, { FIELD_STREET }, A, L::StreetLen>, // proto: string street = 1;
-    pub(crate) city:
-        SingularField<ProtoString, Explicit<{ BIT_CITY }>, { FIELD_CITY }, A, L::CityLen>, // proto: string city = 2;
-    pub(crate) postal_code:
-        SingularField<ProtoFixed32, Explicit<{ BIT_POSTAL_CODE }>, { FIELD_POSTAL_CODE }, A>, // proto: fixed32 postal_code = 3;
-    pub(crate) latitude:
-        SingularField<ProtoDouble, Explicit<{ BIT_LATITUDE }>, { FIELD_LATITUDE }, A>, // proto: double latitude = 4;
+pub(crate) struct AddressFields<A: Allocator + Clone = Global, L: address::Layout<A> = Eager> {
+    street: SingularField<ProtoString, Explicit<{ BIT_STREET }>, { FIELD_STREET }, A, L::StreetLen>,
+    city: SingularField<ProtoString, Explicit<{ BIT_CITY }>, { FIELD_CITY }, A, L::CityLen>,
+    postal_code:
+        SingularField<ProtoFixed32, Explicit<{ BIT_POSTAL_CODE }>, { FIELD_POSTAL_CODE }, A>,
+    latitude: SingularField<ProtoDouble, Explicit<{ BIT_LATITUDE }>, { FIELD_LATITUDE }, A>,
+    _layout: PhantomData<(A, L)>,
 }
 
-pub type Address<A = Global> = AddressImpl<A, Eager>;
-pub type AddressLazy<A = Global> = AddressImpl<A, Lazy<A>>;
+macro_rules! has_address_field {
+    ($n:expr, $slot:ident, $ty:ty) => {
+        impl<A: Allocator + Clone, L: address::Layout<A>> HasField<{ $n }> for AddressFields<A, L> {
+            type Ref<'a>
+                = &'a $ty
+            where
+                Self: 'a;
+            type Mut<'a>
+                = &'a mut $ty
+            where
+                Self: 'a;
 
-impl<A: Allocator + Clone> Address<A> {
-    pub fn street<'a>(&'a self) -> ::puroro::Optional<&'a str, impl ::puroro::HasDefault<&'a str>>
-    where
-        A: 'a,
-    {
-        self.street.bind(&self._common).optional()
-    }
+            fn field<'a>(&'a self) -> Self::Ref<'a> {
+                &self.$slot
+            }
 
-    pub fn city<'a>(&'a self) -> ::puroro::Optional<&'a str, impl ::puroro::HasDefault<&'a str>>
-    where
-        A: 'a,
-    {
-        self.city.bind(&self._common).optional()
-    }
-
-    pub fn postal_code<'a>(&'a self) -> ::puroro::Optional<u32, impl ::puroro::HasDefault<u32>>
-    where
-        A: 'a,
-    {
-        self.postal_code.bind(&self._common).optional()
-    }
-
-    pub fn latitude<'a>(&'a self) -> ::puroro::Optional<f64, impl ::puroro::HasDefault<f64>>
-    where
-        A: 'a,
-    {
-        self.latitude.bind(&self._common).optional()
-    }
-
-    fn visit_fields<V: FieldVisitor<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
-        &self,
-        v: &mut V,
-    ) -> ControlFlow<V::Break> {
-        v.visit("street", &self.street)?;
-        v.visit("city", &self.city)?;
-        v.visit("postal_code", &self.postal_code)?;
-        v.visit("latitude", &self.latitude)?;
-        ControlFlow::Continue(())
-    }
-
-    /// Pair / shared.
-    fn visit_field_pairs<V: FieldPairVisitor<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
-        &self,
-        other: &Self,
-        v: &mut V,
-    ) -> ControlFlow<V::Break> {
-        v.visit("street", &self.street, &other.street)?;
-        v.visit("city", &self.city, &other.city)?;
-        v.visit("postal_code", &self.postal_code, &other.postal_code)?;
-        v.visit("latitude", &self.latitude, &other.latitude)?;
-        ControlFlow::Continue(())
-    }
-
-    /// Pair / mut.
-    fn visit_field_pairs_mut<V: FieldPairVisitorMut<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
-        &self,
-        dst: &mut Self,
-        v: &mut V,
-    ) -> ControlFlow<V::Break>
-    where
-        A: Clone,
-    {
-        v.visit("street", &self.street, &mut dst.street)?;
-        v.visit("city", &self.city, &mut dst.city)?;
-        v.visit("postal_code", &self.postal_code, &mut dst.postal_code)?;
-        v.visit("latitude", &self.latitude, &mut dst.latitude)?;
-        ControlFlow::Continue(())
-    }
-}
-
-impl<A: Allocator + Clone> Address<A> {
-    pub fn new_in(alloc: A) -> Self {
-        // Each field initializer gets its own clone of the allocator; the last
-        // heap field takes the original by move.
-        Self {
-            _common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
-            street: SingularField::new_in(alloc.clone()),
-            city: SingularField::new_in(alloc.clone()),
-            postal_code: SingularField::new_in(alloc.clone()),
-            latitude: SingularField::new_in(alloc),
+            fn field_mut<'a>(&'a mut self) -> Self::Mut<'a> {
+                &mut self.$slot
+            }
         }
-    }
-
-    // -- street (EXPLICIT string, proto field 1) ----------------------------
-
-    pub fn street_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
-        self.street.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_street(&mut self) {
-        self.street.bind_mut(&mut self._common).clear();
-    }
-
-    // -- city (EXPLICIT string, proto field 2) ------------------------------
-
-    pub fn city_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
-        self.city.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_city(&mut self) {
-        self.city.bind_mut(&mut self._common).clear();
-    }
-
-    // -- postal_code (EXPLICIT fixed32, proto field 3) ----------------------
-
-    pub fn postal_code_mut(&mut self) -> impl DerefMut<Target = u32> + '_ {
-        self.postal_code.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_postal_code(&mut self) {
-        self.postal_code.bind_mut(&mut self._common).clear();
-    }
-
-    // -- latitude (EXPLICIT double, proto field 4) --------------------------
-
-    pub fn latitude_mut(&mut self) -> impl DerefMut<Target = f64> + '_ {
-        self.latitude.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_latitude(&mut self) {
-        self.latitude.bind_mut(&mut self._common).clear();
-    }
-
-    /// Replaces `self` with a clone of `src` (same allocator family).
-    pub fn copy_from(&mut self, src: &Self) {
-        *self = src.clone();
-    }
-
-    /// Encodes `self` and rebuilds it as an island-root [`AddressLazy`].
-    pub fn into_lazy(self) -> AddressLazy<A> {
-        let alloc = self._common.alloc.clone();
-        let bytes = Message::encode_to_vec(&self);
-        let mut lazy = AddressLazy::new_in(alloc);
-        lazy.merge_from(&mut bytes.as_slice())
-            .expect("self-encoded Address is a valid Address body");
-        lazy
-    }
+    };
 }
 
-impl Address<Global> {
-    pub fn new() -> Self {
-        <Self as Default>::default()
-    }
+has_address_field!(
+    FIELD_STREET,
+    street,
+    SingularField<ProtoString, Explicit<{ BIT_STREET }>, { FIELD_STREET }, A, L::StreetLen>
+);
+has_address_field!(
+    FIELD_CITY,
+    city,
+    SingularField<ProtoString, Explicit<{ BIT_CITY }>, { FIELD_CITY }, A, L::CityLen>
+);
+has_address_field!(
+    FIELD_POSTAL_CODE,
+    postal_code,
+    SingularField<ProtoFixed32, Explicit<{ BIT_POSTAL_CODE }>, { FIELD_POSTAL_CODE }, A>
+);
+has_address_field!(
+    FIELD_LATITUDE,
+    latitude,
+    SingularField<ProtoDouble, Explicit<{ BIT_LATITUDE }>, { FIELD_LATITUDE }, A>
+);
+
+pub struct Address<A: Allocator + Clone = Global> {
+    pub(crate) record: Record<AddressFields<A, Eager>, A, Eager, UnknownFields<A>>,
 }
 
-impl<A: Allocator + Clone + Default> Default for Address<A> {
-    fn default() -> Self {
-        Self::new_in(A::default())
-    }
+pub struct AddressLazy<A: Allocator + Clone = Global> {
+    pub(crate) record: Record<AddressFields<A, Lazy<A>>, A, Lazy<A>, UnknownFields<A>>,
 }
 
-// ---------------------------------------------------------------------------
-// Clone / PartialEq / Debug
-// ---------------------------------------------------------------------------
+::puroro_rt::forward_record!(eager Address);
+::puroro_rt::forward_record!(lazy AddressLazy);
 
-impl<A: Allocator + Clone> ::puroro_rt::CloneIn<A> for Address<A> {
-    fn clone_in(&self, alloc: A) -> Self {
-        let mut dst = Self::new_in(alloc.clone());
-        let mut v = CloneFieldsVisitor::new(&self._common, &dst._common);
-        let _ = self.visit_field_pairs_mut(&mut dst, &mut v);
-        let mut old = mem::replace(&mut dst._common, self._common.clone_in(alloc));
-        old.deallocate();
-        dst
+impl<A: Allocator + Clone, L: address::Layout<A> + MessageScan<A>> RecordFields<A, L>
+    for AddressFields<A, L>
+{
+    type Bits = <L as address::Layout<A>>::Bits;
+    type Unknown = UnknownFields<A>;
+    type EagerMessage = Address<A>;
+
+    const EAGER_NAME: &'static str = "Address";
+    const LAZY_NAME: &'static str = "AddressLazy";
+
+    fn empty_bits() -> Self::Bits {
+        <L as address::Layout<A>>::empty_bits()
     }
-}
 
-impl<A: Allocator + Clone> Clone for Address<A> {
-    #[inline]
-    fn clone(&self) -> Self {
-        self.clone_in(self._common.alloc.clone())
-    }
-}
-
-impl<A: Allocator + Clone> PartialEq for Address<A> {
-    fn eq(&self, other: &Self) -> bool {
-        matches!(
-            self.visit_field_pairs(
-                other,
-                &mut FieldEqVisitor::new(&self._common, &other._common)
-            ),
-            ControlFlow::Continue(())
-        ) && self._common.unknown_fields_eq(&other._common)
-    }
-}
-
-impl<A: Allocator + Clone> fmt::Debug for Address<A> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut v = DebugStructVisitor::new(f.debug_struct("Address"), &self._common);
-        let _ = self.visit_fields(&mut v);
-        v.finish()
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Drop — releases every unmanaged field through the single allocator
-// ---------------------------------------------------------------------------
-
-impl<A: Allocator + Clone, L: address::Layout<A>> AddressImpl<A, L> {
-    fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<L::Bits, A, UnknownFields<A>, L>>>(
+    fn visit_mut<V: FieldVisitorMut<MessageCommon<Self::Bits, A, Self::Unknown, L>>>(
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
@@ -254,132 +113,204 @@ impl<A: Allocator + Clone, L: address::Layout<A>> AddressImpl<A, L> {
     }
 }
 
-impl<A: Allocator + Clone, L: address::Layout<A>> Drop for AddressImpl<A, L> {
-    fn drop(&mut self) {
-        let mut v = FieldDeallocVisitor::new(&self._common);
-        let _ = self.visit_fields_mut(&mut v);
-        self._common.deallocate();
-    }
-}
-
-// ---------------------------------------------------------------------------
-// DeallocateIn — required for nested `UnmanagedBox` / catalog bounds
-// ---------------------------------------------------------------------------
-
-impl<A: Allocator + Clone> ::puroro_rt::DeallocateIn<A> for Address<A> {
-    #[inline]
-    unsafe fn deallocate_in(self, _alloc: &A) {
-        // Heap is owned by `self._common.alloc`; parent-passed `alloc` is only
-        // needed when freeing an enclosing `UnmanagedBox` slot.
-        drop(self);
-    }
-}
-
-::puroro_rt::impl_owned_slot_bounds!(Address);
-
-// ---------------------------------------------------------------------------
-// Message
-// ---------------------------------------------------------------------------
-
-impl<A: Allocator + Clone> MessageEncode for Address<A> {
-    fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
-        let mut v = EncodedLenVisitor::new(&self._common, ctx);
-        let _ = self.visit_fields(&mut v);
-        v.len + self._common.unknown_fields.len()
-    }
-
-    fn encode_raw<B: BufMut>(&self, ctx: &mut EncodeCtx, buf: &mut B) {
-        let _ = self.visit_fields(&mut EncodeRawVisitor::new(&self._common, ctx, buf));
-        let unknown: &[u8] = &self._common.unknown_fields;
-        buf.put_slice(unknown);
-    }
-}
-
-impl<A: Allocator + Clone> MessageMerge for Address<A> {
-    fn merge_from_with_depth<B: DecodeBuf>(
-        &mut self,
-        buf: &mut B,
-        depth: usize,
-    ) -> Result<(), DecodeError> {
-        if depth >= ::puroro::RECURSION_LIMIT {
-            return Err(DecodeError::RecursionLimitExceeded);
-        }
-        while buf.has_remaining() {
-            let (field_number, wire_type) = decode_tag(buf)?;
-            match field_number.as_u32() {
-                FIELD_STREET => {
-                    // street = 1, EXPLICIT string
-                    self.street
-                        .bind_mut(&mut self._common)
-                        .merge(wire_type, buf, depth)?;
-                }
-                FIELD_CITY => {
-                    // city = 2, EXPLICIT string
-                    self.city
-                        .bind_mut(&mut self._common)
-                        .merge(wire_type, buf, depth)?;
-                }
-                FIELD_POSTAL_CODE => {
-                    // postal_code = 3, EXPLICIT fixed32
-                    self.postal_code
-                        .bind_mut(&mut self._common)
-                        .merge(wire_type, buf, depth)?;
-                }
-                FIELD_LATITUDE => {
-                    // latitude = 4, EXPLICIT double
-                    self.latitude
-                        .bind_mut(&mut self._common)
-                        .merge(wire_type, buf, depth)?;
-                }
-                _ => {
-                    // unknown field — preserve in _common.unknown_fields
-                    skip_field_and_save(
-                        field_number,
-                        wire_type,
-                        buf,
-                        &mut self._common.unknown_fields,
-                        self._common.alloc.clone(),
-                    )?
+macro_rules! impl_address_build {
+    ($layout:ty) => {
+        impl<A: Allocator + Clone> ConstructRecordFields<A, $layout> for AddressFields<A, $layout> {
+            fn new(alloc: A) -> Self {
+                Self {
+                    street: SingularField::new_in(alloc.clone()),
+                    city: SingularField::new_in(alloc.clone()),
+                    postal_code: SingularField::new_in(alloc.clone()),
+                    latitude: SingularField::new_in(alloc),
+                    _layout: PhantomData,
                 }
             }
         }
-        Ok(())
+
+        impl<A: Allocator + Clone> CloneRecordFields<A, $layout> for AddressFields<A, $layout> {
+            fn clone_fields(
+                &self,
+                dst: &mut Self,
+                src_common: &MessageCommon<Self::Bits, A, Self::Unknown, $layout>,
+                dst_common: &MessageCommon<Self::Bits, A, Self::Unknown, $layout>,
+                alloc: A,
+            ) {
+                clone_address_slot!(self, dst, src_common, dst_common, alloc, street);
+                clone_address_slot!(self, dst, src_common, dst_common, alloc, city);
+                clone_address_slot!(self, dst, src_common, dst_common, alloc, postal_code);
+                clone_address_slot!(self, dst, src_common, dst_common, alloc, latitude);
+            }
+        }
+    };
+}
+
+macro_rules! clone_address_slot {
+    ($self:ident, $dst:ident, $src_common:ident, $dst_common:ident, $alloc:ident, $name:ident) => {{
+        let new = FieldCloneIn::clone_field(&$self.$name, $src_common, $alloc.clone());
+        let mut old = mem::replace(&mut $dst.$name, new);
+        FieldDeallocate::deallocate(&mut old, $dst_common);
+    }};
+}
+
+impl_address_build!(Eager);
+impl_address_build!(Lazy<A>);
+
+impl<A: Allocator + Clone> EagerRecordFields<A> for AddressFields<A, Eager> {
+    fn visit_fields<V: FieldVisitor<MessageCommon<Self::Bits, A, Self::Unknown, Eager>>>(
+        &self,
+        v: &mut V,
+    ) -> ControlFlow<V::Break> {
+        v.visit("street", &self.street)?;
+        v.visit("city", &self.city)?;
+        v.visit("postal_code", &self.postal_code)?;
+        v.visit("latitude", &self.latitude)?;
+        ControlFlow::Continue(())
+    }
+
+    fn visit_pairs<V: FieldPairVisitor<MessageCommon<Self::Bits, A, Self::Unknown, Eager>>>(
+        &self,
+        other: &Self,
+        v: &mut V,
+    ) -> ControlFlow<V::Break> {
+        v.visit("street", &self.street, &other.street)?;
+        v.visit("city", &self.city, &other.city)?;
+        v.visit("postal_code", &self.postal_code, &other.postal_code)?;
+        v.visit("latitude", &self.latitude, &other.latitude)?;
+        ControlFlow::Continue(())
+    }
+
+    fn merge_known<B: DecodeBuf>(
+        &mut self,
+        common: &mut MessageCommon<Self::Bits, A, Self::Unknown, Eager>,
+        field_number: u32,
+        wire_type: WireType,
+        buf: &mut B,
+        depth: usize,
+    ) -> Result<bool, DecodeError> {
+        match field_number {
+            FIELD_STREET => {
+                <Self as HasField<{ FIELD_STREET }>>::field_mut(self)
+                    .bind_mut(common)
+                    .merge(wire_type, buf, depth)?;
+                Ok(true)
+            }
+            FIELD_CITY => {
+                <Self as HasField<{ FIELD_CITY }>>::field_mut(self)
+                    .bind_mut(common)
+                    .merge(wire_type, buf, depth)?;
+                Ok(true)
+            }
+            FIELD_POSTAL_CODE => {
+                <Self as HasField<{ FIELD_POSTAL_CODE }>>::field_mut(self)
+                    .bind_mut(common)
+                    .merge(wire_type, buf, depth)?;
+                Ok(true)
+            }
+            FIELD_LATITUDE => {
+                <Self as HasField<{ FIELD_LATITUDE }>>::field_mut(self)
+                    .bind_mut(common)
+                    .merge(wire_type, buf, depth)?;
+                Ok(true)
+            }
+            _ => Ok(false),
+        }
     }
 }
 
-impl<A: Allocator + Clone> ::puroro_rt::DefaultIn<A> for Address<A> {
-    #[inline]
-    fn default_in(alloc: A) -> Self {
-        Self::new_in(alloc)
+impl<A: Allocator + Clone> LazyRecordApply<A> for AddressFields<A, Lazy<A>> {
+    fn apply_record(
+        &mut self,
+        common: &mut MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A>>,
+        rec: &ScannedRecord,
+        origin: usize,
+    ) -> Result<(), DecodeError> {
+        match rec.field_number.as_u32() {
+            FIELD_STREET => {
+                let span = scanned_len_span(origin, rec)?;
+                <Self as HasField<{ FIELD_STREET }>>::field_mut(self).store_len_span(span, common);
+                Ok(())
+            }
+            FIELD_CITY => {
+                let span = scanned_len_span(origin, rec)?;
+                <Self as HasField<{ FIELD_CITY }>>::field_mut(self).store_len_span(span, common);
+                Ok(())
+            }
+            FIELD_POSTAL_CODE => <Self as HasField<{ FIELD_POSTAL_CODE }>>::field_mut(self)
+                .bind_mut(common)
+                .merge_scanned(&rec.value),
+            FIELD_LATITUDE => <Self as HasField<{ FIELD_LATITUDE }>>::field_mut(self)
+                .bind_mut(common)
+                .merge_scanned(&rec.value),
+            _ => common.on_unrecognized_tag(rec.field_number.as_u32()),
+        }
     }
 }
 
-impl<A: Allocator + Clone> Message for Address<A> {
-    type Alloc = A;
-
-    fn new_in(alloc: A) -> Self
+impl<A: Allocator + Clone> Address<A> {
+    pub fn street<'a>(&'a self) -> ::puroro::Optional<&'a str, impl ::puroro::HasDefault<&'a str>>
     where
-        A: Clone,
+        A: 'a,
     {
-        Self::new_in(alloc)
+        self.record.field::<{ FIELD_STREET }>().optional()
     }
 
-    fn encode<B: BufMut>(&self, buf: &mut B) {
-        ::puroro_rt::encode_message(self, buf)
-    }
-
-    fn encode_to_vec(&self) -> Vec<u8> {
-        ::puroro_rt::encode_message_to_vec(self)
-    }
-
-    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError>
+    pub fn city<'a>(&'a self) -> ::puroro::Optional<&'a str, impl ::puroro::HasDefault<&'a str>>
     where
-        A: Clone,
+        A: 'a,
     {
-        ::puroro_rt::merge_message(self, buf)
+        self.record.field::<{ FIELD_CITY }>().optional()
     }
 
-    fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
-        self._common.iter_unknown_fields()
+    pub fn postal_code<'a>(&'a self) -> ::puroro::Optional<u32, impl ::puroro::HasDefault<u32>>
+    where
+        A: 'a,
+    {
+        self.record.field::<{ FIELD_POSTAL_CODE }>().optional()
+    }
+
+    pub fn latitude<'a>(&'a self) -> ::puroro::Optional<f64, impl ::puroro::HasDefault<f64>>
+    where
+        A: 'a,
+    {
+        self.record.field::<{ FIELD_LATITUDE }>().optional()
+    }
+
+    pub fn street_mut<'s>(&'s mut self) -> impl ::puroro::StringMut<A> + 's {
+        self.record.field_mut::<{ FIELD_STREET }>().value_mut()
+    }
+
+    pub fn clear_street(&mut self) {
+        self.record.field_mut::<{ FIELD_STREET }>().clear();
+    }
+
+    pub fn city_mut<'s>(&'s mut self) -> impl ::puroro::StringMut<A> + 's {
+        self.record.field_mut::<{ FIELD_CITY }>().value_mut()
+    }
+
+    pub fn clear_city(&mut self) {
+        self.record.field_mut::<{ FIELD_CITY }>().clear();
+    }
+
+    pub fn postal_code_mut<'s>(&'s mut self) -> impl DerefMut<Target = u32> + 's {
+        self.record.field_mut::<{ FIELD_POSTAL_CODE }>().value_mut()
+    }
+
+    pub fn clear_postal_code(&mut self) {
+        self.record.field_mut::<{ FIELD_POSTAL_CODE }>().clear();
+    }
+
+    pub fn latitude_mut<'s>(&'s mut self) -> impl DerefMut<Target = f64> + 's {
+        self.record.field_mut::<{ FIELD_LATITUDE }>().value_mut()
+    }
+
+    pub fn clear_latitude(&mut self) {
+        self.record.field_mut::<{ FIELD_LATITUDE }>().clear();
+    }
+
+    /// Encodes `self` and rebuilds it as the lazy alias.
+    pub fn into_lazy(self) -> AddressLazy<A> {
+        AddressLazy {
+            record: Record::encode_lazy(self.record),
+        }
     }
 }

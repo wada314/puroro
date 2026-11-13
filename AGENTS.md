@@ -11,7 +11,7 @@ Instructions for coding agents working in this repository. Human-oriented docs s
 | `puroro` (workspace root) | Stable user API (`Message`, `Optional`, errors) |
 | `puroro-rt` | Generated-code field catalog and wire helpers |
 | `protoc-gen-puroro` | `protoc` plugin (`--puroro_out`) |
-| `sample-generated` | Hand-written reference output (`Task` / `Address`) |
+| `sample-generated` | Hand-written reference (`Task` / `Address`) on the plugin's `*Fields` + `Record` shell |
 | `puroro-codegen-tests` | Live plugin fixtures (`fixtures/<case>/`) |
 | `protobuf-core` | Git submodule — wire primitives |
 | `unmanaged` | Git submodule — allocator-less containers that panic on implicit `Drop` |

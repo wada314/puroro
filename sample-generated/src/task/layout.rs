@@ -1,4 +1,4 @@
-//! Per-ingest **kinds** for [`TaskImpl`](crate::task_type::TaskImpl).
+//! Per-ingest **kinds** for [`Task`](crate::Task) / [`TaskLazy`](crate::TaskLazy).
 //!
 //! [`Eager`](::puroro_rt::Eager) / [`Lazy`](::puroro_rt::Lazy) already select
 //! [`MessageCommon`](::puroro_rt::MessageCommon) ingest. This trait only names
@@ -6,13 +6,15 @@
 //!
 //! - singular string / bytes value slot (`InlineOrHeap` vs `WireOrSso`)
 //! - repeated / map storage (`*Ready` vs `*Spans`)
-//! - nested message type (`*Impl<A, Eager>` vs `*Impl<A, Lazy<A>>`)
+//! - nested message type (`Point<A>` / `PointLazy<A>`, `Address<A>` / `AddressLazy<A>`)
 //! - oneof string slots and `postal` child
 //!
-//! Field wrappers themselves live on [`TaskImpl`](crate::task_type::TaskImpl).
+//! Field wrappers live on `TaskFields` (crate-private).
+//! [`Task`](crate::Task) / [`TaskLazy`](crate::TaskLazy) are newtypes over
+//! [`puroro_rt::Record`].
 //!
 //! Not a [`MessageScan`](::puroro_rt::decode::MessageScan) supertrait.
-//! [`TaskImpl`](crate::task_type::TaskImpl) requires `A: Clone` on the struct,
+//! [`Task`](crate::Task) requires `A: Clone` on the struct,
 //! together with every other generated message.
 
 use ::allocator_api2::alloc::Allocator;
@@ -24,8 +26,10 @@ use ::puroro_rt::{
     RepeatedLayout, RepeatedReady, RepeatedSpans, ValueLayout, WireOrSso,
 };
 
-use crate::AddressImpl;
-use crate::PointImpl;
+use crate::Address;
+use crate::AddressLazy;
+use crate::Point;
+use crate::PointLazy;
 
 use super::{
     BIT_EMAIL_ADDRESS_LAZY_KIND, BIT_EMAIL_ADDRESS_SSO, BIT_OWNER_ID_LAZY_KIND, BIT_OWNER_ID_SSO,
@@ -48,15 +52,15 @@ pub trait Layout<A: Allocator>: Sized {
     /// Map storage (`MapReady` or `MapSpans`).
     type Map: MapLayout<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>;
 
-    /// Nested `origin` message (`PointImpl<A, Eager>` or `PointImpl<A, Lazy<A>>`).
+    /// Nested `origin` message (`Point<A>` or `PointLazy<A>`).
     type OriginMsg: MessageEncode + DeallocateBound<A>;
-    /// Nested `watchers` element (`AddressImpl<A, Eager>` or `AddressImpl<A, Lazy<A>>`).
+    /// Nested `watchers` element (`Address<A>` or `AddressLazy<A>`).
     type WatchersMsg: MessageEncode + DeallocateBound<A> + DeallocateIn<A>;
 
     /// `notification` string slots (`InlineOrHeap<{SSO}>` or `WireOrSso<{KIND}>`).
     type EmailLen: ValueLayout<ProtoString, A>;
     type PhoneLen: ValueLayout<ProtoString, A>;
-    /// `notification.postal` (`AddressImpl<A, Eager>` or `AddressImpl<A, Lazy<A>>`).
+    /// `notification.postal` (`Address<A>` or `AddressLazy<A>`).
     type PostalMsg: MessageEncode + DeallocateBound<A> + DeallocateIn<A>;
 
     fn empty_bits() -> Self::Bits;
@@ -69,11 +73,11 @@ impl<A: Allocator + Clone> Layout<A> for Eager {
     type PayloadLen = InlineOrHeap<{ BIT_PAYLOAD_SSO }>;
     type Repeated = RepeatedReady;
     type Map = MapReady;
-    type OriginMsg = PointImpl<A, Eager>;
-    type WatchersMsg = AddressImpl<A, Eager>;
+    type OriginMsg = Point<A>;
+    type WatchersMsg = Address<A>;
     type EmailLen = InlineOrHeap<{ BIT_EMAIL_ADDRESS_SSO }>;
     type PhoneLen = InlineOrHeap<{ BIT_PHONE_NUMBER_SSO }>;
-    type PostalMsg = AddressImpl<A, Eager>;
+    type PostalMsg = Address<A>;
 
     #[inline]
     fn empty_bits() -> Self::Bits {
@@ -88,11 +92,11 @@ impl<A: Allocator + Clone> Layout<A> for Lazy<A> {
     type PayloadLen = WireOrSso<{ BIT_PAYLOAD_LAZY_KIND }>;
     type Repeated = RepeatedSpans;
     type Map = MapSpans;
-    type OriginMsg = PointImpl<A, Lazy<A>>;
-    type WatchersMsg = AddressImpl<A, Lazy<A>>;
+    type OriginMsg = PointLazy<A>;
+    type WatchersMsg = AddressLazy<A>;
     type EmailLen = WireOrSso<{ BIT_EMAIL_ADDRESS_LAZY_KIND }>;
     type PhoneLen = WireOrSso<{ BIT_PHONE_NUMBER_LAZY_KIND }>;
-    type PostalMsg = AddressImpl<A, Lazy<A>>;
+    type PostalMsg = AddressLazy<A>;
 
     #[inline]
     fn empty_bits() -> Self::Bits {
