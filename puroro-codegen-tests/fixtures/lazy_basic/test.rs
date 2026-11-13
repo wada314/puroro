@@ -3,6 +3,7 @@
 use crate::lazy_basic::{Child, ChildLazy, Note, NoteLazy};
 use ::allocator_api2::alloc::Global;
 use puroro::{Message, RepeatedStringMut, StringMut};
+use ::puroro_rt::decode::LazyMessage;
 
 #[test]
 fn eager_round_trip_and_lazy_pin() {
@@ -58,6 +59,15 @@ fn _pinned_is_lazy(slot: &mut ChildLazy<Global>) {
 
 fn _child_is_eager(slot: &mut Child<Global>) {
     let _ = slot;
+}
+
+#[test]
+fn lazy_validate_without_required_does_not_scan() {
+    let mut lazy = NoteLazy::<Global>::new();
+    lazy.validate().expect("empty lazy message");
+    LazyMessage::push(&mut lazy, &[]).expect("empty chunk");
+    lazy.validate()
+        .expect("no required fields, so an unfinished lazy message stays Ok");
 }
 
 #[test]

@@ -1,12 +1,30 @@
 //! proto2 `required` → `LegacyRequired` / boxed message `validate()`.
 
-use crate::proto2_required::RequiredOwner;
+use crate::proto2_required::{RequiredOwner, RequiredOwnerLazy};
+use ::allocator_api2::alloc::Global;
 use ::puroro::{BytesMut, DecodeError, Message};
+use ::puroro_rt::decode::LazyMessage;
 
 fn set_all_required(msg: &mut RequiredOwner) {
     msg.owner_mut().set(b"alice");
     let _ = msg.addr_mut();
     let _ = msg.pos_mut();
+}
+
+#[test]
+fn lazy_unset_scans_then_fails_validate() {
+    let msg = RequiredOwnerLazy::<Global>::new();
+    assert!(matches!(
+        msg.validate(),
+        Err(DecodeError::MissingRequiredField { field_number: 1 })
+    ));
+
+    let mut unfinished = RequiredOwnerLazy::<Global>::new();
+    LazyMessage::push(&mut unfinished, &[]).expect("empty chunk");
+    assert!(matches!(
+        unfinished.validate(),
+        Err(DecodeError::UnfinishedMessage)
+    ));
 }
 
 #[test]

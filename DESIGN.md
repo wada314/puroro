@@ -218,13 +218,13 @@ pub trait Message: Sized {
 
 This section is the normative reference for what the code generator emits. All field patterns are illustrated using a single **editions** reference schema, since editions can express every variant (implicit/explicit presence, custom defaults, required-like semantics, open/closed enums, packed/expanded repeated) in one file.
 
-This section is the **normative** eager-path shape. The lazy alias uses the same field names with `Result` getters and no mutators ([§8](#tasklaya--lazy-parse-timing)). Hand-written [`sample-generated/`](sample-generated/) is the reference implementation; the live `protoc-gen-puroro` plugin emits both aliases (status: [IMPLEMENTATION.md §3](IMPLEMENTATION.md#3-implementation-status)). Deliberate sample-vs-production differences — flat modules, short-name `use`s, no `@generated` header — are documented there and in [IMPLEMENTATION.md §9](IMPLEMENTATION.md#9-struct-layout). For each message type the generator must emit:
+This section is the **normative** shape of what `protoc-gen-puroro` emits. The shell is two newtypes around [`puroro_rt::Record`](puroro-rt/src/message_record.rs). The lazy alias uses the same field names with `Result` getters and no mutators ([§8](#tasklaya--lazy-parse-timing)). Hand-written [`sample-generated/`](sample-generated/) still uses one `TaskImpl<A, L>` that owns both the common state and the slots. That crate is a readable stand-in for field behavior, not the shell the plugin emits. Other sample-vs-production differences — flat modules, short-name `use`s, no `@generated` header — are documented in [IMPLEMENTATION.md §9](IMPLEMENTATION.md#9-struct-layout). For each message type the generator must emit:
 
-1. **The primary struct** — a full-featured owned implementation (§4.0–4.10), internally a product of **`puroro_rt::fields` catalog types** + shared `MessageCommon` (see [IMPLEMENTATION.md §2](IMPLEMENTATION.md#2-architecture-overview)). Field accessors are **inherent methods** on that struct.
-2. **The lazy alias** — `TaskLazy<A> = TaskImpl<A, Lazy<A>>`, same field names, `Result<_, DecodeError>` getters, no `_mut` ([§8](#tasklaya--lazy-parse-timing)). [`sample-generated/`](sample-generated/) is the reference shape; the plugin emits the same pair of aliases.
+1. **The primary struct** — `Task<A>`, a newtype around `puroro_rt::Record<TaskFields<A, Eager>, …>` (§4.0–4.10). Slots are **`puroro_rt::fields` catalog types** on `TaskFields` (see [IMPLEMENTATION.md §2](IMPLEMENTATION.md#2-architecture-overview)). Field accessors are **inherent methods** on `Task`.
+2. **The lazy message** — `TaskLazy<A>`, same field names, `Result<_, DecodeError>` getters, no `_mut` ([§8](#tasklaya--lazy-parse-timing)). The plugin emits `TaskFields<A, L>` for the slots and the `Task<A>` / `TaskLazy<A>` newtypes. `TaskFields` is `pub(crate)`. [`sample-generated/`](sample-generated/) does not use this shell.
 3. **(Future) Per-message traits** — `foo::Message` / `foo::MessageFallible` (in that message's companion module) ([§8](#8-future-work)). The plugin does not emit those traits. The handwritten sample implements `task::MessageFallible` on eager `Task` only. A borrowing view is not part of this sample; the measured `Address` spike is [`archive/address-view-spike`](archive/address-view-spike/).
 
-Generated Rust is not hand-edited. Navigational comments in generated output are **not required**; semantics and usage are documented on the library API (`puroro` / `puroro-rt` rustdoc) and in this document / [IMPLEMENTATION.md](IMPLEMENTATION.md). Production modules still carry an `@generated` file header ([IMPLEMENTATION.md §9](IMPLEMENTATION.md#generated-headers)). Reference shape: [`sample-generated/`](sample-generated/).
+Generated Rust is not hand-edited. Navigational comments in generated output are **not required**; semantics and usage are documented on the library API (`puroro` / `puroro-rt` rustdoc) and in this document / [IMPLEMENTATION.md](IMPLEMENTATION.md). Production modules still carry an `@generated` file header ([IMPLEMENTATION.md §9](IMPLEMENTATION.md#generated-headers)). The shell reference is the plugin's `Record` newtypes ([IMPLEMENTATION.md §9](IMPLEMENTATION.md#9-struct-layout)). [`sample-generated/`](sample-generated/) remains the hand-written `TaskImpl` stand-in.
 
 ### Module layout and naming
 
@@ -1398,14 +1398,19 @@ Every message has an eager alias and a lazy alias. A borrowing `TaskView<'buf>` 
 
 #### `TaskLazy<A>` — lazy parse timing
 
-Shipped, on the sample and in the plugin. The two aliases are one struct:
+Shipped, on the sample and in the plugin. The plugin's two messages share one field struct and one library shell:
 
 ```rust
-pub type Task<A = Global> = TaskImpl<A, Eager>;
-pub type TaskLazy<A = Global> = TaskImpl<A, Lazy<A>>;
+pub struct TaskFields<A: Allocator + Clone = Global, L: task::Layout<A> = Eager> { /* slots */ }
+pub struct Task<A: Allocator + Clone = Global> {
+    record: puroro_rt::Record<TaskFields<A, Eager>, A, Eager, UnknownFields<A>>,
+}
+pub struct TaskLazy<A: Allocator + Clone = Global> {
+    record: puroro_rt::Record<TaskFields<A, Lazy<A>>, A, Lazy<A>, UnknownFields<A>>,
+}
 ```
 
-Eager and lazy are not a runtime enum inside `Task`. Slots that must differ (string / bytes, repeated LEN, maps, follow-parent children) are associated types on the companion `Layout` trait. Numericals, enums, and bools use the same catalog slots on both aliases.
+`record` is private. `puroro_rt::forward_record!` forwards `Clone`, `Message`, and the other shell traits onto `Record`. Getters stay inherent on `Task` / `TaskLazy`. The hand-written sample still uses `type Task<A> = TaskImpl<A, Eager>` instead of this newtype. Eager and lazy are not a runtime enum inside `Task`. Slots that must differ (string / bytes, repeated LEN, maps, follow-parent children) are associated types on the companion `Layout` trait. Numericals, enums, and bools use the same catalog slots on both aliases.
 
 `TaskLazy` is read-oriented. It has no `_mut` or `clear_*`. To mutate, call `into_eager(self) -> Result<Task<A>, DecodeError>` and use the eager API. The implementation lock, including what v1 still does not do, is [`.cursor/plans/lazy-decoder.md`](.cursor/plans/lazy-decoder.md).
 
