@@ -32,7 +32,9 @@ use crate::ProtoString;
 ///
 /// On `*Fields`, ordinary numbers return `&SingularField` / `&RepeatedField` /
 /// `&MapField`, and oneof numbers return [`OneofFieldRef`] / [`OneofFieldMut`].
-/// [`Record::field`](crate::Record::field) binds that projection to `MessageCommon`.
+/// [`Record`](crate::Record) does not implement this trait.
+/// [`Record::field`](crate::Record::field) binds that projection to `MessageCommon`
+/// for the lifetime of `&self`.
 pub trait HasField<const N: u32> {
     /// Borrowed projection of field `N`.
     type Ref<'a>

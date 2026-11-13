@@ -1266,7 +1266,7 @@ fn field_expr(companion: &Ident, field_const: &Ident) -> TokenStream {
     }
 }
 
-/// Bound view of field `N` on `&self.record` (`HasField` for `Record`).
+/// Bound view from `self.record.field::<N>()`. `Record` does not implement `HasField`.
 pub(super) fn eager_field(companion: &Ident, field_const: &Ident) -> TokenStream {
     bound_record_field(companion, field_const, false)
 }
