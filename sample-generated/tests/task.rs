@@ -791,7 +791,7 @@ fn inlined_origin_roundtrip_and_assign() {
     let mut p = Point::new();
     *p.x_mut() = 11;
     *p.y_mut() = 13;
-    task.origin_mut().copy_from(&p);
+    *task.origin_mut() = p;
     assert_eq!(task.origin().unwrap().x(), 11);
     assert_eq!(task.origin().unwrap().y(), 13);
 

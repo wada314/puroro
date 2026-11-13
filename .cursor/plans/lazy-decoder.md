@@ -1,9 +1,11 @@
 # Plan: Lazy decoder (`TaskLazy`)
 
-**Status (2026-10-12).** Steps 1–9 are done. The sample and the plugin both
-emit `Name` / `NameLazy` as `NameImpl<A, Eager>` / `NameImpl<A, Lazy<A>>`.
-[DESIGN.md §8](../../DESIGN.md#tasklaya--lazy-parse-timing) describes that
-alias. The per-field `FieldCache` machine is rejected; do not revive it.
+**Status (2026-11-13).** Steps 1–9 are done. The sample and the plugin both
+use `NameFields<A, L>` plus `Name<A>` / `NameLazy<A>` newtypes over
+`puroro_rt::Record`. The 2026-10-12 `NameImpl<A, L>` shell is gone; do not
+put it back. [DESIGN.md §8](../../DESIGN.md#tasklaya--lazy-parse-timing)
+describes the alias. The per-field `FieldCache` machine is rejected; do not
+revive it.
 
 Updated (2026-10-19): `RecordScanner` emits [`ScannedRecord`](../../puroro-rt/src/decode/record.rs)
 / [`ScannedValue`](../../puroro-rt/src/decode/record.rs). LEN is `payload_len`

@@ -1,253 +1,73 @@
-//! Inherent API for [`AddressLazy`](crate::AddressLazy) (`AddressImpl<A, Lazy<A>>`).
+//! Inherent API for [`AddressLazy`](crate::AddressLazy).
 //!
-//! Numericals apply during scan; strings use WireOrSso. Getters call
-//! [`LazyMessage::ensure_scanned`](::puroro_rt::decode::LazyMessage::ensure_scanned).
-//! `into_eager` re-merges `_wire` into [`Address`](crate::Address).
+//! String getters read spans out of `_wire`. Numerical getters bind the slot
+//! to message common after [`LazyMessage::ensure_scanned`].
 
-use ::allocator_api2::alloc::{Allocator, Global};
-use ::bytes::{Buf, BufMut};
-use ::core::fmt::{self, Debug, Formatter};
-use ::core::iter;
-use ::puroro::{DecodeBuf, DecodeError, HasDefault, Message, Optional, RECURSION_LIMIT};
-use ::puroro_rt::decode::{LazyMessage, LazyScan, ScannedRecord, scanned_len_span};
-use ::puroro_rt::{
-    CloneIn, DeallocateIn, DefaultIn, EncodeCtx, FieldCloneIn, InteriorBitArray, LazyMessageCommon,
-    MessageEncode, MessageMerge, SingularField,
-};
-use ::std::vec::Vec;
+use ::allocator_api2::alloc::Allocator;
+use ::puroro::{DecodeError, HasDefault, Optional};
+use ::puroro_rt::decode::LazyMessage;
+use ::puroro_rt::{HasField, Lazy, Record};
 
 use crate::Address;
 use crate::AddressLazy;
-use crate::address::{
-    BIT_CITY, BIT_STREET, FIELD_CITY, FIELD_LATITUDE, FIELD_POSTAL_CODE, FIELD_STREET,
-};
-
-impl<A: Allocator + Clone + Default> Default for AddressLazy<A> {
-    fn default() -> Self {
-        Self::new_in(A::default())
-    }
-}
-
-impl AddressLazy<Global> {
-    pub fn new() -> Self {
-        Self::new_in(Global)
-    }
-}
+use crate::address::{FIELD_CITY, FIELD_LATITUDE, FIELD_POSTAL_CODE, FIELD_STREET};
+use crate::address_type::AddressFields;
 
 impl<A: Allocator + Clone> AddressLazy<A> {
-    pub fn street(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
+    pub fn street<'a>(&'a self) -> Result<Optional<&'a str, impl HasDefault<&'a str>>, DecodeError>
     where
-        A: Clone,
+        A: 'a,
     {
-        self.ensure_scanned()?;
-        self.street
-            .try_str(&self._common, self._common.lazy.scan.wire())
+        LazyMessage::ensure_scanned(self)?;
+        <AddressFields<A, Lazy<A>> as HasField<{ FIELD_STREET }>>::field(&self.record.fields)
+            .try_str(&self.record.common, self.record.common.lazy.scan.wire())
     }
 
-    pub fn has_street(&self) -> Result<bool, DecodeError>
+    pub fn has_street(&self) -> Result<bool, DecodeError> {
+        LazyMessage::ensure_scanned(self)?;
+        Ok(
+            <AddressFields<A, Lazy<A>> as HasField<{ FIELD_STREET }>>::field(&self.record.fields)
+                .is_present(&self.record.common),
+        )
+    }
+
+    pub fn city<'a>(&'a self) -> Result<Optional<&'a str, impl HasDefault<&'a str>>, DecodeError>
     where
-        A: Clone,
+        A: 'a,
     {
-        self.ensure_scanned()?;
-        Ok(self._common.is_bit_set(BIT_STREET))
+        LazyMessage::ensure_scanned(self)?;
+        <AddressFields<A, Lazy<A>> as HasField<{ FIELD_CITY }>>::field(&self.record.fields)
+            .try_str(&self.record.common, self.record.common.lazy.scan.wire())
     }
 
-    pub fn city(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
+    pub fn has_city(&self) -> Result<bool, DecodeError> {
+        LazyMessage::ensure_scanned(self)?;
+        Ok(
+            <AddressFields<A, Lazy<A>> as HasField<{ FIELD_CITY }>>::field(&self.record.fields)
+                .is_present(&self.record.common),
+        )
+    }
+
+    pub fn postal_code<'a>(&'a self) -> Result<Optional<u32, impl HasDefault<u32>>, DecodeError>
     where
-        A: Clone,
+        A: 'a,
     {
-        self.ensure_scanned()?;
-        self.city
-            .try_str(&self._common, self._common.lazy.scan.wire())
+        LazyMessage::ensure_scanned(self)?;
+        Ok(self.record.field::<{ FIELD_POSTAL_CODE }>().optional())
     }
 
-    pub fn has_city(&self) -> Result<bool, DecodeError>
+    pub fn latitude<'a>(&'a self) -> Result<Optional<f64, impl HasDefault<f64>>, DecodeError>
     where
-        A: Clone,
+        A: 'a,
     {
-        self.ensure_scanned()?;
-        Ok(self._common.is_bit_set(BIT_CITY))
+        LazyMessage::ensure_scanned(self)?;
+        Ok(self.record.field::<{ FIELD_LATITUDE }>().optional())
     }
 
-    pub fn postal_code(&self) -> Result<Optional<u32, impl HasDefault<u32>>, DecodeError>
-    where
-        A: Clone,
-    {
-        self.ensure_scanned()?;
-        Ok(self.postal_code.bind(&self._common).optional())
-    }
-
-    pub fn latitude(&self) -> Result<Optional<f64, impl HasDefault<f64>>, DecodeError>
-    where
-        A: Clone,
-    {
-        self.ensure_scanned()?;
-        Ok(self.latitude.bind(&self._common).optional())
-    }
-}
-
-impl<A: Allocator + Clone> AddressLazy<A> {
-    pub fn new_in(alloc: A) -> Self {
-        Self {
-            _common: LazyMessageCommon::new_in(InteriorBitArray::zero(), alloc.clone()),
-            street: SingularField::new_in(alloc.clone()),
-            city: SingularField::new_in(alloc.clone()),
-            postal_code: SingularField::new_in(alloc.clone()),
-            latitude: SingularField::new_in(alloc),
-        }
-    }
-
-    /// Decode every field from `_wire` into an eager [`Address`].
+    /// Decode `_wire` into the eager message.
     pub fn into_eager(self) -> Result<Address<A>, DecodeError> {
-        self._common.lazy.scan.require_finished()?;
-        let mut eager = Address::new_in(self._common.alloc.clone());
-        self._common.lazy.scan.for_each_body(|chunk| {
-            let mut buf = chunk;
-            Message::merge_from(&mut eager, &mut buf)
-        })?;
-        Ok(eager)
-    }
-}
-
-impl<A: Allocator + Clone> LazyMessage<A> for AddressLazy<A> {
-    fn scan(&self) -> &LazyScan<A> {
-        &self._common.lazy.scan
-    }
-
-    fn scan_mut(&mut self) -> &mut LazyScan<A> {
-        &mut self._common.lazy.scan
-    }
-
-    fn apply_record(&mut self, rec: &ScannedRecord, origin: usize) -> Result<(), DecodeError> {
-        match rec.field_number.as_u32() {
-            FIELD_STREET => {
-                let span = scanned_len_span(origin, rec)?;
-                self.street.store_len_span(span, &mut self._common);
-                Ok(())
-            }
-            FIELD_CITY => {
-                let span = scanned_len_span(origin, rec)?;
-                self.city.store_len_span(span, &mut self._common);
-                Ok(())
-            }
-            FIELD_POSTAL_CODE => self
-                .postal_code
-                .bind_mut(&mut self._common)
-                .merge_scanned(&rec.value),
-            FIELD_LATITUDE => self
-                .latitude
-                .bind_mut(&mut self._common)
-                .merge_scanned(&rec.value),
-            _ => Ok(()),
-        }
-    }
-}
-
-impl<A: Allocator + Clone> CloneIn<A> for AddressLazy<A> {
-    fn clone_in(&self, alloc: A) -> Self {
-        Self {
-            _common: self._common.clone_in(alloc.clone()),
-            street: self.street.clone_field(&self._common, alloc.clone()),
-            city: self.city.clone_field(&self._common, alloc.clone()),
-            postal_code: self.postal_code.clone_field(&self._common, alloc.clone()),
-            latitude: self.latitude.clone_field(&self._common, alloc),
-        }
-    }
-}
-
-impl<A: Allocator + Clone> Clone for AddressLazy<A> {
-    fn clone(&self) -> Self {
-        self.clone_in(self._common.alloc.clone())
-    }
-}
-
-impl<A: Allocator + Clone> PartialEq for AddressLazy<A> {
-    fn eq(&self, other: &Self) -> bool {
-        LazyMessage::eq_with_eager(self, other, |msg| msg.clone().into_eager())
-    }
-}
-
-impl<A: Allocator + Clone> Debug for AddressLazy<A> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        if self.ensure_scanned().is_err() {
-            return f.debug_struct("AddressLazy").finish_non_exhaustive();
-        }
-        match self.clone().into_eager() {
-            Ok(eager) => Debug::fmt(&eager, f),
-            Err(_) => f.debug_struct("AddressLazy").finish_non_exhaustive(),
-        }
-    }
-}
-
-impl<A: Allocator + Clone> DeallocateIn<A> for AddressLazy<A> {
-    #[inline]
-    unsafe fn deallocate_in(self, _alloc: &A) {
-        drop(self);
-    }
-}
-
-::puroro_rt::impl_owned_slot_bounds!(AddressLazy);
-
-impl<A: Allocator + Clone> MessageEncode for AddressLazy<A> {
-    fn encoded_len(&self, _ctx: &mut EncodeCtx) -> usize {
-        self._common.lazy.scan.body_len()
-    }
-
-    fn encode_raw<B: BufMut>(&self, _ctx: &mut EncodeCtx, buf: &mut B) {
-        self._common
-            .lazy
-            .scan
-            .write_bodies(buf)
-            .expect("lazy wire span out of range");
-    }
-}
-
-impl<A: Allocator + Clone> MessageMerge for AddressLazy<A> {
-    fn merge_from_with_depth<B: DecodeBuf>(
-        &mut self,
-        buf: &mut B,
-        depth: usize,
-    ) -> Result<(), DecodeError> {
-        if depth >= RECURSION_LIMIT {
-            return Err(DecodeError::RecursionLimitExceeded);
-        }
-        LazyMessage::ingest_buf(self, buf)
-    }
-}
-
-impl<A: Allocator + Clone> DefaultIn<A> for AddressLazy<A> {
-    #[inline]
-    fn default_in(alloc: A) -> Self {
-        Self::new_in(alloc)
-    }
-}
-
-impl<A: Allocator + Clone> Message for AddressLazy<A> {
-    type Alloc = A;
-
-    fn new_in(alloc: A) -> Self
-    where
-        A: Clone,
-    {
-        Self::new_in(alloc)
-    }
-
-    fn encode<B: BufMut>(&self, buf: &mut B) {
-        ::puroro_rt::encode_message(self, buf)
-    }
-
-    fn encode_to_vec(&self) -> Vec<u8> {
-        ::puroro_rt::encode_message_to_vec(self)
-    }
-
-    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError>
-    where
-        A: Clone,
-    {
-        LazyMessage::ingest_buf(self, buf)
-    }
-
-    fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
-        iter::empty()
+        Ok(Address {
+            record: Record::<_, A, Lazy<A>, _>::decode_eager(self.record)?,
+        })
     }
 }

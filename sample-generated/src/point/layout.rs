@@ -1,4 +1,4 @@
-//! Per-ingest associated types for [`PointImpl`](crate::point_type::PointImpl).
+//! Per-ingest associated types for [`Point`](crate::Point) / [`PointLazy`](crate::PointLazy).
 //!
 //! Both fields are implicit int32. Only [`MessageCommon`](::puroro_rt::MessageCommon)
 //! ingest (`Eager` / `Lazy`) differs.
@@ -8,10 +8,10 @@ use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::puroro_rt::{BitStorage, Eager, Lazy};
 
-/// Ingest bits for [`PointImpl`](crate::point_type::PointImpl).
+/// Ingest bits for [`Point`](crate::Point) / [`PointLazy`](crate::PointLazy).
 ///
 /// Not a [`MessageScan`](::puroro_rt::decode::MessageScan) supertrait.
-/// [`PointImpl`](crate::point_type::PointImpl) requires `A: Clone` on the struct,
+/// [`Point`](crate::Point) requires `A: Clone` on the struct,
 /// together with every other generated message.
 pub trait Layout<A: Allocator>: Sized {
     type Bits: Default + Clone + BitStorage;

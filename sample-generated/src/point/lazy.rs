@@ -1,198 +1,33 @@
-//! Inherent API for [`PointLazy`](crate::PointLazy) (`PointImpl<A, Lazy<A>>`).
+//! Inherent API for [`PointLazy`](crate::PointLazy).
 //!
 //! Both fields are implicit int32 numericals. Getters call
 //! [`LazyMessage::ensure_scanned`](::puroro_rt::decode::LazyMessage::ensure_scanned).
-//! `into_eager` re-merges `_wire` into [`Point`](crate::Point).
+//! `into_eager` replays `_wire` into [`Point`](crate::Point).
 
-use ::allocator_api2::alloc::{Allocator, Global};
-use ::bitvec::array::BitArray;
-use ::bytes::{Buf, BufMut};
-use ::core::fmt::{self, Debug, Formatter};
-use ::core::iter;
-use ::puroro::{DecodeBuf, DecodeError, Message, RECURSION_LIMIT};
-use ::puroro_rt::decode::{LazyMessage, LazyScan, ScannedRecord};
-use ::puroro_rt::{
-    CloneIn, DeallocateIn, DefaultIn, EncodeCtx, FieldCloneIn, LazyMessageCommon, MessageEncode,
-    MessageMerge, SingularField,
-};
-use ::std::vec::Vec;
+use ::allocator_api2::alloc::Allocator;
+use ::puroro::DecodeError;
+use ::puroro_rt::decode::LazyMessage;
+use ::puroro_rt::{Lazy, Record};
 
 use crate::Point;
 use crate::PointLazy;
 use crate::point::{FIELD_X, FIELD_Y};
 
-impl<A: Allocator + Clone + Default> Default for PointLazy<A> {
-    fn default() -> Self {
-        Self::new_in(A::default())
-    }
-}
-
-impl PointLazy<Global> {
-    pub fn new() -> Self {
-        Self::new_in(Global)
-    }
-}
-
 impl<A: Allocator + Clone> PointLazy<A> {
-    pub fn x(&self) -> Result<i32, DecodeError>
-    where
-        A: Clone,
-    {
-        self.ensure_scanned()?;
-        Ok(self.x.bind(&self._common).value())
+    pub fn x(&self) -> Result<i32, DecodeError> {
+        LazyMessage::ensure_scanned(self)?;
+        Ok(self.record.field::<{ FIELD_X }>().value())
     }
 
-    pub fn y(&self) -> Result<i32, DecodeError>
-    where
-        A: Clone,
-    {
-        self.ensure_scanned()?;
-        Ok(self.y.bind(&self._common).value())
-    }
-}
-
-impl<A: Allocator + Clone> PointLazy<A> {
-    pub fn new_in(alloc: A) -> Self {
-        Self {
-            _common: LazyMessageCommon::new_in(BitArray::ZERO, alloc.clone()),
-            x: SingularField::new_in(alloc.clone()),
-            y: SingularField::new_in(alloc),
-        }
+    pub fn y(&self) -> Result<i32, DecodeError> {
+        LazyMessage::ensure_scanned(self)?;
+        Ok(self.record.field::<{ FIELD_Y }>().value())
     }
 
-    /// Decode every field from `_wire` into an eager [`Point`].
+    /// Decode `_wire` into the eager message.
     pub fn into_eager(self) -> Result<Point<A>, DecodeError> {
-        self._common.lazy.scan.require_finished()?;
-        let mut eager = Point::new_in(self._common.alloc.clone());
-        self._common.lazy.scan.for_each_body(|chunk| {
-            let mut buf = chunk;
-            Message::merge_from(&mut eager, &mut buf)
-        })?;
-        Ok(eager)
-    }
-}
-
-impl<A: Allocator + Clone> LazyMessage<A> for PointLazy<A> {
-    fn scan(&self) -> &LazyScan<A> {
-        &self._common.lazy.scan
-    }
-
-    fn scan_mut(&mut self) -> &mut LazyScan<A> {
-        &mut self._common.lazy.scan
-    }
-
-    fn apply_record(&mut self, rec: &ScannedRecord, _origin: usize) -> Result<(), DecodeError> {
-        match rec.field_number.as_u32() {
-            FIELD_X => self.x.bind_mut(&mut self._common).merge_scanned(&rec.value),
-            FIELD_Y => self.y.bind_mut(&mut self._common).merge_scanned(&rec.value),
-            _ => Ok(()),
-        }
-    }
-}
-
-impl<A: Allocator + Clone> CloneIn<A> for PointLazy<A> {
-    fn clone_in(&self, alloc: A) -> Self {
-        Self {
-            _common: self._common.clone_in(alloc.clone()),
-            x: self.x.clone_field(&self._common, alloc.clone()),
-            y: self.y.clone_field(&self._common, alloc),
-        }
-    }
-}
-
-impl<A: Allocator + Clone> Clone for PointLazy<A> {
-    fn clone(&self) -> Self {
-        self.clone_in(self._common.alloc.clone())
-    }
-}
-
-impl<A: Allocator + Clone> PartialEq for PointLazy<A> {
-    fn eq(&self, other: &Self) -> bool {
-        LazyMessage::eq_with_eager(self, other, |msg| msg.clone().into_eager())
-    }
-}
-
-impl<A: Allocator + Clone> Debug for PointLazy<A> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        if self.ensure_scanned().is_err() {
-            return f.debug_struct("PointLazy").finish_non_exhaustive();
-        }
-        match self.clone().into_eager() {
-            Ok(eager) => Debug::fmt(&eager, f),
-            Err(_) => f.debug_struct("PointLazy").finish_non_exhaustive(),
-        }
-    }
-}
-
-impl<A: Allocator + Clone> DeallocateIn<A> for PointLazy<A> {
-    #[inline]
-    unsafe fn deallocate_in(self, _alloc: &A) {
-        drop(self);
-    }
-}
-
-::puroro_rt::impl_owned_slot_bounds!(PointLazy);
-
-impl<A: Allocator + Clone> MessageEncode for PointLazy<A> {
-    fn encoded_len(&self, _ctx: &mut EncodeCtx) -> usize {
-        self._common.lazy.scan.body_len()
-    }
-
-    fn encode_raw<B: BufMut>(&self, _ctx: &mut EncodeCtx, buf: &mut B) {
-        self._common
-            .lazy
-            .scan
-            .write_bodies(buf)
-            .expect("lazy wire span out of range");
-    }
-}
-
-impl<A: Allocator + Clone> MessageMerge for PointLazy<A> {
-    fn merge_from_with_depth<B: DecodeBuf>(
-        &mut self,
-        buf: &mut B,
-        depth: usize,
-    ) -> Result<(), DecodeError> {
-        if depth >= RECURSION_LIMIT {
-            return Err(DecodeError::RecursionLimitExceeded);
-        }
-        LazyMessage::ingest_buf(self, buf)
-    }
-}
-
-impl<A: Allocator + Clone> DefaultIn<A> for PointLazy<A> {
-    #[inline]
-    fn default_in(alloc: A) -> Self {
-        Self::new_in(alloc)
-    }
-}
-
-impl<A: Allocator + Clone> Message for PointLazy<A> {
-    type Alloc = A;
-
-    fn new_in(alloc: A) -> Self
-    where
-        A: Clone,
-    {
-        Self::new_in(alloc)
-    }
-
-    fn encode<B: BufMut>(&self, buf: &mut B) {
-        ::puroro_rt::encode_message(self, buf)
-    }
-
-    fn encode_to_vec(&self) -> Vec<u8> {
-        ::puroro_rt::encode_message_to_vec(self)
-    }
-
-    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError>
-    where
-        A: Clone,
-    {
-        LazyMessage::ingest_buf(self, buf)
-    }
-
-    fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
-        iter::empty()
+        Ok(Point {
+            record: Record::<_, A, Lazy<A>, _>::decode_eager(self.record)?,
+        })
     }
 }

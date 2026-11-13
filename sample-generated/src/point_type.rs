@@ -3,161 +3,94 @@
 //!
 //! Two IMPLICIT `int32` fields. Unknowns are preserved (default
 //! [`MessageCommon`] store). Not part of the DESIGN.md reference schema.
+//!
+//! The shell matches plugin output: [`PointFields`] holds the slots,
+//! [`Point`] / [`PointLazy`] are newtypes over [`puroro_rt::Record`].
 
-use allocator_api2::alloc::{Allocator, Global};
-use bitvec::array::BitArray;
-use bitvec::order::Lsb0;
-use bytes::{Buf, BufMut};
-use core::fmt;
-use core::mem;
-use core::ops::ControlFlow;
-use core::ops::DerefMut;
-
-use puroro::{DecodeBuf, DecodeError, Message};
-use puroro_rt::decode::{decode_tag, skip_field_and_save};
-use puroro_rt::{
-    CloneFieldsVisitor, CloneIn, DebugStructVisitor, Eager, EncodeCtx, EncodeRawVisitor,
-    EncodedLenVisitor, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut,
-    FieldVisitor, FieldVisitorMut, Implicit, Lazy, MessageCommon, MessageEncode, MessageMerge,
-    ProtoInt32, SingularField, UnknownFields,
+use ::allocator_api2::alloc::{Allocator, Global};
+use ::core::marker::PhantomData;
+use ::core::mem;
+use ::core::ops::{ControlFlow, DerefMut};
+use ::puroro::{DecodeBuf, DecodeError, WireType};
+use ::puroro_rt::decode::{MessageScan, ScannedRecord};
+use ::puroro_rt::{
+    CloneRecordFields, ConstructRecordFields, Eager, EagerRecordFields, FieldCloneIn,
+    FieldDeallocate, FieldPairVisitor, FieldVisitor, FieldVisitorMut, HasField, Implicit, Lazy,
+    LazyRecordApply, MessageCommon, ProtoInt32, Record, RecordFields, SingularField, UnknownFields,
 };
 
 use crate::point::{self, FIELD_X, FIELD_Y};
 
-pub struct PointImpl<A: Allocator + Clone = Global, L: point::Layout<A> = Eager> {
-    pub(crate) _common: MessageCommon<L::Bits, A, UnknownFields<A>, L>,
-    pub(crate) x: SingularField<ProtoInt32, Implicit, { FIELD_X }, A>,
-    pub(crate) y: SingularField<ProtoInt32, Implicit, { FIELD_Y }, A>,
+pub(crate) struct PointFields<A: Allocator + Clone = Global, L: point::Layout<A> = Eager> {
+    x: SingularField<ProtoInt32, Implicit, { FIELD_X }, A>,
+    y: SingularField<ProtoInt32, Implicit, { FIELD_Y }, A>,
+    _layout: PhantomData<(A, L)>,
 }
 
-pub type Point<A = Global> = PointImpl<A, Eager>;
-pub type PointLazy<A = Global> = PointImpl<A, Lazy<A>>;
-
-impl<A: Allocator + Clone> Point<A> {
-    pub fn x(&self) -> i32 {
-        self.x.bind(&self._common).value()
-    }
-
-    pub fn y(&self) -> i32 {
-        self.y.bind(&self._common).value()
-    }
-
-    fn visit_fields<V: FieldVisitor<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
-        &self,
-        v: &mut V,
-    ) -> ControlFlow<V::Break> {
-        v.visit("x", &self.x)?;
-        v.visit("y", &self.y)?;
-        ControlFlow::Continue(())
-    }
-
-    fn visit_field_pairs<V: FieldPairVisitor<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
-        &self,
-        other: &Self,
-        v: &mut V,
-    ) -> ControlFlow<V::Break> {
-        v.visit("x", &self.x, &other.x)?;
-        v.visit("y", &self.y, &other.y)?;
-        ControlFlow::Continue(())
-    }
-
-    fn visit_field_pairs_mut<V: FieldPairVisitorMut<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
-        &self,
-        dst: &mut Self,
-        v: &mut V,
-    ) -> ControlFlow<V::Break>
+impl<A: Allocator + Clone, L: point::Layout<A>> HasField<{ FIELD_X }> for PointFields<A, L> {
+    type Ref<'a>
+        = &'a SingularField<ProtoInt32, Implicit, { FIELD_X }, A>
     where
-        A: Clone,
-    {
-        v.visit("x", &self.x, &mut dst.x)?;
-        v.visit("y", &self.y, &mut dst.y)?;
-        ControlFlow::Continue(())
+        Self: 'a;
+    type Mut<'a>
+        = &'a mut SingularField<ProtoInt32, Implicit, { FIELD_X }, A>
+    where
+        Self: 'a;
+
+    fn field<'a>(&'a self) -> Self::Ref<'a> {
+        &self.x
+    }
+
+    fn field_mut<'a>(&'a mut self) -> Self::Mut<'a> {
+        &mut self.x
     }
 }
 
-impl<A: Allocator + Clone> Point<A> {
-    pub fn new_in(alloc: A) -> Self {
-        Self {
-            _common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
-            x: SingularField::new_in(alloc.clone()),
-            y: SingularField::new_in(alloc),
-        }
+impl<A: Allocator + Clone, L: point::Layout<A>> HasField<{ FIELD_Y }> for PointFields<A, L> {
+    type Ref<'a>
+        = &'a SingularField<ProtoInt32, Implicit, { FIELD_Y }, A>
+    where
+        Self: 'a;
+    type Mut<'a>
+        = &'a mut SingularField<ProtoInt32, Implicit, { FIELD_Y }, A>
+    where
+        Self: 'a;
+
+    fn field<'a>(&'a self) -> Self::Ref<'a> {
+        &self.y
     }
 
-    pub fn x_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
-        self.x.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_x(&mut self) {
-        self.x.bind_mut(&mut self._common).clear();
-    }
-
-    pub fn y_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
-        self.y.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_y(&mut self) {
-        self.y.bind_mut(&mut self._common).clear();
-    }
-
-    /// Replaces `self` with a clone of `src` (same allocator family).
-    pub fn copy_from(&mut self, src: &Self) {
-        *self = src.clone();
+    fn field_mut<'a>(&'a mut self) -> Self::Mut<'a> {
+        &mut self.y
     }
 }
 
-impl Point<Global> {
-    pub fn new() -> Self {
-        <Self as Default>::default()
-    }
+pub struct Point<A: Allocator + Clone = Global> {
+    pub(crate) record: Record<PointFields<A, Eager>, A, Eager, UnknownFields<A>>,
 }
 
-impl<A: Allocator + Clone + Default> Default for Point<A> {
-    fn default() -> Self {
-        Self::new_in(A::default())
-    }
+pub struct PointLazy<A: Allocator + Clone = Global> {
+    pub(crate) record: Record<PointFields<A, Lazy<A>>, A, Lazy<A>, UnknownFields<A>>,
 }
 
-impl<A: Allocator + Clone> CloneIn<A> for Point<A> {
-    fn clone_in(&self, alloc: A) -> Self {
-        let mut dst = Self::new_in(alloc.clone());
-        let mut v = CloneFieldsVisitor::new(&self._common, &dst._common);
-        let _ = self.visit_field_pairs_mut(&mut dst, &mut v);
-        let mut old = mem::replace(&mut dst._common, self._common.clone_in(alloc));
-        old.deallocate();
-        dst
-    }
-}
+::puroro_rt::forward_record!(eager Point);
+::puroro_rt::forward_record!(lazy PointLazy);
 
-impl<A: Allocator + Clone> Clone for Point<A> {
-    #[inline]
-    fn clone(&self) -> Self {
-        self.clone_in(self._common.alloc.clone())
-    }
-}
+impl<A: Allocator + Clone, L: point::Layout<A> + MessageScan<A>> RecordFields<A, L>
+    for PointFields<A, L>
+{
+    type Bits = <L as point::Layout<A>>::Bits;
+    type Unknown = UnknownFields<A>;
+    type EagerMessage = Point<A>;
 
-impl<A: Allocator + Clone> PartialEq for Point<A> {
-    fn eq(&self, other: &Self) -> bool {
-        matches!(
-            self.visit_field_pairs(
-                other,
-                &mut FieldEqVisitor::new(&self._common, &other._common)
-            ),
-            ControlFlow::Continue(())
-        ) && self._common.unknown_fields_eq(&other._common)
-    }
-}
+    const EAGER_NAME: &'static str = "Point";
+    const LAZY_NAME: &'static str = "PointLazy";
 
-impl<A: Allocator + Clone> fmt::Debug for Point<A> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut v = DebugStructVisitor::new(f.debug_struct("Point"), &self._common);
-        let _ = self.visit_fields(&mut v);
-        v.finish()
+    fn empty_bits() -> Self::Bits {
+        <L as point::Layout<A>>::empty_bits()
     }
-}
 
-impl<A: Allocator + Clone, L: point::Layout<A>> PointImpl<A, L> {
-    fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<L::Bits, A, UnknownFields<A>, L>>>(
+    fn visit_mut<V: FieldVisitorMut<MessageCommon<Self::Bits, A, Self::Unknown, L>>>(
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
@@ -167,105 +100,134 @@ impl<A: Allocator + Clone, L: point::Layout<A>> PointImpl<A, L> {
     }
 }
 
-impl<A: Allocator + Clone, L: point::Layout<A>> Drop for PointImpl<A, L> {
-    fn drop(&mut self) {
-        let mut v = FieldDeallocVisitor::new(&self._common);
-        let _ = self.visit_fields_mut(&mut v);
-        self._common.deallocate();
-    }
-}
-
-impl<A: Allocator + Clone> ::puroro_rt::DeallocateIn<A> for Point<A> {
-    #[inline]
-    unsafe fn deallocate_in(self, _alloc: &A) {
-        drop(self);
-    }
-}
-
-::puroro_rt::impl_owned_slot_bounds!(Point);
-
-impl<A: Allocator + Clone> MessageEncode for Point<A> {
-    fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
-        let mut v = EncodedLenVisitor::new(&self._common, ctx);
-        let _ = self.visit_fields(&mut v);
-        v.len + self._common.unknown_fields.len()
-    }
-
-    fn encode_raw<B: BufMut>(&self, ctx: &mut EncodeCtx, buf: &mut B) {
-        let _ = self.visit_fields(&mut EncodeRawVisitor::new(&self._common, ctx, buf));
-        let unknown: &[u8] = &self._common.unknown_fields;
-        buf.put_slice(unknown);
-    }
-}
-
-impl<A: Allocator + Clone> MessageMerge for Point<A> {
-    fn merge_from_with_depth<B: DecodeBuf>(
-        &mut self,
-        buf: &mut B,
-        depth: usize,
-    ) -> Result<(), DecodeError> {
-        if depth >= ::puroro::RECURSION_LIMIT {
-            return Err(DecodeError::RecursionLimitExceeded);
-        }
-        while buf.has_remaining() {
-            let (field_number, wire_type) = decode_tag(buf)?;
-            match field_number.as_u32() {
-                FIELD_X => {
-                    self.x
-                        .bind_mut(&mut self._common)
-                        .merge(wire_type, buf, depth)?;
+macro_rules! impl_point_build {
+    ($layout:ty) => {
+        impl<A: Allocator + Clone> ConstructRecordFields<A, $layout> for PointFields<A, $layout> {
+            fn new(alloc: A) -> Self {
+                Self {
+                    x: SingularField::new_in(alloc.clone()),
+                    y: SingularField::new_in(alloc),
+                    _layout: PhantomData,
                 }
-                FIELD_Y => {
-                    self.y
-                        .bind_mut(&mut self._common)
-                        .merge(wire_type, buf, depth)?;
-                }
-                _ => skip_field_and_save(
-                    field_number,
-                    wire_type,
-                    buf,
-                    &mut self._common.unknown_fields,
-                    self._common.alloc.clone(),
-                )?,
             }
         }
-        Ok(())
+
+        impl<A: Allocator + Clone> CloneRecordFields<A, $layout> for PointFields<A, $layout> {
+            fn clone_fields(
+                &self,
+                dst: &mut Self,
+                src_common: &MessageCommon<Self::Bits, A, Self::Unknown, $layout>,
+                dst_common: &MessageCommon<Self::Bits, A, Self::Unknown, $layout>,
+                alloc: A,
+            ) {
+                let new = FieldCloneIn::clone_field(&self.x, src_common, alloc.clone());
+                let mut old = mem::replace(&mut dst.x, new);
+                FieldDeallocate::deallocate(&mut old, dst_common);
+                let new = FieldCloneIn::clone_field(&self.y, src_common, alloc.clone());
+                let mut old = mem::replace(&mut dst.y, new);
+                FieldDeallocate::deallocate(&mut old, dst_common);
+            }
+        }
+    };
+}
+
+impl_point_build!(Eager);
+impl_point_build!(Lazy<A>);
+
+impl<A: Allocator + Clone> EagerRecordFields<A> for PointFields<A, Eager> {
+    fn visit_fields<V: FieldVisitor<MessageCommon<Self::Bits, A, Self::Unknown, Eager>>>(
+        &self,
+        v: &mut V,
+    ) -> ControlFlow<V::Break> {
+        v.visit("x", &self.x)?;
+        v.visit("y", &self.y)?;
+        ControlFlow::Continue(())
+    }
+
+    fn visit_pairs<V: FieldPairVisitor<MessageCommon<Self::Bits, A, Self::Unknown, Eager>>>(
+        &self,
+        other: &Self,
+        v: &mut V,
+    ) -> ControlFlow<V::Break> {
+        v.visit("x", &self.x, &other.x)?;
+        v.visit("y", &self.y, &other.y)?;
+        ControlFlow::Continue(())
+    }
+
+    fn merge_known<B: DecodeBuf>(
+        &mut self,
+        common: &mut MessageCommon<Self::Bits, A, Self::Unknown, Eager>,
+        field_number: u32,
+        wire_type: WireType,
+        buf: &mut B,
+        depth: usize,
+    ) -> Result<bool, DecodeError> {
+        match field_number {
+            FIELD_X => {
+                <Self as HasField<{ FIELD_X }>>::field_mut(self)
+                    .bind_mut(common)
+                    .merge(wire_type, buf, depth)?;
+                Ok(true)
+            }
+            FIELD_Y => {
+                <Self as HasField<{ FIELD_Y }>>::field_mut(self)
+                    .bind_mut(common)
+                    .merge(wire_type, buf, depth)?;
+                Ok(true)
+            }
+            _ => Ok(false),
+        }
     }
 }
 
-impl<A: Allocator + Clone> ::puroro_rt::DefaultIn<A> for Point<A> {
-    #[inline]
-    fn default_in(alloc: A) -> Self {
-        Self::new_in(alloc)
+impl<A: Allocator + Clone> LazyRecordApply<A> for PointFields<A, Lazy<A>> {
+    fn apply_record(
+        &mut self,
+        common: &mut MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A>>,
+        rec: &ScannedRecord,
+        _origin: usize,
+    ) -> Result<(), DecodeError> {
+        match rec.field_number.as_u32() {
+            FIELD_X => <Self as HasField<{ FIELD_X }>>::field_mut(self)
+                .bind_mut(common)
+                .merge_scanned(&rec.value),
+            FIELD_Y => <Self as HasField<{ FIELD_Y }>>::field_mut(self)
+                .bind_mut(common)
+                .merge_scanned(&rec.value),
+            _ => common.on_unrecognized_tag(rec.field_number.as_u32()),
+        }
     }
 }
 
-impl<A: Allocator + Clone> Message for Point<A> {
-    type Alloc = A;
-
-    fn new_in(alloc: A) -> Self
-    where
-        A: Clone,
-    {
-        Self::new_in(alloc)
+impl<A: Allocator + Clone> Point<A> {
+    pub fn x(&self) -> i32 {
+        self.record.field::<{ FIELD_X }>().value()
     }
 
-    fn encode<B: BufMut>(&self, buf: &mut B) {
-        ::puroro_rt::encode_message(self, buf)
+    pub fn y(&self) -> i32 {
+        self.record.field::<{ FIELD_Y }>().value()
     }
 
-    fn encode_to_vec(&self) -> Vec<u8> {
-        ::puroro_rt::encode_message_to_vec(self)
+    pub fn x_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
+        self.record.field_mut::<{ FIELD_X }>().value_mut()
     }
 
-    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError>
-    where
-        A: Clone,
-    {
-        ::puroro_rt::merge_message(self, buf)
+    pub fn clear_x(&mut self) {
+        self.record.field_mut::<{ FIELD_X }>().clear();
     }
 
-    fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
-        self._common.iter_unknown_fields()
+    pub fn y_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
+        self.record.field_mut::<{ FIELD_Y }>().value_mut()
+    }
+
+    pub fn clear_y(&mut self) {
+        self.record.field_mut::<{ FIELD_Y }>().clear();
+    }
+
+    /// Encodes `self` and rebuilds it as the lazy alias.
+    pub fn into_lazy(self) -> PointLazy<A> {
+        PointLazy {
+            record: Record::encode_lazy(self.record),
+        }
     }
 }
