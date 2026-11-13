@@ -27,6 +27,7 @@ fn lazy_unset_scans_then_fails_validate() {
     ));
 }
 
+#[test]
 fn unset_fails_validate() {
     let msg = RequiredOwner::new();
     assert!(!msg.owner().is_set());

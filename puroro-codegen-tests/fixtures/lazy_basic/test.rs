@@ -70,6 +70,7 @@ fn lazy_validate_without_required_does_not_scan() {
         .expect("no required fields, so an unfinished lazy message stays Ok");
 }
 
+#[test]
 fn eager_parent_stores_pinned_lazy_child() {
     let mut note = Note::new();
     _child_is_eager(note.child_mut());
