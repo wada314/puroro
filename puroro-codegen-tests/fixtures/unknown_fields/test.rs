@@ -1,7 +1,8 @@
 //! `(puroro.unknown_fields)` preserve, discard, and reject.
 
 use crate::unknown_fields::{
-    Discard, DiscardChoice, DiscardClosedLazy, DiscardLazy, Keep, KeepLazy, KeepParent, Reject,
+    Discard, DiscardChildLazy, DiscardChoice, DiscardClosedLazy, DiscardLazy, DiscardParent,
+    DiscardParentLazy, Keep, KeepLazy, KeepParent, PreserveParent, PreserveParentLazy, Reject,
     RejectChoice, RejectClosed, RejectLazy, RejectParent, Status,
 };
 use ::core::mem::size_of;
@@ -47,6 +48,39 @@ fn discard_lazy_omits_closed_enum_unknown() {
     assert_eq!(msg.status().expect("status").get(), Status::UNSPECIFIED);
     assert!(msg.unknown_fields().next().is_none());
     assert!(msg.encode_to_vec().is_empty());
+}
+
+#[test]
+fn parent_encode_keeps_discard_child_unknowns() {
+    // child = { n = 3, field 10 = 5 }, then the parent's own field 10 = 5.
+    let wire = [0x0a_u8, 0x04, 0x08, 0x03, 0x50, 0x05, 0x50, 0x05];
+    let child_kept = [0x0a_u8, 0x04, 0x08, 0x03, 0x50, 0x05];
+    let child_only = [0x08_u8, 0x03, 0x50, 0x05];
+
+    let child: DiscardChildLazy = DiscardChildLazy::decode(&child_only[..]).expect("child");
+    assert_eq!(child.encode_to_vec(), [0x08, 0x03]);
+
+    let preserve: PreserveParentLazy =
+        PreserveParentLazy::decode(&wire[..]).expect("preserve parent");
+    assert_eq!(preserve.encode_to_vec(), wire);
+    let preserve_eager = [0x0a_u8, 0x02, 0x08, 0x03, 0x50, 0x05];
+    assert_eq!(
+        preserve.into_eager().expect("into_eager").encode_to_vec(),
+        preserve_eager
+    );
+
+    let discard: DiscardParentLazy = DiscardParentLazy::decode(&wire[..]).expect("discard parent");
+    assert_eq!(discard.encode_to_vec(), child_kept);
+    let child_canonical = [0x0a_u8, 0x02, 0x08, 0x03];
+    assert_eq!(
+        discard.into_eager().expect("into_eager").encode_to_vec(),
+        child_canonical
+    );
+
+    let eager: PreserveParent = PreserveParent::decode(&wire[..]).expect("eager preserve");
+    assert_eq!(eager.encode_to_vec(), preserve_eager);
+    let eager_discard: DiscardParent = DiscardParent::decode(&wire[..]).expect("eager discard");
+    assert_eq!(eager_discard.encode_to_vec(), child_canonical);
 }
 
 #[test]

@@ -503,7 +503,10 @@ impl Utf8Validation {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::descriptor::features::{EnumType, FeatureSet, FieldPresence, RepeatedFieldEncoding};
+    use crate::descriptor::features::{
+        DefaultSymbolVisibility, EnforceNamingStyle, EnumType, FeatureSet, FieldPresence,
+        JsonFormat, RepeatedFieldEncoding,
+    };
     use crate::descriptor::test_helpers as desc;
     use crate::descriptor::{
         Edition, EnumDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, ProtoFile, ProtoFqn,
@@ -916,7 +919,7 @@ mod tests {
     }
 
     #[test]
-    fn edition_2024_naming_and_visibility_are_codegen_errors() {
+    fn edition_2024_defaults_fail_on_naming_then_visibility() {
         let arena = Arena::new();
         let files = [proto_file(
             "ed",
@@ -927,12 +930,106 @@ mod tests {
             }],
             vec![],
         )];
-        let err = resolve(&arena, &files).expect_err("edition 2024");
+        let err = resolve(&arena, &files).expect_err("bare edition 2024");
         let text = err.to_string();
         assert!(
-            text.contains("enforce_naming_style") || text.contains("default_symbol_visibility"),
-            "{text}"
+            text.contains("enforce_naming_style"),
+            "naming is checked before visibility: {text}"
         );
+
+        let mut opted = files[0].clone();
+        opted.features.enforce_naming_style = Some(EnforceNamingStyle::StyleLegacy);
+        let err = resolve(&arena, &[opted.clone()]).expect_err("visibility still 2024");
+        let text = err.to_string();
+        assert!(
+            text.contains("default_symbol_visibility"),
+            "visibility remains after naming is opted back: {text}"
+        );
+
+        opted.features.default_symbol_visibility = Some(DefaultSymbolVisibility::ExportAll);
+        // protoc strips these two features (source retention), so a real
+        // edition 2024 file never arrives with them set. The resolver still
+        // accepts the implemented values when a caller supplies them.
+        resolve(&arena, &[opted]).expect("implemented naming and visibility");
+    }
+
+    #[test]
+    fn explicit_implemented_edition_features_are_accepted() {
+        let arena = Arena::new();
+        let mut file = proto_file(
+            "ed",
+            Syntax::Editions(Edition::Edition2023),
+            vec![MessageDesc {
+                fields: vec![scalar_field("n", FieldLabel::Optional, None, false)],
+                ..desc::message("M")
+            }],
+            vec![],
+        );
+        file.features = FeatureSet {
+            json_format: Some(JsonFormat::Allow),
+            enforce_naming_style: Some(EnforceNamingStyle::StyleLegacy),
+            default_symbol_visibility: Some(DefaultSymbolVisibility::ExportAll),
+            ..FeatureSet::default()
+        };
+        resolve(&arena, &[file]).expect("explicit implemented defaults");
+    }
+
+    #[test]
+    fn explicit_unimplemented_edition_features_are_codegen_errors() {
+        let arena = Arena::new();
+        let base = proto_file(
+            "ed",
+            Syntax::Editions(Edition::Edition2023),
+            vec![MessageDesc {
+                fields: vec![scalar_field("n", FieldLabel::Optional, None, false)],
+                ..desc::message("M")
+            }],
+            vec![],
+        );
+        let cases = [
+            (
+                "json_format",
+                FeatureSet {
+                    json_format: Some(JsonFormat::LegacyBestEffort),
+                    ..FeatureSet::default()
+                },
+            ),
+            (
+                "enforce_naming_style",
+                FeatureSet {
+                    enforce_naming_style: Some(EnforceNamingStyle::Style2024),
+                    ..FeatureSet::default()
+                },
+            ),
+            (
+                "default_symbol_visibility",
+                FeatureSet {
+                    default_symbol_visibility: Some(DefaultSymbolVisibility::ExportTopLevel),
+                    ..FeatureSet::default()
+                },
+            ),
+            (
+                "default_symbol_visibility",
+                FeatureSet {
+                    default_symbol_visibility: Some(DefaultSymbolVisibility::LocalAll),
+                    ..FeatureSet::default()
+                },
+            ),
+            (
+                "default_symbol_visibility",
+                FeatureSet {
+                    default_symbol_visibility: Some(DefaultSymbolVisibility::Strict),
+                    ..FeatureSet::default()
+                },
+            ),
+        ];
+        for (needle, features) in cases {
+            let mut file = base.clone();
+            file.features = features;
+            let err = resolve(&arena, &[file]).expect_err(needle);
+            let text = err.to_string();
+            assert!(text.contains(needle), "{text}");
+        }
     }
 
     #[test]

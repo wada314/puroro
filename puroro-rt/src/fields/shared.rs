@@ -408,15 +408,18 @@ where
     /// Reject or remember one unrecognized lazy record.
     ///
     /// The span stays in `_wire`. Preserve yields it from `unknown_fields()`.
-    /// Discard and reject omit it on encode and do not yield it.
+    /// Discard and reject omit it on encode and do not yield it. The span is
+    /// recorded before the reject check so a failed apply still omits that
+    /// tag on encode, and a retry does not depend on the error path to have
+    /// stored it.
     pub fn note_unrecognized_record(
         &mut self,
         rec: &ScannedRecord,
         origin: usize,
     ) -> Result<(), ::puroro::DecodeError> {
-        self.on_unrecognized_tag(rec.field_number.as_u32())?;
         self.lazy
             .record_policy_span(scanned_record_span(origin, rec)?);
+        self.on_unrecognized_tag(rec.field_number.as_u32())?;
         Ok(())
     }
 }

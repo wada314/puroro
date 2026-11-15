@@ -54,3 +54,19 @@ message RejectChild {
 message KeepParent {
   RejectChild child = 1;
 }
+
+// Discard is one message deep. A parent encode copies this child's LEN blob,
+// including tags the child itself would omit.
+message DiscardChild {
+  option (puroro.unknown_fields) = UNKNOWN_FIELDS_DISCARD;
+  optional int32 n = 1;
+}
+
+message PreserveParent {
+  DiscardChild child = 1;
+}
+
+message DiscardParent {
+  option (puroro.unknown_fields) = UNKNOWN_FIELDS_DISCARD;
+  DiscardChild child = 1;
+}

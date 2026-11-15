@@ -34,20 +34,29 @@ impl FeatureSet {
     ///
     /// Consumed today: `field_presence`, `enum_type`, `repeated_field_encoding`,
     /// `utf8_validation`, and `message_encoding` (LENGTH_PREFIXED only).
-    /// `json_format`, `enforce_naming_style`, and `default_symbol_visibility`
-    /// are not implemented. An explicit value is a codegen error, not a panic.
+    /// `json_format = ALLOW`, `enforce_naming_style = STYLE_LEGACY`, and
+    /// `default_symbol_visibility = EXPORT_ALL` match what this plugin already
+    /// emits, so an explicit copy of those values is accepted. Any other value
+    /// (`LEGACY_BEST_EFFORT`, `STYLE2024`, `EXPORT_TOP_LEVEL`, `LOCAL_ALL`,
+    /// `STRICT`) is a codegen error, not a panic and not a silent ignore.
     pub(crate) fn reject_unimplemented_overrides(&self, context: &str) -> Result<()> {
-        if let Some(value) = self.json_format {
+        if let Some(value) = self.json_format
+            && !matches!(value, JsonFormat::Allow)
+        {
             return Err(Error::Codegen(format!(
                 "editions feature json_format={value:?} is not implemented ({context})"
             )));
         }
-        if let Some(value) = self.enforce_naming_style {
+        if let Some(value) = self.enforce_naming_style
+            && !matches!(value, EnforceNamingStyle::StyleLegacy)
+        {
             return Err(Error::Codegen(format!(
                 "editions feature enforce_naming_style={value:?} is not implemented ({context})"
             )));
         }
-        if let Some(value) = self.default_symbol_visibility {
+        if let Some(value) = self.default_symbol_visibility
+            && !matches!(value, DefaultSymbolVisibility::ExportAll)
+        {
             return Err(Error::Codegen(format!(
                 "editions feature default_symbol_visibility={value:?} is not implemented ({context})"
             )));
@@ -147,8 +156,11 @@ impl FinalizedFeatureSet {
     ///
     /// Edition 2023 defaults (`ALLOW`, `STYLE_LEGACY`, `EXPORT_ALL`) match the
     /// behavior this plugin already has. Edition 2024's naming and visibility
-    /// defaults do not, and are a codegen error until those features exist.
-    /// JSON mapping is not emitted; only `ALLOW` is accepted.
+    /// defaults (`STYLE2024`, `EXPORT_TOP_LEVEL`) do not. Failing those files
+    /// is intentional: accepting them would silently ignore a conformance
+    /// feature. Both features are source retention, so protoc does not deliver
+    /// an explicit override and an edition 2024 file cannot opt back.
+    /// `json_format` is runtime retention; only `ALLOW` is accepted.
     pub(crate) fn apply_or_trap_for_file(&self) -> Result<()> {
         if !matches!(self.json_format, JsonFormat::Allow) {
             return Err(Error::Codegen(format!(

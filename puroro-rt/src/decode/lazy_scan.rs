@@ -185,6 +185,12 @@ impl<A: Allocator + Clone> LazyScan<A> {
     }
 
     pub fn push_policy_span(&mut self, span: WireSpan) {
+        // A failed apply retries the same regions. Recording the span again
+        // would make `unknown_fields()` yield it twice and `encoded_len`
+        // subtract the bytes twice.
+        if self.policy_spans.contains(&span) {
+            return;
+        }
         self.policy_spans.push(span);
     }
 
@@ -537,16 +543,38 @@ impl<'a> Iterator for PolicySpanIter<'a> {
     }
 }
 
-fn retained_len(range: WireSpan, omit: &[WireSpan]) -> usize {
-    let mut kept = range.len;
-    let start = range.offset;
+/// Merged `[lo, hi)` cuts of `omit` that overlap `range`, in offset order.
+///
+/// Identical or overlapping spans count once, matching a retried apply that
+/// recorded the same record twice.
+fn omit_cuts(range: WireSpan, omit: &[WireSpan]) -> Vec<(usize, usize)> {
     let end = range.offset.saturating_add(range.len);
+    let mut cuts: Vec<(usize, usize)> = Vec::new();
     for skip in omit {
-        let lo = start.max(skip.offset);
+        let lo = range.offset.max(skip.offset);
         let hi = end.min(skip.offset.saturating_add(skip.len));
         if hi > lo {
-            kept = kept.saturating_sub(hi - lo);
+            cuts.push((lo, hi));
         }
+    }
+    cuts.sort_by_key(|cut| cut.0);
+    let mut merged: Vec<(usize, usize)> = Vec::new();
+    for (lo, hi) in cuts {
+        if let Some(last) = merged.last_mut()
+            && lo <= last.1
+        {
+            last.1 = last.1.max(hi);
+            continue;
+        }
+        merged.push((lo, hi));
+    }
+    merged
+}
+
+fn retained_len(range: WireSpan, omit: &[WireSpan]) -> usize {
+    let mut kept = range.len;
+    for (lo, hi) in omit_cuts(range, omit) {
+        kept = kept.saturating_sub(hi - lo);
     }
     kept
 }
@@ -561,17 +589,8 @@ fn write_range_omitting<B: BufMut>(
         .offset
         .checked_add(range.len)
         .ok_or(DecodeError::TruncatedMessage)?;
-    let mut cuts: Vec<(usize, usize)> = Vec::new();
-    for skip in omit {
-        let lo = range.offset.max(skip.offset);
-        let hi = end.min(skip.offset.saturating_add(skip.len));
-        if hi > lo {
-            cuts.push((lo, hi));
-        }
-    }
-    cuts.sort_by_key(|cut| cut.0);
     let mut cursor = range.offset;
-    for (lo, hi) in cuts {
+    for (lo, hi) in omit_cuts(range, omit) {
         if lo > cursor {
             buf.put_slice(wire.get(cursor..lo).ok_or(DecodeError::TruncatedMessage)?);
         }
@@ -583,4 +602,26 @@ fn write_range_omitting<B: BufMut>(
         buf.put_slice(wire.get(cursor..end).ok_or(DecodeError::TruncatedMessage)?);
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod omit_tests {
+    use super::{WireSpan, omit_cuts, retained_len, write_range_omitting};
+
+    #[test]
+    fn overlapping_omits_count_once() {
+        let range = WireSpan { offset: 0, len: 10 };
+        let omit = [
+            WireSpan { offset: 2, len: 3 },
+            WireSpan { offset: 2, len: 3 },
+            WireSpan { offset: 4, len: 2 },
+        ];
+        assert_eq!(omit_cuts(range, &omit), vec![(2, 6)]);
+        assert_eq!(retained_len(range, &omit), 6);
+        let wire = [0_u8, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+        let mut out = Vec::new();
+        write_range_omitting(&wire, range, &omit, &mut out).unwrap();
+        assert_eq!(out, [0, 1, 6, 7, 8, 9]);
+        assert_eq!(out.len(), retained_len(range, &omit));
+    }
 }
