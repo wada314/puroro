@@ -18,6 +18,12 @@ use ::unmanaged::{CloneIn, DeallocateIn, DefaultIn, UnmanagedBox, UnmanagedVec};
 /// and discard succeed. Closed-enum diversion uses only `append_blob_mut`,
 /// so a ZST store drops that value instead of failing decode.
 pub trait UnknownStore<A: Allocator>: Sized {
+    /// `true` when unrecognized tags and closed-enum unknowns stay visible.
+    ///
+    /// Discard and reject are `false`: the lazy iterator stays empty, and lazy
+    /// encode drops those records instead of copying `_wire` through.
+    const PRESERVES_UNRECOGNIZED: bool = true;
+
     /// Empty store.
     fn new() -> Self;
 
@@ -131,6 +137,8 @@ impl<A: Allocator> UnknownStore<A> for UnknownFields<A> {
 pub struct DiscardUnknowns;
 
 impl<A: Allocator> UnknownStore<A> for DiscardUnknowns {
+    const PRESERVES_UNRECOGNIZED: bool = false;
+
     #[inline]
     fn new() -> Self {
         Self
@@ -183,6 +191,8 @@ impl Deref for DiscardUnknowns {
 pub struct RejectUnknowns;
 
 impl<A: Allocator> UnknownStore<A> for RejectUnknowns {
+    const PRESERVES_UNRECOGNIZED: bool = false;
+
     #[inline]
     fn new() -> Self {
         Self

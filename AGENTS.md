@@ -4,7 +4,9 @@ Instructions for coding agents working in this repository. Human-oriented docs s
 
 ## Overview
 
-`scratch-ai` is the working branch of **puroro**, a Protocol Buffers runtime and `protoc` plugin for Rust (editions / proto2 / proto3). Do not land work on `master`.
+`master` is the working branch of **puroro**, a Protocol Buffers runtime and `protoc` plugin for Rust (editions / proto2 / proto3). Land changes on `master` through a pull request. There is no `scratch-ai` branch on origin.
+
+Draft pull requests #101 and #102 are leftover environment-setup changes from August and October 2026. Do not treat them as the current environment or as the working branch.
 
 | Crate | Role |
 |---|---|

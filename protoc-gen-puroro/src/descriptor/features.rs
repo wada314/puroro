@@ -11,6 +11,8 @@
 
 use ::derive_more::TryFrom;
 
+use crate::error::{Error, Result};
+
 /// Declared Editions features (`google.protobuf.FeatureSet`).
 ///
 /// Unset members are [`None`] (inherit from a parent scope). Resolve overlays
@@ -32,22 +34,25 @@ impl FeatureSet {
     ///
     /// Consumed today: `field_presence`, `enum_type`, `repeated_field_encoding`,
     /// `utf8_validation`, and `message_encoding` (LENGTH_PREFIXED only).
-    pub(crate) fn reject_unimplemented_overrides(&self, context: &str) {
-        if self.json_format.is_some() {
-            unimplemented!(
-                "editions features.json_format override is not implemented yet ({context})"
-            );
+    /// `json_format`, `enforce_naming_style`, and `default_symbol_visibility`
+    /// are not implemented. An explicit value is a codegen error, not a panic.
+    pub(crate) fn reject_unimplemented_overrides(&self, context: &str) -> Result<()> {
+        if let Some(value) = self.json_format {
+            return Err(Error::Codegen(format!(
+                "editions feature json_format={value:?} is not implemented ({context})"
+            )));
         }
-        if self.enforce_naming_style.is_some() {
-            unimplemented!(
-                "editions features.enforce_naming_style override is not implemented yet ({context})"
-            );
+        if let Some(value) = self.enforce_naming_style {
+            return Err(Error::Codegen(format!(
+                "editions feature enforce_naming_style={value:?} is not implemented ({context})"
+            )));
         }
-        if self.default_symbol_visibility.is_some() {
-            unimplemented!(
-                "editions features.default_symbol_visibility override is not implemented yet ({context})"
-            );
+        if let Some(value) = self.default_symbol_visibility {
+            return Err(Error::Codegen(format!(
+                "editions feature default_symbol_visibility={value:?} is not implemented ({context})"
+            )));
         }
+        Ok(())
     }
 }
 
@@ -139,33 +144,34 @@ impl FinalizedFeatureSet {
     }
 
     /// File-scope features that are not applied anywhere in resolve/codegen yet.
-    pub(crate) fn apply_or_trap_for_file(&self) {
-        assert!(
-            matches!(self.json_format, JsonFormat::Allow),
-            "editions features.json_format={:?}: only ALLOW is assumed until codegen reads this feature",
-            self.json_format
-        );
-        // TODO: emit JSON mapping policy from this feature.
-
-        assert!(
-            matches!(
-                self.enforce_naming_style,
-                EnforceNamingStyle::StyleLegacy | EnforceNamingStyle::Style2024
-            ),
-            "editions features.enforce_naming_style={:?} is not implemented yet",
-            self.enforce_naming_style
-        );
-        // TODO: apply naming-style checks when validating / emitting idents.
-
-        assert!(
-            matches!(
-                self.default_symbol_visibility,
-                DefaultSymbolVisibility::ExportAll | DefaultSymbolVisibility::ExportTopLevel
-            ),
-            "editions features.default_symbol_visibility={:?} is not implemented yet",
-            self.default_symbol_visibility
-        );
-        // TODO: apply default symbol visibility when emitting modules.
+    ///
+    /// Edition 2023 defaults (`ALLOW`, `STYLE_LEGACY`, `EXPORT_ALL`) match the
+    /// behavior this plugin already has. Edition 2024's naming and visibility
+    /// defaults do not, and are a codegen error until those features exist.
+    /// JSON mapping is not emitted; only `ALLOW` is accepted.
+    pub(crate) fn apply_or_trap_for_file(&self) -> Result<()> {
+        if !matches!(self.json_format, JsonFormat::Allow) {
+            return Err(Error::Codegen(format!(
+                "editions feature json_format={:?} is not implemented",
+                self.json_format
+            )));
+        }
+        if !matches!(self.enforce_naming_style, EnforceNamingStyle::StyleLegacy) {
+            return Err(Error::Codegen(format!(
+                "editions feature enforce_naming_style={:?} is not implemented",
+                self.enforce_naming_style
+            )));
+        }
+        if !matches!(
+            self.default_symbol_visibility,
+            DefaultSymbolVisibility::ExportAll
+        ) {
+            return Err(Error::Codegen(format!(
+                "editions feature default_symbol_visibility={:?} is not implemented",
+                self.default_symbol_visibility
+            )));
+        }
+        Ok(())
     }
 }
 

@@ -223,6 +223,7 @@ impl<A: Allocator + Clone> LazyRecordApply<A> for AddressFields<A, Lazy<A>> {
         common: &mut MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A>>,
         rec: &ScannedRecord,
         origin: usize,
+        _depth: usize,
     ) -> Result<(), DecodeError> {
         match rec.field_number.as_u32() {
             FIELD_STREET => {
@@ -241,7 +242,7 @@ impl<A: Allocator + Clone> LazyRecordApply<A> for AddressFields<A, Lazy<A>> {
             FIELD_LATITUDE => <Self as HasField<{ FIELD_LATITUDE }>>::field_mut(self)
                 .bind_mut(common)
                 .merge_scanned(&rec.value),
-            _ => common.on_unrecognized_tag(rec.field_number.as_u32()),
+            _ => common.note_unrecognized_record(rec, origin),
         }
     }
 }

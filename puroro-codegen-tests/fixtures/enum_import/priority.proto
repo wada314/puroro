@@ -1,8 +1,9 @@
-edition = "2024";
+edition = "2023";
 
 package demo;
 
-// Closed enum defined in a different edition than Status / Holder.
+// Closed enum. Edition 2024 is rejected until naming and visibility exist,
+// so this file stays on edition 2023 with an explicit closed enum.
 enum Priority {
   option features.enum_type = CLOSED;
   PRIORITY_UNSPECIFIED = 0;

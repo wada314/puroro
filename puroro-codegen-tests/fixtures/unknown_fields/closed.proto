@@ -14,3 +14,8 @@ message RejectClosed {
   option (puroro.unknown_fields) = UNKNOWN_FIELDS_REJECT;
   Status status = 1;
 }
+
+message DiscardClosed {
+  option (puroro.unknown_fields) = UNKNOWN_FIELDS_DISCARD;
+  Status status = 1;
+}

@@ -138,7 +138,7 @@ pub fn resolve_with<'a>(
 
     // Pass 2: file-level feature traps, then link queued field edges.
     for proto in proto_files {
-        check_file_features(proto);
+        check_file_features(proto)?;
     }
     ctx.link_pending()?;
 
@@ -231,7 +231,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
         self.check_unique_fqn(&fqn)?;
 
         desc.features
-            .reject_unimplemented_overrides(&format!("enum `{fqn}`"));
+            .reject_unimplemented_overrides(&format!("enum `{fqn}`"))?;
 
         let values = desc
             .values
@@ -293,7 +293,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
         if matches!(file.syntax, Syntax::Editions(_)) {
             field
                 .features
-                .reject_unimplemented_overrides(&format!("field `{owner_fqn}.{}`", field.name));
+                .reject_unimplemented_overrides(&format!("field `{owner_fqn}.{}`", field.name))?;
         }
 
         let features = FinalizedFeatureSet::resolve_field(file, field, self.proto2_utf8);
@@ -453,13 +453,14 @@ impl EnumType {
     }
 }
 
-fn check_file_features(proto: &ProtoFile) {
+fn check_file_features(proto: &ProtoFile) -> Result<()> {
     if matches!(proto.syntax, Syntax::Editions(_)) {
         proto
             .features
-            .reject_unimplemented_overrides(&format!("file `{}`", proto.name));
-        FinalizedFeatureSet::resolve(proto, None, Utf8Validation::None).apply_or_trap_for_file();
+            .reject_unimplemented_overrides(&format!("file `{}`", proto.name))?;
+        FinalizedFeatureSet::resolve(proto, None, Utf8Validation::None).apply_or_trap_for_file()?;
     }
+    Ok(())
 }
 
 impl FieldOccurrence {
@@ -881,7 +882,7 @@ mod tests {
         let arena = Arena::new();
         let mut file = proto_file(
             "ed",
-            Syntax::Editions(Edition::Edition2024),
+            Syntax::Editions(Edition::Edition2023),
             vec![MessageDesc {
                 fields: vec![
                     scalar_field("n", FieldLabel::Optional, None, false),
@@ -911,6 +912,26 @@ mod tests {
         assert_eq!(
             fields.next().unwrap().occurrence(),
             FieldOccurrence::Singular(SingularPresence::Explicit)
+        );
+    }
+
+    #[test]
+    fn edition_2024_naming_and_visibility_are_codegen_errors() {
+        let arena = Arena::new();
+        let files = [proto_file(
+            "ed",
+            Syntax::Editions(Edition::Edition2024),
+            vec![MessageDesc {
+                fields: vec![scalar_field("n", FieldLabel::Optional, None, false)],
+                ..desc::message("M")
+            }],
+            vec![],
+        )];
+        let err = resolve(&arena, &files).expect_err("edition 2024");
+        let text = err.to_string();
+        assert!(
+            text.contains("enforce_naming_style") || text.contains("default_symbol_visibility"),
+            "{text}"
         );
     }
 

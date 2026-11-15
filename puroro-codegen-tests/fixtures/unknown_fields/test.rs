@@ -1,8 +1,8 @@
 //! `(puroro.unknown_fields)` preserve, discard, and reject.
 
 use crate::unknown_fields::{
-    Discard, DiscardChoice, Keep, KeepParent, Reject, RejectChoice, RejectClosed, RejectLazy,
-    RejectParent, Status,
+    Discard, DiscardChoice, DiscardClosedLazy, DiscardLazy, Keep, KeepLazy, KeepParent, Reject,
+    RejectChoice, RejectClosed, RejectLazy, RejectParent, Status,
 };
 use ::core::mem::size_of;
 use ::puroro::{DecodeError, Message};
@@ -14,6 +14,39 @@ fn keep_preserves_unknown_tag() {
     assert_eq!(msg.n().get(), 3);
     assert_eq!(msg.unknown_fields().count(), 1);
     assert_eq!(msg.encode_to_vec(), wire);
+}
+
+#[test]
+fn keep_lazy_reads_unknown_from_wire() {
+    let wire = [0x08_u8, 0x03, 0x50, 0x05]; // n=3, field 10 = 5
+    let msg: KeepLazy = KeepLazy::decode(&wire[..]).expect("decode");
+    assert_eq!(msg.n().expect("n").get(), 3);
+    assert_eq!(msg.unknown_fields().count(), 1);
+    assert_eq!(msg.encode_to_vec(), wire);
+}
+
+#[test]
+fn discard_lazy_omits_unknown_on_encode() {
+    let wire = [0x08_u8, 0x03, 0x50, 0x05]; // n=3, field 10 = 5
+    let msg: DiscardLazy = DiscardLazy::decode(&wire[..]).expect("decode");
+    assert_eq!(msg.n().expect("n").get(), 3);
+    assert!(msg.unknown_fields().next().is_none());
+    let encoded = msg.encode_to_vec();
+    assert_eq!(encoded, [0x08, 0x03]);
+    assert_eq!(
+        msg.into_eager().expect("into_eager").encode_to_vec(),
+        encoded
+    );
+}
+
+#[test]
+fn discard_lazy_omits_closed_enum_unknown() {
+    let wire = [0x08_u8, 99];
+    let msg: DiscardClosedLazy = DiscardClosedLazy::decode(&wire[..]).expect("decode");
+    assert!(!msg.status().expect("status").is_set());
+    assert_eq!(msg.status().expect("status").get(), Status::UNSPECIFIED);
+    assert!(msg.unknown_fields().next().is_none());
+    assert!(msg.encode_to_vec().is_empty());
 }
 
 #[test]

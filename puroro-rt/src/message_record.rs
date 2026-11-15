@@ -7,7 +7,6 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
 use ::core::fmt::{self, Debug};
-use ::core::iter;
 use ::core::mem;
 use ::core::ops::ControlFlow;
 use ::puroro::{DecodeBuf, DecodeError, Message, RECURSION_LIMIT, WireType};
@@ -149,12 +148,33 @@ where
     A: Allocator + Clone,
 {
     /// Apply one scanned record into the field slots.
+    ///
+    /// `depth` is this message's merge depth (`0` at the top-level `decode`).
+    /// Message fields must reject a child at `depth + 1` when that reaches
+    /// [`RECURSION_LIMIT`], including children whose bytes are only stored
+    /// as a span.
     fn apply_record(
         &mut self,
         common: &mut MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A>>,
         rec: &ScannedRecord,
         origin: usize,
+        depth: usize,
     ) -> Result<(), DecodeError>;
+
+    /// Count nested message fields in `payload` at this message's `depth`.
+    ///
+    /// The default accepts a message with no nested messages. Override it when
+    /// a field's LEN body is itself a message (or a map entry whose value is).
+    /// `depth >= `[`RECURSION_LIMIT`] fails before the body is scanned,
+    /// matching eager [`MessageMerge`].
+    fn check_message_depth(payload: &[u8], depth: usize) -> Result<(), DecodeError> {
+        let _ = payload;
+        if depth >= RECURSION_LIMIT {
+            Err(DecodeError::RecursionLimitExceeded)
+        } else {
+            Ok(())
+        }
+    }
 }
 
 /// Generated message: common state plus [`RecordFields`].
@@ -488,19 +508,44 @@ impl<F, A, U> MessageEncode for Record<F, A, Lazy<A>, U>
 where
     A: Allocator + Clone,
     U: UnknownStore<A>,
-    F: RecordFields<A, Lazy<A>, Unknown = U>,
+    F: RecordFields<A, Lazy<A>, Unknown = U> + LazyRecordApply<A>,
     F::Bits: Clone,
 {
     fn encoded_len(&self, _ctx: &mut EncodeCtx) -> usize {
-        self.common.lazy.scan.body_len()
+        self.prepare_policy();
+        if U::PRESERVES_UNRECOGNIZED {
+            self.common.lazy.scan.body_len()
+        } else {
+            let omit = self.common.lazy.scan.policy_spans();
+            self.common.lazy.scan.body_len_omitting(omit)
+        }
     }
 
     fn encode_raw<B: BufMut>(&self, _ctx: &mut EncodeCtx, buf: &mut B) {
-        self.common
-            .lazy
-            .scan
-            .write_bodies(buf)
-            .expect("lazy wire span out of range");
+        self.prepare_policy();
+        let scan = &self.common.lazy.scan;
+        let wrote = if U::PRESERVES_UNRECOGNIZED {
+            scan.write_bodies(buf)
+        } else {
+            scan.write_bodies_omitting(buf, scan.policy_spans())
+        };
+        wrote.expect("lazy wire span out of range");
+    }
+}
+
+impl<F, A, U> Record<F, A, Lazy<A>, U>
+where
+    A: Allocator + Clone,
+    U: UnknownStore<A>,
+    F: RecordFields<A, Lazy<A>, Unknown = U> + LazyRecordApply<A>,
+    F::Bits: Clone,
+{
+    /// Apply stored regions so discard encode and `unknown_fields()` see tags
+    /// that were only recorded as spans.
+    fn prepare_policy(&self) {
+        if self.common.lazy.scan.require_finished().is_ok() {
+            let _ = LazyMessage::ensure_scanned(self);
+        }
     }
 }
 
@@ -556,7 +601,7 @@ where
         if depth >= RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
-        LazyMessage::ingest_buf(self, buf)
+        LazyMessage::ingest_with_depth(self, buf, depth)
     }
 }
 
@@ -575,8 +620,14 @@ where
         &mut self.common.lazy.scan
     }
 
-    fn apply_record(&mut self, rec: &ScannedRecord, origin: usize) -> Result<(), DecodeError> {
-        self.fields.apply_record(&mut self.common, rec, origin)
+    fn apply_record(
+        &mut self,
+        rec: &ScannedRecord,
+        origin: usize,
+        depth: usize,
+    ) -> Result<(), DecodeError> {
+        self.fields
+            .apply_record(&mut self.common, rec, origin, depth)
     }
 }
 
@@ -690,7 +741,15 @@ where
     }
 
     fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
-        iter::empty()
+        // Preserve reads `_wire` spans only. Discard and reject stay empty.
+        // Closed-enum bytes may also sit in the store; do not yield that copy.
+        self.prepare_policy();
+        let keep = U::PRESERVES_UNRECOGNIZED;
+        self.common
+            .lazy
+            .scan
+            .iter_policy_spans()
+            .filter(move |_| keep)
     }
 
     fn validate(&self) -> Result<(), DecodeError> {
@@ -938,8 +997,9 @@ macro_rules! forward_record {
                 &mut self,
                 rec: &$crate::decode::ScannedRecord,
                 origin: usize,
+                depth: usize,
             ) -> ::core::result::Result<(), ::puroro::DecodeError> {
-                $crate::decode::LazyMessage::apply_record(&mut self.record, rec, origin)
+                $crate::decode::LazyMessage::apply_record(&mut self.record, rec, origin, depth)
             }
         }
     };

@@ -38,7 +38,9 @@ pub use value_slot::AddressableSlot;
 use ::core::cell::UnsafeCell;
 use ::core::mem::ManuallyDrop;
 
-use crate::decode::{MessageScan, UnknownFieldsIter, iter_unknown_fields};
+use crate::decode::{
+    MessageScan, ScannedRecord, UnknownFieldsIter, iter_unknown_fields, scanned_record_span,
+};
 use ::allocator_api2::alloc::Allocator;
 use ::bitvec::{
     array::BitArray,
@@ -395,6 +397,27 @@ where
     #[inline]
     fn unknown_fields_mut(&mut self) -> &mut U {
         &mut self.unknown_fields
+    }
+}
+
+impl<B, A, U> MessageCommon<B, A, U, Lazy<A>>
+where
+    A: Allocator + Clone,
+    U: UnknownStore<A>,
+{
+    /// Reject or remember one unrecognized lazy record.
+    ///
+    /// The span stays in `_wire`. Preserve yields it from `unknown_fields()`.
+    /// Discard and reject omit it on encode and do not yield it.
+    pub fn note_unrecognized_record(
+        &mut self,
+        rec: &ScannedRecord,
+        origin: usize,
+    ) -> Result<(), ::puroro::DecodeError> {
+        self.on_unrecognized_tag(rec.field_number.as_u32())?;
+        self.lazy
+            .record_policy_span(scanned_record_span(origin, rec)?);
+        Ok(())
     }
 }
 
