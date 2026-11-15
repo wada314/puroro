@@ -1,7 +1,7 @@
 //! Lazy getters on `Record<FooFields<A, Lazy<A>>, …>`.
 
+use super::field_emit::{FieldEmit, GetterShape, MapEmit, RepeatedEmit, ScalarEmit};
 use super::layout::{LayoutAssoc, LayoutAssocKind, MessageApply};
-use super::message::{FieldEmit, MapEmit, RepeatedEmit, ScalarEmit};
 use super::oneof::OneofEmit;
 use crate::error::Result;
 use ::proc_macro2::{Ident, TokenStream};
@@ -85,8 +85,8 @@ fn message_method(name: &Ident, view: &TokenStream, expr: TokenStream) -> TokenS
 fn singular_getter(field: &ScalarEmit, fields_name: &Ident, companion: &Ident) -> TokenStream {
     let name = &field.name;
     let ensured = scan_guard();
-    let get = super::message::lazy_field(fields_name, companion, &field.field_const);
-    if let Some(access) = field.len_access {
+    if let GetterShape::Len { access, .. } = field.getter_shape {
+        let get = super::message::lazy_field(fields_name, companion, &field.field_const);
         let read = match access {
             super::layout::LenAccess::Str => quote! {
                 #get.try_str(&self.record.common, self.record.common.lazy.scan.wire())
@@ -118,13 +118,13 @@ fn singular_getter(field: &ScalarEmit, fields_name: &Ident, companion: &Ident) -
             #has
         };
     }
-    if field.message_apply.is_some() {
+    if matches!(field.getter_shape, GetterShape::Message) {
         let view = lazy_child_view(field.layout.as_ref(), &field.mut_target, companion);
         let get = super::message::bound_record_field(companion, &field.field_const, false);
         return message_method(name, &view, quote! { #get.get() });
     }
     let read = super::message::bound_record_field(companion, &field.field_const, false);
-    if field.optional_getter {
+    if matches!(field.getter_shape, GetterShape::Optional) {
         optional_method(
             name,
             &field.optional_ty,
@@ -212,7 +212,7 @@ fn oneof_getters(field: &OneofEmit, fields_name: &Ident, companion: &Ident) -> V
         let vname = &variant.name;
         let field_const = &variant.field_const;
         let get = super::message::lazy_field(fields_name, companion, field_const);
-        let body = if let Some(access) = variant.len_access {
+        let body = if let GetterShape::Len { access, .. } = variant.getter_shape {
             let read = match access {
                 super::layout::LenAccess::Str => quote! {
                     #get.try_str(&self.record.common, self.record.common.lazy.scan.wire())
@@ -229,7 +229,7 @@ fn oneof_getters(field: &OneofEmit, fields_name: &Ident, companion: &Ident) -> V
                     #read
                 },
             )
-        } else if variant.message_apply.is_some() {
+        } else if matches!(variant.getter_shape, GetterShape::Message) {
             let view = lazy_child_view(variant.layout.as_ref(), &variant.mut_target, companion);
             let read = super::message::bound_record_field(companion, field_const, false);
             message_method(vname, &view, quote! { #read.get() })
@@ -285,7 +285,7 @@ enum SlotApply<'a> {
 }
 
 fn singular_apply(field: &ScalarEmit, companion: &Ident) -> TokenStream {
-    let kind = if field.len_access.is_some() {
+    let kind = if field.getter_shape.len_access().is_some() {
         SlotApply::Len
     } else if let Some(apply) = field.message_apply.as_ref() {
         SlotApply::Message(apply)
@@ -427,7 +427,7 @@ fn oneof_apply(field: &OneofEmit, companion: &Ident) -> Vec<TokenStream> {
             let slot = quote! {
                 #slot_mut.variant(common)
             };
-            let kind = if variant.len_access.is_some() {
+            let kind = if variant.getter_shape.len_access().is_some() {
                 SlotApply::Len
             } else if let Some(apply) = variant.message_apply.as_ref() {
                 SlotApply::Message(apply)

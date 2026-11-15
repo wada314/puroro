@@ -1,7 +1,7 @@
 //! Emit a oneof submodule (`shape` / `Case` / `Storage` + trait impls).
 
-use super::layout::{LayoutAssoc, LayoutAssocKind, LenAccess, MessageApply};
-use super::message::SingularMutStyle;
+use super::field_emit::{EagerGetter, GetterShape, SingularMutStyle};
+use super::layout::{LayoutAssoc, LayoutAssocKind, MessageApply};
 use crate::default_value::CustomDefault;
 use crate::descriptor::UnknownFieldsPolicy;
 use crate::error::Result;
@@ -52,8 +52,8 @@ pub(super) struct OneofVariantEmit {
     pub layout_ty: Option<Type>,
     /// Bool value bit — `Some((BIT_FLAG_VALUE, 4))`; `None` otherwise.
     pub value_bit: Option<(Ident, usize)>,
-    /// Message variant — `get()` / `get_mut()` instead of scalar optional.
-    pub is_message: bool,
+    /// Shared with singular fields. Oneof non-messages are [`GetterShape::Optional`].
+    pub getter_shape: GetterShape,
     /// Bool variant — value lives in a bit, not in the payload word.
     pub is_bool: bool,
     /// `_mut` return: `DerefMut` vs `StringMut` / `BytesMut` (SSO).
@@ -64,8 +64,6 @@ pub(super) struct OneofVariantEmit {
     pub optional_ty: Type,
     /// Non-type-zero `[default = …]` (`EmailDefault` + `HasDefault` items).
     pub custom_default: Option<(CustomDefault, Vec<Item>)>,
-    /// Lazy string / bytes read. `None` for other variants.
-    pub len_access: Option<LenAccess>,
     /// Lazy message apply. `None` when this variant is not a message.
     pub message_apply: Option<MessageApply>,
     /// `Layout` associated type for this variant (string slot or follow-parent child).
@@ -244,7 +242,7 @@ fn render_module_body(
         .variants
         .iter()
         .map(|v| {
-            if v.is_message {
+            if v.getter_shape.is_message() {
                 let mut_target = &v.mut_target;
                 quote! { &'a #mut_target }
             } else {
@@ -592,7 +590,7 @@ pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> (TokenSt
         .variants
         .iter()
         .map(|v| {
-            if v.is_message {
+            if v.getter_shape.is_message() {
                 let mut_target = &v.mut_target;
                 quote! { &'a #mut_target }
             } else {
@@ -613,7 +611,7 @@ pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> (TokenSt
         let optional_ty = &v.optional_ty;
         let get = super::message::eager_field(companion, field_const);
         let get_mut = super::message::eager_field_mut(companion, field_const);
-        if v.is_message {
+        if matches!(v.getter_shape.eager(), EagerGetter::Message) {
             variant_getters.push(quote! {
                 pub fn #vname(&self) -> ::core::option::Option<&#mut_target> {
                     #get.get()

@@ -16,6 +16,7 @@ use ::syn::{Attribute, Item};
 
 mod defaults;
 mod enumeration;
+mod field_emit;
 mod ident;
 mod layout;
 mod lazy;
