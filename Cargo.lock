@@ -541,7 +541,6 @@ dependencies = [
  "protoc-gen-puroro",
  "puroro",
  "puroro-rt",
- "puroro-sample-generated",
 ]
 
 [[package]]

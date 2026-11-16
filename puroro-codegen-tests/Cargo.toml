@@ -8,19 +8,12 @@ description = "Compile-time generation + runtime tests for protoc-gen-puroro"
 [lints]
 workspace = true
 
-[features]
-# Off by default. Compares handwritten `sample-generated` with this crate's
-# plugin output. `cargo test` and CI do not enable it, so a redesign of the
-# sample is allowed to break the comparison.
-sample-parity = ["dep:puroro-sample-generated"]
-
 [dependencies]
 allocator-api2 = "0.2"
 bitvec = "1"
 bytes = "1"
 puroro = { path = ".." }
 puroro-rt = { path = "../puroro-rt" }
-puroro-sample-generated = { path = "../sample-generated", optional = true }
 
 # Host plugin binary for the build script (`CARGO_BIN_FILE_PROTOC_GEN_PURORO`).
 # Requires nightly Cargo `-Z bindeps` (enabled via `.cargo/config.toml`).
