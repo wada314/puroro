@@ -577,6 +577,14 @@ mod tests {
             !content.contains("Boxed"),
             "auto-inlined origin must not emit Boxed: {content}"
         );
+        assert!(
+            content.contains("pub fn set_origin"),
+            "singular message fields move-replace via set_*: {content}"
+        );
+        assert!(
+            content.contains("*self.origin_mut() = src"),
+            "follow-parent set_origin assigns the eager child: {content}"
+        );
     }
 
     #[test]
@@ -609,6 +617,10 @@ mod tests {
         assert!(
             !content.contains("BIT_ASSIGNEE"),
             "boxed assignee must not allocate a presence bit: {content}"
+        );
+        assert!(
+            content.contains("*self.assignee_mut() = src"),
+            "boxed follow-parent set_assignee assigns the eager child: {content}"
         );
     }
 
@@ -666,6 +678,11 @@ mod tests {
         assert!(
             content.contains("::puroro_rt::Oneof"),
             "oneof message variant must keep Oneof presence: {content}"
+        );
+        assert_eq!(
+            content.matches("fn after_deallocate").count(),
+            2,
+            "eager and lazy oneof groups both wipe parent bits: {content}"
         );
     }
 
