@@ -138,7 +138,7 @@ pub fn resolve_with<'a>(
 
     // Pass 2: file-level feature traps, then link queued field edges.
     for proto in proto_files {
-        check_file_features(proto);
+        check_file_features(proto)?;
     }
     ctx.link_pending()?;
 
@@ -180,6 +180,14 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
         let fqn = parent_fqn.append(&desc.name);
 
         self.check_unique_fqn(&fqn)?;
+
+        // `json_format` is runtime retention and targets messages, so protoc
+        // delivers a message option. File / enum / field sets are checked on
+        // their own paths; this is the message path.
+        if matches!(file.syntax, Syntax::Editions(_)) {
+            desc.features
+                .reject_unimplemented_overrides(&format!("message `{fqn}`"))?;
+        }
 
         let (oneofs, oneof_remap) = OneofRemap::from_message(desc);
 
@@ -231,7 +239,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
         self.check_unique_fqn(&fqn)?;
 
         desc.features
-            .reject_unimplemented_overrides(&format!("enum `{fqn}`"));
+            .reject_unimplemented_overrides(&format!("enum `{fqn}`"))?;
 
         let values = desc
             .values
@@ -293,7 +301,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
         if matches!(file.syntax, Syntax::Editions(_)) {
             field
                 .features
-                .reject_unimplemented_overrides(&format!("field `{owner_fqn}.{}`", field.name));
+                .reject_unimplemented_overrides(&format!("field `{owner_fqn}.{}`", field.name))?;
         }
 
         let features = FinalizedFeatureSet::resolve_field(file, field, self.proto2_utf8);
@@ -453,13 +461,14 @@ impl EnumType {
     }
 }
 
-fn check_file_features(proto: &ProtoFile) {
+fn check_file_features(proto: &ProtoFile) -> Result<()> {
     if matches!(proto.syntax, Syntax::Editions(_)) {
         proto
             .features
-            .reject_unimplemented_overrides(&format!("file `{}`", proto.name));
-        FinalizedFeatureSet::resolve(proto, None, Utf8Validation::None).apply_or_trap_for_file();
+            .reject_unimplemented_overrides(&format!("file `{}`", proto.name))?;
+        FinalizedFeatureSet::resolve(proto, None, Utf8Validation::None).apply_or_trap_for_file()?;
     }
+    Ok(())
 }
 
 impl FieldOccurrence {
@@ -502,7 +511,10 @@ impl Utf8Validation {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::descriptor::features::{EnumType, FeatureSet, FieldPresence, RepeatedFieldEncoding};
+    use crate::descriptor::features::{
+        DefaultSymbolVisibility, EnforceNamingStyle, EnumType, FeatureSet, FieldPresence,
+        JsonFormat, RepeatedFieldEncoding,
+    };
     use crate::descriptor::test_helpers as desc;
     use crate::descriptor::{
         Edition, EnumDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, ProtoFile, ProtoFqn,
@@ -881,7 +893,7 @@ mod tests {
         let arena = Arena::new();
         let mut file = proto_file(
             "ed",
-            Syntax::Editions(Edition::Edition2024),
+            Syntax::Editions(Edition::Edition2023),
             vec![MessageDesc {
                 fields: vec![
                     scalar_field("n", FieldLabel::Optional, None, false),
@@ -912,6 +924,155 @@ mod tests {
             fields.next().unwrap().occurrence(),
             FieldOccurrence::Singular(SingularPresence::Explicit)
         );
+    }
+
+    #[test]
+    fn edition_2024_defaults_fail_on_naming_then_visibility() {
+        let arena = Arena::new();
+        let files = [proto_file(
+            "ed",
+            Syntax::Editions(Edition::Edition2024),
+            vec![MessageDesc {
+                fields: vec![scalar_field("n", FieldLabel::Optional, None, false)],
+                ..desc::message("M")
+            }],
+            vec![],
+        )];
+        let err = resolve(&arena, &files).expect_err("bare edition 2024");
+        let text = err.to_string();
+        assert!(
+            text.contains("enforce_naming_style"),
+            "naming is checked before visibility: {text}"
+        );
+
+        let mut opted = files[0].clone();
+        opted.features.enforce_naming_style = Some(EnforceNamingStyle::StyleLegacy);
+        let err = resolve(&arena, &[opted.clone()]).expect_err("visibility still 2024");
+        let text = err.to_string();
+        assert!(
+            text.contains("default_symbol_visibility"),
+            "visibility remains after naming is opted back: {text}"
+        );
+
+        opted.features.default_symbol_visibility = Some(DefaultSymbolVisibility::ExportAll);
+        // protoc strips these two features (source retention), so a real
+        // edition 2024 file never arrives with them set. The resolver still
+        // accepts the implemented values when a caller supplies them.
+        resolve(&arena, &[opted]).expect("implemented naming and visibility");
+    }
+
+    #[test]
+    fn explicit_implemented_edition_features_are_accepted() {
+        let arena = Arena::new();
+        let mut file = proto_file(
+            "ed",
+            Syntax::Editions(Edition::Edition2023),
+            vec![MessageDesc {
+                fields: vec![scalar_field("n", FieldLabel::Optional, None, false)],
+                ..desc::message("M")
+            }],
+            vec![],
+        );
+        file.features = FeatureSet {
+            json_format: Some(JsonFormat::Allow),
+            enforce_naming_style: Some(EnforceNamingStyle::StyleLegacy),
+            default_symbol_visibility: Some(DefaultSymbolVisibility::ExportAll),
+            ..FeatureSet::default()
+        };
+        resolve(&arena, &[file]).expect("explicit implemented defaults");
+    }
+
+    #[test]
+    fn explicit_unimplemented_edition_features_are_codegen_errors() {
+        let arena = Arena::new();
+        let base = proto_file(
+            "ed",
+            Syntax::Editions(Edition::Edition2023),
+            vec![MessageDesc {
+                fields: vec![scalar_field("n", FieldLabel::Optional, None, false)],
+                ..desc::message("M")
+            }],
+            vec![],
+        );
+        let cases = [
+            (
+                "json_format",
+                FeatureSet {
+                    json_format: Some(JsonFormat::LegacyBestEffort),
+                    ..FeatureSet::default()
+                },
+            ),
+            (
+                "enforce_naming_style",
+                FeatureSet {
+                    enforce_naming_style: Some(EnforceNamingStyle::Style2024),
+                    ..FeatureSet::default()
+                },
+            ),
+            (
+                "default_symbol_visibility",
+                FeatureSet {
+                    default_symbol_visibility: Some(DefaultSymbolVisibility::ExportTopLevel),
+                    ..FeatureSet::default()
+                },
+            ),
+            (
+                "default_symbol_visibility",
+                FeatureSet {
+                    default_symbol_visibility: Some(DefaultSymbolVisibility::LocalAll),
+                    ..FeatureSet::default()
+                },
+            ),
+            (
+                "default_symbol_visibility",
+                FeatureSet {
+                    default_symbol_visibility: Some(DefaultSymbolVisibility::Strict),
+                    ..FeatureSet::default()
+                },
+            ),
+        ];
+        for (needle, features) in cases {
+            let mut file = base.clone();
+            file.features = features;
+            let err = resolve(&arena, &[file]).expect_err(needle);
+            let text = err.to_string();
+            assert!(text.contains(needle), "{text}");
+        }
+    }
+
+    #[test]
+    fn message_scoped_json_format_is_checked() {
+        let arena = Arena::new();
+        let allow = proto_file(
+            "ed",
+            Syntax::Editions(Edition::Edition2023),
+            vec![MessageDesc {
+                features: FeatureSet {
+                    json_format: Some(JsonFormat::Allow),
+                    ..FeatureSet::default()
+                },
+                ..desc::message("M")
+            }],
+            vec![],
+        );
+        resolve(&arena, &[allow]).expect("explicit ALLOW on the message");
+
+        let rejected = proto_file(
+            "ed",
+            Syntax::Editions(Edition::Edition2023),
+            vec![MessageDesc {
+                features: FeatureSet {
+                    json_format: Some(JsonFormat::LegacyBestEffort),
+                    ..FeatureSet::default()
+                },
+                ..desc::message("M")
+            }],
+            vec![],
+        );
+        let err = resolve(&arena, &[rejected]).expect_err("message LEGACY_BEST_EFFORT");
+        let text = err.to_string();
+        assert!(text.contains("json_format"), "{text}");
+        assert!(text.contains("message `.ed.M`"), "{text}");
     }
 
     #[test]

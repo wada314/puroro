@@ -3,7 +3,7 @@
 use ::allocator_api2::alloc::Global;
 use ::puroro::{
     BytesMut, DecodeError, MapMut, MapRef, Message, RECURSION_LIMIT, RepeatedStringMut, ScopedBuf,
-    StringMut,
+    StringMut, UnknownPayload,
 };
 use ::puroro_rt::INLINE_CAP;
 use ::puroro_rt::MessageMerge;
@@ -1242,4 +1242,31 @@ fn merge_from_at_recursion_limit_is_rejected() {
         MessageMerge::merge_from_with_depth(&mut lazy, &mut scoped, RECURSION_LIMIT - 1).unwrap();
     }
     assert_eq!(lazy.score().unwrap(), 9);
+}
+
+#[test]
+fn preserve_lazy_unknown_fields_come_from_wire() {
+    let mut bytes = Vec::new();
+    encode_varint_field(
+        field_number_const::<99>(),
+        Varint::from_uint64(5),
+        &mut bytes,
+    );
+    encode_varint_field(
+        field_number_const::<10>(),
+        Varint::from_uint64(99),
+        &mut bytes,
+    );
+
+    let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
+    assert!(!lazy.priority().unwrap().is_set());
+    assert_eq!(lazy.priority().unwrap().get(), Priority::UNSPECIFIED);
+    let unknowns: Vec<_> = lazy.unknown_fields().collect();
+    assert_eq!(unknowns.len(), 2);
+    assert_eq!(unknowns[0].number(), 99);
+    assert_eq!(*unknowns[0].payload(), UnknownPayload::Varint(5));
+    assert_eq!(unknowns[1].number(), 10);
+    assert_eq!(*unknowns[1].payload(), UnknownPayload::Varint(99));
+    assert_eq!(LazyMessage::encode_to_vec(&lazy).unwrap(), bytes);
+    assert_eq!(Message::encode_to_vec(&lazy), bytes);
 }

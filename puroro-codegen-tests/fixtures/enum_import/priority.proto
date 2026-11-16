@@ -1,8 +1,11 @@
-edition = "2024";
+edition = "2023";
 
 package demo;
 
-// Closed enum defined in a different edition than Status / Holder.
+// Closed enum. A bare edition 2024 file is a codegen error: naming and
+// visibility default to values this plugin does not implement, and those
+// features are source retention so an explicit override never reaches protoc
+// plugins. This file stays on edition 2023.
 enum Priority {
   option features.enum_type = CLOSED;
   PRIORITY_UNSPECIFIED = 0;

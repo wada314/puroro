@@ -1,4 +1,4 @@
-//! Cross-edition enum import: edition-2023 open + edition-2024 closed.
+//! Open and closed enums imported from separate edition-2023 files.
 
 use crate::enum_import::demo::{Holder, Priority, Status};
 use ::puroro::Message;

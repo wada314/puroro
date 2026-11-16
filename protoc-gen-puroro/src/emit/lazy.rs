@@ -264,7 +264,9 @@ pub(super) fn render_apply_arms(fields: &[FieldEmit], companion: &Ident) -> Vec<
                     &field.field_const,
                     companion,
                     super::message::field_mut_expr(companion, &field.field_const),
-                    SlotApply::SpanList,
+                    SlotApply::Map {
+                        depth_fields: field.depth_fields.as_ref(),
+                    },
                 ));
             }
             FieldEmit::Oneof(field) => arms.extend(oneof_apply(field, companion)),
@@ -277,8 +279,12 @@ pub(super) fn render_apply_arms(fields: &[FieldEmit], companion: &Ident) -> Vec<
 enum SlotApply<'a> {
     /// Singular or oneof string / bytes: `store_len_span`.
     Len,
-    /// Repeated string / bytes, or a map: `store_span`.
+    /// Repeated string / bytes: `store_span`.
     SpanList,
+    /// Map: `store_span`, and a depth walk when the value is a message.
+    Map {
+        depth_fields: Option<&'a Type>,
+    },
     Message(&'a MessageApply),
     Numerical,
     RepeatedNumerical,
@@ -361,11 +367,21 @@ fn apply_arm(
                 )
             }
         },
+        SlotApply::Map { depth_fields } => {
+            map_apply_arm(field_const, companion, slot, depth_fields)
+        }
         SlotApply::Message(apply) => message_apply_arm(slot, field_const, companion, apply),
         SlotApply::Numerical => quote! {
-            #companion::#field_const => #slot
-                .bind_mut(common)
-                .merge_scanned(&rec.value),
+            #companion::#field_const => {
+                let span = ::puroro_rt::decode::scanned_record_span(origin, rec)?;
+                if #slot.bind_mut(common).merge_scanned_at(
+                    &rec.value,
+                    ::core::option::Option::Some(span),
+                )? {
+                    common.lazy.record_policy_span(span);
+                }
+                ::core::result::Result::Ok(())
+            }
         },
         SlotApply::RepeatedNumerical => quote! {
             #companion::#field_const => {
@@ -380,6 +396,49 @@ fn apply_arm(
     }
 }
 
+fn depth_check(fields: &Type) -> TokenStream {
+    quote! {
+        {
+            let body = span.slice(common.lazy.scan.wire())?;
+            <#fields as ::puroro_rt::LazyRecordApply<A>>::check_message_depth(body, depth + 1)?;
+        }
+    }
+}
+
+fn map_apply_arm(
+    field_const: &Ident,
+    companion: &Ident,
+    slot: TokenStream,
+    depth_fields: Option<&Type>,
+) -> TokenStream {
+    let check = depth_fields.map(|fields| {
+        quote! {
+            let entry = span.slice(common.lazy.scan.wire())?;
+            ::puroro_rt::decode::for_each_len_field(entry, |entry_field, value| {
+                if entry_field == 2 {
+                    <#fields as ::puroro_rt::LazyRecordApply<A>>::check_message_depth(
+                        value,
+                        depth + 1,
+                    )
+                } else {
+                    ::core::result::Result::Ok(())
+                }
+            })?;
+        }
+    });
+    quote! {
+        #companion::#field_const => {
+            let span = ::puroro_rt::decode::scanned_len_span(origin, rec)?;
+            #check
+            #slot.store_span(
+                span,
+                common.lazy.scan.wire(),
+                common,
+            )
+        }
+    }
+}
+
 fn message_apply_arm(
     slot: TokenStream,
     field_const: &Ident,
@@ -387,24 +446,32 @@ fn message_apply_arm(
     apply: &MessageApply,
 ) -> TokenStream {
     let body = match apply {
-        MessageApply::SharedSingular => quote! {
-            let root = common.lazy.scan.shared().clone_handle();
-            #slot.merge_shared(&root, span, common)
-        },
-        MessageApply::SharedRepeated => quote! {
-            let root = common.lazy.scan.shared().clone_handle();
-            #slot.merge_shared(&root, span, common)
-        },
-        MessageApply::EagerSingular => quote! {
+        MessageApply::SharedSingular(fields) => {
+            let check = depth_check(fields);
+            quote! {
+                #check
+                let root = common.lazy.scan.shared().clone_handle();
+                #slot.merge_shared(&root, span, common)
+            }
+        }
+        MessageApply::SharedRepeated(fields) => {
+            let check = depth_check(fields);
+            quote! {
+                #check
+                let root = common.lazy.scan.shared().clone_handle();
+                #slot.merge_shared(&root, span, common)
+            }
+        }
+        MessageApply::EagerSingular(_) => quote! {
             let payload = span.slice(common.lazy.scan.wire())?;
             let child = #slot.bind_mut(common).get_mut();
-            ::puroro::Message::merge_from(child, &mut &payload[..])?;
+            ::puroro_rt::MessageMerge::merge_from_slice(child, payload, depth + 1)?;
             ::core::result::Result::Ok(())
         },
-        MessageApply::EagerRepeated(child_ty) => quote! {
+        MessageApply::EagerRepeated(child_ty, _) => quote! {
             let payload = span.slice(common.lazy.scan.wire())?;
             let mut child = #child_ty::new_in(common.alloc.clone());
-            ::puroro::Message::merge_from(&mut child, &mut &payload[..])?;
+            ::puroro_rt::MessageMerge::merge_from_slice(&mut child, payload, depth + 1)?;
             #slot.push_in(child, common.alloc.clone());
             ::core::result::Result::Ok(())
         },
@@ -415,6 +482,79 @@ fn message_apply_arm(
             #body
         }
     }
+}
+
+/// Match arms for [`LazyRecordApply::check_message_depth`](puroro_rt::LazyRecordApply::check_message_depth).
+pub(super) fn render_depth_arms(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStream> {
+    let mut arms = Vec::new();
+    for field in fields {
+        match field {
+            FieldEmit::Singular(field) => push_depth_arm(
+                &mut arms,
+                field.message_apply.as_ref(),
+                &field.field_const,
+                companion,
+            ),
+            FieldEmit::Repeated(field) => push_depth_arm(
+                &mut arms,
+                field.message_apply.as_ref(),
+                &field.field_const,
+                companion,
+            ),
+            FieldEmit::Oneof(field) => {
+                for variant in &field.variants {
+                    push_depth_arm(
+                        &mut arms,
+                        variant.message_apply.as_ref(),
+                        &variant.field_const,
+                        companion,
+                    );
+                }
+            }
+            FieldEmit::Map(field) => {
+                if let Some(fields_ty) = &field.depth_fields {
+                    let field_const = &field.field_const;
+                    arms.push(quote! {
+                        #companion::#field_const => {
+                            ::puroro_rt::decode::for_each_len_field(body, |entry_field, value| {
+                                if entry_field == 2 {
+                                    <#fields_ty as ::puroro_rt::LazyRecordApply<A>>::check_message_depth(
+                                        value,
+                                        depth + 1,
+                                    )
+                                } else {
+                                    ::core::result::Result::Ok(())
+                                }
+                            })
+                        }
+                    });
+                }
+            }
+        }
+    }
+    arms
+}
+
+fn push_depth_arm(
+    arms: &mut Vec<TokenStream>,
+    apply: Option<&MessageApply>,
+    field_const: &Ident,
+    companion: &Ident,
+) {
+    let Some(apply) = apply else {
+        return;
+    };
+    let fields = match apply {
+        MessageApply::SharedSingular(fields)
+        | MessageApply::SharedRepeated(fields)
+        | MessageApply::EagerSingular(fields)
+        | MessageApply::EagerRepeated(_, fields) => fields,
+    };
+    arms.push(quote! {
+        #companion::#field_const => {
+            <#fields as ::puroro_rt::LazyRecordApply<A>>::check_message_depth(body, depth + 1)
+        }
+    });
 }
 
 fn oneof_apply(field: &OneofEmit, companion: &Ident) -> Vec<TokenStream> {

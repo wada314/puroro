@@ -12,7 +12,7 @@ use ::core::marker::PhantomData;
 use ::core::mem;
 use ::core::ops::{ControlFlow, DerefMut};
 use ::puroro::{DecodeBuf, DecodeError, WireType};
-use ::puroro_rt::decode::{MessageScan, ScannedRecord};
+use ::puroro_rt::decode::{MessageScan, ScannedRecord, scanned_record_span};
 use ::puroro_rt::{
     CloneRecordFields, ConstructRecordFields, Eager, EagerRecordFields, FieldCloneIn,
     FieldDeallocate, FieldPairVisitor, FieldVisitor, FieldVisitorMut, HasField, Implicit, Lazy,
@@ -185,16 +185,31 @@ impl<A: Allocator + Clone> LazyRecordApply<A> for PointFields<A, Lazy<A>> {
         &mut self,
         common: &mut MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A>>,
         rec: &ScannedRecord,
-        _origin: usize,
+        origin: usize,
+        _depth: usize,
     ) -> Result<(), DecodeError> {
         match rec.field_number.as_u32() {
-            FIELD_X => <Self as HasField<{ FIELD_X }>>::field_mut(self)
-                .bind_mut(common)
-                .merge_scanned(&rec.value),
-            FIELD_Y => <Self as HasField<{ FIELD_Y }>>::field_mut(self)
-                .bind_mut(common)
-                .merge_scanned(&rec.value),
-            _ => common.on_unrecognized_tag(rec.field_number.as_u32()),
+            FIELD_X => {
+                let span = scanned_record_span(origin, rec)?;
+                if <Self as HasField<{ FIELD_X }>>::field_mut(self)
+                    .bind_mut(common)
+                    .merge_scanned_at(&rec.value, Some(span))?
+                {
+                    common.lazy.record_policy_span(span);
+                }
+                Ok(())
+            }
+            FIELD_Y => {
+                let span = scanned_record_span(origin, rec)?;
+                if <Self as HasField<{ FIELD_Y }>>::field_mut(self)
+                    .bind_mut(common)
+                    .merge_scanned_at(&rec.value, Some(span))?
+                {
+                    common.lazy.record_policy_span(span);
+                }
+                Ok(())
+            }
+            _ => common.note_unrecognized_record(rec, origin),
         }
     }
 }

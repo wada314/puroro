@@ -24,13 +24,20 @@ pub(super) enum LenAccess {
 #[derive(Clone)]
 pub(super) enum MessageApply {
     /// Singular or oneof child implements `LazyMessage`.
-    SharedSingular,
+    ///
+    /// The type is `ChildFields<A, Lazy<A>>`, used to count nesting.
+    SharedSingular(Type),
     /// Repeated child implements `LazyMessage`.
-    SharedRepeated,
+    SharedRepeated(Type),
     /// Singular or oneof child is the eager type. Decode the LEN into the slot.
-    EagerSingular,
+    ///
+    /// The type is still the lazy field struct, so a lazy parent can count
+    /// depth from the wire without decoding the pin.
+    EagerSingular(Type),
     /// Repeated child is the eager type. Construct one value per LEN and push it.
-    EagerRepeated(Box<Type>),
+    ///
+    /// The second type is `ChildFields<A, Lazy<A>>` for the depth walk.
+    EagerRepeated(Box<Type>, Type),
 }
 
 /// One associated type on `mod layout::Layout`.

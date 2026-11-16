@@ -619,10 +619,26 @@ where
 {
     /// Writes a scanner numeric without re-encoding it to the wire.
     pub fn merge_scanned(self, value: &ScannedValue) -> Result<(), DecodeError> {
+        self.merge_scanned_at(value, None).map(|_| ())
+    }
+
+    /// [`merge_scanned`](Self::merge_scanned).
+    ///
+    /// Returns `Ok(true)` when a closed enum diverted into the unknown store.
+    /// `record` is not stored here: the lazy caller records that span on
+    /// [`Lazy::record_policy_span`](crate::decode::Lazy::record_policy_span)
+    /// so preserve can yield the tag from `_wire` and discard can omit it.
+    /// The store copy is not also yielded.
+    pub fn merge_scanned_at(
+        self,
+        value: &ScannedValue,
+        record: Option<WireSpan>,
+    ) -> Result<bool, DecodeError> {
+        let _ = record;
         match C::from_wire_body(C::WireBody::from_scanned(value)?) {
             Ok(new) => {
                 Numerical::<C>::write(&mut *self.field.value, P::slot_init_mut(), self.common, new);
-                Ok(())
+                Ok(false)
             }
             Err(DecodeError::UnknownClosedEnum { raw }) => {
                 let alloc = self.common.clone_alloc();
@@ -632,7 +648,7 @@ where
                     self.common.unknown_fields_mut(),
                     alloc,
                 );
-                Ok(())
+                Ok(true)
             }
             Err(e) => Err(e),
         }
@@ -649,13 +665,24 @@ where
 {
     /// Writes a scanner bool without re-encoding it to the wire.
     pub fn merge_scanned(self, value: &ScannedValue) -> Result<(), DecodeError> {
+        self.merge_scanned_at(value, None).map(|_| ())
+    }
+
+    /// [`merge_scanned`](Self::merge_scanned). Bools do not divert closed-enum
+    /// unknowns, so `record` is ignored and the result is always `Ok(false)`.
+    pub fn merge_scanned_at(
+        self,
+        value: &ScannedValue,
+        record: Option<WireSpan>,
+    ) -> Result<bool, DecodeError> {
+        let _ = record;
         match BoolCodec::from_wire_body(VarintPayload::from_scanned(value)?) {
             Ok(new) => {
                 let _ =
                     ValueSlot::with_mut(&mut *self.field.value, P::slot_init_mut(), self.common)
                         .get_mut();
                 MessageCommonBits::set_bit(self.common, VALUE_BIT, new);
-                Ok(())
+                Ok(false)
             }
             Err(e) => Err(e),
         }

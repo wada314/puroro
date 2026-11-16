@@ -8,7 +8,10 @@ use super::defaults;
 use super::ident::{escape_ident, is_simple_ident, to_pascal_case};
 use super::layout::{LayoutAssoc, LayoutAssocKind, LenAccess, MessageApply};
 use super::oneof::{OneofEmit, OneofVariantEmit};
-use super::type_path::{fqn_to_enum_root_path, fqn_to_message_lazy_path, fqn_to_message_root_path};
+use super::type_path::{
+    fqn_to_enum_root_path, fqn_to_message_fields_path, fqn_to_message_lazy_path,
+    fqn_to_message_root_path,
+};
 use crate::default_value::CustomDefault;
 use crate::descriptor::features::EnumType;
 use crate::error::{Error, Result};
@@ -120,6 +123,8 @@ pub(super) struct MapEmit {
     pub(super) mut_target: Option<Type>,
     /// `MapReady` vs `MapSpans`, plus a follow-parent value message when there is one.
     pub(super) layouts: Vec<LayoutAssoc>,
+    /// `ValueFields<A, Lazy<A>>` when the map value is a message.
+    pub(super) depth_fields: Option<Type>,
 }
 
 #[derive(Clone, Copy)]
@@ -572,8 +577,10 @@ fn emit_map(field: &PlannedField<'_>, companion: &Ident) -> Result<MapEmit> {
     let mut map_value_bound = value_marker.clone();
     let mut value_view = value_views.map_value;
     let mut layouts = Vec::new();
+    let mut depth_fields = None;
     if let WireTypeKind::Message(child) = value {
         let pin = resolve_child_pin(name, child, field.child_parse())?;
+        depth_fields = Some(pin.fields_ty().clone());
         if let Some(assoc) = pin.follow() {
             let assoc_name = &assoc.assoc;
             // The `Layout` bound names the assoc on `Self`. The field
@@ -612,6 +619,7 @@ fn emit_map(field: &PlannedField<'_>, companion: &Ident) -> Result<MapEmit> {
         value_view,
         mut_target: value_views.map_value_mut,
         layouts,
+        depth_fields,
     })
 }
 
@@ -803,11 +811,17 @@ fn child_type_pair(message: &ResolvedMessage<'_>) -> Result<(Type, Type)> {
 /// Nested message pin, resolved once for every singular / repeated / map / oneof use.
 enum ChildPin {
     /// Child type is a `Layout` associated type and follows the parent alias.
-    Follow(Box<LayoutAssoc>),
+    ///
+    /// The second type is `ChildFields<A, Lazy<A>>` for the recursion walk.
+    Follow(Box<LayoutAssoc>, Type),
     /// Pinned to the lazy alias on both the eager and lazy parent.
-    Lazy { eager: Box<Type>, lazy: Box<Type> },
+    Lazy {
+        eager: Box<Type>,
+        lazy: Box<Type>,
+        fields: Type,
+    },
     /// Pinned to the eager alias. The wire marker from `wire_marker_path` stays.
-    Eager { eager: Box<Type> },
+    Eager { eager: Box<Type>, fields: Type },
 }
 
 fn resolve_child_pin(
@@ -816,36 +830,53 @@ fn resolve_child_pin(
     pin: ResolvedChildParse,
 ) -> Result<ChildPin> {
     let (eager, lazy) = child_type_pair(child)?;
+    let fields_path = fqn_to_message_fields_path(child)?;
+    let fields: Type = parse_quote! { #fields_path<A, ::puroro_rt::Lazy<A>> };
     Ok(match pin {
         ResolvedChildParse::Follow => {
             let assoc = assoc_ident(field_name, "Msg");
-            ChildPin::Follow(Box::new(LayoutAssoc {
-                assoc,
-                kind: LayoutAssocKind::Child { eager, lazy },
-            }))
+            ChildPin::Follow(
+                Box::new(LayoutAssoc {
+                    assoc,
+                    kind: LayoutAssocKind::Child { eager, lazy },
+                }),
+                fields,
+            )
         }
         ResolvedChildParse::Lazy => ChildPin::Lazy {
             eager: Box::new(eager),
             lazy: Box::new(lazy),
+            fields,
         },
         ResolvedChildParse::Eager => ChildPin::Eager {
             eager: Box::new(eager),
+            fields,
         },
     })
 }
 
 impl ChildPin {
-    fn singular_apply(&self) -> MessageApply {
+    fn fields_ty(&self) -> &Type {
         match self {
-            Self::Follow(_) | Self::Lazy { .. } => MessageApply::SharedSingular,
-            Self::Eager { .. } => MessageApply::EagerSingular,
+            Self::Follow(_, fields) | Self::Lazy { fields, .. } | Self::Eager { fields, .. } => {
+                fields
+            }
+        }
+    }
+
+    fn singular_apply(&self) -> MessageApply {
+        let fields = self.fields_ty().clone();
+        match self {
+            Self::Follow(_, _) | Self::Lazy { .. } => MessageApply::SharedSingular(fields),
+            Self::Eager { .. } => MessageApply::EagerSingular(fields),
         }
     }
 
     fn repeated_apply(&self) -> MessageApply {
+        let fields = self.fields_ty().clone();
         match self {
-            Self::Follow(_) | Self::Lazy { .. } => MessageApply::SharedRepeated,
-            Self::Eager { eager } => MessageApply::EagerRepeated(eager.clone()),
+            Self::Follow(_, _) | Self::Lazy { .. } => MessageApply::SharedRepeated(fields),
+            Self::Eager { eager, .. } => MessageApply::EagerRepeated(eager.clone(), fields),
         }
     }
 
@@ -853,7 +884,7 @@ impl ChildPin {
     /// `None` for an eager pin: keep the marker from `wire_marker_path`.
     fn field_marker(&self, layout: &Ident) -> Option<Type> {
         match self {
-            Self::Follow(assoc) => {
+            Self::Follow(assoc, _) => {
                 let name = &assoc.assoc;
                 Some(parse_quote! { ::puroro_rt::ProtoMessage<<L as #layout::Layout<A>>::#name> })
             }
@@ -866,7 +897,7 @@ impl ChildPin {
     /// because the type alias has no `L: Layout<A>` bound.
     fn oneof_marker(&self) -> Option<Type> {
         match self {
-            Self::Follow(assoc) => {
+            Self::Follow(assoc, _) => {
                 let name = &assoc.assoc;
                 Some(parse_quote! {
                     ::puroro_rt::ProtoMessage<<L as super::Layout<A>>::#name>
@@ -879,7 +910,7 @@ impl ChildPin {
 
     fn follow(&self) -> Option<&LayoutAssoc> {
         match self {
-            Self::Follow(assoc) => Some(assoc),
+            Self::Follow(assoc, _) => Some(assoc),
             Self::Lazy { .. } | Self::Eager { .. } => None,
         }
     }
@@ -887,8 +918,8 @@ impl ChildPin {
     /// Eager and lazy aliases when the field is pinned to the lazy child.
     fn lazy_pin(&self) -> Option<(&Type, &Type)> {
         match self {
-            Self::Lazy { eager, lazy } => Some((eager.as_ref(), lazy.as_ref())),
-            Self::Follow(_) | Self::Eager { .. } => None,
+            Self::Lazy { eager, lazy, .. } => Some((eager.as_ref(), lazy.as_ref())),
+            Self::Follow(_, _) | Self::Eager { .. } => None,
         }
     }
 }

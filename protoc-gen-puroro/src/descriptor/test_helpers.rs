@@ -43,6 +43,7 @@ pub(crate) fn message(name: impl Into<String>) -> MessageDesc {
         map_entry: false,
         unknown_fields: UnknownFieldsPolicy::Unspecified,
         child_parse: super::ChildParse::Unspecified,
+        features: FeatureSet::default(),
     }
 }
 

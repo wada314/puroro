@@ -55,6 +55,38 @@ pub struct ScannedRecord {
     pub value: ScannedValue,
 }
 
+/// Full record (tag and body) in `_wire`, given `origin` of `leftover || chunk`.
+pub fn scanned_record_span(origin: usize, rec: &ScannedRecord) -> Result<WireSpan, DecodeError> {
+    let offset = origin
+        .checked_add(rec.start)
+        .ok_or(DecodeError::TruncatedMessage)?;
+    Ok(WireSpan {
+        offset,
+        len: rec.len,
+    })
+}
+
+/// Calls `f` with each LEN payload in a complete message body.
+///
+/// `payload` is one message body (not a length prefix). Non-LEN records are
+/// skipped. A truncated or illegal record is that decode error.
+pub fn for_each_len_field(
+    payload: &[u8],
+    mut f: impl FnMut(u32, &[u8]) -> Result<(), DecodeError>,
+) -> Result<(), DecodeError> {
+    let mut scanner = RecordScanner::<Global>::new();
+    let records = scanner.push(payload)?;
+    scanner.finish()?;
+    for rec in &records {
+        if !matches!(rec.value, ScannedValue::Len { .. }) {
+            continue;
+        }
+        let body = rec.len_span(0)?.slice(payload)?;
+        f(rec.field_number.as_u32(), body)?;
+    }
+    Ok(())
+}
+
 /// LEN payload range in `_wire`, given `origin` of `leftover || chunk`.
 ///
 /// The payload is the last `payload_len` bytes of the record (after tag + length).

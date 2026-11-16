@@ -1,7 +1,7 @@
 //! Editions [`FeatureSet`](https://protobuf.dev/editions/overview/) subset.
 //!
 //! Mirrors `google.protobuf.FeatureSet` fields that protoc may set on file /
-//! field / enum options. Unset members are [`None`] (inherit from a parent scope
+//! message / field / enum options. Unset members are [`None`] (inherit from a parent scope
 //! or syntax / edition defaults during resolve).
 //!
 //! Proto2 and proto3 are treated as fixed default sets (the same idea as
@@ -10,6 +10,8 @@
 //! `utf8_validation` default without changing the schema.
 
 use ::derive_more::TryFrom;
+
+use crate::error::{Error, Result};
 
 /// Declared Editions features (`google.protobuf.FeatureSet`).
 ///
@@ -32,22 +34,34 @@ impl FeatureSet {
     ///
     /// Consumed today: `field_presence`, `enum_type`, `repeated_field_encoding`,
     /// `utf8_validation`, and `message_encoding` (LENGTH_PREFIXED only).
-    pub(crate) fn reject_unimplemented_overrides(&self, context: &str) {
-        if self.json_format.is_some() {
-            unimplemented!(
-                "editions features.json_format override is not implemented yet ({context})"
-            );
+    /// `json_format = ALLOW`, `enforce_naming_style = STYLE_LEGACY`, and
+    /// `default_symbol_visibility = EXPORT_ALL` match what this plugin already
+    /// emits, so an explicit copy of those values is accepted. Any other value
+    /// (`LEGACY_BEST_EFFORT`, `STYLE2024`, `EXPORT_TOP_LEVEL`, `LOCAL_ALL`,
+    /// `STRICT`) is a codegen error, not a panic and not a silent ignore.
+    pub(crate) fn reject_unimplemented_overrides(&self, context: &str) -> Result<()> {
+        if let Some(value) = self.json_format
+            && !matches!(value, JsonFormat::Allow)
+        {
+            return Err(Error::Codegen(format!(
+                "editions feature json_format={value:?} is not implemented ({context})"
+            )));
         }
-        if self.enforce_naming_style.is_some() {
-            unimplemented!(
-                "editions features.enforce_naming_style override is not implemented yet ({context})"
-            );
+        if let Some(value) = self.enforce_naming_style
+            && !matches!(value, EnforceNamingStyle::StyleLegacy)
+        {
+            return Err(Error::Codegen(format!(
+                "editions feature enforce_naming_style={value:?} is not implemented ({context})"
+            )));
         }
-        if self.default_symbol_visibility.is_some() {
-            unimplemented!(
-                "editions features.default_symbol_visibility override is not implemented yet ({context})"
-            );
+        if let Some(value) = self.default_symbol_visibility
+            && !matches!(value, DefaultSymbolVisibility::ExportAll)
+        {
+            return Err(Error::Codegen(format!(
+                "editions feature default_symbol_visibility={value:?} is not implemented ({context})"
+            )));
         }
+        Ok(())
     }
 }
 
@@ -139,33 +153,37 @@ impl FinalizedFeatureSet {
     }
 
     /// File-scope features that are not applied anywhere in resolve/codegen yet.
-    pub(crate) fn apply_or_trap_for_file(&self) {
-        assert!(
-            matches!(self.json_format, JsonFormat::Allow),
-            "editions features.json_format={:?}: only ALLOW is assumed until codegen reads this feature",
-            self.json_format
-        );
-        // TODO: emit JSON mapping policy from this feature.
-
-        assert!(
-            matches!(
-                self.enforce_naming_style,
-                EnforceNamingStyle::StyleLegacy | EnforceNamingStyle::Style2024
-            ),
-            "editions features.enforce_naming_style={:?} is not implemented yet",
-            self.enforce_naming_style
-        );
-        // TODO: apply naming-style checks when validating / emitting idents.
-
-        assert!(
-            matches!(
-                self.default_symbol_visibility,
-                DefaultSymbolVisibility::ExportAll | DefaultSymbolVisibility::ExportTopLevel
-            ),
-            "editions features.default_symbol_visibility={:?} is not implemented yet",
-            self.default_symbol_visibility
-        );
-        // TODO: apply default symbol visibility when emitting modules.
+    ///
+    /// Edition 2023 defaults (`ALLOW`, `STYLE_LEGACY`, `EXPORT_ALL`) match the
+    /// behavior this plugin already has. Edition 2024's naming and visibility
+    /// defaults (`STYLE2024`, `EXPORT_TOP_LEVEL`) do not. Failing those files
+    /// is intentional: accepting them would silently ignore a conformance
+    /// feature. Both features are source retention, so protoc does not deliver
+    /// an explicit override and an edition 2024 file cannot opt back.
+    /// `json_format` is runtime retention; only `ALLOW` is accepted.
+    pub(crate) fn apply_or_trap_for_file(&self) -> Result<()> {
+        if !matches!(self.json_format, JsonFormat::Allow) {
+            return Err(Error::Codegen(format!(
+                "editions feature json_format={:?} is not implemented",
+                self.json_format
+            )));
+        }
+        if !matches!(self.enforce_naming_style, EnforceNamingStyle::StyleLegacy) {
+            return Err(Error::Codegen(format!(
+                "editions feature enforce_naming_style={:?} is not implemented",
+                self.enforce_naming_style
+            )));
+        }
+        if !matches!(
+            self.default_symbol_visibility,
+            DefaultSymbolVisibility::ExportAll
+        ) {
+            return Err(Error::Codegen(format!(
+                "editions feature default_symbol_visibility={:?} is not implemented",
+                self.default_symbol_visibility
+            )));
+        }
+        Ok(())
     }
 }
 

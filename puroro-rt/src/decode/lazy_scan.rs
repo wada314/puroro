@@ -6,9 +6,10 @@ use ::bytes::{Buf, BufMut};
 use ::core::cell::Cell;
 use ::core::cmp::PartialEq;
 use ::core::ptr;
-use ::puroro::DecodeError;
+use ::puroro::{DecodeError, UnknownField};
 use ::std::vec::Vec;
 
+use super::iter_unknown_fields;
 use super::record::{RecordScanner, ScannedRecord, WireSpan};
 use super::shared_wire::SharedWire;
 
@@ -18,6 +19,11 @@ use super::shared_wire::SharedWire;
 pub trait MessageScan<A: Allocator>: Sized {
     fn new_scan(alloc: A) -> Self;
     fn clone_scan(&self, alloc: A) -> Self;
+
+    /// Remember one lazy unknown record. Eager keeps unknowns in the store.
+    fn record_policy_span(&mut self, span: WireSpan) {
+        let _ = span;
+    }
 }
 
 /// Eager ingest layout: no leftover, island buffer, or unparsed regions.
@@ -56,6 +62,12 @@ pub struct LazyScan<A: Allocator = Global> {
     /// Payload spans in [`wire`](Self::wire) when this node is not the island
     /// root. Empty means encode / replay uses the whole buffer.
     regions: AllocVec<WireSpan, A>,
+    /// Unrecognized tags and closed-enum unknowns, as full records in `wire`.
+    ///
+    /// Preserve yields these from `unknown_fields()` and still encodes `_wire`.
+    /// Discard and reject omit them on encode and do not yield them. The store
+    /// is not also iterated, so a closed-enum tag is not returned twice.
+    policy_spans: AllocVec<WireSpan, A>,
 }
 
 impl<A: Allocator> LazyScan<A> {
@@ -163,7 +175,71 @@ impl<A: Allocator + Clone> LazyScan<A> {
             finished: true,
             applied: Cell::new(true),
             wire: SharedWire::empty(alloc.clone()),
-            regions: AllocVec::new_in(alloc),
+            regions: AllocVec::new_in(alloc.clone()),
+            policy_spans: AllocVec::new_in(alloc),
+        }
+    }
+
+    pub fn policy_spans(&self) -> &[WireSpan] {
+        &self.policy_spans
+    }
+
+    pub fn push_policy_span(&mut self, span: WireSpan) {
+        // A failed apply retries the same regions. Recording the span again
+        // would make `unknown_fields()` yield it twice and `encoded_len`
+        // subtract the bytes twice.
+        if self.policy_spans.contains(&span) {
+            return;
+        }
+        self.policy_spans.push(span);
+    }
+
+    /// Byte length of the body after removing `omit` records.
+    pub fn body_len_omitting(&self, omit: &[WireSpan]) -> usize {
+        let mut total = 0;
+        self.for_each_body_range(|range| {
+            total += retained_len(range, omit);
+        });
+        total
+    }
+
+    /// Writes the body, skipping `omit` records that sit inside it.
+    pub fn write_bodies_omitting<B: BufMut>(
+        &self,
+        buf: &mut B,
+        omit: &[WireSpan],
+    ) -> Result<(), DecodeError> {
+        let mut failed = Ok(());
+        self.for_each_body_range(|range| {
+            if failed.is_err() {
+                return;
+            }
+            if let Err(err) = write_range_omitting(self.wire.as_bytes(), range, omit, buf) {
+                failed = Err(err);
+            }
+        });
+        failed
+    }
+
+    /// One unknown field per policy span, in ingest order.
+    pub fn iter_policy_spans(&self) -> PolicySpanIter<'_> {
+        PolicySpanIter {
+            wire: self.wire.as_bytes(),
+            spans: &self.policy_spans,
+            index: 0,
+        }
+    }
+
+    fn for_each_body_range(&self, mut f: impl FnMut(WireSpan)) {
+        if self.regions.is_empty() {
+            f(WireSpan {
+                offset: 0,
+                len: self.wire.len(),
+            });
+        } else {
+            for &span in &self.regions {
+                f(span);
+            }
         }
     }
 
@@ -245,6 +321,7 @@ impl<A: Allocator + Clone> LazyScan<A> {
             applied: Cell::new(self.applied.get()),
             wire: self.wire.clone_in(alloc.clone()),
             regions: self.regions.clone(),
+            policy_spans: self.policy_spans.clone(),
         }
     }
 }
@@ -262,6 +339,19 @@ impl<A: Allocator + Clone> MessageScan<A> for Lazy<A> {
         Self {
             scan: self.scan.clone_in(alloc),
         }
+    }
+
+    #[inline]
+    fn record_policy_span(&mut self, span: WireSpan) {
+        self.scan.push_policy_span(span);
+    }
+}
+
+impl<A: Allocator + Clone> Lazy<A> {
+    /// Remember one unknown record span in this message's scan.
+    #[inline]
+    pub fn record_policy_span(&mut self, span: WireSpan) {
+        self.scan.push_policy_span(span);
     }
 }
 
@@ -281,7 +371,12 @@ impl<A: Allocator + Clone> MessageScan<A> for Lazy<A> {
 pub trait LazyMessage<A: Allocator + Clone> {
     fn scan(&self) -> &LazyScan<A>;
     fn scan_mut(&mut self) -> &mut LazyScan<A>;
-    fn apply_record(&mut self, rec: &ScannedRecord, origin: usize) -> Result<(), DecodeError>;
+    fn apply_record(
+        &mut self,
+        rec: &ScannedRecord,
+        origin: usize,
+        depth: usize,
+    ) -> Result<(), DecodeError>;
 
     /// Parse stored regions on the first field get.
     fn ensure_scanned(&self) -> Result<(), DecodeError> {
@@ -318,7 +413,7 @@ pub trait LazyMessage<A: Allocator + Clone> {
     fn apply_span(&mut self, span: WireSpan) -> Result<(), DecodeError> {
         let records = self.scan_mut().scan_region(span)?;
         for rec in records {
-            self.apply_record(&rec, span.offset)?;
+            self.apply_record(&rec, span.offset, 0)?;
         }
         Ok(())
     }
@@ -354,9 +449,14 @@ pub trait LazyMessage<A: Allocator + Clone> {
     /// Parses `chunk`, appends it to the island buffer, and applies every
     /// complete record.
     fn push(&mut self, chunk: &[u8]) -> Result<(), DecodeError> {
+        self.push_with_depth(chunk, 0)
+    }
+
+    /// [`push`](Self::push) at nesting `depth` (0 is the top-level message).
+    fn push_with_depth(&mut self, chunk: &[u8], depth: usize) -> Result<(), DecodeError> {
         let (origin, records) = self.scan_mut().push(chunk)?;
         for rec in records {
-            self.apply_record(&rec, origin)?;
+            self.apply_record(&rec, origin, depth)?;
         }
         Ok(())
     }
@@ -376,14 +476,19 @@ pub trait LazyMessage<A: Allocator + Clone> {
     /// appends). It does not continue an unfinished chunk sequence; use
     /// [`push`](Self::push) for that.
     fn ingest_buf<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+        self.ingest_with_depth(buf, 0)
+    }
+
+    /// [`ingest_buf`](Self::ingest_buf) at nesting `depth`.
+    fn ingest_with_depth<B: Buf>(&mut self, buf: &mut B, depth: usize) -> Result<(), DecodeError> {
         while buf.has_remaining() {
             let n = buf.chunk().len();
             if n == 0 {
                 let rest = buf.copy_to_bytes(buf.remaining());
-                self.push(&rest)?;
+                self.push_with_depth(&rest, depth)?;
                 break;
             }
-            self.push(buf.chunk())?;
+            self.push_with_depth(buf.chunk(), depth)?;
             buf.advance(n);
         }
         self.finish()
@@ -410,5 +515,113 @@ pub trait LazyMessage<A: Allocator + Clone> {
             (Err(_), Err(_)) => self.scan().body_eq(other.scan()),
             _ => false,
         }
+    }
+}
+
+/// Iterator of one unknown field per [`LazyScan`] policy span.
+pub struct PolicySpanIter<'a> {
+    wire: &'a [u8],
+    spans: &'a [WireSpan],
+    index: usize,
+}
+
+impl<'a> Iterator for PolicySpanIter<'a> {
+    type Item = UnknownField<'a>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        while self.index < self.spans.len() {
+            let span = self.spans[self.index];
+            self.index += 1;
+            let Ok(bytes) = span.slice(self.wire) else {
+                continue;
+            };
+            if let Some(field) = iter_unknown_fields(bytes).next() {
+                return Some(field);
+            }
+        }
+        None
+    }
+}
+
+/// Merged `[lo, hi)` cuts of `omit` that overlap `range`, in offset order.
+///
+/// Identical or overlapping spans count once, matching a retried apply that
+/// recorded the same record twice.
+fn omit_cuts(range: WireSpan, omit: &[WireSpan]) -> Vec<(usize, usize)> {
+    let end = range.offset.saturating_add(range.len);
+    let mut cuts: Vec<(usize, usize)> = Vec::new();
+    for skip in omit {
+        let lo = range.offset.max(skip.offset);
+        let hi = end.min(skip.offset.saturating_add(skip.len));
+        if hi > lo {
+            cuts.push((lo, hi));
+        }
+    }
+    cuts.sort_by_key(|cut| cut.0);
+    let mut merged: Vec<(usize, usize)> = Vec::new();
+    for (lo, hi) in cuts {
+        if let Some(last) = merged.last_mut()
+            && lo <= last.1
+        {
+            last.1 = last.1.max(hi);
+            continue;
+        }
+        merged.push((lo, hi));
+    }
+    merged
+}
+
+fn retained_len(range: WireSpan, omit: &[WireSpan]) -> usize {
+    let mut kept = range.len;
+    for (lo, hi) in omit_cuts(range, omit) {
+        kept = kept.saturating_sub(hi - lo);
+    }
+    kept
+}
+
+fn write_range_omitting<B: BufMut>(
+    wire: &[u8],
+    range: WireSpan,
+    omit: &[WireSpan],
+    buf: &mut B,
+) -> Result<(), DecodeError> {
+    let end = range
+        .offset
+        .checked_add(range.len)
+        .ok_or(DecodeError::TruncatedMessage)?;
+    let mut cursor = range.offset;
+    for (lo, hi) in omit_cuts(range, omit) {
+        if lo > cursor {
+            buf.put_slice(wire.get(cursor..lo).ok_or(DecodeError::TruncatedMessage)?);
+        }
+        if hi > cursor {
+            cursor = hi;
+        }
+    }
+    if cursor < end {
+        buf.put_slice(wire.get(cursor..end).ok_or(DecodeError::TruncatedMessage)?);
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod omit_tests {
+    use super::{WireSpan, omit_cuts, retained_len, write_range_omitting};
+
+    #[test]
+    fn overlapping_omits_count_once() {
+        let range = WireSpan { offset: 0, len: 10 };
+        let omit = [
+            WireSpan { offset: 2, len: 3 },
+            WireSpan { offset: 2, len: 3 },
+            WireSpan { offset: 4, len: 2 },
+        ];
+        assert_eq!(omit_cuts(range, &omit), vec![(2, 6)]);
+        assert_eq!(retained_len(range, &omit), 6);
+        let wire = [0_u8, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+        let mut out = Vec::new();
+        write_range_omitting(&wire, range, &omit, &mut out).unwrap();
+        assert_eq!(out, [0, 1, 6, 7, 8, 9]);
+        assert_eq!(out.len(), retained_len(range, &omit));
     }
 }
