@@ -528,7 +528,9 @@ mod tests {
         let msg = message(&set, "Address");
         let plan = plan_fields(msg, &plan_message_storage(&set)).unwrap();
         // street/city: presence + SSO heap bit each; postal_code/latitude: presence only.
+        // Lazy kind bits follow immediately: street 6, city 8. Two bits each.
         assert_eq!(plan.bit_count(), 6);
+        assert_eq!(plan.lazy_bit_count(), 10);
         assert_eq!(bit_array_byte_len(6), 1);
         assert_eq!(plan.members().len(), 4);
 
@@ -555,6 +557,12 @@ mod tests {
             }
             other => panic!("unexpected kind: {other:?}"),
         }
+        assert_eq!(street.lazy_kind_bit(), Some(6));
+
+        let MessageMember::Field(city) = &plan.members()[1] else {
+            panic!("expected field");
+        };
+        assert_eq!(city.lazy_kind_bit(), Some(8));
 
         let MessageMember::Field(postal) = &plan.members()[2] else {
             panic!("expected field");
@@ -569,6 +577,7 @@ mod tests {
             } => assert_eq!(bit_const, "BIT_POSTAL_CODE"),
             other => panic!("unexpected kind: {other:?}"),
         }
+        assert_eq!(postal.lazy_kind_bit(), None);
     }
 
     #[test]
