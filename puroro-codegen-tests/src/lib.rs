@@ -13,3 +13,8 @@ include!(concat!(env!("OUT_DIR"), "/generated.rs"));
 mod cases {
     include!(concat!(env!("OUT_DIR"), "/case_tests.rs"));
 }
+
+// `#[ignore]` still compiles, so a sample edit ahead of the plugin would fail
+// `cargo test` and CI. The feature gate keeps this module out of both.
+#[cfg(all(test, feature = "sample-parity"))]
+mod sample_parity;

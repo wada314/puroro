@@ -1,0 +1,119 @@
+// Wire shape of the handwritten `sample-generated` crate.
+//
+// `Task` / `Address` match DESIGN.md. `Point`, `origin`, `School`, `Student`,
+// and `Marker` are the extra messages that crate already covers. Layout that
+// the handwritten shells imply is an option here: pinned-lazy `assignee`,
+// inlined `postal` / `student` / `home`. `Point` and `origin` inline because
+// `Point` is a tiny scalar child.
+//
+// Edition 2023, not 2024. Field presence, packing, enums, and UTF-8 defaults
+// match edition 2024. Edition 2024 also defaults `enforce_naming_style` to
+// STYLE2024 and `default_symbol_visibility` to EXPORT_TOP_LEVEL. Those are
+// source retention, so protoc never forwards an override, and the plugin
+// rejects the file (DESIGN.md §6.3). Naming and visibility do not change the
+// generated field layout.
+//
+// This fixture only checks that the plugin accepts the schema. Equality with
+// the handwritten crate is the opt-in `sample-parity` feature, which is
+// allowed to fail while that crate is being redesigned.
+
+edition = "2023";
+
+package example;
+
+import "puroro/options.proto";
+
+// Open enum (edition default): unknown values stay in the typed field.
+enum Status {
+  STATUS_UNSPECIFIED = 0;
+  PENDING = 1;
+  DONE = 2;
+}
+
+// Closed enum: unknown values divert to unknown fields.
+enum Priority {
+  option features.enum_type = CLOSED;
+  PRIORITY_UNSPECIFIED = 0;
+  LOW = 1;
+  HIGH = 2;
+}
+
+// Two IMPLICIT int32s. Unknowns are preserved. Auto-inlined as a child.
+message Point {
+  int32 x = 1 [features.field_presence = IMPLICIT];
+  int32 y = 2 [features.field_presence = IMPLICIT];
+}
+
+message Address {
+  string street = 1;
+  string city = 2;
+  fixed32 postal_code = 3;
+  double latitude = 4;
+}
+
+message Task {
+  string title = 1;
+
+  int32 score = 2 [features.field_presence = IMPLICIT];
+
+  int32 max_retries = 3 [default = 3];
+
+  string owner_id = 4 [features.field_presence = LEGACY_REQUIRED];
+
+  bytes payload = 5;
+
+  repeated int32 tag_ids = 6;
+
+  repeated int32 scores = 7 [features.repeated_field_encoding = EXPANDED];
+
+  repeated string labels = 8;
+
+  Status status = 9 [features.field_presence = IMPLICIT];
+
+  Priority priority = 10;
+
+  // Pinned lazy on both Task and TaskLazy. Address is not a tiny scalar
+  // child, so this stays boxed.
+  Address assignee = 11 [(puroro.child_parse) = CHILD_PARSE_LAZY];
+
+  oneof notification {
+    string email_address = 12;
+    string phone_number = 13;
+    int32 webhook_id = 14 [default = -1];
+    // Address would otherwise stay boxed. The sample size check counts this
+    // inlined child as its own allocator.
+    Address postal = 15 [(puroro.message_layout) = MESSAGE_LAYOUT_INLINE];
+    bool urgent = 18;
+  }
+
+  bool done = 16 [features.field_presence = IMPLICIT];
+
+  bool flag = 17;
+
+  repeated Address watchers = 19;
+
+  repeated bool votes = 20;
+
+  map<string, int32> attributes = 21;
+
+  // Follows the parent. Point auto-inlines.
+  Point origin = 22;
+}
+
+// Two-hop inline chain: School → Student → Point / Address.
+message Student {
+  int32 year = 1;
+  Point location = 2;
+  Address home = 3 [(puroro.message_layout) = MESSAGE_LAYOUT_INLINE];
+}
+
+message School {
+  string name = 1;
+  Student student = 2 [(puroro.message_layout) = MESSAGE_LAYOUT_INLINE];
+}
+
+// Bakes DiscardUnknowns. `n` is IMPLICIT so the getter is a bare i32.
+message Marker {
+  option (puroro.unknown_fields) = UNKNOWN_FIELDS_DISCARD;
+  int32 n = 1 [features.field_presence = IMPLICIT];
+}

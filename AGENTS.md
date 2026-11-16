@@ -45,6 +45,12 @@ RUSTDOCFLAGS='-D warnings' cargo doc --no-deps \
 
 `cargo test` also runs rustdoc examples (doctests). CI (`.github/workflows/rust.yml`) runs fmt, clippy (`-D warnings`, excluding generated/archive/bench crates), tests, codegen fixtures, and `cargo doc` with `RUSTDOCFLAGS=-D warnings` for the first-party packages above. Bench smoke stays in `.github/workflows/benches.yml`.
 
+`sample-generated` stays hand-written so the generated-code shape can be discussed and edited there. An optional check compares its `FIELD_*` / `BIT_*` constants and one `encode_to_vec()` with the plugin output for `puroro-codegen-tests/fixtures/reference_schema`. The `sample-parity` feature is off by default, so `cargo test` and CI do not compile that check. A compile error or a failed assertion is expected while the sample leads the plugin:
+
+```sh
+cargo test -p puroro-codegen-tests --features sample-parity --lib sample_parity
+```
+
 Criterion benches are the unpublished `puroro-benches` member (`publish = false`). Sources live in `puroro-benches/benches/`. The `puroro` package sets `autobenches = false` so Cargo does not pick those files up as its own targets. Do not move the targets back onto `puroro`. A `puroro` dev-dependency on `puroro-rt` makes `cargo publish -p puroro` wait for `puroro-rt`, which itself depends on `puroro`.
 
 Users install the plugin with `cargo install protoc-gen-puroro` (or `cargo build -p protoc-gen-puroro` plus `--plugin=`). That path does not use `-Z bindeps`. `bindeps` is only the artifact dependency in `puroro-codegen-tests`. 0.14 called `puroro-codegen` in-process from `build.rs`; it did not install this binary.
