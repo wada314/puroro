@@ -962,7 +962,14 @@ fn render_singular_accessors(field: &ScalarEmit, companion: &Ident) -> (TokenStr
                 }
             }
         } else {
-            quote! {}
+            // Follow-parent (and pinned-eager) singular messages move-replace
+            // the stored child. A lazy pin takes the branch above.
+            let set_name = Ident::new(&format!("set_{}", field.name_str), Span::call_site());
+            quote! {
+                pub fn #set_name(&mut self, src: #mut_target) {
+                    *self.#name_mut() = src;
+                }
+            }
         };
         let mutator = quote! {
             pub fn #name_mut(&mut self) -> &mut #mut_target {

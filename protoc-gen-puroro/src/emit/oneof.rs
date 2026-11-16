@@ -333,6 +333,20 @@ fn render_module_body(
         })
         .collect();
 
+    // Eager parent bits this group owns: SSO heap-arm bits and bool value bits.
+    // `after_deallocate` wipes them after the variant body is freed so a fresh
+    // slot is not paired with a leftover heap arm or bool value.
+    let eager_clear_bits: Vec<TokenStream> = oneof
+        .variants
+        .iter()
+        .filter_map(|v| {
+            let (ident, _) = v.value_bit.as_ref()?;
+            Some(quote! {
+                common.set_bit(super::#ident, false);
+            })
+        })
+        .collect();
+
     let lazy_clear_bits: Vec<TokenStream> = oneof
         .variants
         .iter()
@@ -460,6 +474,16 @@ fn render_module_body(
                     value,
                     _layout: ::core::marker::PhantomData,
                 }
+            }
+
+            fn after_deallocate(
+                common: &mut MessageCommon<Self::Bits, Self::Alloc, Self::Unknown>,
+            )
+            where
+                A: ::core::clone::Clone,
+            {
+                let _ = common;
+                #(#eager_clear_bits)*
             }
         }
 
