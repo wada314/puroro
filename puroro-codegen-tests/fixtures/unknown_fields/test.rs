@@ -2,7 +2,8 @@
 
 use crate::unknown_fields::{
     Discard, DiscardChildLazy, DiscardChoice, DiscardClosedLazy, DiscardLazy, DiscardParent,
-    DiscardParentLazy, Keep, KeepLazy, KeepParent, PreserveParent, PreserveParentLazy, Reject,
+    DiscardParentLazy, Keep, KeepLazy, KeepParent, KeepParentLazy, PreserveParent,
+    PreserveParentLazy, Reject,
     RejectChoice, RejectClosed, RejectLazy, RejectParent, Status,
 };
 use ::core::mem::size_of;
@@ -181,6 +182,28 @@ fn reject_child_fails_parent_decode() {
     let result: Result<KeepParent, _> = KeepParent::decode(&wire[..]);
     assert_eq!(
         result.unwrap_err(),
+        DecodeError::UnrecognizedField { field_number: 10 }
+    );
+}
+
+#[test]
+fn lazy_parent_defers_reject_child() {
+    // child = { n = 3, field 10 = 5 }. Eager parent merge scans the child and
+    // fails. The lazy parent stores the LEN span and succeeds.
+    let wire = [0x0a_u8, 0x04, 0x08, 0x03, 0x50, 0x05];
+    let lazy: KeepParentLazy =
+        KeepParentLazy::decode(&wire[..]).expect("lazy parent defers the child");
+    assert_eq!(lazy.encode_to_vec(), wire);
+
+    let child = lazy.child().expect("parent scan").expect("child");
+    match child.n() {
+        Ok(_) => panic!("child scan should reject field 10"),
+        Err(err) => assert_eq!(err, DecodeError::UnrecognizedField { field_number: 10 }),
+    }
+    // Infallible encode records the span, drops the scan error, and omits the tag.
+    assert_eq!(Message::encode_to_vec(child), [0x08, 0x03]);
+    assert_eq!(
+        lazy.into_eager().expect_err("eager rebuild rejects"),
         DecodeError::UnrecognizedField { field_number: 10 }
     );
 }

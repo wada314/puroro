@@ -1,7 +1,7 @@
 //! Editions [`FeatureSet`](https://protobuf.dev/editions/overview/) subset.
 //!
 //! Mirrors `google.protobuf.FeatureSet` fields that protoc may set on file /
-//! field / enum options. Unset members are [`None`] (inherit from a parent scope
+//! message / field / enum options. Unset members are [`None`] (inherit from a parent scope
 //! or syntax / edition defaults during resolve).
 //!
 //! Proto2 and proto3 are treated as fixed default sets (the same idea as

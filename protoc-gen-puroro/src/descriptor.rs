@@ -87,6 +87,11 @@ pub struct MessageDesc {
     /// `(puroro.child_parse)` on the message, if set. Default for fields
     /// declared here when the field option is unset.
     pub child_parse: ChildParse,
+    /// Message-level `options.features` (`FeatureSet`), if any fields were set.
+    /// `json_format` is runtime retention and targets messages, so an explicit
+    /// message option reaches the plugin. Naming and visibility are source
+    /// retention and usually do not.
+    pub features: FeatureSet,
 }
 
 /// A field (`FieldDescriptorProto` subset).

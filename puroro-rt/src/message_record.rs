@@ -542,6 +542,11 @@ where
 {
     /// Apply stored regions so discard encode and `unknown_fields()` see tags
     /// that were only recorded as spans.
+    ///
+    /// `ensure_scanned` can fail (reject, invalid UTF-8). Encode stays
+    /// infallible, so that error is dropped. A reject child reached through a
+    /// lazy parent has already recorded the unknown span; the bytes written
+    /// then omit that tag.
     fn prepare_policy(&self) {
         if self.common.lazy.scan.require_finished().is_ok() {
             let _ = LazyMessage::ensure_scanned(self);

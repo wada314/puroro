@@ -181,6 +181,14 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
 
         self.check_unique_fqn(&fqn)?;
 
+        // `json_format` is runtime retention and targets messages, so protoc
+        // delivers a message option. File / enum / field sets are checked on
+        // their own paths; this is the message path.
+        if matches!(file.syntax, Syntax::Editions(_)) {
+            desc.features
+                .reject_unimplemented_overrides(&format!("message `{fqn}`"))?;
+        }
+
         let (oneofs, oneof_remap) = OneofRemap::from_message(desc);
 
         let message = self.arena.alloc(Message {
@@ -1030,6 +1038,41 @@ mod tests {
             let text = err.to_string();
             assert!(text.contains(needle), "{text}");
         }
+    }
+
+    #[test]
+    fn message_scoped_json_format_is_checked() {
+        let arena = Arena::new();
+        let allow = proto_file(
+            "ed",
+            Syntax::Editions(Edition::Edition2023),
+            vec![MessageDesc {
+                features: FeatureSet {
+                    json_format: Some(JsonFormat::Allow),
+                    ..FeatureSet::default()
+                },
+                ..desc::message("M")
+            }],
+            vec![],
+        );
+        resolve(&arena, &[allow]).expect("explicit ALLOW on the message");
+
+        let rejected = proto_file(
+            "ed",
+            Syntax::Editions(Edition::Edition2023),
+            vec![MessageDesc {
+                features: FeatureSet {
+                    json_format: Some(JsonFormat::LegacyBestEffort),
+                    ..FeatureSet::default()
+                },
+                ..desc::message("M")
+            }],
+            vec![],
+        );
+        let err = resolve(&arena, &[rejected]).expect_err("message LEGACY_BEST_EFFORT");
+        let text = err.to_string();
+        assert!(text.contains("json_format"), "{text}");
+        assert!(text.contains("message `.ed.M`"), "{text}");
     }
 
     #[test]

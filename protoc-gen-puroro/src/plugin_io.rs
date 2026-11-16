@@ -211,6 +211,7 @@ fn decode_descriptor(bytes: &[u8]) -> Result<MessageDesc> {
         let mut map_entry = false;
         let mut unknown_fields = UnknownFieldsPolicy::Unspecified;
         let mut child_parse = ChildParse::Unspecified;
+        let mut features = FeatureSet::default();
 
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
@@ -229,6 +230,7 @@ fn decode_descriptor(bytes: &[u8]) -> Result<MessageDesc> {
                     map_entry = decoded.map_entry;
                     unknown_fields = decoded.unknown_fields;
                     child_parse = decoded.child_parse;
+                    features = decoded.features;
                 }
                 // repeated OneofDescriptorProto oneof_decl = 8;
                 8 => oneofs.push(decode_oneof(expect_len(&field)?)?),
@@ -245,6 +247,7 @@ fn decode_descriptor(bytes: &[u8]) -> Result<MessageDesc> {
             map_entry,
             unknown_fields,
             child_parse,
+            features,
         })
     })
 }
@@ -253,19 +256,24 @@ struct DecodedMessageOptions {
     map_entry: bool,
     unknown_fields: UnknownFieldsPolicy,
     child_parse: ChildParse,
+    features: FeatureSet,
 }
 
-/// `MessageOptions`: `map_entry` (7) and `(puroro.unknown_fields)` (51403).
+/// `MessageOptions`: `map_entry` (7), `features` (12), and
+/// `(puroro.unknown_fields)` (51403).
 fn decode_message_options(bytes: &[u8]) -> Result<DecodedMessageOptions> {
     with_decoding_context("MessageOptions", || {
         let mut map_entry = false;
         let mut unknown_fields = UnknownFieldsPolicy::Unspecified;
         let mut child_parse = ChildParse::Unspecified;
+        let mut features = FeatureSet::default();
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
             match field.field_number.as_u32() {
                 // optional bool map_entry = 7;
                 7 => map_entry = expect_bool(&field)?,
+                // optional FeatureSet features = 12;
+                12 => features = decode_feature_set(expect_len(&field)?)?,
                 UNKNOWN_FIELDS_OPTION_NUMBER => {
                     unknown_fields = expect_enum(&field)?;
                 }
@@ -280,6 +288,7 @@ fn decode_message_options(bytes: &[u8]) -> Result<DecodedMessageOptions> {
             map_entry,
             unknown_fields,
             child_parse,
+            features,
         })
     })
 }
@@ -960,6 +969,34 @@ mod tests {
         assert_eq!(
             decoded.proto_files[0].messages[0].unknown_fields,
             UnknownFieldsPolicy::Reject
+        );
+    }
+
+    #[test]
+    fn decode_message_options_json_format() {
+        use crate::descriptor::features::JsonFormat;
+
+        // FeatureSet { json_format: LEGACY_BEST_EFFORT }
+        // MessageOptions.features is field 12 (runtime retention, message target).
+        let feature_set = encode_varint_field(6, JsonFormat::LegacyBestEffort as i32);
+        let options = encode_message_field(12, &feature_set);
+
+        let mut message = Vec::new();
+        message.extend(encode_string_field(1, "M"));
+        message.extend(encode_message_field(7, &options));
+
+        let mut file = Vec::new();
+        file.extend(encode_string_field(1, "t.proto"));
+        file.extend(encode_message_field(4, &message));
+
+        let mut request = Vec::new();
+        request.extend(encode_string_field(1, "t.proto"));
+        request.extend(encode_message_field(15, &file));
+
+        let decoded = decode_request(&request).unwrap();
+        assert_eq!(
+            decoded.proto_files[0].messages[0].features.json_format,
+            Some(JsonFormat::LegacyBestEffort)
         );
     }
 
