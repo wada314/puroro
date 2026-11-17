@@ -9,8 +9,9 @@ use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::Buf;
 use ::bytes::BufMut;
+use ::protobuf_core::FieldNumber;
 use ::puroro::{DecodeBuf, DecodeError, Message, RECURSION_LIMIT};
-use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
+use ::puroro_rt::decode::{next_tag, skip_field_and_save};
 use ::puroro_rt::{
     Boxed, EncodeCtx, FieldCloneIn, FieldDeallocate, FieldEncode, Message as MessagePresence,
     MessageCommon, MessageEncode, MessageMerge, ProtoMessage, SingularField,
@@ -78,12 +79,12 @@ impl<A: Allocator + Clone> MessageMerge for Nest<A> {
         &mut self,
         buf: &mut B,
         depth: usize,
+        end_group: Option<FieldNumber>,
     ) -> Result<(), DecodeError> {
         if depth >= RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
-        while buf.has_remaining() {
-            let (field_number, wire_type) = decode_tag(buf)?;
+        while let Some((field_number, wire_type)) = next_tag(buf, end_group)? {
             match field_number.as_u32() {
                 1 => self
                     .child

@@ -16,7 +16,6 @@ use ::protobuf_core::FieldNumber;
 
 use ::puroro::{DecodeBuf, DecodeError, WireType};
 
-use crate::decode;
 use crate::fields::shared::{
     CloneBound, DeallocateBound, DefaultIn, MessageBindingMut,
     slot_init::SlotInitMut,
@@ -156,17 +155,15 @@ impl<M: MessageEncode + MessageMerge> PayloadMerge for ProtoGroup<M> {
         if wire_type != WireType::SGroup {
             return Err(DecodeError::InvalidTag);
         }
-        decode::read_group_body(buf, field, |body| {
-            let child = ValueSlot::with_mut(slot, init, common).get_mut();
-            MessageMerge::merge_from_slice(child, body, depth + 1)
-        })
+        let child = ValueSlot::with_mut(slot, init, common).get_mut();
+        MessageMerge::merge_group(child, buf, field, depth + 1)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::ProtoGroup;
-    use crate::decode::{decode_tag, decode_varint, read_group_body, skip_field};
+    use crate::decode::{decode_varint, next_tag, skip_field};
     use crate::encode::{encode_tag, encode_varint, field_number_const};
     use crate::fields::repeated::{Expanded, RepeatedField};
     use crate::fields::shared::field_presence::Message;
@@ -245,12 +242,12 @@ mod tests {
             &mut self,
             buf: &mut B,
             depth: usize,
+            end_group: Option<FieldNumber>,
         ) -> Result<(), DecodeError> {
             if depth >= RECURSION_LIMIT {
                 return Err(DecodeError::RecursionLimitExceeded);
             }
-            while buf.has_remaining() {
-                let (number, wire) = decode_tag(buf)?;
+            while let Some((number, wire)) = next_tag(buf, end_group)? {
                 match (number.as_u32(), wire) {
                     (1, WireType::Varint) => {
                         self.a = i32::try_from(decode_varint(buf)?).expect("test varint fits i32");
@@ -259,12 +256,9 @@ mod tests {
                         self.b = i32::try_from(decode_varint(buf)?).expect("test varint fits i32");
                     }
                     (2, WireType::SGroup) => {
-                        read_group_body(buf, field_number_const::<2>(), |body| {
-                            let mut inner = Counts { a: 0, b: 0 };
-                            inner.merge_from_slice(body, depth + 1)?;
-                            self.b = inner.a;
-                            Ok(())
-                        })?;
+                        let mut inner = Counts { a: 0, b: 0 };
+                        inner.merge_group(buf, field_number_const::<2>(), depth + 1)?;
+                        self.b = inner.a;
                     }
                     _ => skip_field(number, wire, buf)?,
                 }
@@ -455,7 +449,7 @@ mod tests {
             .merge(WireType::SGroup, &mut buf, 0)
             .unwrap_err();
         assert_eq!(err, DecodeError::TruncatedMessage);
-        assert_eq!(buf.remaining(), truncated.len());
+        assert!(!buf.has_remaining());
 
         let payload = group_payload(7, &[]);
         let mut rest = &payload[..];
@@ -465,7 +459,7 @@ mod tests {
             .merge(WireType::SGroup, &mut buf, RECURSION_LIMIT)
             .unwrap_err();
         assert_eq!(err, DecodeError::RecursionLimitExceeded);
-        assert!(!buf.has_remaining());
+        assert!(buf.has_remaining());
 
         field.deallocate(&common);
         common.deallocate();

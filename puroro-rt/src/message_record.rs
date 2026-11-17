@@ -9,11 +9,12 @@ use ::bytes::{Buf, BufMut};
 use ::core::fmt::{self, Debug};
 use ::core::mem;
 use ::core::ops::ControlFlow;
+use ::protobuf_core::FieldNumber;
 use ::puroro::{DecodeBuf, DecodeError, Message, RECURSION_LIMIT, WireType};
 
 use crate::decode::{
-    Eager, Lazy, LazyMessage, LazyScan, MessageScan, ScannedRecord, decode_tag,
-    skip_field_and_save_in,
+    Eager, Lazy, LazyMessage, LazyScan, MessageScan, ScannedRecord, copy_group_body, measure_group,
+    next_tag, skip_field_and_save_in,
 };
 use crate::fields::shared::{
     BitStorage, CloneBound, DeallocateBound, DebugStructVisitor, EncodeRawVisitor,
@@ -550,12 +551,12 @@ where
         &mut self,
         buf: &mut B,
         depth: usize,
+        end_group: Option<FieldNumber>,
     ) -> Result<(), DecodeError> {
         if depth >= RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
-        while buf.has_remaining() {
-            let (field_number, wire_type) = decode_tag(buf)?;
+        while let Some((field_number, wire_type)) = next_tag(buf, end_group)? {
             if !self.fields.merge_known(
                 &mut self.common,
                 field_number.as_u32(),
@@ -587,10 +588,33 @@ where
         &mut self,
         buf: &mut B,
         depth: usize,
+        end_group: Option<FieldNumber>,
     ) -> Result<(), DecodeError> {
         // Nested spans do not push a parse frame. `depth` is carried so an
         // eager-pinned child still enters `MessageMerge` at `depth + 1`.
-        LazyMessage::ingest_with_depth(self, buf, depth)
+        let Some(field) = end_group else {
+            return LazyMessage::ingest_with_depth(self, buf, depth);
+        };
+        // The island buffer is the copy. A group that fits in this chunk is
+        // appended as one slice. A group that spans chunks is appended piece
+        // by piece from the walk, with no temporary `Vec`.
+        let chunk_len = buf.chunk().len();
+        if let Some(frame) = measure_group(chunk_len, |i| buf.chunk().get(i).copied(), 0, field)? {
+            let body_len = frame.body_len;
+            let consumed = frame.consumed;
+            if body_len != 0 {
+                LazyMessage::push_with_depth(self, &buf.chunk()[..body_len], depth)?;
+            }
+            buf.advance(consumed);
+            return LazyMessage::finish(self);
+        }
+        if buf.remaining() == chunk_len {
+            return Err(DecodeError::TruncatedMessage);
+        }
+        copy_group_body(field, buf, |bytes| {
+            LazyMessage::push_with_depth(self, bytes, depth)
+        })?;
+        LazyMessage::finish(self)
     }
 }
 
@@ -913,8 +937,14 @@ macro_rules! forward_record {
                 &mut self,
                 buf: &mut B,
                 depth: usize,
+                end_group: Option<$crate::FieldNumber>,
             ) -> ::core::result::Result<(), ::puroro::DecodeError> {
-                $crate::MessageMerge::merge_from_with_depth(&mut self.record, buf, depth)
+                $crate::MessageMerge::merge_from_with_depth(
+                    &mut self.record,
+                    buf,
+                    depth,
+                    end_group,
+                )
             }
         }
 

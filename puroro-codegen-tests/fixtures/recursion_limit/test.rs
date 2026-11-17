@@ -70,7 +70,7 @@ fn merge_at<M: MessageMerge + Default>(bytes: &[u8], depth: usize) -> Result<M, 
     let mut message = M::default();
     let mut cursor = bytes;
     let mut scoped = ScopedBuf::new(&mut cursor);
-    MessageMerge::merge_from_with_depth(&mut message, &mut scoped, depth)?;
+    MessageMerge::merge_from_with_depth(&mut message, &mut scoped, depth, None)?;
     Ok(message)
 }
 

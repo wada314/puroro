@@ -392,6 +392,7 @@ where
                     DerefMut::deref_mut(child),
                     limited,
                     depth + 1,
+                    None,
                 ),
             }
         })
@@ -520,10 +521,8 @@ where
         if wire_type != WireType::SGroup {
             return Err(DecodeError::InvalidTag);
         }
-        decode::read_group_body(buf, field, |body| {
-            let child = ValueSlot::with_mut(slot, init, common).get_mut();
-            MessageMerge::merge_from_slice(DerefMut::deref_mut(child), body, depth + 1)
-        })
+        let child = ValueSlot::with_mut(slot, init, common).get_mut();
+        MessageMerge::merge_group(DerefMut::deref_mut(child), buf, field, depth + 1)
     }
 }
 

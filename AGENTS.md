@@ -64,7 +64,7 @@ Fix new fmt/clippy issues. Do not silence lints unless this repo already does fo
 
 ## Groups
 
-Unknown `SGroup` is preserved, skipped, or rejected through the matching `EGroup`. A known group is `ProtoGroup<M>`: merge the child from the consumed start tag until that field number's end tag, and encode start tag + body + end tag with no length prefix. `protoc-gen-puroro` still rejects `TYPE_GROUP` and `message_encoding=DELIMITED`. Lazy `merge_shared` does not record group spans yet.
+Unknown `SGroup` is preserved, skipped, or rejected through the matching `EGroup`. A known group is `ProtoGroup<M>`: the child reads the caller's buffer from the consumed start tag until that field number's end tag. Do not copy the interior into a side buffer. Encode writes start tag + body + end tag with no length prefix. A lazy child appends that interior into its existing island buffer (`SharedWire`, still the global `Bytes` store). `protoc-gen-puroro` still rejects `TYPE_GROUP` and `message_encoding=DELIMITED`. Lazy `merge_shared` does not record group spans yet.
 
 ## Unknown-field reject
 

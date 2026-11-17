@@ -76,7 +76,7 @@ The puroro project comprises several crates and tools with distinct roles:
 
 ## 1. Goals
 
-- **Protobuf spec compliance.** Support the canonical wire format (varints, I32, I64, LEN records, packed repeated, oneofs, unknown fields) for proto2, proto3, and editions. The compliant unknown-field behavior is preserve-and-round-trip. Opt-in `DISCARD` and `REJECT` leave that rule ([§4.9](#49-unknown-fields)). Group fields are not generated, and the encoder does not emit `SGroup` / `EGroup`. An unknown start-group is preserved on the preserve path (see [§0](#0-project-architecture)).
+- **Protobuf spec compliance.** Support the canonical wire format (varints, I32, I64, LEN records, packed repeated, oneofs, unknown fields) for proto2, proto3, and editions. The compliant unknown-field behavior is preserve-and-round-trip. Opt-in `DISCARD` and `REJECT` leave that rule ([§4.9](#49-unknown-fields)). Group fields are not generated. A hand-written `ProtoGroup<M>` merges and encodes a known group. An unknown start-group is preserved on the preserve path (see [§0](#0-project-architecture)).
 - **Allocator support.** Every generated message is generic over `A: Allocator + Clone` using the `allocator-api2` crate ([why `Clone` is on the struct](#why-a-clone-is-a-struct-bound)). Arena allocators (e.g. `bumpalo`) and custom pools are first-class citizens.
 - **Performance-oriented interface.** Accessors return borrowed references (`&str`, `&[u8]`, `&[T]`), never freshly allocated containers. The `encode_to_vec` / `encode_to_bytes` convenience methods allocate; `Message::encode` writes into a caller-owned buffer. Wire-body sizing / writing (`encoded_len` / `encode_raw` with `EncodeCtx`) lives on `puroro_rt::MessageEncode`, not on `Message`.
 - **Rust idioms.** Private fields accessed via generated accessor methods; `Optional<T, impl HasDefault<T>>` for explicit-presence scalar, string, and enum fields; singular nested messages return `Option<&M>` / `&mut M` (inlined children are a full `M` with their own `MessageCommon`); no `unsafe` in user-visible APIs.
@@ -1362,7 +1362,7 @@ puroro is a greenfield design. Generated types, trait names, and module layout a
 
 ### Deprecated group wire types
 
-Groups (`SGroup` / `EGroup`) are not generated. Unknown start-groups are stored with the other unknown fields and round-trip as raw bytes. A known group is the runtime marker `ProtoGroup<M>`: merge reads from the already-consumed start tag through the matching end tag, and encode writes the start tag, the child body, and the end tag, with no length prefix. Codegen still rejects `TYPE_GROUP` and `message_encoding=DELIMITED`. Lazy span apply does not record group bodies yet. A mismatched end-group is `DecodeError::MismatchedEndGroup`. A bare end-group is `DecodeError::InvalidTag`. An end-group wire type on `encode_field` panics.
+Groups (`SGroup` / `EGroup`) are not generated. Unknown start-groups are stored with the other unknown fields and round-trip as raw bytes. A known group is the runtime marker `ProtoGroup<M>`: the child reads the caller's buffer from the already-consumed start tag through the matching end tag, in place, and encode writes the start tag, the child body, and the end tag, with no length prefix. Codegen still rejects `TYPE_GROUP` and `message_encoding=DELIMITED`. Lazy span apply does not record group bodies yet. A mismatched end-group is `DecodeError::MismatchedEndGroup`. A bare end-group is `DecodeError::InvalidTag`. An end-group wire type on `encode_field` panics.
 
 ### Module layout: package-first, rename when needed
 

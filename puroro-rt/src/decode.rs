@@ -14,7 +14,7 @@ mod varint;
 
 pub use self::slice_cursor::{SliceCursor, contiguous_remaining};
 
-pub(crate) use group::read_group_body;
+pub(crate) use group::{copy_group_body, measure_group};
 
 pub use self::lazy_scan::{Eager, Lazy, LazyMessage, LazyScan, MessageScan};
 pub use self::record::{
@@ -88,6 +88,41 @@ pub fn decode_tag<B: Buf>(buf: &mut B) -> Result<(FieldNumber, WireType), Decode
     let field_number = FieldNumber::try_new(raw >> 3).map_err(|_| DecodeError::InvalidTag)?;
     let wire_type = wire_type::from_raw((raw & 0b111) as u8)?;
     Ok((field_number, wire_type))
+}
+
+/// Next field tag, or the end of this message body.
+///
+/// `end_group` is `None` for a top-level or length-delimited body. A bare
+/// end-group is [`DecodeError::InvalidTag`]. No more bytes is `Ok(None)`.
+///
+/// `Some(field)` reads a group body whose start tag is already consumed. The
+/// matching end-group is consumed and returns `Ok(None)`. A different
+/// end-group is [`DecodeError::MismatchedEndGroup`]. Running out of bytes
+/// before that end-group is [`DecodeError::TruncatedMessage`].
+#[inline]
+pub fn next_tag<B: Buf>(
+    buf: &mut B,
+    end_group: Option<FieldNumber>,
+) -> Result<Option<(FieldNumber, WireType)>, DecodeError> {
+    if !buf.has_remaining() {
+        return if end_group.is_some() {
+            Err(DecodeError::TruncatedMessage)
+        } else {
+            Ok(None)
+        };
+    }
+    let (number, wire_type) = decode_tag(buf)?;
+    if wire_type != WireType::EGroup {
+        return Ok(Some((number, wire_type)));
+    }
+    match end_group {
+        Some(expected) if expected == number => Ok(None),
+        Some(expected) => Err(DecodeError::MismatchedEndGroup {
+            expected: expected.as_u32(),
+            got: number.as_u32(),
+        }),
+        None => Err(DecodeError::InvalidTag),
+    }
 }
 
 /// Decodes one LEN payload into an [`UnmanagedVec<u8, A>`].

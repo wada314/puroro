@@ -8,15 +8,15 @@
 //! [`measure_group`] reports byte ranges for the scanner and the unknown-field
 //! iterator. [`skip_group`] and [`copy_group`] advance a [`Buf`](bytes::Buf).
 //! Copying writes the raw interior and the end tag. It does not re-encode
-//! fields. [`read_group_body`] hands the interior to a known-field parser.
-//! Known-field encoding is [`crate::fields::wire::encode_type::encode_field`]
-//! for [`crate::ProtoGroup`].
+//! fields. A known group is parsed in place by
+//! [`crate::MessageMerge::merge_group`]: the child reads this buffer until the
+//! matching end tag. Known-field encoding is
+//! [`crate::fields::wire::encode_type::encode_field`] for [`crate::ProtoGroup`].
 
 use ::bytes::Buf;
 use ::protobuf_core::{FieldNumber, MAX_VARINT_BYTES};
 use ::puroro::wire_type;
 use ::puroro::{DecodeError, RECURSION_LIMIT, WireType};
-use ::std::vec::Vec;
 
 /// Byte sizes of one group after its start tag has been consumed.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -129,7 +129,7 @@ pub(crate) fn skip_group<B: Buf>(
     field_number: FieldNumber,
     buf: &mut B,
 ) -> Result<(), DecodeError> {
-    walk_group(field_number, buf, false, |_| {})
+    walk_group(field_number, buf, false, |_| Ok(()))
 }
 
 /// Copies one group body and its matching end tag into `emit`.
@@ -139,63 +139,32 @@ pub(crate) fn skip_group<B: Buf>(
 pub(crate) fn copy_group<B: Buf>(
     field_number: FieldNumber,
     buf: &mut B,
-    emit: impl FnMut(&[u8]),
+    mut emit: impl FnMut(&[u8]),
 ) -> Result<(), DecodeError> {
-    walk_group(field_number, buf, true, emit)
+    walk_group(field_number, buf, true, |bytes| {
+        emit(bytes);
+        Ok(())
+    })
 }
 
 /// Copies one group body into `emit`, excluding the matching end tag.
 ///
 /// The start tag is already consumed and is not copied. `emit` must copy the
-/// bytes. The slice is borrowed from `buf`'s current chunk.
+/// bytes before it returns. The slice is borrowed from `buf`'s current chunk.
+/// `Err` from `emit` stops the walk at the byte already consumed.
 pub(crate) fn copy_group_body<B: Buf>(
     field_number: FieldNumber,
     buf: &mut B,
-    emit: impl FnMut(&[u8]),
+    emit: impl FnMut(&[u8]) -> Result<(), DecodeError>,
 ) -> Result<(), DecodeError> {
     walk_group(field_number, buf, false, emit)
-}
-
-/// Reads one known group and passes the interior to `read`.
-///
-/// The start tag is already consumed. `field` is that start-group's field
-/// number; the matching end-group must use it. Rejecting a non-group wire
-/// type is the caller's job.
-///
-/// When the group finishes inside [`Buf::chunk`], `read` sees that subslice
-/// and this function then advances past the end tag. An error from `read`
-/// still advances. A group that continues into a later chunk is copied, then
-/// `read` sees the owned interior. A group that ends before the buffer does
-/// is [`DecodeError::TruncatedMessage`] and consumes nothing when the whole
-/// remainder is one chunk.
-pub(crate) fn read_group_body<B, T, F>(
-    buf: &mut B,
-    field: FieldNumber,
-    read: F,
-) -> Result<T, DecodeError>
-where
-    B: Buf,
-    F: FnOnce(&[u8]) -> Result<T, DecodeError>,
-{
-    let chunk_len = buf.chunk().len();
-    if let Some(frame) = measure_group(chunk_len, |i| buf.chunk().get(i).copied(), 0, field)? {
-        let decoded = read(&buf.chunk()[..frame.body_len]);
-        buf.advance(frame.consumed);
-        return decoded;
-    }
-    if buf.remaining() == chunk_len {
-        return Err(DecodeError::TruncatedMessage);
-    }
-    let mut body = Vec::new();
-    copy_group_body(field, buf, |bytes| body.extend_from_slice(bytes))?;
-    read(&body)
 }
 
 fn walk_group<B: Buf>(
     field_number: FieldNumber,
     buf: &mut B,
     include_end: bool,
-    mut emit: impl FnMut(&[u8]),
+    mut emit: impl FnMut(&[u8]) -> Result<(), DecodeError>,
 ) -> Result<(), DecodeError> {
     let mut groups = OpenGroups::new(field_number.as_u32());
     let mut scratch = [0u8; MAX_VARINT_BYTES];
@@ -208,16 +177,16 @@ fn walk_group<B: Buf>(
         let closed = groups.on_tag(number, wire)?;
         if closed {
             if include_end {
-                emit(raw);
+                emit(raw)?;
             }
             return Ok(());
         }
-        emit(raw);
+        emit(raw)?;
         match wire {
             WireType::SGroup | WireType::EGroup => {}
             WireType::Varint => {
                 let (_, raw) = super::decode_varint_with_raw(buf, &mut scratch)?;
-                emit(raw);
+                emit(raw)?;
             }
             WireType::Int32 => {
                 copy_exact(buf, 4, DecodeError::UnexpectedEof, &mut emit)?;
@@ -227,7 +196,7 @@ fn walk_group<B: Buf>(
             }
             WireType::Len => {
                 let (len_value, raw) = super::decode_varint_with_raw(buf, &mut scratch)?;
-                emit(raw);
+                emit(raw)?;
                 let Ok(len) = usize::try_from(len_value.to_uint64()) else {
                     return Err(DecodeError::TruncatedMessage);
                 };
@@ -339,7 +308,7 @@ fn copy_exact<B: Buf>(
     buf: &mut B,
     mut len: usize,
     short: DecodeError,
-    emit: &mut impl FnMut(&[u8]),
+    emit: &mut impl FnMut(&[u8]) -> Result<(), DecodeError>,
 ) -> Result<(), DecodeError> {
     if buf.remaining() < len {
         return Err(short);
@@ -350,7 +319,7 @@ fn copy_exact<B: Buf>(
             return Err(DecodeError::UnexpectedEof);
         }
         let n = chunk.len().min(len);
-        emit(&chunk[..n]);
+        emit(&chunk[..n])?;
         buf.advance(n);
         len -= n;
     }

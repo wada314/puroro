@@ -480,7 +480,8 @@ where
                     MessageMerge::merge_from_slice(&mut msg, payload, depth + 1).map(|()| msg)
                 }
                 decode::LenBody::Limited(limited) => {
-                    MessageMerge::merge_from_with_depth(&mut msg, limited, depth + 1).map(|()| msg)
+                    MessageMerge::merge_from_with_depth(&mut msg, limited, depth + 1, None)
+                        .map(|()| msg)
                 }
             }
         })
@@ -548,10 +549,9 @@ where
         if wire_type != WireType::SGroup {
             return Err(DecodeError::InvalidTag);
         }
-        decode::read_group_body(buf, field, |body| {
-            let mut msg = M::default_in(alloc);
-            MessageMerge::merge_from_slice(&mut msg, body, depth + 1).map(|()| msg)
-        })
+        let mut msg = M::default_in(alloc);
+        MessageMerge::merge_group(&mut msg, buf, field, depth + 1)?;
+        Ok(msg)
     }
 
     #[inline]
