@@ -5,6 +5,7 @@
 //! [`ChunkScanLikely1`]. Tags are unpacked here into a validated [`FieldNumber`]
 //! plus [`WireType`].
 
+mod group;
 mod lazy_scan;
 mod record;
 mod shared_wire;
@@ -15,8 +16,8 @@ pub use self::slice_cursor::{SliceCursor, contiguous_remaining};
 
 pub use self::lazy_scan::{Eager, Lazy, LazyMessage, LazyScan, MessageScan};
 pub use self::record::{
-    RecordScanner, ScannedRecord, ScannedValue, WireSpan, for_each_len_field, scanned_len_payload,
-    scanned_len_span, scanned_record_span,
+    RecordScanner, ScannedRecord, ScannedValue, WireSpan, for_each_len_field,
+    scanned_group_body_span, scanned_len_payload, scanned_len_span, scanned_record_span,
 };
 pub use self::shared_wire::SharedWire;
 pub use self::varint::{
@@ -154,8 +155,14 @@ where
 /// Skips one field payload for `wire_type` without preserving unknowns.
 ///
 /// Used for map-entry interiors (and similar ephemeral messages) where unknown
-/// fields are not round-tripped.
-pub(crate) fn skip_field<B: Buf>(wire_type: WireType, buf: &mut B) -> Result<(), DecodeError> {
+/// fields are not round-tripped. A start-group consumes the body and the
+/// matching end-group ([`group::skip_group`]). A bare end-group is
+/// [`DecodeError::InvalidTag`].
+pub(crate) fn skip_field<B: Buf>(
+    field_number: FieldNumber,
+    wire_type: WireType,
+    buf: &mut B,
+) -> Result<(), DecodeError> {
     match wire_type {
         WireType::Varint => {
             decode_varint(buf)?;
@@ -179,9 +186,8 @@ pub(crate) fn skip_field<B: Buf>(wire_type: WireType, buf: &mut B) -> Result<(),
             }
             buf.advance(4);
         }
-        WireType::SGroup | WireType::EGroup => {
-            return Err(DecodeError::InvalidTag);
-        }
+        WireType::SGroup => group::skip_group(field_number, buf)?,
+        WireType::EGroup => return Err(DecodeError::InvalidTag),
     }
     Ok(())
 }
@@ -214,11 +220,11 @@ pub fn skip_field_and_save_in<B: Buf, A: Allocator + Clone, U: UnknownStore<A>>(
 ) -> Result<(), DecodeError> {
     let rejected = unknown_fields.on_unrecognized_tag(field_number.as_u32());
     if rejected.is_err() {
-        skip_field(wire_type, buf)?;
+        skip_field(field_number, wire_type, buf)?;
         return rejected;
     }
     let Some(blob) = unknown_fields.append_blob_mut(alloc.clone()) else {
-        return skip_field(wire_type, buf);
+        return skip_field(field_number, wire_type, buf);
     };
     // SAFETY: the owned `alloc` (an `alloc.clone()` from the caller) is
     // interchangeable with the allocator that owns this vector's buffer.
@@ -253,9 +259,10 @@ pub fn skip_field_and_save_in<B: Buf, A: Allocator + Clone, U: UnknownStore<A>>(
             let bytes = buf.copy_to_bytes(4);
             g.extend_from_slice(&bytes);
         }
-        WireType::SGroup | WireType::EGroup => {
-            return Err(DecodeError::InvalidTag);
+        WireType::SGroup => {
+            group::copy_group(field_number, buf, |bytes| g.extend_from_slice(bytes))?;
         }
+        WireType::EGroup => return Err(DecodeError::InvalidTag),
     }
     Ok(())
 }
@@ -302,7 +309,7 @@ impl<'a> Iterator for UnknownFieldsIter<'a> {
         }
 
         let mut buf = self.rest;
-        let (number, wire_type) = match decode_tag(&mut buf) {
+        let (field_number, wire_type) = match decode_tag(&mut buf) {
             Ok(t) => t,
             Err(_) => {
                 debug_assert!(false, "corrupt unknown-fields blob: bad tag");
@@ -310,7 +317,7 @@ impl<'a> Iterator for UnknownFieldsIter<'a> {
                 return None;
             }
         };
-        let number = number.as_u32();
+        let number = field_number.as_u32();
 
         let payload = match wire_type {
             WireType::Varint => {
@@ -364,8 +371,23 @@ impl<'a> Iterator for UnknownFieldsIter<'a> {
                 buf = &buf[4..];
                 UnknownPayload::Fixed32(u32::from_le_bytes(le))
             }
-            WireType::SGroup | WireType::EGroup => {
-                debug_assert!(false, "groups are not preserved in unknown fields");
+            WireType::SGroup => {
+                let frame =
+                    match group::measure_group(buf.len(), |i| buf.get(i).copied(), 0, field_number)
+                    {
+                        Ok(Some(frame)) => frame,
+                        _ => {
+                            debug_assert!(false, "corrupt unknown-fields blob: bad group");
+                            self.rest = &[];
+                            return None;
+                        }
+                    };
+                let payload = &buf[..frame.body_len];
+                buf = &buf[frame.consumed..];
+                UnknownPayload::Group(payload)
+            }
+            WireType::EGroup => {
+                debug_assert!(false, "end-group tag is not an unknown field");
                 self.rest = &[];
                 return None;
             }

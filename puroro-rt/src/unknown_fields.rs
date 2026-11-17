@@ -400,4 +400,71 @@ mod tests {
         assert_eq!(iter_unknown_fields(&s).count(), 1);
         unsafe { s.deallocate_in(&Global) };
     }
+
+    fn group_wire() -> Vec<u8> {
+        use crate::encode::{encode_tag, encode_varint_field};
+        use ::protobuf_core::Varint;
+        // field 7 SGroup, field 1 varint 5, field 7 EGroup, trailing varint tag.
+        let mut body = Vec::new();
+        encode_varint_field(field(1), Varint::from_uint64(5), &mut body);
+        let mut wire = Vec::new();
+        encode_tag(field(7), WireType::SGroup, &mut wire);
+        wire.extend_from_slice(&body);
+        encode_tag(field(7), WireType::EGroup, &mut wire);
+        wire.push(0x08);
+        wire.push(0x01);
+        wire
+    }
+
+    #[test]
+    fn preserve_group_round_trips_the_raw_bytes() {
+        use ::puroro::UnknownPayload;
+        let wire = group_wire();
+        let group_end = wire.len() - 2;
+        // The start tag is already consumed by the caller of `skip_field_and_save`.
+        let mut input = &wire[1..];
+        let mut s = UnknownFields::new();
+        skip_field_and_save(field(7), WireType::SGroup, &mut input, &mut s, Global).unwrap();
+        assert_eq!(input, &wire[group_end..]);
+        assert_eq!(s.as_bytes(), &wire[..group_end]);
+        let items: Vec<_> = iter_unknown_fields(s.as_bytes()).collect();
+        assert_eq!(items.len(), 1);
+        assert_eq!(items[0].number(), 7);
+        assert_eq!(items[0].wire_type(), WireType::SGroup);
+        assert_eq!(
+            items[0].payload(),
+            &UnknownPayload::Group(&wire[1..group_end - 1])
+        );
+        unsafe { s.deallocate_in(&Global) };
+    }
+
+    #[test]
+    fn discard_group_consumes_the_body() {
+        let wire = group_wire();
+        let mut input = &wire[1..];
+        let mut s = DiscardUnknowns;
+        skip_field_and_save_in(field(7), WireType::SGroup, &mut input, &mut s, Global).unwrap();
+        assert_eq!(input, &wire[wire.len() - 2..]);
+        assert!(UnknownStore::<Global>::is_empty(&s));
+    }
+
+    #[test]
+    fn reject_group_consumes_then_reports_unrecognized() {
+        let wire = group_wire();
+        let mut input = &wire[1..];
+        let mut s = RejectUnknowns;
+        let err = skip_field_and_save_in(field(7), WireType::SGroup, &mut input, &mut s, Global)
+            .unwrap_err();
+        assert_eq!(err, DecodeError::UnrecognizedField { field_number: 7 });
+        assert_eq!(input, &wire[wire.len() - 2..]);
+    }
+
+    #[test]
+    fn reject_truncated_group_is_a_wire_error() {
+        let mut input: &[u8] = &[];
+        let mut s = RejectUnknowns;
+        let err = skip_field_and_save_in(field(7), WireType::SGroup, &mut input, &mut s, Global)
+            .unwrap_err();
+        assert_eq!(err, DecodeError::TruncatedMessage);
+    }
 }

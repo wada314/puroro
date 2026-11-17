@@ -2,9 +2,10 @@
 //!
 //! `push` emits every **complete** record as metadata (and a small numeric
 //! value). LEN payloads are **not** copied — callers slice `_wire` after
-//! append via [`scanned_len_span`]. An incomplete tag, length varint, fixed
-//! payload, or LEN body stays in leftover. [`RecordScanner::finish`] errors if
-//! leftover is not empty.
+//! append via [`scanned_len_span`]. A group is one record from its start tag
+//! through the matching end tag; the interior is [`scanned_group_body_span`].
+//! An incomplete tag, length varint, fixed payload, LEN body, or group stays
+//! in leftover. [`RecordScanner::finish`] errors if leftover is not empty.
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::vec::Vec as AllocVec;
@@ -35,13 +36,23 @@ impl WireSpan {
 
 /// Decoded body of one [`ScannedRecord`].
 ///
-/// LEN keeps only the payload length. The bytes live in `_wire` after append.
+/// LEN keeps only the payload length. A group keeps the interior length and
+/// the end-tag length. The bytes live in `_wire` after append.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ScannedValue {
     Varint(Varint),
     I32([u8; 4]),
     I64([u8; 8]),
-    Len { payload_len: usize },
+    Len {
+        payload_len: usize,
+    },
+    /// Start tag, interior, and matching end tag form the record.
+    ///
+    /// `body_len` excludes both tags. `end_tag_len` is the end-group tag.
+    Group {
+        body_len: usize,
+        end_tag_len: usize,
+    },
 }
 
 /// One complete record from [`RecordScanner::push`], with its position in
@@ -68,8 +79,9 @@ pub fn scanned_record_span(origin: usize, rec: &ScannedRecord) -> Result<WireSpa
 
 /// Calls `f` with each LEN payload in a complete message body.
 ///
-/// `payload` is one message body (not a length prefix). Non-LEN records are
-/// skipped. A truncated or illegal record is that decode error.
+/// `payload` is one message body (not a length prefix). Non-LEN records,
+/// including groups, are skipped. A truncated or illegal record is that
+/// decode error. Group interiors are not visited here.
 pub fn for_each_len_field(
     payload: &[u8],
     mut f: impl FnMut(u32, &[u8]) -> Result<(), DecodeError>,
@@ -92,6 +104,17 @@ pub fn for_each_len_field(
 /// The payload is the last `payload_len` bytes of the record (after tag + length).
 pub fn scanned_len_span(origin: usize, rec: &ScannedRecord) -> Result<WireSpan, DecodeError> {
     rec.len_span(origin)
+}
+
+/// Group interior in `_wire`, given `origin` of `leftover || chunk`.
+///
+/// The span excludes the start tag and the matching end tag. Known group
+/// fields are not applied yet; callers that need the bytes slice this span.
+pub fn scanned_group_body_span(
+    origin: usize,
+    rec: &ScannedRecord,
+) -> Result<WireSpan, DecodeError> {
+    rec.group_body_span(origin)
 }
 
 /// LEN payload bytes in `wire`, given `origin` of `leftover || chunk`.
@@ -117,6 +140,21 @@ impl ScannedRecord {
         Ok(WireSpan {
             offset,
             len: payload_len,
+        })
+    }
+
+    /// Group interior in `_wire`, excluding the start tag and the end tag.
+    pub fn group_body_span(&self, origin: usize) -> Result<WireSpan, DecodeError> {
+        let ScannedValue::Group { body_len, .. } = self.value else {
+            return Err(DecodeError::InvalidTag);
+        };
+        let offset = origin
+            .checked_add(self.start)
+            .and_then(|start| start.checked_add(self.tag_len))
+            .ok_or(DecodeError::TruncatedMessage)?;
+        Ok(WireSpan {
+            offset,
+            len: body_len,
         })
     }
 }
@@ -288,7 +326,7 @@ fn try_record_at(src: &TwoSlice<'_>, start: usize) -> Result<TryRecord, DecodeEr
     let raw_tag = raw_tag as u32;
     let field_number = FieldNumber::try_new(raw_tag >> 3).map_err(|_| DecodeError::InvalidTag)?;
     let wire_type = wire_type::from_raw((raw_tag & 0b111) as u8)?;
-    if matches!(wire_type, WireType::SGroup | WireType::EGroup) {
+    if wire_type == WireType::EGroup {
         return Err(DecodeError::InvalidTag);
     }
 
@@ -330,7 +368,21 @@ fn try_record_at(src: &TwoSlice<'_>, start: usize) -> Result<TryRecord, DecodeEr
             }
             (ScannedValue::Len { payload_len }, body_len)
         }
-        WireType::SGroup | WireType::EGroup => unreachable!("rejected above"),
+        WireType::SGroup => {
+            let Some(frame) =
+                super::group::measure_group(src.len(), |i| src.get(i), body_at, field_number)?
+            else {
+                return Ok(TryRecord::NeedMore);
+            };
+            (
+                ScannedValue::Group {
+                    body_len: frame.body_len,
+                    end_tag_len: frame.end_tag_len,
+                },
+                frame.consumed,
+            )
+        }
+        WireType::EGroup => unreachable!("rejected above"),
     };
 
     Ok(TryRecord::Done {
@@ -504,12 +556,84 @@ mod tests {
         assert_eq!(s.finish(), Err(DecodeError::TruncatedMessage));
     }
 
+    fn push_group(buf: &mut Vec<u8>, number: u32, body: &[u8]) {
+        encode_tag(field(number), WireType::SGroup, buf);
+        buf.extend_from_slice(body);
+        encode_tag(field(number), WireType::EGroup, buf);
+    }
+
     #[test]
-    fn group_tag_is_invalid() {
+    fn unclosed_group_stays_in_leftover() {
         let mut buf = Vec::new();
         encode_tag(field(1), WireType::SGroup, &mut buf);
         let mut s = RecordScanner::new();
+        assert!(s.push(&buf).unwrap().is_empty());
+        assert_eq!(s.leftover(), buf.as_slice());
+        assert_eq!(s.finish(), Err(DecodeError::TruncatedMessage));
+    }
+
+    #[test]
+    fn bare_end_group_is_invalid() {
+        let mut buf = Vec::new();
+        encode_tag(field(1), WireType::EGroup, &mut buf);
+        let mut s = RecordScanner::new();
         assert_eq!(s.push(&buf).err(), Some(DecodeError::InvalidTag));
+    }
+
+    #[test]
+    fn group_is_one_record_and_keeps_the_following_field() {
+        let mut inner = Vec::new();
+        encode_varint_field(field(3), Varint::from_uint64(1), &mut inner);
+        let mut nested = Vec::new();
+        push_group(&mut nested, 1, &inner);
+        let mut wire = Vec::new();
+        push_group(&mut wire, 1, &nested);
+        encode_varint_field(field(4), Varint::from_uint64(9), &mut wire);
+
+        let mut s = RecordScanner::new();
+        let recs = s.push(&wire).unwrap();
+        s.finish().unwrap();
+        assert_eq!(recs.len(), 2);
+        let ScannedValue::Group {
+            body_len,
+            end_tag_len,
+        } = recs[0].value
+        else {
+            panic!("expected a group record");
+        };
+        assert_eq!(body_len, nested.len());
+        assert_eq!(end_tag_len, 1);
+        assert_eq!(recs[0].len, recs[0].tag_len + body_len + end_tag_len);
+        let body = recs[0].group_body_span(0).unwrap().slice(&wire).unwrap();
+        assert_eq!(body, nested.as_slice());
+        assert_eq!(recs[1].field_number, field(4));
+    }
+
+    #[test]
+    fn group_split_across_chunks_is_one_record() {
+        let mut wire = Vec::new();
+        push_group(&mut wire, 1, &[0x08, 0x01]);
+        let mut s = RecordScanner::new();
+        assert!(s.push(&wire[..1]).unwrap().is_empty());
+        let recs = s.push(&wire[1..]).unwrap();
+        s.finish().unwrap();
+        assert_eq!(recs.len(), 1);
+        assert!(matches!(recs[0].value, ScannedValue::Group { .. }));
+    }
+
+    #[test]
+    fn mismatched_end_group_fails_the_scan() {
+        let mut wire = Vec::new();
+        encode_tag(field(1), WireType::SGroup, &mut wire);
+        encode_tag(field(2), WireType::EGroup, &mut wire);
+        let mut s = RecordScanner::new();
+        assert_eq!(
+            s.push(&wire).unwrap_err(),
+            DecodeError::MismatchedEndGroup {
+                expected: 1,
+                got: 2
+            }
+        );
     }
 
     #[test]

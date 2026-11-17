@@ -76,7 +76,9 @@ where
             encode::encoded_len_tag(field, T::WIRE_TYPE) + T::payload_len::<A>(value, ctx)
         }
         WireType::SGroup | WireType::EGroup => {
-            unreachable!("generated markers never use group wire types")
+            // Known group fields are not encoded yet. Unknown groups round-trip
+            // as raw bytes in the unknown-field blob, not through this helper.
+            panic!("encoding protobuf groups is not supported")
         }
     }
 }
@@ -99,7 +101,7 @@ pub(crate) fn encode_field<'a, T, A, B>(
             T::encode_payload::<A, B>(value, ctx, buf);
         }
         WireType::SGroup | WireType::EGroup => {
-            unreachable!("generated markers never use group wire types")
+            panic!("encoding protobuf groups is not supported")
         }
     }
 }
