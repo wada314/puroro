@@ -446,15 +446,7 @@ fn message_apply_arm(
     apply: &MessageApply,
 ) -> TokenStream {
     let body = match apply {
-        MessageApply::SharedSingular(fields) => {
-            let check = depth_check(fields);
-            quote! {
-                #check
-                let root = common.lazy.scan.shared().clone_handle();
-                #slot.merge_shared(&root, span, common)
-            }
-        }
-        MessageApply::SharedRepeated(fields) => {
+        MessageApply::Shared(fields) => {
             let check = depth_check(fields);
             quote! {
                 #check
@@ -545,8 +537,7 @@ fn push_depth_arm(
         return;
     };
     let fields = match apply {
-        MessageApply::SharedSingular(fields)
-        | MessageApply::SharedRepeated(fields)
+        MessageApply::Shared(fields)
         | MessageApply::EagerSingular(fields)
         | MessageApply::EagerRepeated(_, fields) => fields,
     };

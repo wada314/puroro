@@ -867,7 +867,7 @@ impl ChildPin {
     fn singular_apply(&self) -> MessageApply {
         let fields = self.fields_ty().clone();
         match self {
-            Self::Follow(_, _) | Self::Lazy { .. } => MessageApply::SharedSingular(fields),
+            Self::Follow(_, _) | Self::Lazy { .. } => MessageApply::Shared(fields),
             Self::Eager { .. } => MessageApply::EagerSingular(fields),
         }
     }
@@ -875,7 +875,7 @@ impl ChildPin {
     fn repeated_apply(&self) -> MessageApply {
         let fields = self.fields_ty().clone();
         match self {
-            Self::Follow(_, _) | Self::Lazy { .. } => MessageApply::SharedRepeated(fields),
+            Self::Follow(_, _) | Self::Lazy { .. } => MessageApply::Shared(fields),
             Self::Eager { eager, .. } => MessageApply::EagerRepeated(eager.clone(), fields),
         }
     }
