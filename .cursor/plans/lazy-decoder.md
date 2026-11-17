@@ -29,11 +29,12 @@ Island-first ingest (copy onto `SharedWire`, then scan; leftover as an
 offset; internal `push_bytes`) was tried and reverted: typical
 `task_lazy/decode` / `map/decode_lazy` did not move (+1.7% / +0.1%,
 noise), and it added a second leftover model plus truncate rollback.
-Do not re-land that shape to chase the island copy. `decode(&[u8])` still
-has to copy; `TaskView` is the extra-lifetime alternative. Packed inners
+Do not re-land that shape to chase the island copy. `decode(&[u8])` on
+`TaskLazy<A, Bytes>` still copies. Zero-copy is `TaskLazy<A, &'buf [u8]>`
+([wire-buf.md](wire-buf.md)), designed and not implemented. Packed inners
 still walk the payload (unread packed-as-slice is out of v1).
 
-Still out of v1: `TaskView`, lazy mutation, `MessageFallible` on the lazy
+Still out of v1: the buffer type parameter, lazy mutation, `MessageFallible` on the lazy
 alias, intra-field repeated cursors, zero-copy spanning LEN, packed repeated
 left unread.
 
@@ -221,7 +222,8 @@ applied numericals / promoted SSO; unpromoted LEN stays offsets.
 - Lazy `_mut` / in-place edit of `_wire`.
 - Mid-payload splits as a **zero-copy storage contract** for `&str` / child
   `_wire`.
-- `TaskView<'buf>`.
+- A separate `TaskView<'buf>` type. Zero-copy is the `B` parameter on
+  `TaskLazy<A, B>` ([wire-buf.md](wire-buf.md)), not a third message type.
 - Generator / `TaskImpl<A, L>` before handwritten lazy works.
 - Field-level partial/resume inside `protobuf-core` (compose tag/varint
   partial at the puroro layer).
@@ -374,7 +376,7 @@ a span (`ScannedRecord` / `ScannedValue`); complete LEN is not copied off
 the island. Numericals use catalog `merge_scanned` (no rematch). Eager
 `Task` implements handwritten `task::MessageFallible` (`Error = Infallible`).
 
-**Not done:** `TaskView`, lazy mutation, `MessageFallible` for `TaskLazy`
+**Not done:** `TaskLazy<A, &'buf [u8]>` ([wire-buf.md](wire-buf.md)), lazy mutation, `MessageFallible` for `TaskLazy`
 (follow-parent fields change type with the parent; the plugin does not emit
 the trait), intra-field repeated cursors, zero-copy spanning LEN,
 packed-as-unread-slice. Island-first leftover-as-offset ingest was tried
@@ -397,6 +399,7 @@ several other behaviours. The list, including option sketches, is
 
 ## Pointers
 
+- [wire-buf.md](wire-buf.md) — `WireBuf` parameter that replaces a separate view type.
 - DESIGN.md §8 — shipped lazy alias. This note keeps the lock and the rejected list.
 - IMPLEMENTATION.md §3 / §17 — plugin status. The runtime exists.
 - `sample-generated/` — eager normative output; lazy is added the same way.
