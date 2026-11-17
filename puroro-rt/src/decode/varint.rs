@@ -1,11 +1,12 @@
 //! Pluggable varint decoders for production and microbenchmarks.
 //!
-//! [`super::decode_varint`] uses [`ChunkScanHot4`]; [`super::decode_tag`] uses
-//! [`super::decode_varint_with`] with [`ChunkScanLikely1`]. Benches monomorphize
-//! over [`VarintDecoder`] impls to compare algorithms without runtime dispatch.
+//! [`decode_varint_with_raw`] is the production read. It runs [`ChunkScanHot4`]
+//! and keeps the consumed wire bytes. [`super::decode_varint`] calls that and
+//! drops the bytes. [`super::decode_tag`] uses [`super::decode_varint_with`]
+//! with [`ChunkScanLikely1`]. Benches monomorphize over [`VarintDecoder`].
 
 use ::bytes::Buf;
-use ::protobuf_core::{MAX_VARINT_BYTES, VARINT_CONTINUATION_BIT, VARINT_PAYLOAD_MASK};
+use ::protobuf_core::{MAX_VARINT_BYTES, VARINT_CONTINUATION_BIT, VARINT_PAYLOAD_MASK, Varint};
 use ::puroro::DecodeError;
 
 /// A varint decode algorithm over [`Buf`].
@@ -100,6 +101,57 @@ fn try_decode_varint_from_slice(chunk: &[u8]) -> Result<Option<(u64, usize)>, De
 #[inline]
 fn decode_varint_byte_iterator<B: Buf>(buf: &mut B) -> Result<u64, DecodeError> {
     finish_varint_bytewise(buf, 0, 0, 0)
+}
+
+/// Copies bytes out of `inner` as [`ChunkScanHot4`] advances.
+struct RecordingBuf<'a, B> {
+    inner: &'a mut B,
+    raw: &'a mut [u8; MAX_VARINT_BYTES],
+    n: usize,
+}
+
+impl<B: Buf> Buf for RecordingBuf<'_, B> {
+    #[inline]
+    fn remaining(&self) -> usize {
+        self.inner.remaining()
+    }
+
+    #[inline]
+    fn chunk(&self) -> &[u8] {
+        let chunk = self.inner.chunk();
+        let room = MAX_VARINT_BYTES.saturating_sub(self.n);
+        let take = chunk.len().min(room);
+        &chunk[..take]
+    }
+
+    #[inline]
+    fn advance(&mut self, cnt: usize) {
+        let src = &self.inner.chunk()[..cnt];
+        self.raw[self.n..self.n + cnt].copy_from_slice(src);
+        self.n += cnt;
+        self.inner.advance(cnt);
+    }
+}
+
+/// Body of [`super::decode_varint_with_raw`].
+///
+/// `raw` receives the bytes [`ChunkScanHot4`] consumed, including a
+/// non-canonical encoding. [`super::decode_varint`] calls this and drops them.
+#[inline]
+pub(crate) fn decode_varint_with_raw<'a, B: Buf>(
+    buf: &mut B,
+    raw: &'a mut [u8; MAX_VARINT_BYTES],
+) -> Result<(Varint, &'a [u8]), DecodeError> {
+    let (value, n) = {
+        let mut rec = RecordingBuf {
+            inner: buf,
+            raw,
+            n: 0,
+        };
+        let value = ChunkScanHot4::decode_varint(&mut rec)?;
+        (value, rec.n)
+    };
+    Ok((Varint::from_uint64(value), &raw[..n]))
 }
 
 /// Fast path for workloads where most varints are a single byte (e.g. tags).
@@ -725,6 +777,68 @@ mod tests {
         crate::for_each_varint_decoder!(D => {
             assert_decode_split_across_chunks::<D>();
         });
+    }
+
+    #[test]
+    fn with_raw_keeps_a_noncanonical_encoding() {
+        // 1 is canonically `0x01`. `0x81 0x00` is the same integer.
+        let wire = [0x81u8, 0x00, 0x02];
+        let mut cursor = wire.as_slice();
+        let mut scratch = [0u8; MAX_VARINT_BYTES];
+        let (value, raw) = decode_varint_with_raw(&mut cursor, &mut scratch).unwrap();
+        assert_eq!(value, Varint::from_uint64(1));
+        assert_eq!(raw, &[0x81, 0x00]);
+        assert_eq!(cursor, &[0x02]);
+    }
+
+    #[test]
+    fn with_raw_keeps_bytes_split_across_chunks() {
+        let mut buf = SplitBuf {
+            first: &[0x81],
+            rest: &[0x00, 0x02],
+        };
+        let mut scratch = [0u8; MAX_VARINT_BYTES];
+        let (value, raw) = decode_varint_with_raw(&mut buf, &mut scratch).unwrap();
+        assert_eq!(value, Varint::from_uint64(1));
+        assert_eq!(raw, &[0x81, 0x00]);
+        assert_eq!(buf.remaining(), 1);
+    }
+
+    #[test]
+    fn with_raw_matches_decode_varint_on_canonical_values() {
+        for value in [0u64, 1, 127, 150, 1 << 28, u64::from(u32::MAX), u64::MAX] {
+            let wire = encode_u64(value);
+            let mut plain = wire.as_slice();
+            let mut keeping = wire.as_slice();
+            let mut scratch = [0u8; MAX_VARINT_BYTES];
+            let (decoded, raw) = decode_varint_with_raw(&mut keeping, &mut scratch).unwrap();
+            assert_eq!(
+                decoded.to_uint64(),
+                super::super::decode_varint(&mut plain).unwrap()
+            );
+            assert_eq!(decoded, Varint::from_uint64(value));
+            assert_eq!(raw, wire.as_slice());
+        }
+    }
+
+    #[test]
+    fn with_raw_rejects_an_empty_or_unfinished_or_overlong_varint() {
+        let mut scratch = [0u8; MAX_VARINT_BYTES];
+        let mut empty = [].as_slice();
+        assert!(matches!(
+            decode_varint_with_raw(&mut empty, &mut scratch),
+            Err(DecodeError::UnexpectedEof)
+        ));
+        let mut short = [0x80u8].as_slice();
+        assert!(matches!(
+            decode_varint_with_raw(&mut short, &mut scratch),
+            Err(DecodeError::UnexpectedEof)
+        ));
+        let mut overlong = [0x80u8; 10].as_slice();
+        assert!(matches!(
+            decode_varint_with_raw(&mut overlong, &mut scratch),
+            Err(DecodeError::InvalidVarint)
+        ));
     }
 
     #[test]

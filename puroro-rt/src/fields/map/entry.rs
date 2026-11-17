@@ -139,7 +139,7 @@ where
                 }
             },
             _ => {
-                if let Err(e) = decode::skip_field(wire_type, buf) {
+                if let Err(e) = decode::skip_field(field_number, wire_type, buf) {
                     discard_partial_entry::<K, V, A>(key, value, &alloc);
                     return Err(e);
                 }

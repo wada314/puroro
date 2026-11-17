@@ -70,13 +70,13 @@ The puroro project comprises several crates and tools with distinct roles:
 |---|---|---|
 | `utf8_validation` (`VERIFY` / `NONE`) | Generated decode paths honour the per-field Editions setting. `NONE` uses bytes views (`&[u8]`), not `&str`. `VERIFY` failure is `DecodeError::InvalidUtf8` and is not diverted into unknown fields. | **Done** — `ProtoString` (`VERIFY`, `&str`) vs `ProtoStringUnchecked` (`NONE`, `&[u8]`). proto2 default is `NONE`; overlay with `proto2_utf8=verify`. Eager merge fails immediately; lazy checks on the getter ([eager / lazy gaps](#eager-and-lazy-semantic-gaps)). |
 | Recursion limit | Nested-message `merge_from` enforces a depth limit; excess depth → `DecodeError::RecursionLimitExceeded`. | **Done** — `puroro_rt::MessageMerge::merge_from_with_depth` + `RECURSION_LIMIT` (100); user `Message::merge_from` wraps `merge_message` at depth 0. Nested catalog paths pass `depth + 1`. |
-| Deprecated groups (`SGroup` / `EGroup`) | Never generated; not preserved on decode. | Decoder may return `DecodeError::InvalidTag`, skip, or panic — round-trip fidelity for groups is **not** a goal. |
+| Deprecated groups (`SGroup` / `EGroup`) | Not generated. Unknown start-groups are preserved (raw bytes through the matching end-group). Known group fields are not parsed yet. The encoder does not emit groups. | Unknown groups round-trip on the preserve path. A mismatched end-group is `DecodeError::MismatchedEndGroup`. A bare end-group is `DecodeError::InvalidTag`. |
 
 ---
 
 ## 1. Goals
 
-- **Protobuf spec compliance.** Support the canonical wire format (varints, I32, I64, LEN records, packed repeated, oneofs, unknown fields) for proto2, proto3, and editions. The compliant unknown-field behavior is preserve-and-round-trip. Opt-in `DISCARD` and `REJECT` leave that rule ([§4.9](#49-unknown-fields)). Deprecated group wire types (`SGroup` / `EGroup`) are never generated; the decoder does not preserve them (see [§0](#0-project-architecture)).
+- **Protobuf spec compliance.** Support the canonical wire format (varints, I32, I64, LEN records, packed repeated, oneofs, unknown fields) for proto2, proto3, and editions. The compliant unknown-field behavior is preserve-and-round-trip. Opt-in `DISCARD` and `REJECT` leave that rule ([§4.9](#49-unknown-fields)). Group fields are not generated, and the encoder does not emit `SGroup` / `EGroup`. An unknown start-group is preserved on the preserve path (see [§0](#0-project-architecture)).
 - **Allocator support.** Every generated message is generic over `A: Allocator + Clone` using the `allocator-api2` crate ([why `Clone` is on the struct](#why-a-clone-is-a-struct-bound)). Arena allocators (e.g. `bumpalo`) and custom pools are first-class citizens.
 - **Performance-oriented interface.** Accessors return borrowed references (`&str`, `&[u8]`, `&[T]`), never freshly allocated containers. The `encode_to_vec` / `encode_to_bytes` convenience methods allocate; `Message::encode` writes into a caller-owned buffer. Wire-body sizing / writing (`encoded_len` / `encode_raw` with `EncodeCtx`) lives on `puroro_rt::MessageEncode`, not on `Message`.
 - **Rust idioms.** Private fields accessed via generated accessor methods; `Optional<T, impl HasDefault<T>>` for explicit-presence scalar, string, and enum fields; singular nested messages return `Option<&M>` / `&mut M` (inlined children are a full `M` with their own `MessageCommon`); no `unsafe` in user-visible APIs.
@@ -99,7 +99,7 @@ value      := varint         for wire_type 0 (VARINT)
             | 4 bytes LE     for wire_type 5 (I32)
 ```
 
-Wire types 3 and 4 (SGROUP / EGROUP) are deprecated. The encoder must never emit them. The decoder does not preserve group payloads for round-trip; encountering a group tag may be rejected with an error or otherwise ignored (see [§0](#0-project-architecture)).
+Wire types 3 and 4 (SGROUP / EGROUP) are deprecated. The encoder does not emit them, and a known field is not decoded as a group yet. An unknown start-group is preserved on the preserve path: the raw bytes run through the matching end-group. A mismatched end-group number is `DecodeError::MismatchedEndGroup`. A bare end-group is `DecodeError::InvalidTag` (see [§0](#0-project-architecture)).
 
 | Protobuf type | Wire type |
 |---|---|
@@ -1362,7 +1362,7 @@ puroro is a greenfield design. Generated types, trait names, and module layout a
 
 ### Deprecated group wire types
 
-Groups (`SGroup` / `EGroup`) are not generated and are not stored in unknown fields. If a decoder encounters a group tag on the wire, it may return `DecodeError::InvalidTag`, skip the field, or panic — preserving group payloads for round-trip is explicitly out of scope.
+Groups (`SGroup` / `EGroup`) are not generated. Unknown start-groups are stored with the other unknown fields and round-trip as raw bytes. Known group fields are not parsed yet. The encoder does not emit group tags; the generated encode path panics if a group wire type is reached. A mismatched end-group is `DecodeError::MismatchedEndGroup`. A bare end-group is `DecodeError::InvalidTag`.
 
 ### Module layout: package-first, rename when needed
 

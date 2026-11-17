@@ -47,8 +47,11 @@ impl<'a> UnknownField<'a> {
 
 /// Payload of an unknown field, discriminated by wire type.
 ///
-/// Deprecated group wire types (`SGroup` / `EGroup`) are never preserved and
-/// therefore have no variant here.
+/// A group is the interior bytes only. The preserved blob still holds the
+/// start tag and the matching end tag around those bytes. Message encode
+/// writes that blob unchanged. Writing a group from this view is not
+/// implemented: [`crate::WireType::SGroup`] on the generated encode path
+/// panics.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UnknownPayload<'a> {
     /// Wire type VARINT.
@@ -59,6 +62,8 @@ pub enum UnknownPayload<'a> {
     Bytes(&'a [u8]),
     /// Wire type I32 (fixed32 / sfixed32 / float bit pattern).
     Fixed32(u32),
+    /// Interior of a group (start tag and matching end tag not included).
+    Group(&'a [u8]),
 }
 
 impl UnknownPayload<'_> {
@@ -70,6 +75,7 @@ impl UnknownPayload<'_> {
             Self::Fixed64(_) => WireType::Int64,
             Self::Bytes(_) => WireType::Len,
             Self::Fixed32(_) => WireType::Int32,
+            Self::Group(_) => WireType::SGroup,
         }
     }
 }

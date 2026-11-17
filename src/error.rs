@@ -70,6 +70,17 @@ pub enum DecodeError {
         /// Field number from the tag.
         field_number: u32,
     },
+    /// An end-group tag's field number did not match the open start-group.
+    ///
+    /// `expected` is the field number of the start-group still open.
+    /// `got` is the field number on the end-group tag. Produced while skipping
+    /// or scanning a group. A length-delimited field does not use this variant.
+    MismatchedEndGroup {
+        /// Field number of the open start-group.
+        expected: u32,
+        /// Field number of the end-group tag.
+        got: u32,
+    },
     /// A message or length-delimited payload is larger than the allowed size.
     ///
     /// `value` is the rejected length in bytes. `limit` is the cap for that
@@ -106,6 +117,12 @@ impl fmt::Display for DecodeError {
             }
             DecodeError::UnrecognizedField { field_number } => {
                 write!(f, "unrecognized field {field_number}")
+            }
+            DecodeError::MismatchedEndGroup { expected, got } => {
+                write!(
+                    f,
+                    "end-group field {got} does not match start-group field {expected}"
+                )
             }
             DecodeError::SizeLimitExceeded { value, limit } => {
                 write!(f, "size {value} exceeds the limit of {limit} bytes")

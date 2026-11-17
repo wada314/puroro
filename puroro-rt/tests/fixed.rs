@@ -212,3 +212,24 @@ fn packed_fixed32_dual_form_decode() {
     assert_eq!(decoded.tags.bind(&decoded._common).as_slice(), &[1, 2]);
     assert_eq!(decoded.samples.bind(&decoded._common).as_slice(), &[4.0]);
 }
+
+#[test]
+fn unknown_group_is_preserved_and_round_trips() {
+    use ::puroro::UnknownPayload;
+    // field 9 SGroup, field 1 varint 5, field 9 EGroup, then field 4 fixed32 = 1.
+    let mut bytes = vec![0x4b, 0x08, 0x05, 0x4c, 37];
+    bytes.extend_from_slice(&1u32.to_le_bytes());
+
+    let decoded = FixedDemo::<Global>::decode(&bytes[..]).unwrap();
+    assert_eq!(decoded.tags.bind(&decoded._common).as_slice(), &[1]);
+    let unknown: Vec<_> = decoded.unknown_fields().collect();
+    assert_eq!(unknown.len(), 1);
+    assert_eq!(unknown[0].number(), 9);
+    assert_eq!(unknown[0].payload(), &UnknownPayload::Group(&[0x08, 0x05]));
+
+    let again = decoded.encode_to_vec();
+    let round = FixedDemo::<Global>::decode(&again[..]).unwrap();
+    let unknown: Vec<_> = round.unknown_fields().collect();
+    assert_eq!(unknown[0].payload(), &UnknownPayload::Group(&[0x08, 0x05]));
+    assert_eq!(round.tags.bind(&round._common).as_slice(), &[1]);
+}
