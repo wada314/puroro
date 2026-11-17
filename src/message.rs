@@ -6,15 +6,16 @@ use ::bytes::{Buf, BufMut};
 use crate::error::DecodeError;
 use crate::unknown::UnknownField;
 
-/// Maximum nesting depth for nested-message decode.
+/// Stack cap for eager nested-message merge.
 ///
-/// Root messages start at depth `0`. Entering a child increments depth; when
-/// `depth >= RECURSION_LIMIT`, decode returns
-/// [`DecodeError::RecursionLimitExceeded`]. Matches the common protobuf C++
-/// default of 100.
+/// This is not a limit in the Protocol Buffers encoding. Eager merge is
+/// recursive, so this bounds that call stack, matching the common protobuf
+/// C++ default of 100. Root messages start at depth `0`. Entering a child
+/// increments depth; when `depth >= RECURSION_LIMIT`, eager merge returns
+/// [`DecodeError::RecursionLimitExceeded`].
 ///
-/// Enforced on nested-message decode paths; application code uses
-/// [`Message::merge_from`] / [`Message::decode`].
+/// Lazy ingest does not apply it. A lazy [`Message::decode`] of a deeper wire
+/// succeeds. `into_eager` merges through this eager path and still fails here.
 pub const RECURSION_LIMIT: usize = 100;
 
 /// Implemented by every generated message type (C++ `MessageLite`-like surface).

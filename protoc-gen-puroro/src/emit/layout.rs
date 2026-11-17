@@ -21,23 +21,16 @@ pub(super) enum LenAccess {
 /// A child that implements `LazyMessage` stores the span with `merge_shared`,
 /// whether the slot is singular, repeated, or a oneof variant. Eager singular
 /// and eager repeated still differ: the latter names the type used to
-/// construct one value per LEN.
+/// construct one value per LEN. Nesting is not counted here; an eager child
+/// receives `depth + 1` from the apply arm.
 #[derive(Clone)]
 pub(super) enum MessageApply {
-    /// Child implements `LazyMessage`.
-    ///
-    /// The type is `ChildFields<A, Lazy<A>>`, used to count nesting.
-    /// Singular, repeated, and oneof all call `merge_shared`.
-    Shared(Type),
+    /// Child implements `LazyMessage`. Singular, repeated, and oneof call `merge_shared`.
+    Shared,
     /// Singular or oneof child is the eager type. Decode the LEN into the slot.
-    ///
-    /// The type is still the lazy field struct, so a lazy parent can count
-    /// depth from the wire without decoding the pin.
-    EagerSingular(Type),
+    EagerSingular,
     /// Repeated child is the eager type. Construct one value per LEN and push it.
-    ///
-    /// The second type is `ChildFields<A, Lazy<A>>` for the depth walk.
-    EagerRepeated(Box<Type>, Type),
+    EagerRepeated(Box<Type>),
 }
 
 /// One associated type on `mod layout::Layout`.

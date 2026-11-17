@@ -27,8 +27,9 @@ pub trait MessageMerge {
     /// length-delimited body that fits in one chunk is passed to
     /// [`Self::merge_from_slice`] as a subslice.
     ///
-    /// Returns [`DecodeError::RecursionLimitExceeded`] when
-    /// `depth >= `[`puroro::RECURSION_LIMIT`].
+    /// Eager messages return [`DecodeError::RecursionLimitExceeded`] when
+    /// `depth >= `[`puroro::RECURSION_LIMIT`]. Lazy ingest ignores `depth`
+    /// except to forward `depth + 1` into an eager-pinned child.
     fn merge_from_with_depth<B: DecodeBuf>(
         &mut self,
         buf: &mut B,

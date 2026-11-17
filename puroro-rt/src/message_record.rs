@@ -149,10 +149,10 @@ where
 {
     /// Apply one scanned record into the field slots.
     ///
-    /// `depth` is this message's merge depth (`0` at the top-level `decode`).
-    /// Message fields must reject a child at `depth + 1` when that reaches
-    /// [`RECURSION_LIMIT`], including children whose bytes are only stored
-    /// as a span.
+    /// `depth` is forwarded only into an eager child merge (`child_parse =
+    /// eager`). Lazy children are stored as spans and do not consult it.
+    /// [`RECURSION_LIMIT`] is the eager merge stack cap, not a wire-format
+    /// maximum, so this path does not reject a deep span.
     fn apply_record(
         &mut self,
         common: &mut MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A>>,
@@ -160,21 +160,6 @@ where
         origin: usize,
         depth: usize,
     ) -> Result<(), DecodeError>;
-
-    /// Count nested message fields in `payload` at this message's `depth`.
-    ///
-    /// The default accepts a message with no nested messages. Override it when
-    /// a field's LEN body is itself a message (or a map entry whose value is).
-    /// `depth >= `[`RECURSION_LIMIT`] fails before the body is scanned,
-    /// matching eager [`MessageMerge`].
-    fn check_message_depth(payload: &[u8], depth: usize) -> Result<(), DecodeError> {
-        let _ = payload;
-        if depth >= RECURSION_LIMIT {
-            Err(DecodeError::RecursionLimitExceeded)
-        } else {
-            Ok(())
-        }
-    }
 }
 
 /// Generated message: common state plus [`RecordFields`].
@@ -603,9 +588,8 @@ where
         buf: &mut B,
         depth: usize,
     ) -> Result<(), DecodeError> {
-        if depth >= RECURSION_LIMIT {
-            return Err(DecodeError::RecursionLimitExceeded);
-        }
+        // Nested spans do not push a parse frame. `depth` is carried so an
+        // eager-pinned child still enters `MessageMerge` at `depth + 1`.
         LazyMessage::ingest_with_depth(self, buf, depth)
     }
 }

@@ -87,29 +87,6 @@ pub(super) fn render_items(
     let merge_arms = render_merge_arms(&fields, companion);
     let validate_body = render_validate(&fields, companion);
     let apply_arms = super::lazy::render_apply_arms(&fields, companion);
-    let depth_arms = super::lazy::render_depth_arms(&fields, companion);
-    let depth_method = if depth_arms.is_empty() {
-        quote! {}
-    } else {
-        quote! {
-            fn check_message_depth(
-                payload: &[u8],
-                depth: usize,
-            ) -> ::core::result::Result<(), ::puroro::DecodeError> {
-                if depth >= ::puroro::RECURSION_LIMIT {
-                    return ::core::result::Result::Err(
-                        ::puroro::DecodeError::RecursionLimitExceeded,
-                    );
-                }
-                ::puroro_rt::decode::for_each_len_field(payload, |number, body| {
-                    match number {
-                        #(#depth_arms)*
-                        _ => ::core::result::Result::Ok(()),
-                    }
-                })
-            }
-        }
-    };
     let layout = quote! { L };
     let validate_method = record_validate_method(validate_body.as_ref(), &layout);
     let record_fields_impl = quote! {
@@ -308,8 +285,6 @@ pub(super) fn render_items(
         impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone>
             ::puroro_rt::LazyRecordApply<A> for #fields_name<A, ::puroro_rt::Lazy<A>>
         {
-            #depth_method
-
             #[allow(unused_variables)]
             fn apply_record(
                 &mut self,

@@ -1218,7 +1218,24 @@ fn encode_before_finish_is_unfinished() {
 }
 
 #[test]
-fn merge_from_at_recursion_limit_is_rejected() {
+fn leaf_child_is_accepted_at_the_eager_limit() {
+    let mut addr = Address::new();
+    addr.street_mut().set("Oak");
+    let mut bytes = Vec::new();
+    encode_message_field(FIELD_ASSIGNEE, &addr.encode_to_vec(), &mut bytes);
+
+    let mut lazy = TaskLazy::new();
+    {
+        let mut cursor = bytes.as_slice();
+        let mut scoped = ScopedBuf::new(&mut cursor);
+        MessageMerge::merge_from_with_depth(&mut lazy, &mut scoped, RECURSION_LIMIT).unwrap();
+    }
+    let got = lazy.assignee().unwrap().expect("assignee present");
+    assert_eq!(got.street().unwrap().get(), "Oak");
+}
+
+#[test]
+fn merge_from_ignores_the_eager_recursion_limit() {
     let mut bytes = Vec::new();
     encode_varint_field(
         field_number_const::<FIELD_SCORE>(),
@@ -1229,17 +1246,7 @@ fn merge_from_at_recursion_limit_is_rejected() {
     {
         let mut cursor = bytes.as_slice();
         let mut scoped = ScopedBuf::new(&mut cursor);
-        assert_eq!(
-            MessageMerge::merge_from_with_depth(&mut lazy, &mut scoped, RECURSION_LIMIT),
-            Err(DecodeError::RecursionLimitExceeded),
-        );
-    }
-    assert_eq!(lazy.score().unwrap(), 0);
-
-    {
-        let mut cursor = bytes.as_slice();
-        let mut scoped = ScopedBuf::new(&mut cursor);
-        MessageMerge::merge_from_with_depth(&mut lazy, &mut scoped, RECURSION_LIMIT - 1).unwrap();
+        MessageMerge::merge_from_with_depth(&mut lazy, &mut scoped, RECURSION_LIMIT).unwrap();
     }
     assert_eq!(lazy.score().unwrap(), 9);
 }
