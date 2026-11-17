@@ -421,51 +421,16 @@ fn emit_oneof_variant(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
         )));
     };
 
-    // Const lives on the parent message module (`super::BIT_*`).
-    let (layout_ty, value_bit) = planned_layout_ty(
+    let plan = plan_singular(
+        field,
+        wire,
         layout,
-        |ident| quote! { super::#ident },
-        custom_default.is_some(),
-    );
-
-    let catalog = wire_catalog(wire)?;
-    let is_bool = matches!(wire, WireTypeKind::Bool);
-    let mut_style = SingularMutStyle::from_layout(wire, layout);
+        custom_default.as_ref(),
+        SingularSite::Oneof,
+    )?;
     let variant_pascal = to_pascal_case(field.name());
-    let mut marker = catalog.marker;
-    let mut mut_target = catalog.views.mut_target;
-    let mut layout_assoc = None;
-    let mut message_apply = None;
-    let getter_shape = oneof_getter_shape(wire);
-    let mut lazy_kind = None;
-    if let Some(kind_bit) = field.lazy_kind_bit() {
-        let kind_ident = Ident::new(&lazy_kind_bit_const(field.name()), Span::call_site());
-        lazy_kind = Some((kind_ident.clone(), kind_bit));
-        let eager_layout = layout_ty
-            .clone()
-            .unwrap_or_else(|| parse_quote! { ::puroro_rt::Inline });
-        layout_assoc = Some(wire_or_sso_assoc(
-            field.name(),
-            &marker,
-            &kind_ident,
-            eager_layout,
-        ));
-    }
-    if let WireTypeKind::Message(child) = wire {
-        let pin = resolve_child_pin(field.name(), child, field.child_parse())?;
-        message_apply = Some(pin.singular_apply());
-        if let Some(assoc) = pin.follow() {
-            layout_assoc = Some(assoc.clone());
-        }
-        if let Some(ty) = pin.oneof_marker() {
-            marker = ty;
-        }
-        if let Some((_, lazy)) = pin.lazy_pin() {
-            mut_target = lazy.clone();
-        }
-    }
     // A len slot or a follow-parent child mentions `Layout`. A concrete pin does not.
-    let generic_layout = layout_assoc.is_some();
+    let generic_layout = plan.layout.is_some();
     Ok(OneofVariantEmit {
         name: escape_ident(field.name()),
         name_str: field.name().to_owned(),
@@ -474,21 +439,18 @@ fn emit_oneof_variant(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
         field_alias: Ident::new(&format!("{variant_pascal}Field"), Span::call_site()),
         field_const: Ident::new(field.field_const(), Span::call_site()),
         number: field.number() as u32,
-        marker,
-        layout_ty,
-        value_bit,
-        is_bool,
-        mut_style,
-        mut_target,
-        optional_ty: catalog.views.optional,
-        custom_default: match custom_default {
-            Some(custom) => Some((custom.clone(), defaults::render_marker_item(custom, wire)?)),
-            None => None,
-        },
-        getter_shape,
-        message_apply,
-        layout: layout_assoc,
-        lazy_kind,
+        marker: plan.marker,
+        layout_ty: plan.layout_ty,
+        value_bit: plan.value_bit,
+        is_bool: matches!(wire, WireTypeKind::Bool),
+        mut_style: plan.mut_style,
+        mut_target: plan.mut_target,
+        optional_ty: plan.optional_ty,
+        custom_default: plan.custom_default,
+        getter_shape: oneof_getter_shape(wire),
+        message_apply: plan.message_apply,
+        layout: plan.layout,
+        lazy_kind: plan.lazy_kind,
         generic_layout,
     })
 }
@@ -669,9 +631,81 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
         PlannedPresence::Oneof => unreachable!("rejected above"),
     };
 
+    let plan = plan_singular(
+        field,
+        wire,
+        layout,
+        custom_default,
+        SingularSite::Field { companion },
+    )?;
+
+    Ok(ScalarEmit {
+        name: escape_ident(name),
+        name_str: name.to_owned(),
+        field_const: Ident::new(field_const, Span::call_site()),
+        number: number as u32,
+        marker: plan.marker,
+        presence_ty,
+        layout_ty: plan.layout_ty,
+        presence_bit,
+        value_bit: plan.value_bit,
+        getter_shape: scalar_getter_shape(wire, presence),
+        required,
+        mut_target: plan.mut_target,
+        implicit_ty: plan.implicit_ty,
+        optional_ty: plan.optional_ty,
+        custom_default: plan.custom_default,
+        mut_style: plan.mut_style,
+        layout: plan.layout,
+        message_apply: plan.message_apply,
+        set_eager: plan.set_eager,
+        lazy_kind_const: plan.lazy_kind,
+    })
+}
+
+/// Message field versus oneof variant. The planning steps match; the module
+/// that owns `BIT_*` and `Layout` does not.
+#[derive(Clone, Copy)]
+enum SingularSite<'a> {
+    /// Field on the message impl. Paths are `#companion::BIT_*`.
+    Field { companion: &'a Ident },
+    /// Variant inside `mod <oneof>`. Paths are `super::BIT_*`.
+    Oneof,
+}
+
+/// Facts shared by [`emit_scalar`] and [`emit_oneof_variant`] after wire,
+/// layout, lazy-kind, and child-pin resolution.
+struct SingularPlan {
+    layout_ty: Option<Type>,
+    value_bit: Option<(Ident, usize)>,
+    marker: Type,
+    mut_target: Type,
+    implicit_ty: Type,
+    optional_ty: Type,
+    custom_default: Option<(CustomDefault, Vec<Item>)>,
+    mut_style: SingularMutStyle,
+    layout: Option<LayoutAssoc>,
+    message_apply: Option<MessageApply>,
+    /// Eager alias for `set_*`. Only a message field pinned to the lazy child.
+    set_eager: Option<Type>,
+    lazy_kind: Option<(Ident, usize)>,
+}
+
+fn plan_singular(
+    field: &PlannedField<'_>,
+    wire: &WireTypeKind<'_>,
+    layout: &PlannedLayout,
+    custom_default: Option<&CustomDefault>,
+    site: SingularSite<'_>,
+) -> Result<SingularPlan> {
+    let name = field.name();
     let (mut layout_ty, value_bit) = planned_layout_ty(
         layout,
-        |ident| quote! { #companion::#ident },
+        |ident| match site {
+            // Oneof modules sit under the companion, so bits are `super::`.
+            SingularSite::Field { companion } => quote! { #companion::#ident },
+            SingularSite::Oneof => quote! { super::#ident },
+        },
         custom_default.is_some(),
     );
 
@@ -680,48 +714,54 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
     let mut mut_target = catalog.views.mut_target;
     let mut set_eager = None;
     let mut layout_assoc = None;
-    let mut message_apply_slot = None;
-    let mut lazy_kind_const = None;
-    let getter_shape = scalar_getter_shape(wire, presence);
+    let mut message_apply = None;
+    let mut lazy_kind = None;
 
     if let Some(kind_bit) = field.lazy_kind_bit() {
         let kind_ident = Ident::new(&lazy_kind_bit_const(name), Span::call_site());
-        lazy_kind_const = Some((kind_ident.clone(), kind_bit));
-        // `mod layout` sits under the companion, so the eager arm uses `super::`.
-        let eager_layout = singular_len_eager(name, layout)?;
+        lazy_kind = Some((kind_ident.clone(), kind_bit));
+        // A message field's eager arm is written inside `mod layout`, which
+        // already sits under the companion, so that arm names `super::BIT_*`.
+        // A oneof variant's `layout_ty` was built with `super::` above.
+        let eager_layout = match site {
+            SingularSite::Field { .. } => singular_len_eager(name, layout)?,
+            SingularSite::Oneof => layout_ty
+                .clone()
+                .unwrap_or_else(|| parse_quote! { ::puroro_rt::Inline }),
+        };
         let assoc = wire_or_sso_assoc(name, &marker, &kind_ident, eager_layout);
-        let assoc_name = assoc.assoc.clone();
+        if let SingularSite::Field { companion } = site {
+            let assoc_name = assoc.assoc.clone();
+            layout_ty = Some(parse_quote! { <L as #companion::Layout<A>>::#assoc_name });
+        }
         layout_assoc = Some(assoc);
-        layout_ty = Some(parse_quote! { <L as #companion::Layout<A>>::#assoc_name });
     }
 
     if let WireTypeKind::Message(child) = wire {
         let pin = resolve_child_pin(name, child, field.child_parse())?;
-        message_apply_slot = Some(pin.singular_apply());
+        message_apply = Some(pin.singular_apply());
         if let Some(assoc) = pin.follow() {
             layout_assoc = Some(assoc.clone());
         }
-        if let Some(ty) = pin.field_marker(companion) {
+        let child_marker = match site {
+            SingularSite::Field { companion } => pin.field_marker(companion),
+            SingularSite::Oneof => pin.oneof_marker(),
+        };
+        if let Some(ty) = child_marker {
             marker = ty;
         }
         if let Some((eager, lazy)) = pin.lazy_pin() {
-            set_eager = Some(eager.clone());
+            if matches!(site, SingularSite::Field { .. }) {
+                set_eager = Some(eager.clone());
+            }
             mut_target = lazy.clone();
         }
     }
 
-    Ok(ScalarEmit {
-        name: escape_ident(name),
-        name_str: name.to_owned(),
-        field_const: Ident::new(field_const, Span::call_site()),
-        number: number as u32,
-        marker,
-        presence_ty,
+    Ok(SingularPlan {
         layout_ty,
-        presence_bit,
         value_bit,
-        getter_shape,
-        required,
+        marker,
         mut_target,
         implicit_ty: catalog.views.implicit,
         optional_ty: catalog.views.optional,
@@ -731,9 +771,9 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
         },
         mut_style: SingularMutStyle::from_layout(wire, layout),
         layout: layout_assoc,
-        message_apply: message_apply_slot,
+        message_apply,
         set_eager,
-        lazy_kind_const,
+        lazy_kind,
     })
 }
 
