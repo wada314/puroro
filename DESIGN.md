@@ -222,7 +222,7 @@ This section is the **normative** shape of what `protoc-gen-puroro` emits. The s
 
 1. **The primary struct** — `Task<A>`, a newtype around `puroro_rt::Record<TaskFields<A, Eager>, …>` (§4.0–4.10). Slots are **`puroro_rt::fields` catalog types** on `TaskFields` (see [IMPLEMENTATION.md §2](IMPLEMENTATION.md#2-architecture-overview)). Field accessors are **inherent methods** on `Task`.
 2. **The lazy message** — `TaskLazy<A>`, same field names, `Result<_, DecodeError>` getters, no `_mut` ([§8](#tasklaya--lazy-parse-timing)). The plugin emits `TaskFields<A, L>` for the slots and the `Task<A>` / `TaskLazy<A>` newtypes. `TaskFields` is `pub(crate)`. [`sample-generated/`](sample-generated/) uses the same newtypes. `School`, `Student`, and `Marker` stay eager-only.
-3. **(Future) Per-message traits** — `foo::Message` / `foo::MessageFallible` (in that message's companion module) ([§8](#8-future-work)). The plugin does not emit those traits. The handwritten sample implements `task::MessageFallible` on eager `Task` only. A borrowing view is not part of this sample; the measured `Address` spike is [`archive/address-view-spike`](archive/address-view-spike/).
+3. **(Future) Per-message traits** — `foo::Message` / `foo::MessageFallible` (in that message's companion module) ([§8](#8-future-work)). The plugin does not emit those traits. The handwritten sample implements `task::MessageFallible` on eager `Task` only. A borrowing view is a third sample type (`TaskView` / `AddressView` / `PointView`); the plugin does not emit it. The measured `Address` spike is [`archive/address-view-spike`](archive/address-view-spike/).
 
 Generated Rust is not hand-edited. Navigational comments in generated output are **not required**; semantics and usage are documented on the library API (`puroro` / `puroro-rt` rustdoc) and in this document / [IMPLEMENTATION.md](IMPLEMENTATION.md). Production modules still carry an `@generated` file header ([IMPLEMENTATION.md §9](IMPLEMENTATION.md#generated-headers)). The shell reference is the plugin's `Record` newtypes ([IMPLEMENTATION.md §9](IMPLEMENTATION.md#9-struct-layout)). [`sample-generated/`](sample-generated/) is the hand-written copy of that shell.
 
@@ -1314,9 +1314,9 @@ A future design would need:
 
 ## 7. Design decisions and trade-offs
 
-### No zero-copy decode (for now)
+### Lifetime-free messages, plus a borrowing view
 
-Giving `string` and `bytes` fields a lifetime parameter would enable zero-copy decoding but would propagate that lifetime to every generated type and its callers. The current API is lifetime-free, which significantly simplifies usage. An `Address`-only spike of that idea is kept in [`archive/address-view-spike`](archive/address-view-spike/), outside [`sample-generated`](sample-generated/) and outside the generator.
+Giving `string` and `bytes` fields a lifetime parameter on `Task` / `TaskLazy` would propagate that lifetime to every caller. Those two aliases stay lifetime-free. Zero-copy decode is a third type, [`TaskView<'buf>`](#taskviewbuf--zero-copy-buffer-referencing), handwritten in the sample. The plugin does not emit it. An earlier `Address`-only measurement remains in [`archive/address-view-spike`](archive/address-view-spike/).
 
 ### No builder / immutable-object pattern
 
@@ -1397,7 +1397,7 @@ These traits are **not** yet emitted by `protoc-gen-puroro`. The hand-written [`
 
 ### Specialized message implementations
 
-Every message has an eager alias and a lazy alias. A borrowing `TaskView<'buf>` is not part of that pair. The measured `Address` spike lives in [`archive/address-view-spike`](archive/address-view-spike/). A shared `task::MessageFallible` impl for the eager and lazy aliases is not emitted yet ([Per-message traits](#per-message-traits-not-yet-generated)).
+Every message has an eager alias and a lazy alias. A borrowing `TaskView<'buf>` is a third type, not a mode of either alias. The sample hand-writes `TaskView`, `AddressView`, and `PointView`. The plugin does not emit them. The measured `Address` spike lives in [`archive/address-view-spike`](archive/address-view-spike/). A shared `task::MessageFallible` impl for the eager and lazy aliases is not emitted yet ([Per-message traits](#per-message-traits-not-yet-generated)).
 
 #### `TaskLazy<A>` — lazy parse timing
 
@@ -1463,16 +1463,11 @@ A lazy alias is not a drop-in for the eager alias. The rows below are the behavi
 
 #### `TaskView<'buf>` — zero-copy, buffer-referencing
 
-Archived, not generator output, and not in [`sample-generated`](sample-generated/). The handwritten spike covers `Address` only (two strings, `fixed32`, `double`): one scan, last-wins offsets, UTF-8 on each get. Criterion numbers are in that crate. See [`archive/address-view-spike`](archive/address-view-spike/).
+Handwritten in [`sample-generated`](sample-generated/) for `Task`, `Address`, and `Point`. The plugin does not emit a view. [`archive/address-view-spike`](archive/address-view-spike/) is the earlier `Address`-only measurement and stays there.
 
-- Holds `&'buf [u8]` to the original input; no heap allocation for field data.
-- String / bytes fields return subslices into the input buffer.
-- Read-only; tied to buffer lifetime.
-- Fully lazy (scan on each access) or semi-eager (field-offset index built once).
-- Implements `task::MessageFallible` with `Error = DecodeError`.
-- Repeated fields support early termination via fallible iterators.
+`TaskView::parse` scans the caller's buffer once through `RecordScanner` and stores scalars plus spans. Getters do not walk that buffer again. String and bytes getters return subslices (`'buf`, independent of the `&self` borrow). UTF-8 is checked on each string get, so a numeric read does not validate strings. Repeated numericals are copied during the scan. Repeated strings, watchers, and map entries keep spans; `labels()` and `attributes()` are iterators, so a caller can stop before a later element. A singular message merges each LEN into one child view. Unknown field numbers, including unknown groups, are skipped. `to_owned(alloc)` decodes the same bytes with eager `Task`, so those unknowns still round-trip there. `as_bytes()` returns the original buffer.
 
-**Native methods beyond the trait:** `title() -> Result<&'buf str, …>` (buffer lifetime, not `&self`), `to_owned(alloc) -> Task<A>`, `tag_ids_raw() -> Result<&'buf [u8], …>`.
+The view does not implement `task::MessageFallible`. That trait's child types are `Address` / `AddressLazy`, and the view's child is `AddressView`. An explicit field that is absent stays `None` (`max_retries` does not fill in `3`; `webhook_id` does not fill in `-1`). A closed-enum number outside the set does not replace a value already stored.
 
 #### Relationship between implementations
 
@@ -1485,7 +1480,7 @@ task::MessageFallible (Result-returning trait, not emitted)
     ↑ impl
     Task<A>        (handwritten sample only, Error = Infallible)
     TaskLazy<A>    (not implemented; inherent Result getters)
-    TaskView<'buf> (archived Address spike; not emitted)
+    TaskView<'buf> (handwritten sample; not emitted; does not implement the trait)
 ```
 
 Generic code that only reads fields is meant to use `task::MessageFallible` with `Task<A>` or `TaskLazy<A>`. Today only eager `Task` implements that trait. `TaskLazy` is a separate alias with its own inherent `Result` getters.

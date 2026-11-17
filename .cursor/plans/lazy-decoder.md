@@ -33,7 +33,7 @@ Do not re-land that shape to chase the island copy. `decode(&[u8])` still
 has to copy; `TaskView` is the extra-lifetime alternative. Packed inners
 still walk the payload (unread packed-as-slice is out of v1).
 
-Still out of v1: `TaskView`, lazy mutation, `MessageFallible` on the lazy
+Still out of v1: lazy mutation, `MessageFallible` on the lazy
 alias, intra-field repeated cursors, zero-copy spanning LEN, packed repeated
 left unread.
 
@@ -221,7 +221,8 @@ applied numericals / promoted SSO; unpromoted LEN stays offsets.
 - Lazy `_mut` / in-place edit of `_wire`.
 - Mid-payload splits as a **zero-copy storage contract** for `&str` / child
   `_wire`.
-- `TaskView<'buf>`.
+- `TaskView<'buf>` as a mode of `Task` / `TaskLazy`. The sample now has a
+  separate borrowing view; do not fold it back into the lazy alias.
 - Generator / `TaskImpl<A, L>` before handwritten lazy works.
 - Field-level partial/resume inside `protobuf-core` (compose tag/varint
   partial at the puroro layer).
@@ -374,7 +375,7 @@ a span (`ScannedRecord` / `ScannedValue`); complete LEN is not copied off
 the island. Numericals use catalog `merge_scanned` (no rematch). Eager
 `Task` implements handwritten `task::MessageFallible` (`Error = Infallible`).
 
-**Not done:** `TaskView`, lazy mutation, `MessageFallible` for `TaskLazy`
+**Not done:** plugin-emitted views (the sample has handwritten `TaskView`), lazy mutation, `MessageFallible` for `TaskLazy`
 (follow-parent fields change type with the parent; the plugin does not emit
 the trait), intra-field repeated cursors, zero-copy spanning LEN,
 packed-as-unread-slice. Island-first leftover-as-offset ingest was tried

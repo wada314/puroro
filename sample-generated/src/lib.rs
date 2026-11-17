@@ -17,8 +17,8 @@
 //! `DESIGN.md` § "Path qualification".
 //!
 //! **Module layout.** Message structs are public at this crate root
-//! (`Task` / `TaskLazy`, `Address` / `AddressLazy`,
-//! `Point` / `PointLazy`, `School`, `Student`, `Marker`) — the parent of their
+//! (`Task` / `TaskLazy` / `TaskView`, `Address` / `AddressLazy` / `AddressView`,
+//! `Point` / `PointLazy` / `PointView`, `School`, `Student`, `Marker`) — the parent of their
 //! snake_case companion modules (`address`, `task`, `school`, `student`,
 //! `point`, `marker`) which hold `FIELD_*` / `BIT_*`, defaults, oneofs, and
 //! message-local traits (`Layout`, `MessageFallible`). Those items omit the
@@ -27,7 +27,8 @@
 //! module, and re-exports this runtime as `puroro` at the crate root. This
 //! sample does the same. It stays flat (no `example::v1` prefix) for readability.
 //! The `*_type` files are a hand-written split so the crate root stays small;
-//! they are not a public module path.
+//! they are not a public module path. `TaskView`, `AddressView`, and `PointView`
+//! are sample-only borrowing views. The plugin does not emit them.
 //!
 //! These files are maintained by hand as a readable reference; in a real project
 //! the equivalent sources would come from the plugin instead. Comments here are
@@ -47,16 +48,23 @@ pub mod student;
 pub mod task;
 
 mod address_type;
+mod address_view;
 mod marker_type;
 mod point_type;
+mod point_view;
 mod school_type;
 mod student_type;
 mod task_type;
+mod task_view;
+mod view_scan;
 
 pub use address_type::{Address, AddressLazy};
+pub use address_view::AddressView;
 pub use enums::{Priority, Status};
 pub use marker_type::Marker;
 pub use point_type::{Point, PointLazy};
+pub use point_view::PointView;
 pub use school_type::School;
 pub use student_type::Student;
 pub use task_type::{Task, TaskLazy};
+pub use task_view::TaskView;
