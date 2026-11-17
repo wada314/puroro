@@ -180,14 +180,31 @@ impl<A: Allocator + Clone> RecordScanner<A> {
     /// Complete records are read in place. Only the unfinished tail is copied
     /// into leftover. Incomplete input is not an error here — call
     /// [`finish`](Self::finish) when no more bytes will arrive.
+    ///
+    /// An empty leftover (the usual `decode(&[u8])` chunk) scans `chunk` as one
+    /// slice and decodes varints with the same 4-byte window as
+    /// [`super::decode_varint`]. A record that still straddles the previous
+    /// leftover uses the two-slice reader.
     pub fn push(&mut self, chunk: &[u8]) -> Result<AllocVec<ScannedRecord, A>, DecodeError> {
         let alloc = self.leftover.allocator().clone();
         let mut records = AllocVec::new_in(alloc);
+        let mut pos = 0usize;
+        if self.leftover.is_empty() {
+            while let TryRecord::Done { rec } = try_record_at(chunk, pos)? {
+                pos += rec.len;
+                records.push(rec);
+            }
+            // A decode error returns before this copy, so a rejected chunk does
+            // not become leftover ahead of records already accepted.
+            if pos < chunk.len() {
+                self.leftover.extend_from_slice(&chunk[pos..]);
+            }
+            return Ok(records);
+        }
         let src = TwoSlice {
             head: &self.leftover,
             tail: chunk,
         };
-        let mut pos = 0usize;
         while let TryRecord::Done { rec } = try_record_at(&src, pos)? {
             pos += rec.len;
             records.push(rec);
@@ -207,6 +224,40 @@ enum TryVarint {
     Done { value: u64, len: usize },
 }
 
+/// Bytes `try_record_at` can read without owning them.
+trait ScanSrc {
+    fn len(&self) -> usize;
+    fn copy_fixed<const N: usize>(&self, start: usize) -> Option<[u8; N]>;
+    fn try_varint(&self, start: usize) -> Result<TryVarint, DecodeError>;
+}
+
+impl ScanSrc for [u8] {
+    #[inline(always)]
+    fn len(&self) -> usize {
+        <[u8]>::len(self)
+    }
+
+    #[inline(always)]
+    fn copy_fixed<const N: usize>(&self, start: usize) -> Option<[u8; N]> {
+        let end = start.checked_add(N)?;
+        let bytes = self.get(start..end)?;
+        let mut out = [0u8; N];
+        out.copy_from_slice(bytes);
+        Some(out)
+    }
+
+    #[inline(always)]
+    fn try_varint(&self, start: usize) -> Result<TryVarint, DecodeError> {
+        let Some(rest) = self.get(start..) else {
+            return Ok(TryVarint::NeedMore);
+        };
+        match super::varint::try_decode_varint_slice(rest)? {
+            Some((value, len)) => Ok(TryVarint::Done { value, len }),
+            None => Ok(TryVarint::NeedMore),
+        }
+    }
+}
+
 /// `leftover || chunk` without concatenating complete records.
 struct TwoSlice<'a> {
     head: &'a [u8],
@@ -214,16 +265,18 @@ struct TwoSlice<'a> {
 }
 
 impl<'a> TwoSlice<'a> {
-    fn len(&self) -> usize {
-        self.head.len() + self.tail.len()
-    }
-
     fn get(&self, i: usize) -> Option<u8> {
         if i < self.head.len() {
             Some(self.head[i])
         } else {
             self.tail.get(i - self.head.len()).copied()
         }
+    }
+}
+
+impl ScanSrc for TwoSlice<'_> {
+    fn len(&self) -> usize {
+        self.head.len() + self.tail.len()
     }
 
     fn copy_fixed<const N: usize>(&self, start: usize) -> Option<[u8; N]> {
@@ -232,6 +285,20 @@ impl<'a> TwoSlice<'a> {
             *slot = self.get(start + j)?;
         }
         Some(out)
+    }
+
+    fn try_varint(&self, start: usize) -> Result<TryVarint, DecodeError> {
+        let mut value = 0u64;
+        for i in 0..MAX_VARINT_BYTES {
+            let Some(byte) = self.get(start + i) else {
+                return Ok(TryVarint::NeedMore);
+            };
+            value |= u64::from(byte & VARINT_PAYLOAD_MASK) << (7 * i);
+            if byte & VARINT_CONTINUATION_BIT == 0 {
+                return Ok(TryVarint::Done { value, len: i + 1 });
+            }
+        }
+        Err(DecodeError::InvalidVarint)
     }
 }
 
@@ -257,28 +324,14 @@ fn keep_unparsed_tail<A: Allocator + Clone>(
     leftover.extend_from_slice(chunk);
 }
 
-fn try_varint_at(src: &TwoSlice<'_>, start: usize) -> Result<TryVarint, DecodeError> {
-    let mut value = 0u64;
-    for i in 0..MAX_VARINT_BYTES {
-        let Some(byte) = src.get(start + i) else {
-            return Ok(TryVarint::NeedMore);
-        };
-        value |= u64::from(byte & VARINT_PAYLOAD_MASK) << (7 * i);
-        if byte & VARINT_CONTINUATION_BIT == 0 {
-            return Ok(TryVarint::Done { value, len: i + 1 });
-        }
-    }
-    Err(DecodeError::InvalidVarint)
-}
-
-fn try_record_at(src: &TwoSlice<'_>, start: usize) -> Result<TryRecord, DecodeError> {
+fn try_record_at<S: ScanSrc + ?Sized>(src: &S, start: usize) -> Result<TryRecord, DecodeError> {
     if start >= src.len() {
         return Ok(TryRecord::NeedMore);
     }
     let TryVarint::Done {
         value: raw_tag,
         len: tag_len,
-    } = try_varint_at(src, start)?
+    } = src.try_varint(start)?
     else {
         return Ok(TryRecord::NeedMore);
     };
@@ -294,7 +347,7 @@ fn try_record_at(src: &TwoSlice<'_>, start: usize) -> Result<TryRecord, DecodeEr
 
     let body_at = start + tag_len;
     let (value, body_len) = match wire_type {
-        WireType::Varint => match try_varint_at(src, body_at)? {
+        WireType::Varint => match src.try_varint(body_at)? {
             TryVarint::NeedMore => return Ok(TryRecord::NeedMore),
             TryVarint::Done { value, len } => {
                 (ScannedValue::Varint(Varint::from_uint64(value)), len)
@@ -316,7 +369,7 @@ fn try_record_at(src: &TwoSlice<'_>, start: usize) -> Result<TryRecord, DecodeEr
             let TryVarint::Done {
                 value: payload_len,
                 len: len_len,
-            } = try_varint_at(src, body_at)?
+            } = src.try_varint(body_at)?
             else {
                 return Ok(TryRecord::NeedMore);
             };
@@ -610,6 +663,60 @@ mod tests {
         s.finish().unwrap();
         assert_eq!(recs.len(), 1);
         assert_eq!(recs[0].value, ScannedValue::Len { payload_len: 128 });
+    }
+
+    #[test]
+    fn contiguous_scan_matches_byte_splits() {
+        let mut wire = Vec::new();
+        encode_varint_field(field(1), Varint::from_uint64(300), &mut wire);
+        wire.extend(encode_fixed32_field(2, 0xAABBCCDD));
+        wire.extend(encode_fixed64_field(3, 7));
+        wire.extend(encode_len_field(4, b"hello"));
+        encode_varint_field(
+            field(16),
+            Varint::from_uint64(u64::from(u32::MAX)),
+            &mut wire,
+        );
+        let content = vec![0xab; 128];
+        wire.extend(encode_len_field(5, &content));
+
+        let mut whole = RecordScanner::new();
+        let once = whole.push(&wire).unwrap();
+        whole.finish().unwrap();
+
+        let mut split = RecordScanner::new();
+        let mut got = Vec::new();
+        for byte in wire.chunks(1) {
+            got.extend(split.push(byte).unwrap());
+        }
+        split.finish().unwrap();
+
+        assert_eq!(once.len(), got.len());
+        for (left, right) in once.iter().zip(&got) {
+            assert_eq!(left.field_number, right.field_number);
+            assert_eq!(left.len, right.len);
+            assert_eq!(left.tag_len, right.tag_len);
+            assert_eq!(left.value, right.value);
+        }
+        let span = scanned_len_span(0, &once[3]).unwrap();
+        assert_eq!(&wire[span.offset..span.offset + span.len], b"hello");
+    }
+
+    #[test]
+    fn overlong_varint_in_one_chunk() {
+        let mut s = RecordScanner::new();
+        assert_eq!(s.push(&[0x80; 10]).err(), Some(DecodeError::InvalidVarint));
+        assert!(s.leftover().is_empty());
+    }
+
+    #[test]
+    fn tag_above_u32_in_one_chunk() {
+        let mut s = RecordScanner::new();
+        assert_eq!(
+            s.push(&[0x80, 0x80, 0x80, 0x80, 0x10]).err(),
+            Some(DecodeError::InvalidVarint)
+        );
+        assert!(s.leftover().is_empty());
     }
 
     #[test]
