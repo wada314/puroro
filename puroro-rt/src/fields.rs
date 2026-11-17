@@ -24,6 +24,7 @@
 //! | [`singular`] | `SingularField` (+ bound views) |
 //! | [`repeated`] | `RepeatedField` (`RepeatedReady` / `RepeatedSpans`), `Packed` / `Expanded` |
 //! | [`map`] | `MapField` (`MapReady` / `MapSpans`), `MapKey` |
+//! | [`span_list`] | lazy offset list shared by repeated LEN and map fields |
 //! | [`oneof`] | `OneofSlot`, `OneofView` |
 //! | [`oneof_variant`] | `OneofVariant` (field-number dispatch) |
 
@@ -34,4 +35,5 @@ pub(crate) mod repeated;
 pub(crate) mod shared;
 pub(crate) mod singular;
 pub(crate) mod slot_index;
+pub(crate) mod span_list;
 pub(crate) mod wire;
