@@ -186,40 +186,6 @@ impl<A: Allocator + Clone> RecordScanner<A> {
     /// [`super::decode_varint`]. A record that still straddles the previous
     /// leftover uses the two-slice reader.
     pub fn push(&mut self, chunk: &[u8]) -> Result<AllocVec<ScannedRecord, A>, DecodeError> {
-        // Only this function monomorphizes the record walk, so the trait stays
-        // inside it. `[u8]` is one contiguous chunk; `TwoSlice` is leftover || chunk.
-        // `Ok(None)` means the bytes so far are a legal prefix. `Err` is a
-        // malformed record.
-        trait ScanSrc {
-            fn len(&self) -> usize;
-            fn copy_fixed<const N: usize>(&self, start: usize) -> Option<[u8; N]>;
-            fn try_varint(&self, start: usize) -> Result<Option<(u64, usize)>, DecodeError>;
-        }
-
-        impl ScanSrc for [u8] {
-            #[inline(always)]
-            fn len(&self) -> usize {
-                <[u8]>::len(self)
-            }
-
-            #[inline(always)]
-            fn copy_fixed<const N: usize>(&self, start: usize) -> Option<[u8; N]> {
-                let end = start.checked_add(N)?;
-                let bytes = self.get(start..end)?;
-                let mut out = [0u8; N];
-                out.copy_from_slice(bytes);
-                Some(out)
-            }
-
-            #[inline(always)]
-            fn try_varint(&self, start: usize) -> Result<Option<(u64, usize)>, DecodeError> {
-                let Some(rest) = self.get(start..) else {
-                    return Ok(None);
-                };
-                super::varint::try_decode_varint_slice(rest)
-            }
-        }
-
         /// `leftover || chunk` without concatenating complete records.
         struct TwoSlice<'a> {
             head: &'a [u8],
@@ -264,74 +230,6 @@ impl<A: Allocator + Clone> RecordScanner<A> {
             }
         }
 
-        #[inline(always)]
-        fn try_record_at<S: ScanSrc + ?Sized>(
-            src: &S,
-            start: usize,
-        ) -> Result<Option<ScannedRecord>, DecodeError> {
-            if start >= src.len() {
-                return Ok(None);
-            }
-            let Some((raw_tag, tag_len)) = src.try_varint(start)? else {
-                return Ok(None);
-            };
-            if raw_tag > u64::from(u32::MAX) {
-                return Err(DecodeError::InvalidVarint);
-            }
-            let raw_tag = raw_tag as u32;
-            let field_number =
-                FieldNumber::try_new(raw_tag >> 3).map_err(|_| DecodeError::InvalidTag)?;
-            let wire_type = wire_type::from_raw((raw_tag & 0b111) as u8)?;
-            if matches!(wire_type, WireType::SGroup | WireType::EGroup) {
-                return Err(DecodeError::InvalidTag);
-            }
-
-            let body_at = start + tag_len;
-            let (value, body_len) = match wire_type {
-                WireType::Varint => {
-                    let Some((value, len)) = src.try_varint(body_at)? else {
-                        return Ok(None);
-                    };
-                    (ScannedValue::Varint(Varint::from_uint64(value)), len)
-                }
-                WireType::Int64 => {
-                    let Some(bytes) = src.copy_fixed::<8>(body_at) else {
-                        return Ok(None);
-                    };
-                    (ScannedValue::I64(bytes), 8)
-                }
-                WireType::Int32 => {
-                    let Some(bytes) = src.copy_fixed::<4>(body_at) else {
-                        return Ok(None);
-                    };
-                    (ScannedValue::I32(bytes), 4)
-                }
-                WireType::Len => {
-                    let Some((payload_len, len_len)) = src.try_varint(body_at)? else {
-                        return Ok(None);
-                    };
-                    let payload_len = payload_len as usize;
-                    let body_len = len_len
-                        .checked_add(payload_len)
-                        .ok_or(DecodeError::TruncatedMessage)?;
-                    let payload_end = body_at + body_len;
-                    if src.len() < payload_end {
-                        return Ok(None);
-                    }
-                    (ScannedValue::Len { payload_len }, body_len)
-                }
-                WireType::SGroup | WireType::EGroup => unreachable!("rejected above"),
-            };
-
-            Ok(Some(ScannedRecord {
-                field_number,
-                start,
-                len: tag_len + body_len,
-                tag_len,
-                value,
-            }))
-        }
-
         let alloc = self.leftover.allocator().clone();
         let mut records = AllocVec::new_in(alloc);
         let mut pos = 0usize;
@@ -358,6 +256,107 @@ impl<A: Allocator + Clone> RecordScanner<A> {
         keep_unparsed_tail(&mut self.leftover, chunk, pos);
         Ok(records)
     }
+}
+
+/// Byte source for [`try_record_at`].
+///
+/// `Ok(None)` from [`ScanSrc::try_varint`] is a legal prefix. `Err` is malformed.
+trait ScanSrc {
+    fn len(&self) -> usize;
+    fn copy_fixed<const N: usize>(&self, start: usize) -> Option<[u8; N]>;
+    fn try_varint(&self, start: usize) -> Result<Option<(u64, usize)>, DecodeError>;
+}
+
+impl ScanSrc for [u8] {
+    #[inline(always)]
+    fn len(&self) -> usize {
+        <[u8]>::len(self)
+    }
+
+    #[inline(always)]
+    fn copy_fixed<const N: usize>(&self, start: usize) -> Option<[u8; N]> {
+        let end = start.checked_add(N)?;
+        let bytes = self.get(start..end)?;
+        let mut out = [0u8; N];
+        out.copy_from_slice(bytes);
+        Some(out)
+    }
+
+    #[inline(always)]
+    fn try_varint(&self, start: usize) -> Result<Option<(u64, usize)>, DecodeError> {
+        let Some(rest) = self.get(start..) else {
+            return Ok(None);
+        };
+        super::varint::try_decode_varint_slice(rest)
+    }
+}
+
+/// Read one complete record at `start`, or `Ok(None)` when more bytes are required.
+#[inline(always)]
+fn try_record_at<S: ScanSrc + ?Sized>(
+    src: &S,
+    start: usize,
+) -> Result<Option<ScannedRecord>, DecodeError> {
+    if start >= src.len() {
+        return Ok(None);
+    }
+    let Some((raw_tag, tag_len)) = src.try_varint(start)? else {
+        return Ok(None);
+    };
+    if raw_tag > u64::from(u32::MAX) {
+        return Err(DecodeError::InvalidVarint);
+    }
+    let raw_tag = raw_tag as u32;
+    let field_number = FieldNumber::try_new(raw_tag >> 3).map_err(|_| DecodeError::InvalidTag)?;
+    let wire_type = wire_type::from_raw((raw_tag & 0b111) as u8)?;
+    if matches!(wire_type, WireType::SGroup | WireType::EGroup) {
+        return Err(DecodeError::InvalidTag);
+    }
+
+    let body_at = start + tag_len;
+    let (value, body_len) = match wire_type {
+        WireType::Varint => {
+            let Some((value, len)) = src.try_varint(body_at)? else {
+                return Ok(None);
+            };
+            (ScannedValue::Varint(Varint::from_uint64(value)), len)
+        }
+        WireType::Int64 => {
+            let Some(bytes) = src.copy_fixed::<8>(body_at) else {
+                return Ok(None);
+            };
+            (ScannedValue::I64(bytes), 8)
+        }
+        WireType::Int32 => {
+            let Some(bytes) = src.copy_fixed::<4>(body_at) else {
+                return Ok(None);
+            };
+            (ScannedValue::I32(bytes), 4)
+        }
+        WireType::Len => {
+            let Some((payload_len, len_len)) = src.try_varint(body_at)? else {
+                return Ok(None);
+            };
+            let payload_len = payload_len as usize;
+            let body_len = len_len
+                .checked_add(payload_len)
+                .ok_or(DecodeError::TruncatedMessage)?;
+            let payload_end = body_at + body_len;
+            if src.len() < payload_end {
+                return Ok(None);
+            }
+            (ScannedValue::Len { payload_len }, body_len)
+        }
+        WireType::SGroup | WireType::EGroup => unreachable!("rejected above"),
+    };
+
+    Ok(Some(ScannedRecord {
+        field_number,
+        start,
+        len: tag_len + body_len,
+        tag_len,
+        value,
+    }))
 }
 
 /// Keep `src[pos..]` in `leftover`. Complete prefix is dropped, not shifted
