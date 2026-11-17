@@ -11,9 +11,7 @@
 //! fields. Known-field group encoding is a separate path and panics.
 
 use ::bytes::Buf;
-use ::protobuf_core::{
-    FieldNumber, MAX_VARINT_BYTES, VARINT_CONTINUATION_BIT, VARINT_PAYLOAD_MASK,
-};
+use ::protobuf_core::{FieldNumber, MAX_VARINT_BYTES};
 use ::puroro::wire_type;
 use ::puroro::{DecodeError, RECURSION_LIMIT, WireType};
 
@@ -85,7 +83,7 @@ pub(crate) fn measure_group(
     let mut groups = OpenGroups::new(field_number.as_u32());
     let mut pos = start;
     loop {
-        let Some((raw, tag_len)) = varint_at(&mut get, pos)? else {
+        let Some((raw, tag_len)) = varint_at(len, &mut get, pos)? else {
             return Ok(None);
         };
         let (number, wire) = split_tag(raw)?;
@@ -101,7 +99,7 @@ pub(crate) fn measure_group(
         pos = after_tag;
         pos = match wire {
             WireType::SGroup | WireType::EGroup => pos,
-            WireType::Varint => match varint_at(&mut get, pos)? {
+            WireType::Varint => match varint_at(len, &mut get, pos)? {
                 Some((_, n)) => pos + n,
                 None => return Ok(None),
             },
@@ -195,21 +193,67 @@ fn split_tag(raw: u64) -> Result<(u32, WireType), DecodeError> {
     Ok((number.as_u32(), wire))
 }
 
+/// One byte of an indexable buffer, so [`super::decode_varint`] can read it.
+///
+/// `chunk` is at most one byte. The byte at `pos` is loaded before it is
+/// observed.
+struct IndexBuf<'a, F> {
+    get: &'a mut F,
+    pos: usize,
+    end: usize,
+    byte: [u8; 1],
+}
+
+impl<'a, F: FnMut(usize) -> Option<u8>> IndexBuf<'a, F> {
+    fn new(get: &'a mut F, pos: usize, end: usize) -> Self {
+        let mut buf = Self {
+            get,
+            pos,
+            end,
+            byte: [0],
+        };
+        buf.load();
+        buf
+    }
+
+    fn load(&mut self) {
+        if self.pos >= self.end {
+            return;
+        }
+        match (self.get)(self.pos) {
+            Some(byte) => self.byte[0] = byte,
+            None => self.end = self.pos,
+        }
+    }
+}
+
+impl<F: FnMut(usize) -> Option<u8>> Buf for IndexBuf<'_, F> {
+    fn remaining(&self) -> usize {
+        self.end.saturating_sub(self.pos)
+    }
+
+    fn chunk(&self) -> &[u8] {
+        if self.pos < self.end { &self.byte } else { &[] }
+    }
+
+    fn advance(&mut self, cnt: usize) {
+        self.pos += cnt;
+        self.load();
+    }
+}
+
 fn varint_at(
+    len: usize,
     get: &mut impl FnMut(usize) -> Option<u8>,
     start: usize,
 ) -> Result<Option<(u64, usize)>, DecodeError> {
-    let mut value = 0u64;
-    for i in 0..MAX_VARINT_BYTES {
-        let Some(byte) = get(start + i) else {
-            return Ok(None);
-        };
-        value |= u64::from(byte & VARINT_PAYLOAD_MASK) << (7 * i);
-        if byte & VARINT_CONTINUATION_BIT == 0 {
-            return Ok(Some((value, i + 1)));
-        }
+    let mut buf = IndexBuf::new(get, start, len);
+    let available = buf.remaining();
+    match super::decode_varint(&mut buf) {
+        Ok(value) => Ok(Some((value, available - buf.remaining()))),
+        Err(DecodeError::UnexpectedEof) => Ok(None),
+        Err(err) => Err(err),
     }
-    Err(DecodeError::InvalidVarint)
 }
 
 fn skip_fixed(len: usize, pos: usize, n: usize) -> Option<usize> {
@@ -222,7 +266,7 @@ fn len_end(
     get: &mut impl FnMut(usize) -> Option<u8>,
     pos: usize,
 ) -> Result<Option<usize>, DecodeError> {
-    let Some((payload_len, prefix_len)) = varint_at(get, pos)? else {
+    let Some((payload_len, prefix_len)) = varint_at(len, get, pos)? else {
         return Ok(None);
     };
     let Ok(payload_len) = usize::try_from(payload_len) else {

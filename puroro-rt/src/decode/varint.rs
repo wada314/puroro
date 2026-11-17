@@ -3,8 +3,8 @@
 //! [`super::decode_varint`] uses [`ChunkScanHot4`]; [`super::decode_tag`] uses
 //! [`super::decode_varint_with`] with [`ChunkScanLikely1`]. Benches monomorphize
 //! over [`VarintDecoder`] impls to compare algorithms without runtime dispatch.
-//! [`decode_varint_with_raw`] is the path that also keeps the consumed wire
-//! bytes. The fast decoders return only the integer.
+//! [`decode_varint_with_raw`] calls [`super::decode_varint`] and records the
+//! bytes that call consumes.
 
 use ::bytes::Buf;
 use ::protobuf_core::{MAX_VARINT_BYTES, VARINT_CONTINUATION_BIT, VARINT_PAYLOAD_MASK, Varint};
@@ -104,31 +104,55 @@ fn decode_varint_byte_iterator<B: Buf>(buf: &mut B) -> Result<u64, DecodeError> 
     finish_varint_bytewise(buf, 0, 0, 0)
 }
 
+/// Copies bytes out of `inner` as [`super::decode_varint`] advances.
+struct RecordingBuf<'a, B> {
+    inner: &'a mut B,
+    raw: &'a mut [u8; MAX_VARINT_BYTES],
+    n: usize,
+}
+
+impl<B: Buf> Buf for RecordingBuf<'_, B> {
+    #[inline]
+    fn remaining(&self) -> usize {
+        self.inner.remaining()
+    }
+
+    #[inline]
+    fn chunk(&self) -> &[u8] {
+        let chunk = self.inner.chunk();
+        let room = MAX_VARINT_BYTES.saturating_sub(self.n);
+        let take = chunk.len().min(room);
+        &chunk[..take]
+    }
+
+    #[inline]
+    fn advance(&mut self, cnt: usize) {
+        let src = &self.inner.chunk()[..cnt];
+        self.raw[self.n..self.n + cnt].copy_from_slice(src);
+        self.n += cnt;
+        self.inner.advance(cnt);
+    }
+}
+
 /// Body of [`super::decode_varint_with_raw`].
 ///
-/// Byte-at-a-time, matching [`finish_varint_bytewise`]: a 10-byte varint whose
-/// last byte terminates is accepted, and ten continuation bytes are
-/// [`DecodeError::InvalidVarint`].
+/// The value comes from [`super::decode_varint`]. `raw` receives the bytes
+/// that call consumed, including a non-canonical encoding.
 #[inline]
 pub(crate) fn decode_varint_with_raw<'a, B: Buf>(
     buf: &mut B,
     raw: &'a mut [u8; MAX_VARINT_BYTES],
 ) -> Result<(Varint, &'a [u8]), DecodeError> {
-    let mut value = 0u64;
-    let mut shift = 0u32;
-    for n in 0..MAX_VARINT_BYTES {
-        if !buf.has_remaining() {
-            return Err(DecodeError::UnexpectedEof);
-        }
-        let byte = buf.get_u8();
-        raw[n] = byte;
-        value |= u64::from(byte & VARINT_PAYLOAD_MASK) << shift;
-        if byte < VARINT_CONTINUATION_BIT {
-            return Ok((Varint::from_uint64(value), &raw[..=n]));
-        }
-        shift += 7;
-    }
-    Err(DecodeError::InvalidVarint)
+    let (value, n) = {
+        let mut rec = RecordingBuf {
+            inner: buf,
+            raw,
+            n: 0,
+        };
+        let value = super::decode_varint(&mut rec)?;
+        (value, rec.n)
+    };
+    Ok((Varint::from_uint64(value), &raw[..n]))
 }
 
 /// Fast path for workloads where most varints are a single byte (e.g. tags).

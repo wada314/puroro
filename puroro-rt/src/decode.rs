@@ -55,9 +55,10 @@ pub fn decode_varint_with<D: VarintDecoder, B: Buf>(buf: &mut B) -> Result<u64, 
 
 /// Decodes a base-128 varint and returns the decoded value plus its wire bytes.
 ///
-/// `raw` is scratch. The returned slice borrows it and is the exact encoding
-/// read from `buf`, including a non-canonical one. The [`Varint`] is that
-/// value after decoding. [`decode_varint`] returns the same value as `u64`.
+/// The value is [`decode_varint`]. `raw` is scratch and receives the bytes
+/// that call consumed, including a non-canonical encoding. The returned slice
+/// borrows `raw`. The [`Varint`] is `decode_varint`'s `u64` via
+/// [`Varint::from_uint64`].
 #[inline]
 pub fn decode_varint_with_raw<'a, B: Buf>(
     buf: &mut B,

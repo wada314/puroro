@@ -9,9 +9,8 @@
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::vec::Vec as AllocVec;
-use ::protobuf_core::{
-    FieldNumber, MAX_VARINT_BYTES, VARINT_CONTINUATION_BIT, VARINT_PAYLOAD_MASK, Varint,
-};
+use ::bytes::Buf;
+use ::protobuf_core::{FieldNumber, Varint};
 use ::puroro::wire_type;
 use ::puroro::{DecodeError, WireType};
 
@@ -271,6 +270,51 @@ impl<'a> TwoSlice<'a> {
         }
         Some(out)
     }
+
+    fn buf_from(&self, start: usize) -> TwoSliceBuf<'a> {
+        if start < self.head.len() {
+            TwoSliceBuf {
+                head: &self.head[start..],
+                tail: self.tail,
+            }
+        } else {
+            let at = start - self.head.len();
+            TwoSliceBuf {
+                head: &[],
+                tail: self.tail.get(at..).unwrap_or(&[]),
+            }
+        }
+    }
+}
+
+/// [`Buf`] view of [`TwoSlice`] from a start index.
+struct TwoSliceBuf<'a> {
+    head: &'a [u8],
+    tail: &'a [u8],
+}
+
+impl Buf for TwoSliceBuf<'_> {
+    fn remaining(&self) -> usize {
+        self.head.len() + self.tail.len()
+    }
+
+    fn chunk(&self) -> &[u8] {
+        if self.head.is_empty() {
+            self.tail
+        } else {
+            self.head
+        }
+    }
+
+    fn advance(&mut self, cnt: usize) {
+        if cnt <= self.head.len() {
+            self.head = &self.head[cnt..];
+            return;
+        }
+        let into_tail = cnt - self.head.len();
+        self.head = &[];
+        self.tail = self.tail.get(into_tail..).unwrap_or(&[]);
+    }
 }
 
 /// Keep `src[pos..]` in `leftover`. Complete prefix is dropped, not shifted
@@ -296,17 +340,16 @@ fn keep_unparsed_tail<A: Allocator + Clone>(
 }
 
 fn try_varint_at(src: &TwoSlice<'_>, start: usize) -> Result<TryVarint, DecodeError> {
-    let mut value = 0u64;
-    for i in 0..MAX_VARINT_BYTES {
-        let Some(byte) = src.get(start + i) else {
-            return Ok(TryVarint::NeedMore);
-        };
-        value |= u64::from(byte & VARINT_PAYLOAD_MASK) << (7 * i);
-        if byte & VARINT_CONTINUATION_BIT == 0 {
-            return Ok(TryVarint::Done { value, len: i + 1 });
-        }
+    let mut buf = src.buf_from(start);
+    let available = buf.remaining();
+    match super::decode_varint(&mut buf) {
+        Ok(value) => Ok(TryVarint::Done {
+            value,
+            len: available - buf.remaining(),
+        }),
+        Err(DecodeError::UnexpectedEof) => Ok(TryVarint::NeedMore),
+        Err(err) => Err(err),
     }
-    Err(DecodeError::InvalidVarint)
 }
 
 fn try_record_at(src: &TwoSlice<'_>, start: usize) -> Result<TryRecord, DecodeError> {
