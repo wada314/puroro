@@ -70,12 +70,6 @@ impl OpenGroups {
     }
 }
 
-struct RawVarint {
-    value: u64,
-    bytes: [u8; MAX_VARINT_BYTES],
-    len: usize,
-}
-
 /// Measures one group in an indexable buffer.
 ///
 /// `get` reads absolute indexes in `0..len`. `start` is the first byte after
@@ -155,22 +149,23 @@ fn walk_group<B: Buf>(
     mut emit: impl FnMut(&[u8]),
 ) -> Result<(), DecodeError> {
     let mut groups = OpenGroups::new(field_number.as_u32());
+    let mut scratch = [0u8; MAX_VARINT_BYTES];
     loop {
         if !buf.has_remaining() {
             return Err(DecodeError::TruncatedMessage);
         }
-        let tag = read_raw_varint(buf)?;
-        let (number, wire) = split_tag(tag.value)?;
+        let (tag, raw) = super::decode_varint_with_raw(buf, &mut scratch)?;
+        let (number, wire) = split_tag(tag)?;
         let closed = groups.on_tag(number, wire)?;
-        emit(&tag.bytes[..tag.len]);
+        emit(raw);
         if closed {
             return Ok(());
         }
         match wire {
             WireType::SGroup | WireType::EGroup => {}
             WireType::Varint => {
-                let value = read_raw_varint(buf)?;
-                emit(&value.bytes[..value.len]);
+                let (_, raw) = super::decode_varint_with_raw(buf, &mut scratch)?;
+                emit(raw);
             }
             WireType::Int32 => {
                 copy_exact(buf, 4, DecodeError::UnexpectedEof, &mut emit)?;
@@ -179,36 +174,15 @@ fn walk_group<B: Buf>(
                 copy_exact(buf, 8, DecodeError::UnexpectedEof, &mut emit)?;
             }
             WireType::Len => {
-                let len_raw = read_raw_varint(buf)?;
-                emit(&len_raw.bytes[..len_raw.len]);
-                let Ok(len) = usize::try_from(len_raw.value) else {
+                let (len_value, raw) = super::decode_varint_with_raw(buf, &mut scratch)?;
+                emit(raw);
+                let Ok(len) = usize::try_from(len_value) else {
                     return Err(DecodeError::TruncatedMessage);
                 };
                 copy_exact(buf, len, DecodeError::TruncatedMessage, &mut emit)?;
             }
         }
     }
-}
-
-fn read_raw_varint<B: Buf>(buf: &mut B) -> Result<RawVarint, DecodeError> {
-    let mut bytes = [0u8; MAX_VARINT_BYTES];
-    let mut value = 0u64;
-    for i in 0..MAX_VARINT_BYTES {
-        let Some(&byte) = buf.chunk().first() else {
-            return Err(DecodeError::UnexpectedEof);
-        };
-        buf.advance(1);
-        bytes[i] = byte;
-        value |= u64::from(byte & VARINT_PAYLOAD_MASK) << (7 * i);
-        if byte & VARINT_CONTINUATION_BIT == 0 {
-            return Ok(RawVarint {
-                value,
-                bytes,
-                len: i + 1,
-            });
-        }
-    }
-    Err(DecodeError::InvalidVarint)
 }
 
 fn split_tag(raw: u64) -> Result<(u32, WireType), DecodeError> {
@@ -436,5 +410,18 @@ mod tests {
             .unwrap();
         assert_eq!(copied, wire[1..1 + frame.consumed]);
         assert_eq!(chunked.rest, &[0x99]);
+    }
+
+    #[test]
+    fn copy_keeps_a_noncanonical_varint() {
+        // Field 2, varint 1, encoded as `81 00` rather than `01`.
+        let body = [0x10, 0x81, 0x00];
+        let mut wire = Vec::new();
+        push_group(&mut wire, 1, &body);
+        let mut copied = Vec::new();
+        let mut rest = &wire[1..];
+        copy_group(field(1), &mut rest, |bytes| copied.extend_from_slice(bytes)).unwrap();
+        assert_eq!(copied, wire[1..]);
+        assert!(!rest.has_remaining());
     }
 }

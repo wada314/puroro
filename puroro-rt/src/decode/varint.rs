@@ -3,6 +3,8 @@
 //! [`super::decode_varint`] uses [`ChunkScanHot4`]; [`super::decode_tag`] uses
 //! [`super::decode_varint_with`] with [`ChunkScanLikely1`]. Benches monomorphize
 //! over [`VarintDecoder`] impls to compare algorithms without runtime dispatch.
+//! [`decode_varint_with_raw`] is the path that also keeps the consumed wire
+//! bytes. The fast decoders return only the integer.
 
 use ::bytes::Buf;
 use ::protobuf_core::{MAX_VARINT_BYTES, VARINT_CONTINUATION_BIT, VARINT_PAYLOAD_MASK};
@@ -100,6 +102,33 @@ fn try_decode_varint_from_slice(chunk: &[u8]) -> Result<Option<(u64, usize)>, De
 #[inline]
 fn decode_varint_byte_iterator<B: Buf>(buf: &mut B) -> Result<u64, DecodeError> {
     finish_varint_bytewise(buf, 0, 0, 0)
+}
+
+/// Body of [`super::decode_varint_with_raw`].
+///
+/// Byte-at-a-time, matching [`finish_varint_bytewise`]: a 10-byte varint whose
+/// last byte terminates is accepted, and ten continuation bytes are
+/// [`DecodeError::InvalidVarint`].
+#[inline]
+pub(crate) fn decode_varint_with_raw<'a, B: Buf>(
+    buf: &mut B,
+    raw: &'a mut [u8; MAX_VARINT_BYTES],
+) -> Result<(u64, &'a [u8]), DecodeError> {
+    let mut value = 0u64;
+    let mut shift = 0u32;
+    for n in 0..MAX_VARINT_BYTES {
+        if !buf.has_remaining() {
+            return Err(DecodeError::UnexpectedEof);
+        }
+        let byte = buf.get_u8();
+        raw[n] = byte;
+        value |= u64::from(byte & VARINT_PAYLOAD_MASK) << shift;
+        if byte < VARINT_CONTINUATION_BIT {
+            return Ok((value, &raw[..=n]));
+        }
+        shift += 7;
+    }
+    Err(DecodeError::InvalidVarint)
 }
 
 /// Fast path for workloads where most varints are a single byte (e.g. tags).
@@ -716,6 +745,65 @@ mod tests {
         crate::for_each_varint_decoder!(D => {
             assert_decode_split_across_chunks::<D>();
         });
+    }
+
+    #[test]
+    fn with_raw_keeps_a_noncanonical_encoding() {
+        // 1 is canonically `0x01`. `0x81 0x00` is the same integer.
+        let wire = [0x81u8, 0x00, 0x02];
+        let mut cursor = wire.as_slice();
+        let mut scratch = [0u8; MAX_VARINT_BYTES];
+        let (value, raw) = decode_varint_with_raw(&mut cursor, &mut scratch).unwrap();
+        assert_eq!(value, 1);
+        assert_eq!(raw, &[0x81, 0x00]);
+        assert_eq!(cursor, &[0x02]);
+    }
+
+    #[test]
+    fn with_raw_keeps_bytes_split_across_chunks() {
+        let mut buf = SplitBuf {
+            first: &[0x81],
+            rest: &[0x00, 0x02],
+        };
+        let mut scratch = [0u8; MAX_VARINT_BYTES];
+        let (value, raw) = decode_varint_with_raw(&mut buf, &mut scratch).unwrap();
+        assert_eq!(value, 1);
+        assert_eq!(raw, &[0x81, 0x00]);
+        assert_eq!(buf.remaining(), 1);
+    }
+
+    #[test]
+    fn with_raw_matches_decode_varint_on_canonical_values() {
+        for value in [0u64, 1, 127, 150, 1 << 28, u64::from(u32::MAX), u64::MAX] {
+            let wire = encode_u64(value);
+            let mut plain = wire.as_slice();
+            let mut keeping = wire.as_slice();
+            let mut scratch = [0u8; MAX_VARINT_BYTES];
+            let (decoded, raw) = decode_varint_with_raw(&mut keeping, &mut scratch).unwrap();
+            assert_eq!(decoded, super::super::decode_varint(&mut plain).unwrap());
+            assert_eq!(decoded, value);
+            assert_eq!(raw, wire.as_slice());
+        }
+    }
+
+    #[test]
+    fn with_raw_rejects_an_empty_or_unfinished_or_overlong_varint() {
+        let mut scratch = [0u8; MAX_VARINT_BYTES];
+        let mut empty = [].as_slice();
+        assert!(matches!(
+            decode_varint_with_raw(&mut empty, &mut scratch),
+            Err(DecodeError::UnexpectedEof)
+        ));
+        let mut short = [0x80u8].as_slice();
+        assert!(matches!(
+            decode_varint_with_raw(&mut short, &mut scratch),
+            Err(DecodeError::UnexpectedEof)
+        ));
+        let mut overlong = [0x80u8; 10].as_slice();
+        assert!(matches!(
+            decode_varint_with_raw(&mut overlong, &mut scratch),
+            Err(DecodeError::InvalidVarint)
+        ));
     }
 
     #[test]

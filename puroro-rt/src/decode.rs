@@ -2,7 +2,8 @@
 //!
 //! Varint decoding is pluggable via [`VarintDecoder`]. [`decode_varint`] uses
 //! [`ChunkScanHot4`]; [`decode_tag`] uses [`decode_varint_with`] with
-//! [`ChunkScanLikely1`]. Tags are unpacked here into a validated [`FieldNumber`]
+//! [`ChunkScanLikely1`]. [`decode_varint_with_raw`] also returns the wire bytes
+//! just consumed. Tags are unpacked here into a validated [`FieldNumber`]
 //! plus [`WireType`].
 
 mod group;
@@ -28,7 +29,7 @@ pub use self::varint::{
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::Buf;
-use ::protobuf_core::{FieldNumber, Varint};
+use ::protobuf_core::{FieldNumber, MAX_VARINT_BYTES, Varint};
 use ::puroro::wire_type;
 use ::puroro::{DecodeBuf, DecodeError, UnknownField, UnknownPayload, WireType};
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
@@ -50,6 +51,19 @@ pub fn decode_varint<B: Buf>(buf: &mut B) -> Result<u64, DecodeError> {
 #[inline]
 pub fn decode_varint_with<D: VarintDecoder, B: Buf>(buf: &mut B) -> Result<u64, DecodeError> {
     D::decode_varint(buf)
+}
+
+/// Decodes a base-128 varint and returns the wire bytes that were consumed.
+///
+/// `raw` is scratch. The returned slice borrows it and is the exact encoding
+/// read from `buf`, including a non-canonical one. [`decode_varint`] returns
+/// only the integer.
+#[inline]
+pub fn decode_varint_with_raw<'a, B: Buf>(
+    buf: &mut B,
+    raw: &'a mut [u8; MAX_VARINT_BYTES],
+) -> Result<(u64, &'a [u8]), DecodeError> {
+    self::varint::decode_varint_with_raw(buf, raw)
 }
 
 /// Decodes a tag and returns `(field_number, wire_type)`.
