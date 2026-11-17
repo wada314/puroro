@@ -369,17 +369,8 @@ fn render_module_body(
         })
         .collect();
 
-    let unknown_assoc = match unknown_fields {
-        UnknownFieldsPolicy::Discard => {
-            quote! { type Unknown = ::puroro_rt::DiscardUnknowns; }
-        }
-        UnknownFieldsPolicy::Reject => {
-            quote! { type Unknown = ::puroro_rt::RejectUnknowns; }
-        }
-        UnknownFieldsPolicy::Unspecified | UnknownFieldsPolicy::Preserve => {
-            quote! { type Unknown = ::puroro_rt::UnknownFields<A>; }
-        }
-    };
+    let store = super::unknown_store_ty(unknown_fields);
+    let unknown_assoc = quote! { type Unknown = #store; };
 
     let root_alias = nested_root_alias();
     Ok(quote! {

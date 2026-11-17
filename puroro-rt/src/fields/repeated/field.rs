@@ -5,7 +5,6 @@
 //! message allocator. [`RepeatedSpans`] stores element-LEN offsets and builds
 //! that vec on first get.
 
-use ::core::cell::UnsafeCell;
 use ::core::fmt::{Debug, Formatter, Result as FmtResult};
 use ::core::marker::PhantomData;
 use ::core::mem::ManuallyDrop;
@@ -24,6 +23,7 @@ use crate::decode::{LazyMessage, ScannedRecord, ScannedValue, SharedWire, WireSp
 use crate::encode::field_number_const;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{DefaultIn, FieldDeallocate, MessageCommon, MessageCommonAlloc};
+use crate::fields::span_list::SpanList;
 use crate::fields::wire::len::{ProtoBytes, ProtoString, ProtoStringUnchecked};
 use crate::fields::wire::numerical::{Numerical, NumericalType};
 use crate::fields::wire::proto_message::ProtoMessage;
@@ -92,32 +92,17 @@ where
     }
 }
 
-/// Offset list plus an optional materialised [`RepeatedField`] (`L = `[`RepeatedReady`]).
-#[doc(hidden)]
-pub struct RepeatedSpanStorage<T, E, const FIELD: u32, A>
-where
-    T: RepeatedElement,
-    E: RepeatedEncoding<T, A>,
-    A: Allocator,
-{
-    spans: AllocVec<WireSpan, A>,
-    ready: UnsafeCell<Option<RepeatedField<T, E, FIELD, A>>>,
-}
-
 impl<T, E, const FIELD: u32, A> RepeatedLayout<T, E, FIELD, A> for RepeatedSpans
 where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator,
 {
-    type Storage = RepeatedSpanStorage<T, E, FIELD, A>;
+    type Storage = SpanList<RepeatedField<T, E, FIELD, A>, A>;
 
     #[inline]
     fn new_storage(alloc: A) -> Self::Storage {
-        RepeatedSpanStorage {
-            spans: AllocVec::new_in(alloc),
-            ready: UnsafeCell::new(None),
-        }
+        SpanList::new(alloc)
     }
 
     #[inline]
@@ -126,7 +111,7 @@ where
         C: MessageCommonAlloc<Alloc = A>,
         T::Element<A>: DeallocateIn<A>,
     {
-        if let Some(mut field) = storage.ready.get_mut().take() {
+        if let Some(mut field) = storage.take_ready() {
             FieldDeallocate::deallocate(&mut field, common);
         }
     }
@@ -480,11 +465,9 @@ where
         A: Clone,
         T: DecodeLenBody<A>,
     {
-        self.storage.spans.push(span);
-        if let Some(field) = self.storage.ready.get_mut() {
-            append_span(field, span, wire, common.clone_alloc())?;
-        }
-        Ok(())
+        self.storage.store_span(span, |field, span| {
+            append_span(field, span, wire, common.clone_alloc())
+        })
     }
 
     /// Materialise on first call, then return the catalog repeated view.
@@ -500,21 +483,14 @@ where
     {
         // SAFETY: callers only `bind` after the parent stream is finished, and
         // never overlap it with `store_span` (`&mut self`).
-        let ready = unsafe { &mut *self.storage.ready.get() };
-        if ready.is_none() {
-            let mut field = RepeatedField::new_in(common.clone_alloc());
-            for &span in &self.storage.spans {
-                if let Err(e) = append_span(&mut field, span, wire, common.clone_alloc()) {
-                    FieldDeallocate::deallocate(&mut field, common);
-                    return Err(e);
-                }
-            }
-            *ready = Some(field);
-        }
-        Ok(ready
-            .as_ref()
-            .expect("repeated field materialised")
-            .bind(common))
+        let ready = unsafe {
+            self.storage.materialize(
+                common,
+                || RepeatedField::new_in(common.clone_alloc()),
+                |field, span| append_span(field, span, wire, common.clone_alloc()),
+            )?
+        };
+        Ok(ready.bind(common))
     }
 }
 
@@ -646,13 +622,10 @@ where
     fn clone_field(&self, common: &Cx, alloc: A) -> Self {
         // SAFETY: `ready` is written only through `&mut self` (`store_span` / `bind`).
         // `clone_field` shares `self` and does not overlap those borrows.
-        let ready = unsafe { (*self.storage.ready.get()).as_ref() };
+        let ready = unsafe { self.storage.ready_ref() };
         let ready = ready.map(|field| field.clone_field(common, alloc.clone()));
         Self {
-            storage: RepeatedSpanStorage {
-                spans: self.storage.spans.clone(),
-                ready: UnsafeCell::new(ready),
-            },
+            storage: SpanList::from_parts(self.storage.spans().clone(), ready),
             _encoding: PhantomData,
         }
     }

@@ -48,7 +48,7 @@ pub(super) fn render_items(
     } else {
         bits_ty.clone()
     };
-    let unknown_ty = unknown_store_ty(field_plan.unknown_fields());
+    let unknown_ty = super::unknown_store_ty(field_plan.unknown_fields());
     // Field struct is generic over `L`. User-facing names are `Record` aliases.
     let fields_name = Ident::new(&format!("{name_str}Fields"), Span::call_site());
     let lazy_name_str = format!("{name_str}Lazy");
@@ -798,16 +798,6 @@ fn render_oneof_modules(
         }
     }
     Ok(out)
-}
-
-fn unknown_store_ty(policy: UnknownFieldsPolicy) -> TokenStream {
-    match policy {
-        UnknownFieldsPolicy::Discard => quote! { ::puroro_rt::DiscardUnknowns },
-        UnknownFieldsPolicy::Reject => quote! { ::puroro_rt::RejectUnknowns },
-        UnknownFieldsPolicy::Unspecified | UnknownFieldsPolicy::Preserve => {
-            quote! { ::puroro_rt::UnknownFields<A> }
-        }
-    }
 }
 
 fn render_new_in_fields(fields: &[FieldEmit]) -> Vec<TokenStream> {

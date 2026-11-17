@@ -5,14 +5,29 @@
 //! maps with legal keys and Copy scalar / bool values. Orchestration (resolve,
 //! target selection, forest install, layout) lives in [`mod@crate::generate`].
 
-use crate::descriptor::ProtoFqn;
+use crate::descriptor::{ProtoFqn, UnknownFieldsPolicy};
 use crate::error::{Error, Result};
 use crate::field_kind::{MessageStoragePlan, plan_fields};
 use crate::module_tree::{ModuleForest, ModuleNode, ModuleOrigin, type_name_to_module_ident};
 use crate::resolved::{Enum, File, Message};
-use ::proc_macro2::Ident;
+use ::proc_macro2::{Ident, TokenStream};
 use ::quote::quote;
 use ::syn::{Attribute, Item};
+
+/// Runtime unknown-field store baked for `policy`.
+///
+/// Message structs use this as a type alias. Oneof modules use the same tokens
+/// as `type Unknown`. `Unspecified` and `Preserve` are `UnknownFields<A>`.
+/// `Reject` stays `RejectUnknowns` (it is not rewritten to preserve).
+pub(super) fn unknown_store_ty(policy: UnknownFieldsPolicy) -> TokenStream {
+    match policy {
+        UnknownFieldsPolicy::Discard => quote! { ::puroro_rt::DiscardUnknowns },
+        UnknownFieldsPolicy::Reject => quote! { ::puroro_rt::RejectUnknowns },
+        UnknownFieldsPolicy::Unspecified | UnknownFieldsPolicy::Preserve => {
+            quote! { ::puroro_rt::UnknownFields<A> }
+        }
+    }
+}
 
 mod defaults;
 mod enumeration;

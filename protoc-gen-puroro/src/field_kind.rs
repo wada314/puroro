@@ -175,6 +175,32 @@ impl<'a> WireTypeKind<'a> {
         }
     }
 
+    /// Protobuf map keys are integral, `bool`, or `string`.
+    ///
+    /// Not floating-point, `bytes`, enum, or message. `string` with
+    /// `utf8_validation = NONE` stays a legal key.
+    pub fn is_legal_map_key(self) -> bool {
+        match self {
+            Self::Int32
+            | Self::Int64
+            | Self::UInt32
+            | Self::UInt64
+            | Self::SInt32
+            | Self::SInt64
+            | Self::Fixed32
+            | Self::Fixed64
+            | Self::SFixed32
+            | Self::SFixed64
+            | Self::Bool
+            | Self::String { .. } => true,
+            Self::Double
+            | Self::Float
+            | Self::Bytes { .. }
+            | Self::Message(_)
+            | Self::Enum { .. } => false,
+        }
+    }
+
     /// Whether the type may use packed repeated wire encoding.
     pub fn is_packable(self) -> bool {
         match self {
@@ -286,6 +312,47 @@ pub fn bit_array_byte_len(bit_count: usize) -> usize {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn legal_map_keys_are_integral_bool_and_string() {
+        assert!(WireTypeKind::Int32.is_legal_map_key());
+        assert!(WireTypeKind::Int64.is_legal_map_key());
+        assert!(WireTypeKind::UInt32.is_legal_map_key());
+        assert!(WireTypeKind::UInt64.is_legal_map_key());
+        assert!(WireTypeKind::SInt32.is_legal_map_key());
+        assert!(WireTypeKind::SInt64.is_legal_map_key());
+        assert!(WireTypeKind::Fixed32.is_legal_map_key());
+        assert!(WireTypeKind::Fixed64.is_legal_map_key());
+        assert!(WireTypeKind::SFixed32.is_legal_map_key());
+        assert!(WireTypeKind::SFixed64.is_legal_map_key());
+        assert!(WireTypeKind::Bool.is_legal_map_key());
+        assert!(
+            WireTypeKind::String {
+                utf8: Utf8Validation::Verify
+            }
+            .is_legal_map_key()
+        );
+        assert!(
+            WireTypeKind::String {
+                utf8: Utf8Validation::None
+            }
+            .is_legal_map_key()
+        );
+        assert!(!WireTypeKind::Float.is_legal_map_key());
+        assert!(!WireTypeKind::Double.is_legal_map_key());
+        assert!(
+            !WireTypeKind::Bytes {
+                utf8: Utf8Validation::Verify
+            }
+            .is_legal_map_key()
+        );
+        assert!(
+            !WireTypeKind::Bytes {
+                utf8: Utf8Validation::None
+            }
+            .is_legal_map_key()
+        );
+    }
 
     #[test]
     fn string_catalog_marker_follows_utf8_validation() {

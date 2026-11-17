@@ -9,13 +9,11 @@
 //! [`MapSpans`] stores entry-LEN offsets and builds that `HashMap` on first get.
 
 use ::core::borrow::Borrow;
-use ::core::cell::UnsafeCell;
 use ::core::fmt::{Debug, Formatter, Result as FmtResult};
 use ::core::hash::Hash;
 use ::core::mem;
 
 use ::allocator_api2::alloc::Allocator;
-use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::{Buf, BufMut};
 use ::hashbrown::hash_map::Iter as HashMapIter;
 use ::hashbrown::{DefaultHashBuilder, Equivalent, HashMap};
@@ -27,6 +25,7 @@ use crate::decode::{self, WireSpan};
 use crate::encode::{self, field_number_const};
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{FieldDeallocate, MessageCommon, MessageCommonAlloc};
+use crate::fields::span_list::SpanList;
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut,
 };
@@ -88,32 +87,17 @@ where
     }
 }
 
-/// Offset list plus an optional materialised [`MapField`] (`L = `[`MapReady`]).
-#[doc(hidden)]
-pub struct MapSpanStorage<K, V, const FIELD: u32, A>
-where
-    K: MapKey,
-    V: RepeatedElement,
-    A: Allocator,
-{
-    spans: AllocVec<WireSpan, A>,
-    ready: UnsafeCell<Option<MapField<K, V, FIELD, A>>>,
-}
-
 impl<K, V, const FIELD: u32, A> MapLayout<K, V, FIELD, A> for MapSpans
 where
     K: MapKey,
     V: RepeatedElement,
     A: Allocator,
 {
-    type Storage = MapSpanStorage<K, V, FIELD, A>;
+    type Storage = SpanList<MapField<K, V, FIELD, A>, A>;
 
     #[inline]
     fn new_storage(alloc: A) -> Self::Storage {
-        MapSpanStorage {
-            spans: AllocVec::new_in(alloc),
-            ready: UnsafeCell::new(None),
-        }
+        SpanList::new(alloc)
     }
 
     #[inline]
@@ -121,7 +105,7 @@ where
         storage: &mut Self::Storage,
         common: &C,
     ) {
-        if let Some(mut map) = storage.ready.get_mut().take() {
+        if let Some(mut map) = storage.take_ready() {
             FieldDeallocate::deallocate(&mut map, common);
         }
     }
@@ -258,12 +242,10 @@ where
         V: RepeatedElementMerge<A>,
         K::Element<A>: Eq + Hash,
     {
-        self.storage.spans.push(span);
-        if let Some(map) = self.storage.ready.get_mut() {
+        self.storage.store_span(span, |map, span| {
             let payload = span.slice(wire)?;
-            map.merge_entry_body(&mut &payload[..], common.clone_alloc(), 0)?;
-        }
-        Ok(())
+            map.merge_entry_body(&mut &payload[..], common.clone_alloc(), 0)
+        })
     }
 
     /// Materialise on first call, then return the catalog map view.
@@ -280,25 +262,17 @@ where
     {
         // SAFETY: callers only `bind` after the parent stream is finished, and
         // never overlap it with `store_span` (`&mut self`).
-        let ready = unsafe { &mut *self.storage.ready.get() };
-        if ready.is_none() {
-            let mut map = MapField::new_in(common.clone_alloc());
-            for &span in &self.storage.spans {
-                let payload = match span.slice(wire) {
-                    Ok(p) => p,
-                    Err(e) => {
-                        FieldDeallocate::deallocate(&mut map, common);
-                        return Err(e);
-                    }
-                };
-                if let Err(e) = map.merge_entry_body(&mut &payload[..], common.clone_alloc(), 0) {
-                    FieldDeallocate::deallocate(&mut map, common);
-                    return Err(e);
-                }
-            }
-            *ready = Some(map);
-        }
-        Ok(ready.as_ref().expect("map materialised").bind(common))
+        let ready = unsafe {
+            self.storage.materialize(
+                common,
+                || MapField::new_in(common.clone_alloc()),
+                |map, span| {
+                    let payload = span.slice(wire)?;
+                    map.merge_entry_body(&mut &payload[..], common.clone_alloc(), 0)
+                },
+            )?
+        };
+        Ok(ready.bind(common))
     }
 }
 
@@ -418,13 +392,10 @@ where
     fn clone_field(&self, common: &Cx, alloc: A) -> Self {
         // SAFETY: `ready` is written only through `&mut self` (`store_span` / `bind`).
         // `clone_field` shares `self` and does not overlap those borrows.
-        let ready = unsafe { (*self.storage.ready.get()).as_ref() };
+        let ready = unsafe { self.storage.ready_ref() };
         let ready = ready.map(|map| map.clone_field(common, alloc.clone()));
         Self {
-            storage: MapSpanStorage {
-                spans: self.storage.spans.clone(),
-                ready: UnsafeCell::new(ready),
-            },
+            storage: SpanList::from_parts(self.storage.spans().clone(), ready),
         }
     }
 }
