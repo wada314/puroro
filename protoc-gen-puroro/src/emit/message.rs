@@ -87,11 +87,19 @@ pub(super) fn render_items(
     let merge_arms = render_merge_arms(&fields, companion);
     let validate_body = render_validate(&fields, companion);
     let apply_arms = super::lazy::render_apply_arms(&fields, companion);
-    let depth_arms = super::lazy::render_depth_arms(&fields, companion);
-    let depth_method = if depth_arms.is_empty() {
+    let depth = super::lazy::render_depth_arms(&fields, companion);
+    let depth_method = if depth.arms.is_empty() {
         quote! {}
     } else {
+        let depth_arms = &depth.arms;
+        let leaf_guard = depth.children.iter().map(|child| {
+            quote! {
+                && !<#child as ::puroro_rt::LazyRecordApply<A>>::READS_DEPTH_PAYLOAD
+            }
+        });
         quote! {
+            const READS_DEPTH_PAYLOAD: bool = true;
+
             fn check_message_depth(
                 payload: &[u8],
                 depth: usize,
@@ -100,6 +108,11 @@ pub(super) fn render_items(
                     return ::core::result::Result::Err(
                         ::puroro::DecodeError::RecursionLimitExceeded,
                     );
+                }
+                // Every child is a leaf, and one more level still fits: the
+                // payload cannot change the answer.
+                if depth + 1 < ::puroro::RECURSION_LIMIT #(#leaf_guard)* {
+                    return ::core::result::Result::Ok(());
                 }
                 ::puroro_rt::decode::for_each_len_field(payload, |number, body| {
                     match number {

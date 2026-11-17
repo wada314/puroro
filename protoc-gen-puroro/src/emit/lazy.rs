@@ -399,8 +399,17 @@ fn apply_arm(
 fn depth_check(fields: &Type) -> TokenStream {
     quote! {
         {
-            let body = span.slice(common.lazy.scan.wire())?;
-            <#fields as ::puroro_rt::LazyRecordApply<A>>::check_message_depth(body, depth + 1)?;
+            if <#fields as ::puroro_rt::LazyRecordApply<A>>::READS_DEPTH_PAYLOAD {
+                let body = span.slice(common.lazy.scan.wire())?;
+                <#fields as ::puroro_rt::LazyRecordApply<A>>::check_message_depth(
+                    body,
+                    depth + 1,
+                )?;
+            } else if depth + 1 >= ::puroro::RECURSION_LIMIT {
+                return ::core::result::Result::Err(
+                    ::puroro::DecodeError::RecursionLimitExceeded,
+                );
+            }
         }
     }
 }
@@ -413,17 +422,30 @@ fn map_apply_arm(
 ) -> TokenStream {
     let check = depth_fields.map(|fields| {
         quote! {
-            let entry = span.slice(common.lazy.scan.wire())?;
-            ::puroro_rt::decode::for_each_len_field(entry, |entry_field, value| {
-                if entry_field == 2 {
-                    <#fields as ::puroro_rt::LazyRecordApply<A>>::check_message_depth(
-                        value,
-                        depth + 1,
-                    )
-                } else {
-                    ::core::result::Result::Ok(())
-                }
-            })?;
+            if <#fields as ::puroro_rt::LazyRecordApply<A>>::READS_DEPTH_PAYLOAD {
+                let entry = span.slice(common.lazy.scan.wire())?;
+                ::puroro_rt::decode::for_each_len_field(entry, |entry_field, value| {
+                    if entry_field == 2 {
+                        <#fields as ::puroro_rt::LazyRecordApply<A>>::check_message_depth(
+                            value,
+                            depth + 1,
+                        )
+                    } else {
+                        ::core::result::Result::Ok(())
+                    }
+                })?;
+            } else if depth + 1 >= ::puroro::RECURSION_LIMIT {
+                let entry = span.slice(common.lazy.scan.wire())?;
+                ::puroro_rt::decode::for_each_len_field(entry, |entry_field, _value| {
+                    if entry_field == 2 {
+                        ::core::result::Result::Err(
+                            ::puroro::DecodeError::RecursionLimitExceeded,
+                        )
+                    } else {
+                        ::core::result::Result::Ok(())
+                    }
+                })?;
+            }
         }
     });
     quote! {
@@ -477,18 +499,27 @@ fn message_apply_arm(
 }
 
 /// Match arms for [`LazyRecordApply::check_message_depth`](puroro_rt::LazyRecordApply::check_message_depth).
-pub(super) fn render_depth_arms(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStream> {
+pub(super) struct DepthArms {
+    pub arms: Vec<TokenStream>,
+    /// Child field structs named by [`Self::arms`].
+    pub children: Vec<Type>,
+}
+
+pub(super) fn render_depth_arms(fields: &[FieldEmit], companion: &Ident) -> DepthArms {
     let mut arms = Vec::new();
+    let mut children = Vec::new();
     for field in fields {
         match field {
             FieldEmit::Singular(field) => push_depth_arm(
                 &mut arms,
+                &mut children,
                 field.message_apply.as_ref(),
                 &field.field_const,
                 companion,
             ),
             FieldEmit::Repeated(field) => push_depth_arm(
                 &mut arms,
+                &mut children,
                 field.message_apply.as_ref(),
                 &field.field_const,
                 companion,
@@ -497,6 +528,7 @@ pub(super) fn render_depth_arms(fields: &[FieldEmit], companion: &Ident) -> Vec<
                 for variant in &field.variants {
                     push_depth_arm(
                         &mut arms,
+                        &mut children,
                         variant.message_apply.as_ref(),
                         &variant.field_const,
                         companion,
@@ -506,14 +538,13 @@ pub(super) fn render_depth_arms(fields: &[FieldEmit], companion: &Ident) -> Vec<
             FieldEmit::Map(field) => {
                 if let Some(fields_ty) = &field.depth_fields {
                     let field_const = &field.field_const;
+                    let call = child_depth_call(fields_ty, quote! { value });
+                    children.push(fields_ty.clone());
                     arms.push(quote! {
                         #companion::#field_const => {
                             ::puroro_rt::decode::for_each_len_field(body, |entry_field, value| {
                                 if entry_field == 2 {
-                                    <#fields_ty as ::puroro_rt::LazyRecordApply<A>>::check_message_depth(
-                                        value,
-                                        depth + 1,
-                                    )
+                                    #call
                                 } else {
                                     ::core::result::Result::Ok(())
                                 }
@@ -524,11 +555,25 @@ pub(super) fn render_depth_arms(fields: &[FieldEmit], companion: &Ident) -> Vec<
             }
         }
     }
-    arms
+    DepthArms { arms, children }
+}
+
+/// `body` is the child LEN. A leaf child fails only when `depth + 1` is the limit.
+fn child_depth_call(fields: &Type, body: TokenStream) -> TokenStream {
+    quote! {
+        if <#fields as ::puroro_rt::LazyRecordApply<A>>::READS_DEPTH_PAYLOAD {
+            <#fields as ::puroro_rt::LazyRecordApply<A>>::check_message_depth(#body, depth + 1)
+        } else if depth + 1 >= ::puroro::RECURSION_LIMIT {
+            ::core::result::Result::Err(::puroro::DecodeError::RecursionLimitExceeded)
+        } else {
+            ::core::result::Result::Ok(())
+        }
+    }
 }
 
 fn push_depth_arm(
     arms: &mut Vec<TokenStream>,
+    children: &mut Vec<Type>,
     apply: Option<&MessageApply>,
     field_const: &Ident,
     companion: &Ident,
@@ -541,9 +586,11 @@ fn push_depth_arm(
         | MessageApply::EagerSingular(fields)
         | MessageApply::EagerRepeated(_, fields) => fields,
     };
+    let call = child_depth_call(fields, quote! { body });
+    children.push(fields.clone());
     arms.push(quote! {
         #companion::#field_const => {
-            <#fields as ::puroro_rt::LazyRecordApply<A>>::check_message_depth(body, depth + 1)
+            #call
         }
     });
 }

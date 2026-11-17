@@ -161,12 +161,25 @@ where
         depth: usize,
     ) -> Result<(), DecodeError>;
 
+    /// `true` when [`check_message_depth`](Self::check_message_depth) reads `payload`.
+    ///
+    /// The default is `false`: the message has no message fields, so the only
+    /// failure is `depth >= `[`RECURSION_LIMIT`]. A parent then checks
+    /// `depth + 1` and does not slice the child. An override sets this when a
+    /// field is a message or a map whose value is a message, including when
+    /// those children are themselves leaves — at `depth == RECURSION_LIMIT - 1`
+    /// the parent still has to see whether that field is present.
+    const READS_DEPTH_PAYLOAD: bool = false;
+
     /// Count nested message fields in `payload` at this message's `depth`.
     ///
     /// The default accepts a message with no nested messages. Override it when
     /// a field's LEN body is itself a message (or a map entry whose value is).
     /// `depth >= `[`RECURSION_LIMIT`] fails before the body is scanned,
-    /// matching eager [`MessageMerge`].
+    /// matching eager [`MessageMerge`]. When every child leaves
+    /// [`READS_DEPTH_PAYLOAD`](Self::READS_DEPTH_PAYLOAD) false, the override
+    /// still returns before walking `payload` unless `depth + 1` has reached
+    /// the limit.
     fn check_message_depth(payload: &[u8], depth: usize) -> Result<(), DecodeError> {
         let _ = payload;
         if depth >= RECURSION_LIMIT {

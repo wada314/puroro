@@ -1218,6 +1218,33 @@ fn encode_before_finish_is_unfinished() {
 }
 
 #[test]
+fn leaf_child_at_recursion_limit_is_rejected() {
+    let mut addr = Address::new();
+    addr.street_mut().set("Oak");
+    let mut bytes = Vec::new();
+    encode_message_field(FIELD_ASSIGNEE, &addr.encode_to_vec(), &mut bytes);
+
+    let mut at_limit = TaskLazy::new();
+    {
+        let mut cursor = bytes.as_slice();
+        let mut scoped = ScopedBuf::new(&mut cursor);
+        assert_eq!(
+            MessageMerge::merge_from_with_depth(&mut at_limit, &mut scoped, RECURSION_LIMIT - 1),
+            Err(DecodeError::RecursionLimitExceeded),
+        );
+    }
+
+    let mut under = TaskLazy::new();
+    {
+        let mut cursor = bytes.as_slice();
+        let mut scoped = ScopedBuf::new(&mut cursor);
+        MessageMerge::merge_from_with_depth(&mut under, &mut scoped, RECURSION_LIMIT - 2).unwrap();
+    }
+    let got = under.assignee().unwrap().expect("assignee present");
+    assert_eq!(got.street().unwrap().get(), "Oak");
+}
+
+#[test]
 fn merge_from_at_recursion_limit_is_rejected() {
     let mut bytes = Vec::new();
     encode_varint_field(
