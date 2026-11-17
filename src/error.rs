@@ -7,8 +7,8 @@
 //! message unknown-field set rather than aborting `merge_from`.
 //! [`DecodeError::UnrecognizedField`] aborts `merge_from` when the message
 //! bakes the reject policy.
-//! [`DecodeError::SizeLimitExceeded`] is the image of
-//! `protobuf_core::ProtobufError::SizeLimitExceeded`.
+//! [`DecodeError::SizeLimitExceeded`] reports a message or length-delimited
+//! payload larger than the allowed size.
 //!
 //! Encoding into a growing `Vec` / `BytesMut` is infallible, so there is no
 //! public encode error type.
@@ -70,19 +70,14 @@ pub enum DecodeError {
         /// Field number from the tag.
         field_number: u32,
     },
-    /// `protobuf-core` rejected a length for exceeding its cap.
+    /// A message or length-delimited payload is larger than the allowed size.
     ///
-    /// `value` is the rejected length in bytes. `limit` is
-    /// `MAX_MESSAGE_SIZE` for a top-level message budget or input slice, and
-    /// `MAX_STRING_SIZE` for every wire-type `Len` prefix (string, bytes,
-    /// embedded message, or packed repeated). A length above `u32::MAX` stays
-    /// [`InvalidVarint`](Self::InvalidVarint). A length within the cap whose
-    /// payload bytes are missing stays [`UnexpectedEof`](Self::UnexpectedEof).
-    ///
-    /// Message decode in this crate reads fields through `puroro-rt`'s slice
-    /// cursor, so [`Message::decode`](crate::Message::decode) does not produce
-    /// this variant. It is the [`From`] image of
-    /// `protobuf_core::ProtobufError::SizeLimitExceeded`.
+    /// `value` is the rejected length in bytes. `limit` is the cap for that
+    /// length: the top-level message cap, or the cap for a length-delimited
+    /// field (string, bytes, embedded message, or packed repeated). A length
+    /// above `u32::MAX` is [`InvalidVarint`](Self::InvalidVarint). A length
+    /// within the cap whose payload is missing is
+    /// [`UnexpectedEof`](Self::UnexpectedEof).
     SizeLimitExceeded {
         /// Rejected length in bytes.
         value: u64,
