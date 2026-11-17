@@ -188,20 +188,12 @@ impl<A: Allocator + Clone> RecordScanner<A> {
     pub fn push(&mut self, chunk: &[u8]) -> Result<AllocVec<ScannedRecord, A>, DecodeError> {
         // Only this function monomorphizes the record walk, so the trait stays
         // inside it. `[u8]` is one contiguous chunk; `TwoSlice` is leftover || chunk.
-        enum TryRecord {
-            NeedMore,
-            Done { rec: ScannedRecord },
-        }
-
-        enum TryVarint {
-            NeedMore,
-            Done { value: u64, len: usize },
-        }
-
+        // `Ok(None)` means the bytes so far are a legal prefix. `Err` is a
+        // malformed record.
         trait ScanSrc {
             fn len(&self) -> usize;
             fn copy_fixed<const N: usize>(&self, start: usize) -> Option<[u8; N]>;
-            fn try_varint(&self, start: usize) -> Result<TryVarint, DecodeError>;
+            fn try_varint(&self, start: usize) -> Result<Option<(u64, usize)>, DecodeError>;
         }
 
         impl ScanSrc for [u8] {
@@ -220,14 +212,11 @@ impl<A: Allocator + Clone> RecordScanner<A> {
             }
 
             #[inline(always)]
-            fn try_varint(&self, start: usize) -> Result<TryVarint, DecodeError> {
+            fn try_varint(&self, start: usize) -> Result<Option<(u64, usize)>, DecodeError> {
                 let Some(rest) = self.get(start..) else {
-                    return Ok(TryVarint::NeedMore);
+                    return Ok(None);
                 };
-                match super::varint::try_decode_varint_slice(rest)? {
-                    Some((value, len)) => Ok(TryVarint::Done { value, len }),
-                    None => Ok(TryVarint::NeedMore),
-                }
+                super::varint::try_decode_varint_slice(rest)
             }
         }
 
@@ -260,15 +249,15 @@ impl<A: Allocator + Clone> RecordScanner<A> {
                 Some(out)
             }
 
-            fn try_varint(&self, start: usize) -> Result<TryVarint, DecodeError> {
+            fn try_varint(&self, start: usize) -> Result<Option<(u64, usize)>, DecodeError> {
                 let mut value = 0u64;
                 for i in 0..MAX_VARINT_BYTES {
                     let Some(byte) = self.get(start + i) else {
-                        return Ok(TryVarint::NeedMore);
+                        return Ok(None);
                     };
                     value |= u64::from(byte & VARINT_PAYLOAD_MASK) << (7 * i);
                     if byte & VARINT_CONTINUATION_BIT == 0 {
-                        return Ok(TryVarint::Done { value, len: i + 1 });
+                        return Ok(Some((value, i + 1)));
                     }
                 }
                 Err(DecodeError::InvalidVarint)
@@ -279,16 +268,12 @@ impl<A: Allocator + Clone> RecordScanner<A> {
         fn try_record_at<S: ScanSrc + ?Sized>(
             src: &S,
             start: usize,
-        ) -> Result<TryRecord, DecodeError> {
+        ) -> Result<Option<ScannedRecord>, DecodeError> {
             if start >= src.len() {
-                return Ok(TryRecord::NeedMore);
+                return Ok(None);
             }
-            let TryVarint::Done {
-                value: raw_tag,
-                len: tag_len,
-            } = src.try_varint(start)?
-            else {
-                return Ok(TryRecord::NeedMore);
+            let Some((raw_tag, tag_len)) = src.try_varint(start)? else {
+                return Ok(None);
             };
             if raw_tag > u64::from(u32::MAX) {
                 return Err(DecodeError::InvalidVarint);
@@ -303,31 +288,27 @@ impl<A: Allocator + Clone> RecordScanner<A> {
 
             let body_at = start + tag_len;
             let (value, body_len) = match wire_type {
-                WireType::Varint => match src.try_varint(body_at)? {
-                    TryVarint::NeedMore => return Ok(TryRecord::NeedMore),
-                    TryVarint::Done { value, len } => {
-                        (ScannedValue::Varint(Varint::from_uint64(value)), len)
-                    }
-                },
+                WireType::Varint => {
+                    let Some((value, len)) = src.try_varint(body_at)? else {
+                        return Ok(None);
+                    };
+                    (ScannedValue::Varint(Varint::from_uint64(value)), len)
+                }
                 WireType::Int64 => {
                     let Some(bytes) = src.copy_fixed::<8>(body_at) else {
-                        return Ok(TryRecord::NeedMore);
+                        return Ok(None);
                     };
                     (ScannedValue::I64(bytes), 8)
                 }
                 WireType::Int32 => {
                     let Some(bytes) = src.copy_fixed::<4>(body_at) else {
-                        return Ok(TryRecord::NeedMore);
+                        return Ok(None);
                     };
                     (ScannedValue::I32(bytes), 4)
                 }
                 WireType::Len => {
-                    let TryVarint::Done {
-                        value: payload_len,
-                        len: len_len,
-                    } = src.try_varint(body_at)?
-                    else {
-                        return Ok(TryRecord::NeedMore);
+                    let Some((payload_len, len_len)) = src.try_varint(body_at)? else {
+                        return Ok(None);
                     };
                     let payload_len = payload_len as usize;
                     let body_len = len_len
@@ -335,29 +316,27 @@ impl<A: Allocator + Clone> RecordScanner<A> {
                         .ok_or(DecodeError::TruncatedMessage)?;
                     let payload_end = body_at + body_len;
                     if src.len() < payload_end {
-                        return Ok(TryRecord::NeedMore);
+                        return Ok(None);
                     }
                     (ScannedValue::Len { payload_len }, body_len)
                 }
                 WireType::SGroup | WireType::EGroup => unreachable!("rejected above"),
             };
 
-            Ok(TryRecord::Done {
-                rec: ScannedRecord {
-                    field_number,
-                    start,
-                    len: tag_len + body_len,
-                    tag_len,
-                    value,
-                },
-            })
+            Ok(Some(ScannedRecord {
+                field_number,
+                start,
+                len: tag_len + body_len,
+                tag_len,
+                value,
+            }))
         }
 
         let alloc = self.leftover.allocator().clone();
         let mut records = AllocVec::new_in(alloc);
         let mut pos = 0usize;
         if self.leftover.is_empty() {
-            while let TryRecord::Done { rec } = try_record_at(chunk, pos)? {
+            while let Some(rec) = try_record_at(chunk, pos)? {
                 pos += rec.len;
                 records.push(rec);
             }
@@ -372,7 +351,7 @@ impl<A: Allocator + Clone> RecordScanner<A> {
             head: &self.leftover,
             tail: chunk,
         };
-        while let TryRecord::Done { rec } = try_record_at(&src, pos)? {
+        while let Some(rec) = try_record_at(&src, pos)? {
             pos += rec.len;
             records.push(rec);
         }
