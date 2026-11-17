@@ -12,7 +12,7 @@ use ::protobuf_core::{
     FieldNumber, MAX_VARINT_BYTES, VARINT_CONTINUATION_BIT, VARINT_PAYLOAD_MASK, Varint,
 };
 use ::puroro::wire_type;
-use ::puroro::{DecodeError, ScopedBuf, WireType};
+use ::puroro::{DecodeError, WireType};
 
 /// Byte range of one field payload inside a parent `_wire` buffer.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -119,19 +119,6 @@ impl ScannedRecord {
             len: payload_len,
         })
     }
-
-    /// Tag-stripped field body in `_wire` (length prefix included for LEN).
-    pub fn body_slice<'a>(&self, origin: usize, wire: &'a [u8]) -> Result<&'a [u8], DecodeError> {
-        let start = origin
-            .checked_add(self.start)
-            .and_then(|s| s.checked_add(self.tag_len))
-            .ok_or(DecodeError::TruncatedMessage)?;
-        let end = origin
-            .checked_add(self.start)
-            .and_then(|s| s.checked_add(self.len))
-            .ok_or(DecodeError::TruncatedMessage)?;
-        wire.get(start..end).ok_or(DecodeError::TruncatedMessage)
-    }
 }
 
 /// Leftover-holding scanner over vectored / chunked input.
@@ -207,48 +194,6 @@ impl<A: Allocator + Clone> RecordScanner<A> {
         }
         keep_unparsed_tail(&mut self.leftover, chunk, pos);
         Ok(records)
-    }
-}
-
-/// Feeds a scanned record into catalog `merge` by reconstructing a wire body.
-///
-/// Generated lazy apply does **not** use this for numerics — those go through
-/// catalog `merge_scanned` / `CopyWirePayload::from_scanned`.
-/// Numerics here still re-encode the small value (tests / leftover callers).
-/// LEN / packed slices `wire` after the tag (length prefix included).
-/// Pass a [`SharedWire`](super::shared_wire::SharedWire) handle slice, not
-/// `scan.wire()`, when `merge` also mutates the message that owns the scan.
-pub fn merge_scanned_field<F>(
-    rec: &ScannedRecord,
-    wire: &[u8],
-    origin: usize,
-    merge: F,
-) -> Result<(), DecodeError>
-where
-    F: FnOnce(WireType, &mut ScopedBuf<'_, &[u8]>) -> Result<(), DecodeError>,
-{
-    match rec.value {
-        ScannedValue::Varint(v) => {
-            let (bytes, n) = v.encode();
-            let mut slice = &bytes[..n];
-            let mut scoped = ScopedBuf::new(&mut slice);
-            merge(WireType::Varint, &mut scoped)
-        }
-        ScannedValue::I32(bytes) => {
-            let mut slice = bytes.as_slice();
-            let mut scoped = ScopedBuf::new(&mut slice);
-            merge(WireType::Int32, &mut scoped)
-        }
-        ScannedValue::I64(bytes) => {
-            let mut slice = bytes.as_slice();
-            let mut scoped = ScopedBuf::new(&mut slice);
-            merge(WireType::Int64, &mut scoped)
-        }
-        ScannedValue::Len { .. } => {
-            let mut slice = rec.body_slice(origin, wire)?;
-            let mut scoped = ScopedBuf::new(&mut slice);
-            merge(WireType::Len, &mut scoped)
-        }
     }
 }
 
@@ -522,16 +467,6 @@ mod tests {
         assert_eq!(recs[0].value, ScannedValue::Len { payload_len: 5 });
         let span = scanned_len_span(0, &recs[0]).unwrap();
         assert_eq!(&wire[span.offset..span.offset + span.len], b"hello");
-        merge_scanned_field(&recs[0], &wire, 0, |wt, buf| {
-            assert_eq!(wt, WireType::Len);
-            let n = ::bytes::Buf::remaining(buf);
-            let mut body = vec![0u8; n];
-            ::bytes::Buf::copy_to_slice(buf, &mut body);
-            assert_eq!(body[0], 5);
-            assert_eq!(&body[1..], b"hello");
-            Ok(())
-        })
-        .unwrap();
     }
 
     #[test]
