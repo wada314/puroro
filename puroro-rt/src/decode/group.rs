@@ -8,12 +8,15 @@
 //! [`measure_group`] reports byte ranges for the scanner and the unknown-field
 //! iterator. [`skip_group`] and [`copy_group`] advance a [`Buf`](bytes::Buf).
 //! Copying writes the raw interior and the end tag. It does not re-encode
-//! fields. Known-field group encoding is a separate path and panics.
+//! fields. [`read_group_body`] hands the interior to a known-field parser.
+//! Known-field encoding is [`crate::fields::wire::encode_type::encode_field`]
+//! for [`crate::ProtoGroup`].
 
 use ::bytes::Buf;
 use ::protobuf_core::{FieldNumber, MAX_VARINT_BYTES};
 use ::puroro::wire_type;
 use ::puroro::{DecodeError, RECURSION_LIMIT, WireType};
+use ::std::vec::Vec;
 
 /// Byte sizes of one group after its start tag has been consumed.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -126,7 +129,7 @@ pub(crate) fn skip_group<B: Buf>(
     field_number: FieldNumber,
     buf: &mut B,
 ) -> Result<(), DecodeError> {
-    walk_group(field_number, buf, |_| {})
+    walk_group(field_number, buf, false, |_| {})
 }
 
 /// Copies one group body and its matching end tag into `emit`.
@@ -138,12 +141,64 @@ pub(crate) fn copy_group<B: Buf>(
     buf: &mut B,
     emit: impl FnMut(&[u8]),
 ) -> Result<(), DecodeError> {
-    walk_group(field_number, buf, emit)
+    walk_group(field_number, buf, true, emit)
+}
+
+/// Copies one group body into `emit`, excluding the matching end tag.
+///
+/// The start tag is already consumed and is not copied. `emit` must copy the
+/// bytes. The slice is borrowed from `buf`'s current chunk.
+pub(crate) fn copy_group_body<B: Buf>(
+    field_number: FieldNumber,
+    buf: &mut B,
+    emit: impl FnMut(&[u8]),
+) -> Result<(), DecodeError> {
+    walk_group(field_number, buf, false, emit)
+}
+
+/// Reads one known group and passes the interior to `read`.
+///
+/// The start tag is already consumed. `field` is that start-group's field
+/// number; the matching end-group must use it. A wire type other than
+/// [`WireType::SGroup`] is [`DecodeError::InvalidTag`] and consumes nothing.
+///
+/// When the group finishes inside [`Buf::chunk`], `read` sees that subslice
+/// and this function then advances past the end tag. An error from `read`
+/// still advances. A group that continues into a later chunk is copied, then
+/// `read` sees the owned interior. A group that ends before the buffer does
+/// is [`DecodeError::TruncatedMessage`] and consumes nothing when the whole
+/// remainder is one chunk.
+pub(crate) fn read_group_body<B, T, F>(
+    buf: &mut B,
+    wire_type: WireType,
+    field: FieldNumber,
+    read: F,
+) -> Result<T, DecodeError>
+where
+    B: Buf,
+    F: FnOnce(&[u8]) -> Result<T, DecodeError>,
+{
+    if wire_type != WireType::SGroup {
+        return Err(DecodeError::InvalidTag);
+    }
+    let chunk_len = buf.chunk().len();
+    if let Some(frame) = measure_group(chunk_len, |i| buf.chunk().get(i).copied(), 0, field)? {
+        let decoded = read(&buf.chunk()[..frame.body_len]);
+        buf.advance(frame.consumed);
+        return decoded;
+    }
+    if buf.remaining() == chunk_len {
+        return Err(DecodeError::TruncatedMessage);
+    }
+    let mut body = Vec::new();
+    copy_group_body(field, buf, |bytes| body.extend_from_slice(bytes))?;
+    read(&body)
 }
 
 fn walk_group<B: Buf>(
     field_number: FieldNumber,
     buf: &mut B,
+    include_end: bool,
     mut emit: impl FnMut(&[u8]),
 ) -> Result<(), DecodeError> {
     let mut groups = OpenGroups::new(field_number.as_u32());
@@ -155,10 +210,13 @@ fn walk_group<B: Buf>(
         let (tag, raw) = super::decode_varint_with_raw(buf, &mut scratch)?;
         let (number, wire) = split_tag(tag.to_uint64())?;
         let closed = groups.on_tag(number, wire)?;
-        emit(raw);
         if closed {
+            if include_end {
+                emit(raw);
+            }
             return Ok(());
         }
+        emit(raw);
         match wire {
             WireType::SGroup | WireType::EGroup => {}
             WireType::Varint => {

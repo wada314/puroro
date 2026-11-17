@@ -12,6 +12,7 @@
 pub(crate) mod encode_type;
 pub(crate) mod len;
 pub(crate) mod numerical;
+pub(crate) mod proto_group;
 pub(crate) mod proto_message;
 pub(crate) mod proto_ref_ops;
 pub(crate) mod repeated_element;
@@ -28,6 +29,7 @@ pub use numerical::{
     ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoInt32, ProtoInt64, ProtoSFixed32, ProtoSFixed64,
     ProtoSInt32, ProtoSInt64, ProtoUInt32, ProtoUInt64,
 };
+pub use proto_group::ProtoGroup;
 pub use proto_message::ProtoMessage;
 pub use repeated_element::RepeatedElement;
 pub use singular_type::{PayloadAccess, SingularType};

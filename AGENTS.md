@@ -62,6 +62,10 @@ Fix new fmt/clippy issues. Do not silence lints unless this repo already does fo
 - New submodules use `foo.rs`, not `foo/mod.rs`.
 - In `quote!`, interpolations must be simple `#ident` (bind expressions first).
 
+## Groups
+
+Unknown `SGroup` is preserved, skipped, or rejected through the matching `EGroup`. A known group is `ProtoGroup<M>`: merge the child from the consumed start tag until that field number's end tag, and encode start tag + body + end tag with no length prefix. `protoc-gen-puroro` still rejects `TYPE_GROUP` and `message_encoding=DELIMITED`. Lazy `merge_shared` does not record group spans yet.
+
 ## Unknown-field reject
 
 `(puroro.unknown_fields) = REJECT` fails decode on an unrecognized field number (`DecodeError::UnrecognizedField`). That is outside the protobuf spec. A conforming parser accepts the tag and preserves the bytes; the default preserve store is that behavior. Do not describe reject as conformant, and do not change it to preserve in order to match the spec. Closed-enum unknowns still divert and, with no store, are dropped. Public wording: [`DESIGN.md` §4.9](DESIGN.md#49-unknown-fields).

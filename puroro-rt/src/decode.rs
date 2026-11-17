@@ -14,6 +14,8 @@ mod varint;
 
 pub use self::slice_cursor::{SliceCursor, contiguous_remaining};
 
+pub(crate) use group::read_group_body;
+
 pub use self::lazy_scan::{Eager, Lazy, LazyMessage, LazyScan, MessageScan};
 pub use self::record::{
     RecordScanner, ScannedRecord, ScannedValue, WireSpan, for_each_len_field,

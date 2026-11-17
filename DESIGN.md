@@ -70,7 +70,7 @@ The puroro project comprises several crates and tools with distinct roles:
 |---|---|---|
 | `utf8_validation` (`VERIFY` / `NONE`) | Generated decode paths honour the per-field Editions setting. `NONE` uses bytes views (`&[u8]`), not `&str`. `VERIFY` failure is `DecodeError::InvalidUtf8` and is not diverted into unknown fields. | **Done** — `ProtoString` (`VERIFY`, `&str`) vs `ProtoStringUnchecked` (`NONE`, `&[u8]`). proto2 default is `NONE`; overlay with `proto2_utf8=verify`. Eager merge fails immediately; lazy checks on the getter ([eager / lazy gaps](#eager-and-lazy-semantic-gaps)). |
 | Recursion limit | Eager nested-message merge caps its call stack; excess depth → `DecodeError::RecursionLimitExceeded`. This is not a wire-format maximum. | **Done for eager** — `puroro_rt::MessageMerge::merge_from_with_depth` + `RECURSION_LIMIT` (100); user `Message::merge_from` wraps `merge_message` at depth 0. Nested eager catalog paths pass `depth + 1`. Lazy ingest does not count nesting. |
-| Deprecated groups (`SGroup` / `EGroup`) | Not generated. Unknown start-groups are preserved (raw bytes through the matching end-group). Known group fields are not parsed yet. The encoder does not emit groups. | Unknown groups round-trip on the preserve path. A mismatched end-group is `DecodeError::MismatchedEndGroup`. A bare end-group is `DecodeError::InvalidTag`. |
+| Deprecated groups (`SGroup` / `EGroup`) | Not generated. Unknown start-groups are preserved (raw bytes through the matching end-group). A hand-written `ProtoGroup<M>` merges and encodes a known group. | Unknown groups round-trip on the preserve path. A mismatched end-group is `DecodeError::MismatchedEndGroup`. A bare end-group is `DecodeError::InvalidTag`. |
 
 ---
 
@@ -1362,7 +1362,7 @@ puroro is a greenfield design. Generated types, trait names, and module layout a
 
 ### Deprecated group wire types
 
-Groups (`SGroup` / `EGroup`) are not generated. Unknown start-groups are stored with the other unknown fields and round-trip as raw bytes. Known group fields are not parsed yet. The encoder does not emit group tags; the generated encode path panics if a group wire type is reached. A mismatched end-group is `DecodeError::MismatchedEndGroup`. A bare end-group is `DecodeError::InvalidTag`.
+Groups (`SGroup` / `EGroup`) are not generated. Unknown start-groups are stored with the other unknown fields and round-trip as raw bytes. A known group is the runtime marker `ProtoGroup<M>`: merge reads from the already-consumed start tag through the matching end tag, and encode writes the start tag, the child body, and the end tag, with no length prefix. Codegen still rejects `TYPE_GROUP` and `message_encoding=DELIMITED`. Lazy span apply does not record group bodies yet. A mismatched end-group is `DecodeError::MismatchedEndGroup`. A bare end-group is `DecodeError::InvalidTag`. An end-group wire type on `encode_field` panics.
 
 ### Module layout: package-first, rename when needed
 

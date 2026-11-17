@@ -114,7 +114,13 @@ where
             }
         };
         match field_number.as_u32() {
-            KEY_FIELD => match K::decode_element(wire_type, buf, alloc.clone(), depth) {
+            KEY_FIELD => match K::decode_element(
+                wire_type,
+                buf,
+                alloc.clone(),
+                depth,
+                field_number_const::<KEY_FIELD>(),
+            ) {
                 Ok(next) => {
                     if let Some(old) = key.replace(next) {
                         // SAFETY: message allocator owns replaced key payloads.
@@ -126,7 +132,13 @@ where
                     return Err(e);
                 }
             },
-            VALUE_FIELD => match V::decode_element(wire_type, buf, alloc.clone(), depth) {
+            VALUE_FIELD => match V::decode_element(
+                wire_type,
+                buf,
+                alloc.clone(),
+                depth,
+                field_number_const::<VALUE_FIELD>(),
+            ) {
                 Ok(next) => {
                     if let Some(old) = value.replace(next) {
                         // SAFETY: message allocator owns replaced value payloads.

@@ -55,9 +55,9 @@ pub use fields::slot_index::{BindField, BindFieldMut, HasField, OneofFieldMut, O
 pub use fields::wire::{
     Closed, ClosedEnum, INLINE_CAP, LazyBytesSlot, LazyStringSlot, Open, OpenEnum, PayloadAccess,
     ProtoBool, ProtoBytes, ProtoDouble, ProtoEnum, ProtoEnumStorage, ProtoFixed32, ProtoFixed64,
-    ProtoFloat, ProtoInt32, ProtoInt64, ProtoMessage, ProtoSFixed32, ProtoSFixed64, ProtoSInt32,
-    ProtoSInt64, ProtoString, ProtoStringUnchecked, ProtoUInt32, ProtoUInt64, SingularType,
-    SsoBytes, SsoBytesMut, SsoString, SsoStringMut, WireOrSsoKind, WireOrSsoSlot,
+    ProtoFloat, ProtoGroup, ProtoInt32, ProtoInt64, ProtoMessage, ProtoSFixed32, ProtoSFixed64,
+    ProtoSInt32, ProtoSInt64, ProtoString, ProtoStringUnchecked, ProtoUInt32, ProtoUInt64,
+    SingularType, SsoBytes, SsoBytesMut, SsoString, SsoStringMut, WireOrSsoKind, WireOrSsoSlot,
 };
 pub use message_encode::{EncodeCtx, MessageEncode, encode_message, encode_message_to_vec};
 pub use message_merge::{MessageMerge, merge_message};
