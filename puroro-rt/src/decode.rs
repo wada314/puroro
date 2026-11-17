@@ -29,7 +29,7 @@ use ::allocator_api2::alloc::Allocator;
 use ::bytes::Buf;
 use ::protobuf_core::{FieldNumber, Varint};
 use ::puroro::wire_type;
-use ::puroro::{DecodeError, UnknownField, UnknownPayload, WireType};
+use ::puroro::{DecodeBuf, DecodeError, UnknownField, UnknownPayload, WireType};
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
 use crate::unknown_fields::{UnknownFields, UnknownStore};
@@ -100,6 +100,55 @@ pub(crate) fn decode_string_in<B: Buf, A: Allocator + Clone>(
             Err(DecodeError::InvalidUtf8)
         }
     }
+}
+
+/// One length-delimited body, either a contiguous slice or a limited reader.
+///
+/// [`read_len_body`] advances the outer buffer after [`LenBody::Slice`] returns.
+/// [`LenBody::Limited`] is already scoped; its limit pops when the reader returns.
+pub(crate) enum LenBody<'a, B: ?Sized> {
+    /// `buf.chunk()` held the whole body. The outer buffer is not advanced yet.
+    Slice(&'a [u8]),
+    /// The body spans chunks. Reads stay inside the LEN length.
+    Limited(&'a mut B),
+}
+
+/// Reads one LEN body and passes it to `read`.
+///
+/// A wire type other than [`WireType::Len`] is [`DecodeError::InvalidTag`] and
+/// consumes nothing. The length varint is consumed before the remaining-length
+/// check, so [`DecodeError::TruncatedMessage`] leaves that varint behind.
+///
+/// On the contiguous path, `read` runs against [`LenBody::Slice`], then this
+/// function advances `len` bytes and returns that result. An `Err` from `read`
+/// still advances. On the split path, `read` runs against [`LenBody::Limited`].
+#[inline]
+pub(crate) fn read_len_body<B, T, F>(
+    buf: &mut B,
+    wire_type: WireType,
+    read: F,
+) -> Result<T, DecodeError>
+where
+    B: DecodeBuf,
+    F: FnOnce(LenBody<'_, B>) -> Result<T, DecodeError>,
+{
+    if wire_type != WireType::Len {
+        return Err(DecodeError::InvalidTag);
+    }
+    let len = decode_varint(buf)? as usize;
+    if buf.remaining() < len {
+        return Err(DecodeError::TruncatedMessage);
+    }
+    if buf.chunk().len() >= len {
+        let decoded = {
+            let payload = &buf.chunk()[..len];
+            read(LenBody::Slice(payload))
+        };
+        buf.advance(len);
+        return decoded;
+    }
+    let mut guard = buf.push_limit_guard(len)?;
+    read(LenBody::Limited(&mut *guard))
 }
 
 /// Skips one field payload for `wire_type` without preserving unknowns.
@@ -324,5 +373,126 @@ impl<'a> Iterator for UnknownFieldsIter<'a> {
 
         self.rest = buf;
         Some(UnknownField::new(number, payload))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{LenBody, read_len_body};
+    use ::bytes::Buf;
+    use ::puroro::{DecodeError, ScopedBuf, WireType};
+
+    /// [`Buf`] whose [`chunk`](Buf::chunk) is at most `max_chunk` bytes.
+    struct Chunked<'a> {
+        rest: &'a [u8],
+        max_chunk: usize,
+    }
+
+    impl Buf for Chunked<'_> {
+        fn remaining(&self) -> usize {
+            self.rest.len()
+        }
+
+        fn chunk(&self) -> &[u8] {
+            let n = self.max_chunk.min(self.rest.len());
+            &self.rest[..n]
+        }
+
+        fn advance(&mut self, cnt: usize) {
+            self.rest = &self.rest[cnt..];
+        }
+    }
+
+    /// Length 3, body `AA BB CC`, trailing `DD`.
+    const LEN3: [u8; 5] = [0x03, 0xAA, 0xBB, 0xCC, 0xDD];
+
+    #[test]
+    fn non_len_consumes_nothing() {
+        let mut inner = Chunked {
+            rest: &LEN3,
+            max_chunk: 8,
+        };
+        let mut buf = ScopedBuf::new(&mut inner);
+        let err = read_len_body(&mut buf, WireType::Varint, |_| -> Result<(), DecodeError> {
+            panic!("reader must not run")
+        })
+        .unwrap_err();
+        assert_eq!(err, DecodeError::InvalidTag);
+        assert_eq!(buf.chunk(), &LEN3);
+    }
+
+    #[test]
+    fn truncated_length_consumes_only_the_varint() {
+        let data = [0x05, 0x01, 0x02];
+        let mut inner = Chunked {
+            rest: &data,
+            max_chunk: 8,
+        };
+        let mut buf = ScopedBuf::new(&mut inner);
+        let err = read_len_body(&mut buf, WireType::Len, |_| -> Result<(), DecodeError> {
+            panic!("reader must not run")
+        })
+        .unwrap_err();
+        assert_eq!(err, DecodeError::TruncatedMessage);
+        assert_eq!(buf.chunk(), &[0x01, 0x02]);
+    }
+
+    #[test]
+    fn contiguous_body_is_a_slice_and_advances_on_error() {
+        let mut inner = Chunked {
+            rest: &LEN3,
+            max_chunk: 8,
+        };
+        let mut buf = ScopedBuf::new(&mut inner);
+        let err = read_len_body(&mut buf, WireType::Len, |body| -> Result<(), DecodeError> {
+            match body {
+                LenBody::Slice(payload) => {
+                    assert_eq!(payload, &[0xAA, 0xBB, 0xCC]);
+                    Err(DecodeError::InvalidUtf8)
+                }
+                LenBody::Limited(_) => panic!("contiguous body took the limit path"),
+            }
+        })
+        .unwrap_err();
+        assert_eq!(err, DecodeError::InvalidUtf8);
+        assert_eq!(buf.chunk(), &[0xDD]);
+    }
+
+    #[test]
+    fn empty_body_is_an_empty_slice() {
+        let data = [0x00, 0x7F];
+        let mut inner = Chunked {
+            rest: &data,
+            max_chunk: 8,
+        };
+        let mut buf = ScopedBuf::new(&mut inner);
+        let payload = read_len_body(&mut buf, WireType::Len, |body| match body {
+            LenBody::Slice(payload) => Ok(payload.to_vec()),
+            LenBody::Limited(_) => panic!("empty body took the limit path"),
+        })
+        .unwrap();
+        assert_eq!(payload, Vec::<u8>::new());
+        assert_eq!(buf.chunk(), &[0x7F]);
+    }
+
+    #[test]
+    fn split_body_is_limited_and_unread_bytes_are_skipped() {
+        let mut inner = Chunked {
+            rest: &LEN3,
+            max_chunk: 1,
+        };
+        let mut buf = ScopedBuf::new(&mut inner);
+        let first = read_len_body(&mut buf, WireType::Len, |body| match body {
+            LenBody::Slice(_) => panic!("split body took the slice path"),
+            LenBody::Limited(limited) => {
+                assert_eq!(limited.remaining(), 3);
+                assert_eq!(limited.chunk(), &[0xAA]);
+                limited.advance(1);
+                Ok(limited.chunk()[0])
+            }
+        })
+        .unwrap();
+        assert_eq!(first, 0xBB);
+        assert_eq!(buf.chunk(), &[0xDD]);
     }
 }
