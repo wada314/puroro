@@ -217,7 +217,7 @@ Live plugin emits both messages for every message (`Name` / `NameLazy`, each a n
 | [`decode/lazy_scan.rs`](puroro-rt/src/decode/lazy_scan.rs) | `Eager` / `Lazy<A>` / `MessageScan` / `LazyScan` / `LazyMessage` |
 | [`decode/record.rs`](puroro-rt/src/decode/record.rs) | `RecordScanner` / `ScannedRecord` / `ScannedValue` (numerics use catalog `merge_scanned`) |
 | [`decode/shared_wire.rs`](puroro-rt/src/decode/shared_wire.rs) | `SharedWire` — lazy ingested blob (`bytes::Bytes` + `A`) |
-| [`decode/varint.rs`](puroro-rt/src/decode/varint.rs) | Pluggable `VarintDecoder` / chunked varint scan. `decode_varint_with_raw()` also returns the consumed wire bytes |
+| [`decode/varint.rs`](puroro-rt/src/decode/varint.rs) | Pluggable `VarintDecoder` / chunked varint scan. `decode_varint_with_raw()` is the production read; `decode_varint()` calls it and drops the wire bytes |
 
 The table above is the `fields/` catalog plus the encode/decode modules that generated messages call. Lazy ingest behaviour is specified in [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing) and locked in [`.cursor/plans/lazy-decoder.md`](.cursor/plans/lazy-decoder.md); Parts II–IV below describe the **eager** catalog path unless noted.
 

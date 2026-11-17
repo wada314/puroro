@@ -1,10 +1,9 @@
 //! Pluggable varint decoders for production and microbenchmarks.
 //!
-//! [`super::decode_varint`] uses [`ChunkScanHot4`]; [`super::decode_tag`] uses
-//! [`super::decode_varint_with`] with [`ChunkScanLikely1`]. Benches monomorphize
-//! over [`VarintDecoder`] impls to compare algorithms without runtime dispatch.
-//! [`decode_varint_with_raw`] calls [`super::decode_varint`] and records the
-//! bytes that call consumes.
+//! [`decode_varint_with_raw`] is the production read. It runs [`ChunkScanHot4`]
+//! and keeps the consumed wire bytes. [`super::decode_varint`] calls that and
+//! drops the bytes. [`super::decode_tag`] uses [`super::decode_varint_with`]
+//! with [`ChunkScanLikely1`]. Benches monomorphize over [`VarintDecoder`].
 
 use ::bytes::Buf;
 use ::protobuf_core::{MAX_VARINT_BYTES, VARINT_CONTINUATION_BIT, VARINT_PAYLOAD_MASK, Varint};
@@ -104,7 +103,7 @@ fn decode_varint_byte_iterator<B: Buf>(buf: &mut B) -> Result<u64, DecodeError> 
     finish_varint_bytewise(buf, 0, 0, 0)
 }
 
-/// Copies bytes out of `inner` as [`super::decode_varint`] advances.
+/// Copies bytes out of `inner` as [`ChunkScanHot4`] advances.
 struct RecordingBuf<'a, B> {
     inner: &'a mut B,
     raw: &'a mut [u8; MAX_VARINT_BYTES],
@@ -136,8 +135,8 @@ impl<B: Buf> Buf for RecordingBuf<'_, B> {
 
 /// Body of [`super::decode_varint_with_raw`].
 ///
-/// The value comes from [`super::decode_varint`]. `raw` receives the bytes
-/// that call consumed, including a non-canonical encoding.
+/// `raw` receives the bytes [`ChunkScanHot4`] consumed, including a
+/// non-canonical encoding. [`super::decode_varint`] calls this and drops them.
 #[inline]
 pub(crate) fn decode_varint_with_raw<'a, B: Buf>(
     buf: &mut B,
@@ -149,7 +148,7 @@ pub(crate) fn decode_varint_with_raw<'a, B: Buf>(
             raw,
             n: 0,
         };
-        let value = super::decode_varint(&mut rec)?;
+        let value = ChunkScanHot4::decode_varint(&mut rec)?;
         (value, rec.n)
     };
     Ok((Varint::from_uint64(value), &raw[..n]))

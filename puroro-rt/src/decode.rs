@@ -1,10 +1,9 @@
 //! Wire-format decoding helpers used by generated field types.
 //!
-//! Varint decoding is pluggable via [`VarintDecoder`]. [`decode_varint`] uses
-//! [`ChunkScanHot4`]; [`decode_tag`] uses [`decode_varint_with`] with
-//! [`ChunkScanLikely1`]. [`decode_varint_with_raw`] also returns the wire bytes
-//! just consumed. Tags are unpacked here into a validated [`FieldNumber`]
-//! plus [`WireType`].
+//! [`decode_varint_with_raw`] is the production varint read ([`ChunkScanHot4`]).
+//! [`decode_varint`] calls it and drops the wire bytes. [`decode_tag`] uses
+//! [`decode_varint_with`] with [`ChunkScanLikely1`]. Tags are unpacked here
+//! into a validated [`FieldNumber`] plus [`WireType`].
 
 mod group;
 mod lazy_scan;
@@ -38,10 +37,27 @@ use crate::unknown_fields::{UnknownFields, UnknownStore};
 
 use crate::encode;
 
-/// Decodes a base-128 varint from `buf` with [`ChunkScanHot4`].
+/// Decodes a base-128 varint and returns the decoded value plus its wire bytes.
+///
+/// This is the production read ([`ChunkScanHot4`]). [`decode_varint`] calls it
+/// and drops the slice. `raw` is scratch. The returned slice borrows it and is
+/// the exact encoding consumed, including a non-canonical one.
+#[inline]
+pub fn decode_varint_with_raw<'a, B: Buf>(
+    buf: &mut B,
+    raw: &'a mut [u8; MAX_VARINT_BYTES],
+) -> Result<(Varint, &'a [u8]), DecodeError> {
+    self::varint::decode_varint_with_raw(buf, raw)
+}
+
+/// Decodes a base-128 varint from `buf`.
+///
+/// Calls [`decode_varint_with_raw`] and drops the wire bytes. The `u64` is
+/// [`Varint::to_uint64`] of the decoded value.
 #[inline]
 pub fn decode_varint<B: Buf>(buf: &mut B) -> Result<u64, DecodeError> {
-    decode_varint_with::<ChunkScanHot4, _>(buf)
+    let mut raw = [0u8; MAX_VARINT_BYTES];
+    Ok(decode_varint_with_raw(buf, &mut raw)?.0.to_uint64())
 }
 
 /// Decodes a base-128 varint from `buf` using algorithm `D`.
@@ -51,20 +67,6 @@ pub fn decode_varint<B: Buf>(buf: &mut B) -> Result<u64, DecodeError> {
 #[inline]
 pub fn decode_varint_with<D: VarintDecoder, B: Buf>(buf: &mut B) -> Result<u64, DecodeError> {
     D::decode_varint(buf)
-}
-
-/// Decodes a base-128 varint and returns the decoded value plus its wire bytes.
-///
-/// The value is [`decode_varint`]. `raw` is scratch and receives the bytes
-/// that call consumed, including a non-canonical encoding. The returned slice
-/// borrows `raw`. The [`Varint`] is `decode_varint`'s `u64` via
-/// [`Varint::from_uint64`].
-#[inline]
-pub fn decode_varint_with_raw<'a, B: Buf>(
-    buf: &mut B,
-    raw: &'a mut [u8; MAX_VARINT_BYTES],
-) -> Result<(Varint, &'a [u8]), DecodeError> {
-    self::varint::decode_varint_with_raw(buf, raw)
 }
 
 /// Decodes a tag and returns `(field_number, wire_type)`.
