@@ -11,8 +11,8 @@ Updated (2026-10-19): `RecordScanner` emits [`ScannedRecord`](../../puroro-rt/sr
 / [`ScannedValue`](../../puroro-rt/src/decode/record.rs). LEN is `payload_len`
 only; callers slice `_wire`. Do not rebuild `protobuf_core::Field` with an
 owned LEN `AllocVec`. Numerical apply uses catalog `merge_scanned` /
-`CopyWirePayload::from_scanned`. Do not rematch `Varint` / `I32` / `I64`
-through `merge_scanned_field` (re-encode then catalog `merge`). Packed LEN
+`CopyWirePayload::from_scanned`. Do not re-encode a scanned `Varint` / `I32` /
+`I64` into a wire body and merge that. Packed LEN
 uses `payload_len` / `len_span` and `merge_packed_buf` — do not re-read the
 length prefix via `merge(WireType::Len)`. Inner bodies were not scanned.
 
@@ -271,7 +271,8 @@ Tests: last-wins scalar, implicit zero, packed + expanded mixed, truncated
 input, second `merge_from` of a complete message (real protobuf merge).
 
 Done (2026-09-06): `TaskLazy` + `RecordScanner` + catalog `merge` via
-`merge_scanned_field`. LEN / map / nested / oneof skipped. Getters require
+`merge_scanned_field` (later removed; numerics use `merge_scanned`).
+LEN / map / nested / oneof skipped. Getters require
 `finish` (`UnfinishedMessage` / `TruncatedMessage`).
 
 ### Step 4 — LEN as offset, decode every get (no union)

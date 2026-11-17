@@ -18,17 +18,17 @@ pub(super) enum LenAccess {
 
 /// How a lazy parent records one message LEN.
 ///
-/// Singular and repeated differ in the slot method (`&mut` merge vs append),
-/// so each shape is its own variant. An eager repeated child names the type
-/// used to construct one value per LEN.
+/// A child that implements `LazyMessage` stores the span with `merge_shared`,
+/// whether the slot is singular, repeated, or a oneof variant. Eager singular
+/// and eager repeated still differ: the latter names the type used to
+/// construct one value per LEN.
 #[derive(Clone)]
 pub(super) enum MessageApply {
-    /// Singular or oneof child implements `LazyMessage`.
+    /// Child implements `LazyMessage`.
     ///
     /// The type is `ChildFields<A, Lazy<A>>`, used to count nesting.
-    SharedSingular(Type),
-    /// Repeated child implements `LazyMessage`.
-    SharedRepeated(Type),
+    /// Singular, repeated, and oneof all call `merge_shared`.
+    Shared(Type),
     /// Singular or oneof child is the eager type. Decode the LEN into the slot.
     ///
     /// The type is still the lazy field struct, so a lazy parent can count

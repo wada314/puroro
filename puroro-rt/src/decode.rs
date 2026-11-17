@@ -15,8 +15,8 @@ pub use self::slice_cursor::{SliceCursor, contiguous_remaining};
 
 pub use self::lazy_scan::{Eager, Lazy, LazyMessage, LazyScan, MessageScan};
 pub use self::record::{
-    RecordScanner, ScannedRecord, ScannedValue, WireSpan, for_each_len_field, merge_scanned_field,
-    scanned_len_payload, scanned_len_span, scanned_record_span,
+    RecordScanner, ScannedRecord, ScannedValue, WireSpan, for_each_len_field, scanned_len_payload,
+    scanned_len_span, scanned_record_span,
 };
 pub use self::shared_wire::SharedWire;
 pub use self::varint::{
