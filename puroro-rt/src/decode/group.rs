@@ -159,8 +159,8 @@ pub(crate) fn copy_group_body<B: Buf>(
 /// Reads one known group and passes the interior to `read`.
 ///
 /// The start tag is already consumed. `field` is that start-group's field
-/// number; the matching end-group must use it. A wire type other than
-/// [`WireType::SGroup`] is [`DecodeError::InvalidTag`] and consumes nothing.
+/// number; the matching end-group must use it. Rejecting a non-group wire
+/// type is the caller's job.
 ///
 /// When the group finishes inside [`Buf::chunk`], `read` sees that subslice
 /// and this function then advances past the end tag. An error from `read`
@@ -170,7 +170,6 @@ pub(crate) fn copy_group_body<B: Buf>(
 /// remainder is one chunk.
 pub(crate) fn read_group_body<B, T, F>(
     buf: &mut B,
-    wire_type: WireType,
     field: FieldNumber,
     read: F,
 ) -> Result<T, DecodeError>
@@ -178,9 +177,6 @@ where
     B: Buf,
     F: FnOnce(&[u8]) -> Result<T, DecodeError>,
 {
-    if wire_type != WireType::SGroup {
-        return Err(DecodeError::InvalidTag);
-    }
     let chunk_len = buf.chunk().len();
     if let Some(frame) = measure_group(chunk_len, |i| buf.chunk().get(i).copied(), 0, field)? {
         let decoded = read(&buf.chunk()[..frame.body_len]);

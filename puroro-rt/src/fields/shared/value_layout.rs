@@ -517,7 +517,10 @@ where
         A: Clone,
         UnmanagedBox<M, A>: DefaultIn<A>,
     {
-        decode::read_group_body(buf, wire_type, field, |body| {
+        if wire_type != WireType::SGroup {
+            return Err(DecodeError::InvalidTag);
+        }
+        decode::read_group_body(buf, field, |body| {
             let child = ValueSlot::with_mut(slot, init, common).get_mut();
             MessageMerge::merge_from_slice(DerefMut::deref_mut(child), body, depth + 1)
         })

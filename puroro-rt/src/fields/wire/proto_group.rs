@@ -153,7 +153,10 @@ impl<M: MessageEncode + MessageMerge> PayloadMerge for ProtoGroup<M> {
         Cx: MessageBindingMut<A>,
         B: DecodeBuf,
     {
-        decode::read_group_body(buf, wire_type, field, |body| {
+        if wire_type != WireType::SGroup {
+            return Err(DecodeError::InvalidTag);
+        }
+        decode::read_group_body(buf, field, |body| {
             let child = ValueSlot::with_mut(slot, init, common).get_mut();
             MessageMerge::merge_from_slice(child, body, depth + 1)
         })
@@ -256,7 +259,7 @@ mod tests {
                         self.b = i32::try_from(decode_varint(buf)?).expect("test varint fits i32");
                     }
                     (2, WireType::SGroup) => {
-                        read_group_body(buf, wire, field_number_const::<2>(), |body| {
+                        read_group_body(buf, field_number_const::<2>(), |body| {
                             let mut inner = Counts { a: 0, b: 0 };
                             inner.merge_from_slice(body, depth + 1)?;
                             self.b = inner.a;

@@ -545,7 +545,10 @@ where
         depth: usize,
         field: FieldNumber,
     ) -> Result<M, DecodeError> {
-        decode::read_group_body(buf, wire_type, field, |body| {
+        if wire_type != WireType::SGroup {
+            return Err(DecodeError::InvalidTag);
+        }
+        decode::read_group_body(buf, field, |body| {
             let mut msg = M::default_in(alloc);
             MessageMerge::merge_from_slice(&mut msg, body, depth + 1).map(|()| msg)
         })
