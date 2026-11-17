@@ -408,23 +408,13 @@ fn plan_map_field<'a>(field: &'a Field<'a>) -> Result<FieldKind<'a>> {
 }
 
 fn validate_map_key_wire(key: &WireTypeKind<'_>, field_name: &str) -> Result<()> {
-    // Protobuf: integral, bool, or string — not float / bytes / enum / message.
-    match key {
-        WireTypeKind::Int32
-        | WireTypeKind::Int64
-        | WireTypeKind::UInt32
-        | WireTypeKind::UInt64
-        | WireTypeKind::SInt32
-        | WireTypeKind::SInt64
-        | WireTypeKind::Fixed32
-        | WireTypeKind::Fixed64
-        | WireTypeKind::SFixed32
-        | WireTypeKind::SFixed64
-        | WireTypeKind::Bool
-        | WireTypeKind::String { .. } => Ok(()),
-        other => Err(Error::Codegen(format!(
-            "map field `{field_name}`: invalid map key type {other:?}"
-        ))),
+    // The allow-list lives on `WireTypeKind::is_legal_map_key()`.
+    if key.is_legal_map_key() {
+        Ok(())
+    } else {
+        Err(Error::Codegen(format!(
+            "map field `{field_name}`: invalid map key type {key:?}"
+        )))
     }
 }
 

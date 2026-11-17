@@ -571,7 +571,8 @@ fn emit_map(field: &PlannedField<'_>, companion: &Ident) -> Result<MapEmit> {
     let name = field.name();
     let field_const = field.field_const();
     let number = field.number();
-    let key_view = map_key_view(key, name)?;
+    // `plan_map_field` already rejected illegal keys via `is_legal_map_key()`.
+    let key_view = wire_views(key)?.map_value;
     let value_views = wire_views(value)?;
     let mut value_marker = wire_marker_path(value)?;
     let mut map_value_bound = value_marker.clone();
@@ -621,26 +622,6 @@ fn emit_map(field: &PlannedField<'_>, companion: &Ident) -> Result<MapEmit> {
         layouts,
         depth_fields,
     })
-}
-
-fn map_key_view(key: &WireTypeKind<'_>, field_name: &str) -> Result<Type> {
-    match key {
-        WireTypeKind::String { .. }
-        | WireTypeKind::Bool
-        | WireTypeKind::Int32
-        | WireTypeKind::SInt32
-        | WireTypeKind::SFixed32
-        | WireTypeKind::Int64
-        | WireTypeKind::SInt64
-        | WireTypeKind::SFixed64
-        | WireTypeKind::UInt32
-        | WireTypeKind::Fixed32
-        | WireTypeKind::UInt64
-        | WireTypeKind::Fixed64 => Ok(wire_views(key)?.map_value),
-        other => Err(Error::internal(format!(
-            "map field `{field_name}`: invalid map key type {other:?}"
-        ))),
-    }
 }
 
 fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit> {
