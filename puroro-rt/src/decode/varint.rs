@@ -7,7 +7,7 @@
 //! bytes. The fast decoders return only the integer.
 
 use ::bytes::Buf;
-use ::protobuf_core::{MAX_VARINT_BYTES, VARINT_CONTINUATION_BIT, VARINT_PAYLOAD_MASK};
+use ::protobuf_core::{MAX_VARINT_BYTES, VARINT_CONTINUATION_BIT, VARINT_PAYLOAD_MASK, Varint};
 use ::puroro::DecodeError;
 
 /// A varint decode algorithm over [`Buf`].
@@ -113,7 +113,7 @@ fn decode_varint_byte_iterator<B: Buf>(buf: &mut B) -> Result<u64, DecodeError> 
 pub(crate) fn decode_varint_with_raw<'a, B: Buf>(
     buf: &mut B,
     raw: &'a mut [u8; MAX_VARINT_BYTES],
-) -> Result<(u64, &'a [u8]), DecodeError> {
+) -> Result<(Varint, &'a [u8]), DecodeError> {
     let mut value = 0u64;
     let mut shift = 0u32;
     for n in 0..MAX_VARINT_BYTES {
@@ -124,7 +124,7 @@ pub(crate) fn decode_varint_with_raw<'a, B: Buf>(
         raw[n] = byte;
         value |= u64::from(byte & VARINT_PAYLOAD_MASK) << shift;
         if byte < VARINT_CONTINUATION_BIT {
-            return Ok((value, &raw[..=n]));
+            return Ok((Varint::from_uint64(value), &raw[..=n]));
         }
         shift += 7;
     }
@@ -754,7 +754,7 @@ mod tests {
         let mut cursor = wire.as_slice();
         let mut scratch = [0u8; MAX_VARINT_BYTES];
         let (value, raw) = decode_varint_with_raw(&mut cursor, &mut scratch).unwrap();
-        assert_eq!(value, 1);
+        assert_eq!(value, Varint::from_uint64(1));
         assert_eq!(raw, &[0x81, 0x00]);
         assert_eq!(cursor, &[0x02]);
     }
@@ -767,7 +767,7 @@ mod tests {
         };
         let mut scratch = [0u8; MAX_VARINT_BYTES];
         let (value, raw) = decode_varint_with_raw(&mut buf, &mut scratch).unwrap();
-        assert_eq!(value, 1);
+        assert_eq!(value, Varint::from_uint64(1));
         assert_eq!(raw, &[0x81, 0x00]);
         assert_eq!(buf.remaining(), 1);
     }
@@ -780,8 +780,11 @@ mod tests {
             let mut keeping = wire.as_slice();
             let mut scratch = [0u8; MAX_VARINT_BYTES];
             let (decoded, raw) = decode_varint_with_raw(&mut keeping, &mut scratch).unwrap();
-            assert_eq!(decoded, super::super::decode_varint(&mut plain).unwrap());
-            assert_eq!(decoded, value);
+            assert_eq!(
+                decoded.to_uint64(),
+                super::super::decode_varint(&mut plain).unwrap()
+            );
+            assert_eq!(decoded, Varint::from_uint64(value));
             assert_eq!(raw, wire.as_slice());
         }
     }

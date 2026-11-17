@@ -155,7 +155,7 @@ fn walk_group<B: Buf>(
             return Err(DecodeError::TruncatedMessage);
         }
         let (tag, raw) = super::decode_varint_with_raw(buf, &mut scratch)?;
-        let (number, wire) = split_tag(tag)?;
+        let (number, wire) = split_tag(tag.to_uint64())?;
         let closed = groups.on_tag(number, wire)?;
         emit(raw);
         if closed {
@@ -176,7 +176,7 @@ fn walk_group<B: Buf>(
             WireType::Len => {
                 let (len_value, raw) = super::decode_varint_with_raw(buf, &mut scratch)?;
                 emit(raw);
-                let Ok(len) = usize::try_from(len_value) else {
+                let Ok(len) = usize::try_from(len_value.to_uint64()) else {
                     return Err(DecodeError::TruncatedMessage);
                 };
                 copy_exact(buf, len, DecodeError::TruncatedMessage, &mut emit)?;
