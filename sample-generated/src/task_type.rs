@@ -10,14 +10,11 @@ use ::allocator_api2::vec::Vec as AllocVec;
 use ::core::marker::PhantomData;
 use ::core::mem;
 use ::core::ops::{ControlFlow, Deref, DerefMut};
-use ::puroro::RECURSION_LIMIT;
 use ::puroro::{
     DecodeBuf, DecodeError, HasDefault, MapMut, OneofView, OneofViewMut, Optional,
     RepeatedStringMut, WireType,
 };
-use ::puroro_rt::decode::{
-    MessageScan, ScannedRecord, for_each_len_field, scanned_len_span, scanned_record_span,
-};
+use ::puroro_rt::decode::{MessageScan, ScannedRecord, scanned_len_span, scanned_record_span};
 use ::puroro_rt::{
     BitPacked, Boxed, CloneRecordFields, Closed, ConstructRecordFields, Eager, EagerRecordFields,
     Expanded, Explicit, FieldCloneIn, FieldDeallocate, FieldPairVisitor, FieldVisitor,
@@ -30,9 +27,7 @@ use ::puroro_rt::{
 use crate::Address;
 use crate::AddressLazy;
 use crate::Point;
-use crate::address_type::AddressFields;
 use crate::enums::{Priority, Status};
-use crate::point_type::PointFields;
 use crate::task::defaults::MaxRetriesDefault;
 use crate::task::notification::NotificationStorage;
 use crate::task::{
@@ -473,57 +468,13 @@ impl<A: Allocator + Clone> EagerRecordFields<A> for TaskFields<A, Eager> {
     }
 }
 
-/// Leaf children fail only when `child_depth` is the recursion limit.
-///
-/// `body` runs only when the child [`LazyRecordApply::READS_DEPTH_PAYLOAD`].
-#[inline(always)]
-fn count_child_depth<'a, F, A>(
-    child_depth: usize,
-    body: impl FnOnce() -> Result<&'a [u8], DecodeError>,
-) -> Result<(), DecodeError>
-where
-    A: Allocator + Clone,
-    F: LazyRecordApply<A>,
-{
-    if F::READS_DEPTH_PAYLOAD {
-        F::check_message_depth(body()?, child_depth)
-    } else if child_depth >= RECURSION_LIMIT {
-        Err(DecodeError::RecursionLimitExceeded)
-    } else {
-        Ok(())
-    }
-}
-
 impl<A: Allocator + Clone> LazyRecordApply<A> for TaskFields<A, Lazy<A>> {
-    const READS_DEPTH_PAYLOAD: bool = true;
-
-    fn check_message_depth(payload: &[u8], depth: usize) -> Result<(), DecodeError> {
-        if depth >= RECURSION_LIMIT {
-            return Err(DecodeError::RecursionLimitExceeded);
-        }
-        // Address and Point have no message fields. One more level cannot
-        // exceed the limit, so the payload does not matter.
-        if depth + 1 < RECURSION_LIMIT
-            && !<AddressFields<A, Lazy<A>> as LazyRecordApply<A>>::READS_DEPTH_PAYLOAD
-            && !<PointFields<A, Lazy<A>> as LazyRecordApply<A>>::READS_DEPTH_PAYLOAD
-        {
-            return Ok(());
-        }
-        for_each_len_field(payload, |number, body| match number {
-            FIELD_ASSIGNEE | FIELD_WATCHERS | FIELD_POSTAL => {
-                count_child_depth::<AddressFields<A, Lazy<A>>, A>(depth + 1, || Ok(body))
-            }
-            FIELD_ORIGIN => count_child_depth::<PointFields<A, Lazy<A>>, A>(depth + 1, || Ok(body)),
-            _ => Ok(()),
-        })
-    }
-
     fn apply_record(
         &mut self,
         common: &mut MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A>>,
         rec: &ScannedRecord,
         origin: usize,
-        depth: usize,
+        _depth: usize,
     ) -> Result<(), DecodeError> {
         match rec.field_number.as_u32() {
             FIELD_TITLE => {
@@ -544,27 +495,18 @@ impl<A: Allocator + Clone> LazyRecordApply<A> for TaskFields<A, Lazy<A>> {
             }
             FIELD_ASSIGNEE => {
                 let span = scanned_len_span(origin, rec)?;
-                count_child_depth::<AddressFields<A, Lazy<A>>, A>(depth + 1, || {
-                    span.slice(common.lazy.scan.wire())
-                })?;
                 let root = common.lazy.scan.shared().clone_handle();
                 <Self as HasField<{ FIELD_ASSIGNEE }>>::field_mut(self)
                     .merge_shared(&root, span, common)
             }
             FIELD_ORIGIN => {
                 let span = scanned_len_span(origin, rec)?;
-                count_child_depth::<PointFields<A, Lazy<A>>, A>(depth + 1, || {
-                    span.slice(common.lazy.scan.wire())
-                })?;
                 let root = common.lazy.scan.shared().clone_handle();
                 <Self as HasField<{ FIELD_ORIGIN }>>::field_mut(self)
                     .merge_shared(&root, span, common)
             }
             FIELD_WATCHERS => {
                 let span = scanned_len_span(origin, rec)?;
-                count_child_depth::<AddressFields<A, Lazy<A>>, A>(depth + 1, || {
-                    span.slice(common.lazy.scan.wire())
-                })?;
                 let root = common.lazy.scan.shared().clone_handle();
                 <Self as HasField<{ FIELD_WATCHERS }>>::field_mut(self)
                     .merge_shared(&root, span, common)
@@ -589,9 +531,6 @@ impl<A: Allocator + Clone> LazyRecordApply<A> for TaskFields<A, Lazy<A>> {
                 .merge_scanned(&rec.value),
             FIELD_POSTAL => {
                 let span = scanned_len_span(origin, rec)?;
-                count_child_depth::<AddressFields<A, Lazy<A>>, A>(depth + 1, || {
-                    span.slice(common.lazy.scan.wire())
-                })?;
                 let root = common.lazy.scan.shared().clone_handle();
                 <Self as HasField<{ FIELD_POSTAL }>>::field_mut(self)
                     .variant(common)

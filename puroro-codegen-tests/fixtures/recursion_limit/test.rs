@@ -1,4 +1,4 @@
-//! Lazy decode counts nested messages with the same limit as eager decode.
+//! Eager merge rejects a stack deeper than `RECURSION_LIMIT`. Lazy ingest does not.
 
 use crate::recursion_limit::{Holder, HolderLazy, Nest, NestLazy, Wrap, WrapLazy};
 use ::puroro::{DecodeError, Message, RECURSION_LIMIT, ScopedBuf};
@@ -29,12 +29,16 @@ fn encode_nest_levels(levels: usize) -> Vec<u8> {
 }
 
 #[test]
-fn lazy_decode_rejects_at_recursion_limit() {
+fn eager_rejects_at_recursion_limit_lazy_accepts() {
     let over = encode_nest_levels(RECURSION_LIMIT);
     let eager_over: Result<Nest, _> = Nest::decode(&over[..]);
     let lazy_over: Result<NestLazy, _> = NestLazy::decode(&over[..]);
     assert_eq!(eager_over.err(), Some(DecodeError::RecursionLimitExceeded));
-    assert_eq!(lazy_over.err(), Some(DecodeError::RecursionLimitExceeded));
+    let lazy_over = lazy_over.expect("lazy ingest does not apply the eager stack limit");
+    assert_eq!(
+        lazy_over.into_eager().err(),
+        Some(DecodeError::RecursionLimitExceeded)
+    );
 
     let ok = encode_nest_levels(RECURSION_LIMIT - 1);
     let eager_ok: Result<Nest, _> = Nest::decode(&ok[..]);
@@ -71,34 +75,18 @@ fn merge_at<M: MessageMerge + Default>(bytes: &[u8], depth: usize) -> Result<M, 
 }
 
 #[test]
-fn leaf_child_fails_only_at_the_limit() {
+fn lazy_ingest_accepts_a_nesting_eager_rejects() {
     let with_item = encode_holder(&[0x08, 0x01]);
     assert!(matches!(
         merge_at::<Holder>(&with_item, RECURSION_LIMIT - 1),
         Err(DecodeError::RecursionLimitExceeded)
     ));
-    assert!(matches!(
-        merge_at::<HolderLazy>(&with_item, RECURSION_LIMIT - 1),
-        Err(DecodeError::RecursionLimitExceeded)
-    ));
-    merge_at::<Holder>(&with_item, RECURSION_LIMIT - 2).expect("eager under the limit");
-    merge_at::<HolderLazy>(&with_item, RECURSION_LIMIT - 2).expect("lazy under the limit");
+    merge_at::<HolderLazy>(&with_item, RECURSION_LIMIT).expect("lazy holder");
 
-    let scalar = vec![0x10, 0x01]; // field 2, varint 1
-    merge_at::<Holder>(&scalar, RECURSION_LIMIT - 1).expect("no nested field");
-    merge_at::<HolderLazy>(&scalar, RECURSION_LIMIT - 1).expect("no nested field");
-
-    // Wrap calls Holder::check_message_depth. Holder's children are leaves, so
-    // that walk is skipped until the next level would be the limit.
     let wrap = encode_holder(&with_item);
     assert!(matches!(
         merge_at::<Wrap>(&wrap, RECURSION_LIMIT - 2),
         Err(DecodeError::RecursionLimitExceeded)
     ));
-    assert!(matches!(
-        merge_at::<WrapLazy>(&wrap, RECURSION_LIMIT - 2),
-        Err(DecodeError::RecursionLimitExceeded)
-    ));
-    merge_at::<Wrap>(&wrap, RECURSION_LIMIT - 3).expect("eager wrap under the limit");
-    merge_at::<WrapLazy>(&wrap, RECURSION_LIMIT - 3).expect("lazy wrap under the limit");
+    merge_at::<WrapLazy>(&wrap, RECURSION_LIMIT).expect("lazy wrap");
 }
