@@ -402,7 +402,7 @@ fn plan_map_field<'a>(field: &'a Field<'a>) -> Result<FieldKind<'a>> {
     let key = WireTypeKind::from_field(key_field);
     let value = WireTypeKind::from_field(value_field);
     validate_map_key_wire(&key, field.name())?;
-    validate_map_value_wire(&value, field.name())?;
+    // Any non-map value is allowed. Descriptors do not emit maps of maps.
 
     Ok(FieldKind::Map { key, value })
 }
@@ -425,29 +425,6 @@ fn validate_map_key_wire(key: &WireTypeKind<'_>, field_name: &str) -> Result<()>
         other => Err(Error::Codegen(format!(
             "map field `{field_name}`: invalid map key type {other:?}"
         ))),
-    }
-}
-
-fn validate_map_value_wire(value: &WireTypeKind<'_>, _field_name: &str) -> Result<()> {
-    // Any non-map value is allowed (maps-of-maps do not appear in descriptors).
-    match value {
-        WireTypeKind::Double
-        | WireTypeKind::Float
-        | WireTypeKind::Int32
-        | WireTypeKind::Int64
-        | WireTypeKind::UInt32
-        | WireTypeKind::UInt64
-        | WireTypeKind::SInt32
-        | WireTypeKind::SInt64
-        | WireTypeKind::Fixed32
-        | WireTypeKind::Fixed64
-        | WireTypeKind::SFixed32
-        | WireTypeKind::SFixed64
-        | WireTypeKind::Bool
-        | WireTypeKind::String { .. }
-        | WireTypeKind::Bytes { .. }
-        | WireTypeKind::Enum { .. }
-        | WireTypeKind::Message(_) => Ok(()),
     }
 }
 
