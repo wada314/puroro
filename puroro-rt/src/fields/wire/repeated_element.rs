@@ -461,26 +461,17 @@ where
         alloc: A,
         depth: usize,
     ) -> Result<M, DecodeError> {
-        if wire_type != WireType::Len {
-            return Err(DecodeError::InvalidTag);
-        }
-        let len = decode::decode_varint(buf)? as usize;
-        if buf.remaining() < len {
-            return Err(DecodeError::TruncatedMessage);
-        }
-        if buf.chunk().len() >= len {
-            let merged = {
-                let payload = &buf.chunk()[..len];
-                let mut msg = M::new_in(alloc);
-                MessageMerge::merge_from_slice(&mut msg, payload, depth + 1).map(|()| msg)
-            };
-            buf.advance(len);
-            return merged;
-        }
-        let mut guard = buf.push_limit_guard(len)?;
-        let mut msg = M::new_in(alloc);
-        MessageMerge::merge_from_with_depth(&mut msg, &mut *guard, depth + 1)?;
-        Ok(msg)
+        decode::read_len_body(buf, wire_type, |body| {
+            let mut msg = M::new_in(alloc);
+            match body {
+                decode::LenBody::Slice(payload) => {
+                    MessageMerge::merge_from_slice(&mut msg, payload, depth + 1).map(|()| msg)
+                }
+                decode::LenBody::Limited(limited) => {
+                    MessageMerge::merge_from_with_depth(&mut msg, limited, depth + 1).map(|()| msg)
+                }
+            }
+        })
     }
 
     #[inline]

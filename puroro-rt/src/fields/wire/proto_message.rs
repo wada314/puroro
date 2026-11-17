@@ -12,7 +12,6 @@
 //! `Address<A>`). Singular fields pass the same `A` so the box allocator matches.
 
 use ::allocator_api2::alloc::Allocator;
-use ::bytes::Buf;
 use ::core::marker::PhantomData;
 use ::protobuf_core::FieldNumber;
 
@@ -155,26 +154,18 @@ impl<M: MessageEncode + MessageMerge> PayloadMerge for ProtoMessage<M> {
         Cx: MessageBindingMut<A>,
         B: DecodeBuf,
     {
-        if wire_type != WireType::Len {
-            return Err(DecodeError::InvalidTag);
-        }
-        let len = decode::decode_varint(buf)? as usize;
-        if buf.remaining() < len {
-            return Err(DecodeError::TruncatedMessage);
-        }
         // One chunk: the child body is a subslice. The cursor limit stack stays
-        // off this path.
-        if buf.chunk().len() >= len {
-            let merged = {
-                let payload = &buf.chunk()[..len];
-                let child = ValueSlot::with_mut(slot, init, common).get_mut();
-                MessageMerge::merge_from_slice(child, payload, depth + 1)
-            };
-            buf.advance(len);
-            return merged;
-        }
-        let mut guard = buf.push_limit_guard(len)?;
-        let child = ValueSlot::with_mut(slot, init, common).get_mut();
-        MessageMerge::merge_from_with_depth(child, &mut *guard, depth + 1)
+        // off that path. A split chunk uses the limit guard inside `read_len_body()`.
+        decode::read_len_body(buf, wire_type, |body| {
+            let child = ValueSlot::with_mut(slot, init, common).get_mut();
+            match body {
+                decode::LenBody::Slice(payload) => {
+                    MessageMerge::merge_from_slice(child, payload, depth + 1)
+                }
+                decode::LenBody::Limited(limited) => {
+                    MessageMerge::merge_from_with_depth(child, limited, depth + 1)
+                }
+            }
+        })
     }
 }

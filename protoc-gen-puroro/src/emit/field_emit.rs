@@ -421,51 +421,16 @@ fn emit_oneof_variant(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
         )));
     };
 
-    // Const lives on the parent message module (`super::BIT_*`).
-    let (layout_ty, value_bit) = planned_layout_ty(
+    let plan = plan_singular(
+        field,
+        wire,
         layout,
-        |ident| quote! { super::#ident },
-        custom_default.is_some(),
-    );
-
-    let views = wire_views(wire)?;
-    let is_bool = matches!(wire, WireTypeKind::Bool);
-    let mut_style = SingularMutStyle::from_layout(wire, layout);
+        custom_default.as_ref(),
+        SingularSite::Oneof,
+    )?;
     let variant_pascal = to_pascal_case(field.name());
-    let mut marker = wire_marker_path(wire)?;
-    let mut mut_target = views.mut_target;
-    let mut layout_assoc = None;
-    let mut message_apply = None;
-    let getter_shape = oneof_getter_shape(wire);
-    let mut lazy_kind = None;
-    if let Some(kind_bit) = field.lazy_kind_bit() {
-        let kind_ident = Ident::new(&lazy_kind_bit_const(field.name()), Span::call_site());
-        lazy_kind = Some((kind_ident.clone(), kind_bit));
-        let eager_layout = layout_ty
-            .clone()
-            .unwrap_or_else(|| parse_quote! { ::puroro_rt::Inline });
-        layout_assoc = Some(wire_or_sso_assoc(
-            field.name(),
-            &marker,
-            &kind_ident,
-            eager_layout,
-        ));
-    }
-    if let WireTypeKind::Message(child) = wire {
-        let pin = resolve_child_pin(field.name(), child, field.child_parse())?;
-        message_apply = Some(pin.singular_apply());
-        if let Some(assoc) = pin.follow() {
-            layout_assoc = Some(assoc.clone());
-        }
-        if let Some(ty) = pin.oneof_marker() {
-            marker = ty;
-        }
-        if let Some((_, lazy)) = pin.lazy_pin() {
-            mut_target = lazy.clone();
-        }
-    }
     // A len slot or a follow-parent child mentions `Layout`. A concrete pin does not.
-    let generic_layout = layout_assoc.is_some();
+    let generic_layout = plan.layout.is_some();
     Ok(OneofVariantEmit {
         name: escape_ident(field.name()),
         name_str: field.name().to_owned(),
@@ -474,21 +439,18 @@ fn emit_oneof_variant(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
         field_alias: Ident::new(&format!("{variant_pascal}Field"), Span::call_site()),
         field_const: Ident::new(field.field_const(), Span::call_site()),
         number: field.number() as u32,
-        marker,
-        layout_ty,
-        value_bit,
-        is_bool,
-        mut_style,
-        mut_target,
-        optional_ty: views.optional,
-        custom_default: match custom_default {
-            Some(custom) => Some((custom.clone(), defaults::render_marker_item(custom, wire)?)),
-            None => None,
-        },
-        getter_shape,
-        message_apply,
-        layout: layout_assoc,
-        lazy_kind,
+        marker: plan.marker,
+        layout_ty: plan.layout_ty,
+        value_bit: plan.value_bit,
+        is_bool: matches!(wire, WireTypeKind::Bool),
+        mut_style: plan.mut_style,
+        mut_target: plan.mut_target,
+        optional_ty: plan.optional_ty,
+        custom_default: plan.custom_default,
+        getter_shape: oneof_getter_shape(wire),
+        message_apply: plan.message_apply,
+        layout: plan.layout,
+        lazy_kind: plan.lazy_kind,
         generic_layout,
     })
 }
@@ -507,7 +469,7 @@ fn emit_repeated(field: &PlannedField<'_>, companion: &Ident) -> Result<Repeated
         RepeatedEncodingKind::Packed => parse_quote! { ::puroro_rt::Packed },
         RepeatedEncodingKind::Expanded => parse_quote! { ::puroro_rt::Expanded },
     };
-    let views = wire_views(wire)?;
+    let catalog = wire_catalog(wire)?;
     let style = match wire {
         WireTypeKind::String { utf8 } => match StringCatalogMarker::from_utf8(*utf8) {
             StringCatalogMarker::ProtoString => RepeatedAccessorStyle::String,
@@ -516,8 +478,8 @@ fn emit_repeated(field: &PlannedField<'_>, companion: &Ident) -> Result<Repeated
         WireTypeKind::Bytes { .. } => RepeatedAccessorStyle::Bytes,
         _ => RepeatedAccessorStyle::Slice,
     };
-    let mut marker = wire_marker_path(wire)?;
-    let mut slice_elem_ty = views.slice_elem;
+    let mut marker = catalog.marker;
+    let mut slice_elem_ty = catalog.views.slice_elem;
     let mut layout = None;
     let mut message_apply = None;
     if let WireTypeKind::Message(child) = wire {
@@ -572,11 +534,13 @@ fn emit_map(field: &PlannedField<'_>, companion: &Ident) -> Result<MapEmit> {
     let field_const = field.field_const();
     let number = field.number();
     // `plan_map_field` already rejected illegal keys via `is_legal_map_key()`.
-    let key_view = wire_views(key)?.map_value;
-    let value_views = wire_views(value)?;
-    let mut value_marker = wire_marker_path(value)?;
+    let key_wire = wire_catalog(key)?;
+    let key_view = key_wire.views.map_value;
+    let key_marker = key_wire.marker;
+    let value_wire = wire_catalog(value)?;
+    let mut value_marker = value_wire.marker;
     let mut map_value_bound = value_marker.clone();
-    let mut value_view = value_views.map_value;
+    let mut value_view = value_wire.views.map_value;
     let mut layouts = Vec::new();
     let mut depth_fields = None;
     if let WireTypeKind::Message(child) = value {
@@ -604,7 +568,7 @@ fn emit_map(field: &PlannedField<'_>, companion: &Ident) -> Result<MapEmit> {
     layouts.push(LayoutAssoc {
         assoc: map_assoc,
         kind: LayoutAssocKind::Map {
-            key: wire_marker_path(key)?,
+            key: key_marker.clone(),
             value: map_value_bound,
             field_const: field_ident,
         },
@@ -614,11 +578,11 @@ fn emit_map(field: &PlannedField<'_>, companion: &Ident) -> Result<MapEmit> {
         name_str: name.to_owned(),
         field_const: Ident::new(field_const, Span::call_site()),
         number: number as u32,
-        key_marker: wire_marker_path(key)?,
+        key_marker,
         value_marker,
         key_view,
         value_view,
-        mut_target: value_views.map_value_mut,
+        mut_target: value_wire.views.map_value_mut,
         layouts,
         depth_fields,
     })
@@ -667,71 +631,149 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
         PlannedPresence::Oneof => unreachable!("rejected above"),
     };
 
-    let (mut layout_ty, value_bit) = planned_layout_ty(
+    let plan = plan_singular(
+        field,
+        wire,
         layout,
-        |ident| quote! { #companion::#ident },
-        custom_default.is_some(),
-    );
-
-    let views = wire_views(wire)?;
-    let mut marker = wire_marker_path(wire)?;
-    let mut mut_target = views.mut_target;
-    let mut set_eager = None;
-    let mut layout_assoc = None;
-    let mut message_apply_slot = None;
-    let mut lazy_kind_const = None;
-    let getter_shape = scalar_getter_shape(wire, presence);
-
-    if let Some(kind_bit) = field.lazy_kind_bit() {
-        let kind_ident = Ident::new(&lazy_kind_bit_const(name), Span::call_site());
-        lazy_kind_const = Some((kind_ident.clone(), kind_bit));
-        // `mod layout` sits under the companion, so the eager arm uses `super::`.
-        let eager_layout = singular_len_eager(name, layout)?;
-        let assoc = wire_or_sso_assoc(name, &marker, &kind_ident, eager_layout);
-        let assoc_name = assoc.assoc.clone();
-        layout_assoc = Some(assoc);
-        layout_ty = Some(parse_quote! { <L as #companion::Layout<A>>::#assoc_name });
-    }
-
-    if let WireTypeKind::Message(child) = wire {
-        let pin = resolve_child_pin(name, child, field.child_parse())?;
-        message_apply_slot = Some(pin.singular_apply());
-        if let Some(assoc) = pin.follow() {
-            layout_assoc = Some(assoc.clone());
-        }
-        if let Some(ty) = pin.field_marker(companion) {
-            marker = ty;
-        }
-        if let Some((eager, lazy)) = pin.lazy_pin() {
-            set_eager = Some(eager.clone());
-            mut_target = lazy.clone();
-        }
-    }
+        custom_default,
+        SingularSite::Field { companion },
+    )?;
 
     Ok(ScalarEmit {
         name: escape_ident(name),
         name_str: name.to_owned(),
         field_const: Ident::new(field_const, Span::call_site()),
         number: number as u32,
-        marker,
+        marker: plan.marker,
         presence_ty,
-        layout_ty,
+        layout_ty: plan.layout_ty,
         presence_bit,
-        value_bit,
-        getter_shape,
+        value_bit: plan.value_bit,
+        getter_shape: scalar_getter_shape(wire, presence),
         required,
+        mut_target: plan.mut_target,
+        implicit_ty: plan.implicit_ty,
+        optional_ty: plan.optional_ty,
+        custom_default: plan.custom_default,
+        mut_style: plan.mut_style,
+        layout: plan.layout,
+        message_apply: plan.message_apply,
+        set_eager: plan.set_eager,
+        lazy_kind_const: plan.lazy_kind,
+    })
+}
+
+/// Message field versus oneof variant. The planning steps match; the module
+/// that owns `BIT_*` and `Layout` does not.
+#[derive(Clone, Copy)]
+enum SingularSite<'a> {
+    /// Field on the message impl. Paths are `#companion::BIT_*`.
+    Field { companion: &'a Ident },
+    /// Variant inside `mod <oneof>`. Paths are `super::BIT_*`.
+    Oneof,
+}
+
+/// Facts shared by [`emit_scalar`] and [`emit_oneof_variant`] after wire,
+/// layout, lazy-kind, and child-pin resolution.
+struct SingularPlan {
+    layout_ty: Option<Type>,
+    value_bit: Option<(Ident, usize)>,
+    marker: Type,
+    mut_target: Type,
+    implicit_ty: Type,
+    optional_ty: Type,
+    custom_default: Option<(CustomDefault, Vec<Item>)>,
+    mut_style: SingularMutStyle,
+    layout: Option<LayoutAssoc>,
+    message_apply: Option<MessageApply>,
+    /// Eager alias for `set_*`. Only a message field pinned to the lazy child.
+    set_eager: Option<Type>,
+    lazy_kind: Option<(Ident, usize)>,
+}
+
+fn plan_singular(
+    field: &PlannedField<'_>,
+    wire: &WireTypeKind<'_>,
+    layout: &PlannedLayout,
+    custom_default: Option<&CustomDefault>,
+    site: SingularSite<'_>,
+) -> Result<SingularPlan> {
+    let name = field.name();
+    let (mut layout_ty, value_bit) = planned_layout_ty(
+        layout,
+        |ident| match site {
+            // Oneof modules sit under the companion, so bits are `super::`.
+            SingularSite::Field { companion } => quote! { #companion::#ident },
+            SingularSite::Oneof => quote! { super::#ident },
+        },
+        custom_default.is_some(),
+    );
+
+    let catalog = wire_catalog(wire)?;
+    let mut marker = catalog.marker;
+    let mut mut_target = catalog.views.mut_target;
+    let mut set_eager = None;
+    let mut layout_assoc = None;
+    let mut message_apply = None;
+    let mut lazy_kind = None;
+
+    if let Some(kind_bit) = field.lazy_kind_bit() {
+        let kind_ident = Ident::new(&lazy_kind_bit_const(name), Span::call_site());
+        lazy_kind = Some((kind_ident.clone(), kind_bit));
+        // A message field's eager arm is written inside `mod layout`, which
+        // already sits under the companion, so that arm names `super::BIT_*`.
+        // A oneof variant's `layout_ty` was built with `super::` above.
+        let eager_layout = match site {
+            SingularSite::Field { .. } => singular_len_eager(name, layout)?,
+            SingularSite::Oneof => layout_ty
+                .clone()
+                .unwrap_or_else(|| parse_quote! { ::puroro_rt::Inline }),
+        };
+        let assoc = wire_or_sso_assoc(name, &marker, &kind_ident, eager_layout);
+        if let SingularSite::Field { companion } = site {
+            let assoc_name = assoc.assoc.clone();
+            layout_ty = Some(parse_quote! { <L as #companion::Layout<A>>::#assoc_name });
+        }
+        layout_assoc = Some(assoc);
+    }
+
+    if let WireTypeKind::Message(child) = wire {
+        let pin = resolve_child_pin(name, child, field.child_parse())?;
+        message_apply = Some(pin.singular_apply());
+        if let Some(assoc) = pin.follow() {
+            layout_assoc = Some(assoc.clone());
+        }
+        let child_marker = match site {
+            SingularSite::Field { companion } => pin.field_marker(companion),
+            SingularSite::Oneof => pin.oneof_marker(),
+        };
+        if let Some(ty) = child_marker {
+            marker = ty;
+        }
+        if let Some((eager, lazy)) = pin.lazy_pin() {
+            if matches!(site, SingularSite::Field { .. }) {
+                set_eager = Some(eager.clone());
+            }
+            mut_target = lazy.clone();
+        }
+    }
+
+    Ok(SingularPlan {
+        layout_ty,
+        value_bit,
+        marker,
         mut_target,
-        implicit_ty: views.implicit,
-        optional_ty: views.optional,
+        implicit_ty: catalog.views.implicit,
+        optional_ty: catalog.views.optional,
         custom_default: match custom_default {
             Some(custom) => Some((custom.clone(), defaults::render_marker_item(custom, wire)?)),
             None => None,
         },
         mut_style: SingularMutStyle::from_layout(wire, layout),
         layout: layout_assoc,
-        message_apply: message_apply_slot,
+        message_apply,
         set_eager,
-        lazy_kind_const,
+        lazy_kind,
     })
 }
 
@@ -801,7 +843,7 @@ enum ChildPin {
         lazy: Box<Type>,
         fields: Type,
     },
-    /// Pinned to the eager alias. The wire marker from `wire_marker_path` stays.
+    /// Pinned to the eager alias. The wire marker from [`wire_catalog`] stays.
     Eager { eager: Box<Type>, fields: Type },
 }
 
@@ -862,7 +904,7 @@ impl ChildPin {
     }
 
     /// Marker on the message impl. `layout` is `#companion::Layout<A>`.
-    /// `None` for an eager pin: keep the marker from `wire_marker_path`.
+    /// `None` for an eager pin: keep the marker from [`wire_catalog`].
     fn field_marker(&self, layout: &Ident) -> Option<Type> {
         match self {
             Self::Follow(assoc, _) => {
@@ -905,39 +947,116 @@ impl ChildPin {
     }
 }
 
-fn wire_marker_path(wire: &WireTypeKind<'_>) -> Result<Type> {
+/// Catalog marker plus the Rust types quoted into generated signatures.
+///
+/// One arm owns both so a new [`WireTypeKind`] cannot update the marker and
+/// leave the signature types behind (or the other way around). Copyable
+/// scalars share one Rust type across several markers via [`copy_catalog`].
+struct WireCatalog {
+    marker: Type,
+    views: WireViews,
+}
+
+fn copy_catalog(marker: Type, ty: Type) -> WireCatalog {
+    WireCatalog {
+        marker,
+        views: copy_views(ty),
+    }
+}
+
+fn wire_catalog(wire: &WireTypeKind<'_>) -> Result<WireCatalog> {
     Ok(match wire {
-        WireTypeKind::Double => parse_quote! { ::puroro_rt::ProtoDouble },
-        WireTypeKind::Float => parse_quote! { ::puroro_rt::ProtoFloat },
-        WireTypeKind::Int64 => parse_quote! { ::puroro_rt::ProtoInt64 },
-        WireTypeKind::UInt64 => parse_quote! { ::puroro_rt::ProtoUInt64 },
-        WireTypeKind::Int32 => parse_quote! { ::puroro_rt::ProtoInt32 },
-        WireTypeKind::Fixed64 => parse_quote! { ::puroro_rt::ProtoFixed64 },
-        WireTypeKind::Fixed32 => parse_quote! { ::puroro_rt::ProtoFixed32 },
-        WireTypeKind::Bool => parse_quote! { ::puroro_rt::ProtoBool },
+        WireTypeKind::Double => copy_catalog(
+            parse_quote! { ::puroro_rt::ProtoDouble },
+            parse_quote! { f64 },
+        ),
+        WireTypeKind::Float => copy_catalog(
+            parse_quote! { ::puroro_rt::ProtoFloat },
+            parse_quote! { f32 },
+        ),
+        WireTypeKind::Int64 => copy_catalog(
+            parse_quote! { ::puroro_rt::ProtoInt64 },
+            parse_quote! { i64 },
+        ),
+        WireTypeKind::SInt64 => copy_catalog(
+            parse_quote! { ::puroro_rt::ProtoSInt64 },
+            parse_quote! { i64 },
+        ),
+        WireTypeKind::SFixed64 => copy_catalog(
+            parse_quote! { ::puroro_rt::ProtoSFixed64 },
+            parse_quote! { i64 },
+        ),
+        WireTypeKind::UInt64 => copy_catalog(
+            parse_quote! { ::puroro_rt::ProtoUInt64 },
+            parse_quote! { u64 },
+        ),
+        WireTypeKind::Fixed64 => copy_catalog(
+            parse_quote! { ::puroro_rt::ProtoFixed64 },
+            parse_quote! { u64 },
+        ),
+        WireTypeKind::Int32 => copy_catalog(
+            parse_quote! { ::puroro_rt::ProtoInt32 },
+            parse_quote! { i32 },
+        ),
+        WireTypeKind::SInt32 => copy_catalog(
+            parse_quote! { ::puroro_rt::ProtoSInt32 },
+            parse_quote! { i32 },
+        ),
+        WireTypeKind::SFixed32 => copy_catalog(
+            parse_quote! { ::puroro_rt::ProtoSFixed32 },
+            parse_quote! { i32 },
+        ),
+        WireTypeKind::UInt32 => copy_catalog(
+            parse_quote! { ::puroro_rt::ProtoUInt32 },
+            parse_quote! { u32 },
+        ),
+        WireTypeKind::Fixed32 => copy_catalog(
+            parse_quote! { ::puroro_rt::ProtoFixed32 },
+            parse_quote! { u32 },
+        ),
+        WireTypeKind::Bool => copy_catalog(
+            parse_quote! { ::puroro_rt::ProtoBool },
+            parse_quote! { bool },
+        ),
         WireTypeKind::String { utf8 } => match StringCatalogMarker::from_utf8(*utf8) {
-            StringCatalogMarker::ProtoString => parse_quote! { ::puroro_rt::ProtoString },
-            StringCatalogMarker::ProtoStringUnchecked => {
-                parse_quote! { ::puroro_rt::ProtoStringUnchecked }
-            }
+            StringCatalogMarker::ProtoString => WireCatalog {
+                marker: parse_quote! { ::puroro_rt::ProtoString },
+                views: string_views(),
+            },
+            StringCatalogMarker::ProtoStringUnchecked => WireCatalog {
+                marker: parse_quote! { ::puroro_rt::ProtoStringUnchecked },
+                views: len_bytes_views(),
+            },
         },
-        WireTypeKind::Bytes { .. } => parse_quote! { ::puroro_rt::ProtoBytes },
-        WireTypeKind::UInt32 => parse_quote! { ::puroro_rt::ProtoUInt32 },
-        WireTypeKind::SFixed32 => parse_quote! { ::puroro_rt::ProtoSFixed32 },
-        WireTypeKind::SFixed64 => parse_quote! { ::puroro_rt::ProtoSFixed64 },
-        WireTypeKind::SInt32 => parse_quote! { ::puroro_rt::ProtoSInt32 },
-        WireTypeKind::SInt64 => parse_quote! { ::puroro_rt::ProtoSInt64 },
+        WireTypeKind::Bytes { .. } => WireCatalog {
+            marker: parse_quote! { ::puroro_rt::ProtoBytes },
+            views: len_bytes_views(),
+        },
         WireTypeKind::Enum { ty, openness } => {
             let path = fqn_to_enum_root_path(ty)?;
             let kind: Type = match openness {
                 EnumType::Open => parse_quote! { ::puroro_rt::Open },
                 EnumType::Closed => parse_quote! { ::puroro_rt::Closed },
             };
-            parse_quote! { ::puroro_rt::ProtoEnum<#path, #kind> }
+            WireCatalog {
+                marker: parse_quote! { ::puroro_rt::ProtoEnum<#path, #kind> },
+                views: copy_views(parse_quote! { #path }),
+            }
         }
         WireTypeKind::Message(m) => {
             let path = fqn_to_message_root_path(m)?;
-            parse_quote! { ::puroro_rt::ProtoMessage<#path<A>> }
+            let ty: Type = parse_quote! { #path<A> };
+            WireCatalog {
+                marker: parse_quote! { ::puroro_rt::ProtoMessage<#ty> },
+                views: WireViews {
+                    implicit: parse_quote! { () },
+                    optional: parse_quote! { () },
+                    mut_target: ty.clone(),
+                    slice_elem: ty.clone(),
+                    map_value: ty,
+                    map_value_mut: None,
+                },
+            }
         }
     })
 }
@@ -966,6 +1085,18 @@ fn copy_views(ty: Type) -> WireViews {
     }
 }
 
+fn string_views() -> WireViews {
+    let owned: Type = parse_quote! { ::puroro::String<A> };
+    WireViews {
+        implicit: parse_quote! { &str },
+        optional: parse_quote! { &'a str },
+        mut_target: owned.clone(),
+        slice_elem: parse_quote! { impl ::core::ops::Deref<Target = str> },
+        map_value: parse_quote! { str },
+        map_value_mut: Some(owned),
+    }
+}
+
 fn len_bytes_views() -> WireViews {
     let owned: Type = parse_quote! { ::allocator_api2::vec::Vec<u8, A> };
     WireViews {
@@ -976,51 +1107,4 @@ fn len_bytes_views() -> WireViews {
         map_value: parse_quote! { [u8] },
         map_value_mut: Some(owned),
     }
-}
-
-fn wire_views(wire: &WireTypeKind<'_>) -> Result<WireViews> {
-    Ok(match wire {
-        WireTypeKind::Double => copy_views(parse_quote! { f64 }),
-        WireTypeKind::Float => copy_views(parse_quote! { f32 }),
-        WireTypeKind::Int64 | WireTypeKind::SInt64 | WireTypeKind::SFixed64 => {
-            copy_views(parse_quote! { i64 })
-        }
-        WireTypeKind::UInt64 | WireTypeKind::Fixed64 => copy_views(parse_quote! { u64 }),
-        WireTypeKind::Int32 | WireTypeKind::SInt32 | WireTypeKind::SFixed32 => {
-            copy_views(parse_quote! { i32 })
-        }
-        WireTypeKind::UInt32 | WireTypeKind::Fixed32 => copy_views(parse_quote! { u32 }),
-        WireTypeKind::Bool => copy_views(parse_quote! { bool }),
-        WireTypeKind::String { utf8 } => match StringCatalogMarker::from_utf8(*utf8) {
-            StringCatalogMarker::ProtoString => {
-                let owned: Type = parse_quote! { ::puroro::String<A> };
-                WireViews {
-                    implicit: parse_quote! { &str },
-                    optional: parse_quote! { &'a str },
-                    mut_target: owned.clone(),
-                    slice_elem: parse_quote! { impl ::core::ops::Deref<Target = str> },
-                    map_value: parse_quote! { str },
-                    map_value_mut: Some(owned),
-                }
-            }
-            StringCatalogMarker::ProtoStringUnchecked => len_bytes_views(),
-        },
-        WireTypeKind::Bytes { .. } => len_bytes_views(),
-        WireTypeKind::Enum { ty, .. } => {
-            let path = fqn_to_enum_root_path(ty)?;
-            copy_views(parse_quote! { #path })
-        }
-        WireTypeKind::Message(m) => {
-            let path = fqn_to_message_root_path(m)?;
-            let ty: Type = parse_quote! { #path<A> };
-            WireViews {
-                implicit: parse_quote! { () },
-                optional: parse_quote! { () },
-                mut_target: ty.clone(),
-                slice_elem: ty.clone(),
-                map_value: ty,
-                map_value_mut: None,
-            }
-        }
-    })
 }

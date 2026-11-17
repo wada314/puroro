@@ -548,27 +548,16 @@ where
         A: Clone,
         K::Element<A>: Eq + Hash,
     {
-        if wire_type != WireType::Len {
-            return Err(DecodeError::InvalidTag);
-        }
-        let len = decode::decode_varint(buf)? as usize;
-        if buf.remaining() < len {
-            return Err(DecodeError::TruncatedMessage);
-        }
         let alloc = self.common.clone_alloc();
-        if buf.chunk().len() >= len {
-            let merged = {
-                let payload = &buf.chunk()[..len];
+        let (key, value) = decode::read_len_body(buf, wire_type, |body| match body {
+            decode::LenBody::Slice(payload) => {
                 let mut cursor = decode::SliceCursor::new(payload);
                 decode_map_entry::<K, V, A, _>(&mut cursor, alloc.clone(), depth)
-            };
-            buf.advance(len);
-            let (key, value) = merged?;
-            self.insert(key, value);
-            return Ok(());
-        }
-        let mut guard = buf.push_limit_guard(len)?;
-        let (key, value) = decode_map_entry::<K, V, A, _>(&mut *guard, alloc, depth)?;
+            }
+            decode::LenBody::Limited(limited) => {
+                decode_map_entry::<K, V, A, _>(limited, alloc, depth)
+            }
+        })?;
         self.insert(key, value);
         Ok(())
     }
