@@ -163,7 +163,7 @@ impl<M: MessageEncode + MessageMerge> PayloadMerge for ProtoMessage<M> {
                     MessageMerge::merge_from_slice(child, payload, depth + 1)
                 }
                 decode::LenBody::Limited(limited) => {
-                    MessageMerge::merge_from_with_depth(child, limited, depth + 1)
+                    MessageMerge::merge_from_with_depth(child, limited, depth + 1, None)
                 }
             }
         })

@@ -5,6 +5,7 @@
 //! generated impls forward that to [`merge_message`].
 
 use ::bytes::Buf;
+use ::protobuf_core::FieldNumber;
 use ::puroro::{DecodeBuf, DecodeError, ScopedBuf};
 
 use crate::decode::{SliceCursor, contiguous_remaining};
@@ -21,6 +22,11 @@ pub trait MessageMerge {
     /// Reads fields from `buf` and merges them into `self`, threading decode
     /// nesting `depth`.
     ///
+    /// `end_group` is `None` for a top-level or length-delimited body. `Some(field)`
+    /// is a group body whose start tag is already consumed: stop after the
+    /// matching end-group, and consume that tag. The child reads `buf` in
+    /// place. Nothing is copied into a side buffer.
+    ///
     /// Generated messages run their field `match` here. [`merge_message`] calls
     /// [`Self::merge_from_slice`] when the input is one chunk, and calls this
     /// method on a [`ScopedBuf`] when the remainder spans chunks. A nested
@@ -28,13 +34,29 @@ pub trait MessageMerge {
     /// [`Self::merge_from_slice`] as a subslice.
     ///
     /// Eager messages return [`DecodeError::RecursionLimitExceeded`] when
-    /// `depth >= `[`puroro::RECURSION_LIMIT`]. Lazy ingest ignores `depth`
-    /// except to forward `depth + 1` into an eager-pinned child.
+    /// `depth >= `[`puroro::RECURSION_LIMIT`]. That check runs before a group
+    /// body is read, so the matching end-group stays in `buf`. Lazy ingest
+    /// ignores `depth` except to forward `depth + 1` into an eager-pinned child.
     fn merge_from_with_depth<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
         depth: usize,
+        end_group: Option<FieldNumber>,
     ) -> Result<(), DecodeError>;
+
+    /// Merges one group body. The start tag for `field` is already consumed.
+    ///
+    /// The default calls [`merge_from_with_depth`](Self::merge_from_with_depth)
+    /// with `Some(field)`.
+    #[inline]
+    fn merge_group<B: DecodeBuf>(
+        &mut self,
+        buf: &mut B,
+        field: FieldNumber,
+        depth: usize,
+    ) -> Result<(), DecodeError> {
+        self.merge_from_with_depth(buf, depth, Some(field))
+    }
 
     /// Merge one contiguous message body.
     ///
@@ -43,7 +65,7 @@ pub trait MessageMerge {
     #[inline]
     fn merge_from_slice(&mut self, slice: &[u8], depth: usize) -> Result<(), DecodeError> {
         let mut cursor = SliceCursor::new(slice);
-        self.merge_from_with_depth(&mut cursor, depth)
+        self.merge_from_with_depth(&mut cursor, depth, None)
     }
 }
 
@@ -63,5 +85,5 @@ pub fn merge_message<M: MessageMerge, B: Buf>(
         return Ok(());
     }
     let mut scoped = ScopedBuf::new(buf);
-    message.merge_from_with_depth(&mut scoped, 0)
+    message.merge_from_with_depth(&mut scoped, 0, None)
 }

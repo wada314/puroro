@@ -1,6 +1,7 @@
 //! `TaskLazy` ingest: scanner, catalog merge, WireOrSso, nested lazy children.
 
 use ::allocator_api2::alloc::Global;
+use ::bytes::Buf;
 use ::puroro::{
     BytesMut, DecodeError, MapMut, MapRef, Message, RECURSION_LIMIT, RepeatedStringMut, ScopedBuf,
     StringMut, UnknownPayload,
@@ -1228,7 +1229,7 @@ fn leaf_child_is_accepted_at_the_eager_limit() {
     {
         let mut cursor = bytes.as_slice();
         let mut scoped = ScopedBuf::new(&mut cursor);
-        MessageMerge::merge_from_with_depth(&mut lazy, &mut scoped, RECURSION_LIMIT).unwrap();
+        MessageMerge::merge_from_with_depth(&mut lazy, &mut scoped, RECURSION_LIMIT, None).unwrap();
     }
     let got = lazy.assignee().unwrap().expect("assignee present");
     assert_eq!(got.street().unwrap().get(), "Oak");
@@ -1246,7 +1247,7 @@ fn merge_from_ignores_the_eager_recursion_limit() {
     {
         let mut cursor = bytes.as_slice();
         let mut scoped = ScopedBuf::new(&mut cursor);
-        MessageMerge::merge_from_with_depth(&mut lazy, &mut scoped, RECURSION_LIMIT).unwrap();
+        MessageMerge::merge_from_with_depth(&mut lazy, &mut scoped, RECURSION_LIMIT, None).unwrap();
     }
     assert_eq!(lazy.score().unwrap(), 9);
 }
@@ -1276,4 +1277,94 @@ fn preserve_lazy_unknown_fields_come_from_wire() {
     assert_eq!(*unknowns[1].payload(), UnknownPayload::Varint(99));
     assert_eq!(LazyMessage::encode_to_vec(&lazy).unwrap(), bytes);
     assert_eq!(Message::encode_to_vec(&lazy), bytes);
+}
+
+/// One-byte chunks used to force a group that does not fit in `Buf::chunk`.
+struct OneByte<'a> {
+    rest: &'a [u8],
+}
+
+impl Buf for OneByte<'_> {
+    fn remaining(&self) -> usize {
+        self.rest.len()
+    }
+
+    fn chunk(&self) -> &[u8] {
+        let n = 1.min(self.rest.len());
+        &self.rest[..n]
+    }
+
+    fn advance(&mut self, cnt: usize) {
+        self.rest = &self.rest[cnt..];
+    }
+}
+
+fn group_with_score(score: i32) -> Vec<u8> {
+    let mut bytes = Vec::new();
+    encode_varint_field(
+        field_number_const::<FIELD_SCORE>(),
+        Varint::from_int32(score),
+        &mut bytes,
+    );
+    // End-group for field 9. The trailing byte is not part of the group.
+    encode_u64_varint(9u64 << 3 | 4, &mut bytes);
+    bytes.push(0x99);
+    bytes
+}
+
+#[test]
+fn merge_group_reads_eager_and_lazy_records_in_place() {
+    let bytes = group_with_score(4);
+    let group = field_number_const::<9>();
+
+    let mut eager = Task::new();
+    {
+        let mut rest = &bytes[..];
+        let mut buf = ScopedBuf::new(&mut rest);
+        MessageMerge::merge_group(&mut eager, &mut buf, group, 0).unwrap();
+        assert_eq!(buf.chunk(), &[0x99]);
+    }
+    assert_eq!(eager.score(), 4);
+
+    let mut eager_split = Task::new();
+    {
+        let mut chunked = OneByte { rest: &bytes };
+        let mut buf = ScopedBuf::new(&mut chunked);
+        MessageMerge::merge_group(&mut eager_split, &mut buf, group, 0).unwrap();
+        assert_eq!(buf.chunk(), &[0x99]);
+    }
+    assert_eq!(eager_split.score(), 4);
+
+    let mut lazy = TaskLazy::new();
+    {
+        let mut rest = &bytes[..];
+        let mut buf = ScopedBuf::new(&mut rest);
+        MessageMerge::merge_group(&mut lazy, &mut buf, group, 0).unwrap();
+        assert_eq!(buf.chunk(), &[0x99]);
+    }
+    assert_eq!(lazy.score().unwrap(), 4);
+
+    let mut lazy_split = TaskLazy::new();
+    {
+        let mut chunked = OneByte { rest: &bytes };
+        let mut buf = ScopedBuf::new(&mut chunked);
+        MessageMerge::merge_group(&mut lazy_split, &mut buf, group, 0).unwrap();
+        assert_eq!(buf.chunk(), &[0x99]);
+    }
+    assert_eq!(lazy_split.score().unwrap(), 4);
+
+    let mut truncated = Vec::new();
+    encode_varint_field(
+        field_number_const::<FIELD_SCORE>(),
+        Varint::from_int32(1),
+        &mut truncated,
+    );
+    let mut lazy_cut = TaskLazy::new();
+    let mut rest = &truncated[..];
+    let mut buf = ScopedBuf::new(&mut rest);
+    assert_eq!(
+        MessageMerge::merge_group(&mut lazy_cut, &mut buf, group, 0).unwrap_err(),
+        DecodeError::TruncatedMessage
+    );
+    assert_eq!(buf.remaining(), truncated.len());
 }

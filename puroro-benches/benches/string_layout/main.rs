@@ -24,8 +24,9 @@ use ::bytes::{Buf, BufMut};
 use ::core::time::Duration;
 use ::criterion::measurement::WallTime;
 use ::criterion::{BenchmarkGroup, BenchmarkId, Criterion, Throughput, black_box, criterion_group};
+use ::protobuf_core::FieldNumber;
 use ::puroro::{DecodeBuf, DecodeError, Message, String as AllocString};
-use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
+use ::puroro_rt::decode::{next_tag, skip_field_and_save};
 use ::puroro_rt::{
     EncodeCtx, Explicit, FieldDeallocate, FieldEncode, INLINE_CAP, Inline, InlineOrHeap,
     MessageCommon, MessageEncode, MessageMerge, ProtoString, SingularField,
@@ -161,12 +162,12 @@ macro_rules! impl_eight_string_message {
                 &mut self,
                 buf: &mut B,
                 depth: usize,
+                end_group: Option<FieldNumber>,
             ) -> Result<(), DecodeError> {
                 if depth >= ::puroro::RECURSION_LIMIT {
                     return Err(DecodeError::RecursionLimitExceeded);
                 }
-                while buf.has_remaining() {
-                    let (field_number, wire_type) = decode_tag(buf)?;
+                while let Some((field_number, wire_type)) = next_tag(buf, end_group)? {
                     match field_number.as_u32() {
                         1 => self
                             .s0

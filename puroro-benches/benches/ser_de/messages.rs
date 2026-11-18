@@ -4,8 +4,9 @@ use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
+use ::protobuf_core::FieldNumber;
 use ::puroro::{DecodeBuf, DecodeError, Message};
-use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
+use ::puroro_rt::decode::{next_tag, skip_field_and_save};
 use ::puroro_rt::{
     Boxed, EncodeCtx, Explicit, FieldDeallocate, FieldEncode, Implicit, Inline, InlineOrHeap,
     Message as MessagePresence, MessageCommon, MessageEncode, MessageMerge, Packed, ProtoBytes,
@@ -129,12 +130,12 @@ impl<A: Allocator + Clone> MessageMerge for FlatScalars<A> {
         &mut self,
         buf: &mut B,
         depth: usize,
+        end_group: Option<FieldNumber>,
     ) -> Result<(), DecodeError> {
         if depth >= ::puroro::RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
-        while buf.has_remaining() {
-            let (field_number, wire_type) = decode_tag(buf)?;
+        while let Some((field_number, wire_type)) = next_tag(buf, end_group)? {
             match field_number.as_u32() {
                 1 => self
                     .a
@@ -299,12 +300,12 @@ impl<A: Allocator + Clone> MessageMerge for Nest<A> {
         &mut self,
         buf: &mut B,
         depth: usize,
+        end_group: Option<FieldNumber>,
     ) -> Result<(), DecodeError> {
         if depth >= ::puroro::RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
-        while buf.has_remaining() {
-            let (field_number, wire_type) = decode_tag(buf)?;
+        while let Some((field_number, wire_type)) = next_tag(buf, end_group)? {
             match field_number.as_u32() {
                 1 => self
                     .child
@@ -437,12 +438,12 @@ impl<A: Allocator + Clone> MessageMerge for Leaf<A> {
         &mut self,
         buf: &mut B,
         depth: usize,
+        end_group: Option<FieldNumber>,
     ) -> Result<(), DecodeError> {
         if depth >= ::puroro::RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
-        while buf.has_remaining() {
-            let (field_number, wire_type) = decode_tag(buf)?;
+        while let Some((field_number, wire_type)) = next_tag(buf, end_group)? {
             match field_number.as_u32() {
                 1 => self
                     .value
@@ -579,12 +580,12 @@ macro_rules! impl_wrap_message {
                 &mut self,
                 buf: &mut B,
                 depth: usize,
+                end_group: Option<FieldNumber>,
             ) -> Result<(), DecodeError> {
                 if depth >= ::puroro::RECURSION_LIMIT {
                     return Err(DecodeError::RecursionLimitExceeded);
                 }
-                while buf.has_remaining() {
-                    let (field_number, wire_type) = decode_tag(buf)?;
+                while let Some((field_number, wire_type)) = next_tag(buf, end_group)? {
                     match field_number.as_u32() {
                         1 => self
                             .child
@@ -723,12 +724,12 @@ impl<A: Allocator + Clone> MessageMerge for PackedInts<A> {
         &mut self,
         buf: &mut B,
         depth: usize,
+        end_group: Option<FieldNumber>,
     ) -> Result<(), DecodeError> {
         if depth >= ::puroro::RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
-        while buf.has_remaining() {
-            let (field_number, wire_type) = decode_tag(buf)?;
+        while let Some((field_number, wire_type)) = next_tag(buf, end_group)? {
             match field_number.as_u32() {
                 1 => self
                     .values
@@ -898,12 +899,12 @@ impl<A: Allocator + Clone> MessageMerge for StringHeavy<A> {
         &mut self,
         buf: &mut B,
         depth: usize,
+        end_group: Option<FieldNumber>,
     ) -> Result<(), DecodeError> {
         if depth >= ::puroro::RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
-        while buf.has_remaining() {
-            let (field_number, wire_type) = decode_tag(buf)?;
+        while let Some((field_number, wire_type)) = next_tag(buf, end_group)? {
             match field_number.as_u32() {
                 1 => self
                     .s0
@@ -1064,12 +1065,12 @@ impl<A: Allocator + Clone> MessageMerge for ShortStrings<A> {
         &mut self,
         buf: &mut B,
         depth: usize,
+        end_group: Option<FieldNumber>,
     ) -> Result<(), DecodeError> {
         if depth >= ::puroro::RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
-        while buf.has_remaining() {
-            let (field_number, wire_type) = decode_tag(buf)?;
+        while let Some((field_number, wire_type)) = next_tag(buf, end_group)? {
             match field_number.as_u32() {
                 1 => self
                     .s0

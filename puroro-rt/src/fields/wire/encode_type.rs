@@ -20,6 +20,7 @@ use crate::message_encode::{EncodeCtx, MessageEncode};
 
 use super::len::{LenCodec, LenScalar};
 use super::numerical::{Numerical, NumericalType};
+use super::proto_group::ProtoGroup;
 use super::proto_message::ProtoMessage;
 use super::wire_payload::WirePayload;
 
@@ -42,11 +43,14 @@ pub trait EncodeType {
         A: 'a;
 
     /// Wire type used on the tag (`Varint`, `Int32` / fixed32-family, `Int64` /
-    /// fixed64-family, or `Len`).
+    /// fixed64-family, `Len`, or `SGroup` for [`super::proto_group::ProtoGroup`]).
+    ///
+    /// `SGroup` means the untagged body is the raw group interior. Tagged encode
+    /// writes the start-group tag, that body, and the matching end-group tag.
     const WIRE_TYPE: WireType;
 
     /// Byte length of the complete untagged wire body (no tag; for `Len`,
-    /// includes the length varint).
+    /// includes the length varint; for `SGroup`, the interior only).
     fn payload_len<'a, A: Allocator>(value: Self::View<'a, A>, ctx: &mut EncodeCtx) -> usize
     where
         Self: 'a;
@@ -75,11 +79,12 @@ where
         WireType::Varint | WireType::Int32 | WireType::Int64 | WireType::Len => {
             encode::encoded_len_tag(field, T::WIRE_TYPE) + T::payload_len::<A>(value, ctx)
         }
-        WireType::SGroup | WireType::EGroup => {
-            // Known group fields are not encoded yet. Unknown groups round-trip
-            // as raw bytes in the unknown-field blob, not through this helper.
-            panic!("encoding protobuf groups is not supported")
+        WireType::SGroup => {
+            encode::encoded_len_tag(field, WireType::SGroup)
+                + T::payload_len::<A>(value, ctx)
+                + encode::encoded_len_tag(field, WireType::EGroup)
         }
+        WireType::EGroup => panic!("end-group is not a protobuf type marker"),
     }
 }
 
@@ -100,9 +105,12 @@ pub(crate) fn encode_field<'a, T, A, B>(
             encode::encode_tag(field, T::WIRE_TYPE, buf);
             T::encode_payload::<A, B>(value, ctx, buf);
         }
-        WireType::SGroup | WireType::EGroup => {
-            panic!("encoding protobuf groups is not supported")
+        WireType::SGroup => {
+            encode::encode_tag(field, WireType::SGroup, buf);
+            T::encode_payload::<A, B>(value, ctx, buf);
+            encode::encode_tag(field, WireType::EGroup, buf);
         }
+        WireType::EGroup => panic!("end-group is not a protobuf type marker"),
     }
 }
 
@@ -192,6 +200,34 @@ impl<M: MessageEncode> EncodeType for ProtoMessage<M> {
     {
         let n = ctx.body_len_for(value);
         encode::encode_varint(Varint::from_uint64(n as u64), buf);
+        value.encode_raw(ctx, buf);
+    }
+}
+
+impl<M: MessageEncode> EncodeType for ProtoGroup<M> {
+    type View<'a, A: Allocator>
+        = &'a M
+    where
+        Self: 'a,
+        A: 'a;
+
+    const WIRE_TYPE: WireType = WireType::SGroup;
+
+    #[inline]
+    fn payload_len<'a, A: Allocator>(value: &'a M, ctx: &mut EncodeCtx) -> usize
+    where
+        Self: 'a,
+    {
+        ctx.body_len_for(value)
+    }
+
+    #[inline]
+    fn encode_payload<'a, A, B>(value: &'a M, ctx: &mut EncodeCtx, buf: &mut B)
+    where
+        Self: 'a,
+        A: Allocator,
+        B: BufMut,
+    {
         value.encode_raw(ctx, buf);
     }
 }

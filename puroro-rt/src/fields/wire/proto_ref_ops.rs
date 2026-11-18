@@ -7,6 +7,7 @@ use ::core::fmt::{Debug, Formatter, Result as FmtResult};
 
 use super::len::{BytesLikeLenCodec, LenScalar, StringCodec};
 use super::numerical::{Numerical, NumericalType};
+use super::proto_group::ProtoGroup;
 use super::proto_message::ProtoMessage;
 use super::singular_type::SingularType;
 use crate::fields::shared::value_slot::AddressableSlot;
@@ -130,6 +131,34 @@ where
 }
 
 impl<M, A> ProtoRefDebug<A> for ProtoMessage<M>
+where
+    M: MessageEncode + Debug,
+    A: Allocator,
+{
+    #[inline]
+    fn fmt_ref<'a>(value: &&'a M, f: &mut Formatter<'_>) -> FmtResult
+    where
+        A: 'a,
+    {
+        Debug::fmt(*value, f)
+    }
+}
+
+impl<M, A> ProtoRefEq<A> for ProtoGroup<M>
+where
+    M: MessageEncode + PartialEq,
+    A: Allocator,
+{
+    #[inline]
+    fn option_eq<'a>(lhs: Option<&'a M>, rhs: Option<&'a M>) -> bool
+    where
+        A: 'a,
+    {
+        lhs == rhs
+    }
+}
+
+impl<M, A> ProtoRefDebug<A> for ProtoGroup<M>
 where
     M: MessageEncode + Debug,
     A: Allocator,

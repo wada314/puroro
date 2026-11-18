@@ -4,8 +4,9 @@ use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
+use ::protobuf_core::FieldNumber;
 use ::puroro::{DecodeBuf, DecodeError, Message};
-use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
+use ::puroro_rt::decode::{next_tag, skip_field_and_save};
 use ::puroro_rt::{
     EncodeCtx, Expanded, Explicit, FieldDeallocate, FieldEncode, MessageCommon, MessageEncode,
     MessageMerge, Packed, ProtoDouble, ProtoFixed32, ProtoFloat, RepeatedField, SingularField,
@@ -86,12 +87,12 @@ impl<A: Allocator + Clone> MessageMerge for FixedDemo<A> {
         &mut self,
         buf: &mut B,
         depth: usize,
+        end_group: Option<FieldNumber>,
     ) -> Result<(), DecodeError> {
         if depth >= ::puroro::RECURSION_LIMIT {
             return Err(DecodeError::RecursionLimitExceeded);
         }
-        while buf.has_remaining() {
-            let (field_number, wire_type) = decode_tag(buf)?;
+        while let Some((field_number, wire_type)) = next_tag(buf, end_group)? {
             match field_number.as_u32() {
                 1 => self
                     .code
