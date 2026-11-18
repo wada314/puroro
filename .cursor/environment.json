@@ -1,0 +1,4 @@
+{
+  "name": "wada314/puroro",
+  "install": "bash .cursor/install.sh"
+}
