@@ -222,8 +222,8 @@ applied numericals / promoted SSO; unpromoted LEN stays offsets.
 - Lazy `_mut` / in-place edit of `_wire`.
 - Mid-payload splits as a **zero-copy storage contract** for `&str` / child
   `_wire`.
-- A separate `TaskView<'buf>` type. Zero-copy is the `B` parameter on
-  `TaskLazy<A, B>` ([wire-buf.md](wire-buf.md)), not a third message type.
+- A `*View` message type (`TaskView`, `AddressView`, `PointView`). Zero-copy
+  is the `B` parameter on `TaskLazy<A, B>` ([wire-buf.md](wire-buf.md)).
 - Generator / `TaskImpl<A, L>` before handwritten lazy works.
 - Field-level partial/resume inside `protobuf-core` (compose tag/varint
   partial at the puroro layer).
@@ -399,7 +399,7 @@ several other behaviours. The list, including option sketches, is
 
 ## Pointers
 
-- [wire-buf.md](wire-buf.md) — `WireBuf` parameter that replaces a separate view type.
+- [wire-buf.md](wire-buf.md) — `WireBuf` parameter. No `*View` message type.
 - DESIGN.md §8 — shipped lazy alias. This note keeps the lock and the rejected list.
 - IMPLEMENTATION.md §3 / §17 — plugin status. The runtime exists.
 - `sample-generated/` — eager normative output; lazy is added the same way.

@@ -1,6 +1,6 @@
 # Wire buffer parameter
 
-**Status: design.** Not implemented. This replaces a separate `TaskView<'buf>`.
+**Status: design.** Not implemented. There is no `*View` message type.
 `TaskLazy<A>` stays the owned lazy message. Zero-copy is the same struct with
 a second type parameter.
 
@@ -192,4 +192,4 @@ cannot invent one. `TaskLazy<A, Bytes>::new_in` uses `WireAppend::empty`.
    behavior, including `push` and `Message::decode`.
 3. Add `open` and `TaskLazy<A, &'buf [u8]>::parse`, plus the borrowed getters
    on the handwritten sample.
-4. Move the sample's zero-copy tests onto `parse`. Do not add a `TaskView` type.
+4. Add zero-copy tests on `parse`. There is no `*View` message type.
