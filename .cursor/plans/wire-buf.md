@@ -1,8 +1,10 @@
 # Wire buffer parameter
 
-**Status: design.** Not implemented. There is no `*View` message type.
-`TaskLazy<A>` stays the owned lazy message. Zero-copy is the same struct with
-a second type parameter.
+**Status: design + step 1.** `WireBuf` / `WireAppend` live in
+`puroro-rt/src/decode/wire_buf.rs`. `SharedWire` append / slice go through
+those traits. Steps 2–4 (parameterize `LazyScan`, `parse_in`, sample getters)
+are not done. There is no `*View` message type. `TaskLazy<A>` stays the owned
+lazy message. Zero-copy is the same struct with a second type parameter.
 
 ## Public type
 

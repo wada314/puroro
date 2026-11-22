@@ -11,6 +11,7 @@ mod record;
 mod shared_wire;
 mod slice_cursor;
 mod varint;
+mod wire_buf;
 
 pub use self::slice_cursor::{SliceCursor, contiguous_remaining};
 
@@ -27,6 +28,7 @@ pub use self::varint::{
     ChunkScanHot4, ChunkScanHot8, ChunkScanHot10, ChunkScanHotAdapt, ChunkScanLikely1,
     ChunkScanMsb, VarintDecoder,
 };
+pub use self::wire_buf::{WireAppend, WireBuf};
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::Buf;

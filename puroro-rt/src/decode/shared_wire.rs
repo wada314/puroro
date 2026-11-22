@@ -8,11 +8,11 @@
 //! "Why `A: Clone` is a struct bound".
 
 use ::allocator_api2::alloc::{Allocator, Global};
-use ::bytes::{Bytes, BytesMut};
+use ::bytes::Bytes;
 use ::core::fmt::{self, Debug, Formatter};
-use ::core::mem;
 
 use super::record::WireSpan;
+use super::wire_buf::{WireAppend, WireBuf};
 
 /// Reference-counted wire blob plus the message allocator (unused for data).
 pub struct SharedWire<A: Allocator = Global> {
@@ -73,22 +73,15 @@ impl<A: Allocator + Clone> SharedWire<A> {
 
     /// Sub-handle of `span`. Offsets in the result are 0-based in the slice.
     pub fn slice(&self, span: WireSpan) -> Result<Self, ::puroro::DecodeError> {
-        let _ = span.slice(self.as_bytes())?;
-        let end = span.offset + span.len;
         Ok(Self {
-            data: self.data.slice(span.offset..end),
+            data: self.data.subslice(span)?,
             alloc: self.alloc.clone(),
         })
     }
 
     /// Append `more`. If other handles exist, copies then appends (COW).
     pub fn append(&mut self, more: &[u8]) {
-        if more.is_empty() {
-            return;
-        }
-        let mut buf = BytesMut::from(mem::take(&mut self.data));
-        buf.extend_from_slice(more);
-        self.data = buf.freeze();
+        self.data.append(more);
     }
 }
 
