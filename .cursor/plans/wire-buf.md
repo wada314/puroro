@@ -26,11 +26,17 @@ message does not implement `Message`. Its surface is `parse_in` / `parse` and
 ```rust
 impl<'buf, A: Allocator + Clone> TaskLazy<A, &'buf [u8]> {
     pub fn parse_in(buf: &'buf [u8], alloc: A) -> Result<Self, DecodeError>;
+}
+
+impl<'buf> TaskLazy<Global, &'buf [u8]> {
     pub fn parse(buf: &'buf [u8]) -> Result<Self, DecodeError> {
         Self::parse_in(buf, Global)
     }
 }
 ```
+
+`parse` is a separate impl for `A = Global`. Putting it on `impl<'buf, A>`
+does not type-check, because `Global` is not an arbitrary `A`.
 
 `parse_in` scans once. It does not copy `buf` into `Bytes`. Slots and the
 scan `Vec`s use `alloc`. Nested apply still builds a child with `DefaultIn`
@@ -224,11 +230,12 @@ pub trait LazyAppend<A: Allocator + Clone, B: WireAppend>: LazyMessage<A, B> {
 It has no public `new_in`. `TaskLazy<A, Bytes>::new_in` uses
 `WireAppend::empty`.
 
-A nested slot still needs a placeholder before `adopt`. That value is
-crate-private, built through `DefaultIn`. For `B = &'buf [u8]` its `wire` is
-`&[]`, which coerces to `'buf`. It is not a public empty borrowed message.
-`adopt` then replaces that wire with a clone of the parent buffer and records
-a non-empty region.
+A nested slot still needs a placeholder before `adopt`. `DefaultIn` is a
+public trait, and nested construction uses `DefaultIn::default_in`. For
+`B = &'buf [u8]` that value has `wire = &[]`, which coerces to `'buf`. It is
+the slot placeholder, not a root API. A caller who wants a message from a
+buffer uses `parse_in`. `adopt` then replaces that wire with a clone of the
+parent buffer and records a non-empty region.
 
 ## Steps
 
