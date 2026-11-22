@@ -1,11 +1,12 @@
 # Wire buffer parameter
 
-**Status: design + steps 1–2.** `WireBuf` / `WireAppend` live in
-`puroro-rt/src/decode/wire_buf.rs`. `LazyScan<A, B = Bytes>` / `Lazy<A, B>` /
-`LazyMessage<A, B>` store `B` directly. Default `B = Bytes` keeps
-`TaskLazy<A>` call sites. `SharedWire` remains for its unit tests; lazy ingest
-no longer uses it. Steps 3–4 (`parse_in`, borrowed getters) are not done.
-There is no `*View` message type.
+**Status: steps 1–4 on the handwritten sample.** `WireBuf` / `WireAppend` live
+in `puroro-rt/src/decode/wire_buf.rs`. `LazyScan::open` scans a finished buffer
+without appending. Sample `TaskLazy` / `AddressLazy` / `PointLazy` take
+`B: WireBuf = Bytes`. Zero-copy is `TaskLazy<A, &'buf [u8]>` via `parse_in` /
+`parse` and peeking string/bytes getters. Plugin emit of `B` / borrowed getters
+is not done yet. `SharedWire` remains for its unit tests. There is no `*View`
+message type.
 
 ## Public type
 
@@ -252,9 +253,8 @@ parent buffer and records a non-empty region.
 
 ## Which document wins
 
-This file is the design for the unshipped buffer parameter. `DESIGN.md` §7
-still says there is no zero-copy decode, and §8 still names `TaskView<'buf>`
-as not part of the eager / lazy pair. `IMPLEMENTATION.md` still describes the
-shipped lazy alias. Those two stay the description of what is implemented.
-The implementation PR updates them when `TaskLazy<A, &'buf [u8]>` exists.
-Until then, a reviewer of this design reads this file.
+`DESIGN.md` §8 and `IMPLEMENTATION.md` describe the shipped sample surface
+(`TaskLazy<A, B>`, `parse_in`, peek getters). The plugin still emits the
+`Bytes` default without a `B` parameter or borrowed getters. This file keeps
+the trait shape and the steps. Removals of `SharedWire` and plugin emit of
+`B` are follow-ups.
