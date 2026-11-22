@@ -6,11 +6,12 @@
 //! newtypes over [`puroro_rt::Record`].
 
 use ::allocator_api2::alloc::{Allocator, Global};
+use ::bytes::Bytes;
 use ::core::marker::PhantomData;
 use ::core::mem;
 use ::core::ops::{ControlFlow, DerefMut};
 use ::puroro::{DecodeBuf, DecodeError, WireType};
-use ::puroro_rt::decode::{MessageScan, ScannedRecord, scanned_len_span};
+use ::puroro_rt::decode::{MessageScan, ScannedRecord, WireBuf, scanned_len_span};
 use ::puroro_rt::{
     CloneRecordFields, ConstructRecordFields, Eager, EagerRecordFields, Explicit, FieldCloneIn,
     FieldDeallocate, FieldPairVisitor, FieldVisitor, FieldVisitorMut, HasField, Lazy,
@@ -80,8 +81,9 @@ pub struct Address<A: Allocator + Clone = Global> {
     pub(crate) record: Record<AddressFields<A, Eager>, A, Eager, UnknownFields<A>>,
 }
 
-pub struct AddressLazy<A: Allocator + Clone = Global> {
-    pub(crate) record: Record<AddressFields<A, Lazy<A>>, A, Lazy<A>, UnknownFields<A>>,
+pub struct AddressLazy<A: Allocator + Clone = Global, B: WireBuf = Bytes> {
+    #[allow(clippy::type_complexity)]
+    pub(crate) record: Record<AddressFields<A, Lazy<A, B>>, A, Lazy<A, B>, UnknownFields<A>>,
 }
 
 ::puroro_rt::forward_record!(eager Address);
@@ -153,7 +155,37 @@ macro_rules! clone_address_slot {
 }
 
 impl_address_build!(Eager);
-impl_address_build!(Lazy<A>);
+
+impl<A: Allocator + Clone, B: WireBuf> ConstructRecordFields<A, Lazy<A, B>>
+    for AddressFields<A, Lazy<A, B>>
+{
+    fn new(alloc: A) -> Self {
+        Self {
+            street: SingularField::new_in(alloc.clone()),
+            city: SingularField::new_in(alloc.clone()),
+            postal_code: SingularField::new_in(alloc.clone()),
+            latitude: SingularField::new_in(alloc),
+            _layout: PhantomData,
+        }
+    }
+}
+
+impl<A: Allocator + Clone, B: WireBuf> CloneRecordFields<A, Lazy<A, B>>
+    for AddressFields<A, Lazy<A, B>>
+{
+    fn clone_fields(
+        &self,
+        dst: &mut Self,
+        src_common: &MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A, B>>,
+        dst_common: &MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A, B>>,
+        alloc: A,
+    ) {
+        clone_address_slot!(self, dst, src_common, dst_common, alloc, street);
+        clone_address_slot!(self, dst, src_common, dst_common, alloc, city);
+        clone_address_slot!(self, dst, src_common, dst_common, alloc, postal_code);
+        clone_address_slot!(self, dst, src_common, dst_common, alloc, latitude);
+    }
+}
 
 impl<A: Allocator + Clone> EagerRecordFields<A> for AddressFields<A, Eager> {
     fn visit_fields<V: FieldVisitor<MessageCommon<Self::Bits, A, Self::Unknown, Eager>>>(
@@ -217,10 +249,10 @@ impl<A: Allocator + Clone> EagerRecordFields<A> for AddressFields<A, Eager> {
     }
 }
 
-impl<A: Allocator + Clone> LazyRecordApply<A> for AddressFields<A, Lazy<A>> {
+impl<A: Allocator + Clone, B: WireBuf> LazyRecordApply<A, B> for AddressFields<A, Lazy<A, B>> {
     fn apply_record(
         &mut self,
-        common: &mut MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A>>,
+        common: &mut MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A, B>>,
         rec: &ScannedRecord,
         origin: usize,
         _depth: usize,

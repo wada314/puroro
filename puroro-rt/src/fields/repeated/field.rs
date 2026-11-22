@@ -19,7 +19,7 @@ use ::unmanaged::UnmanagedString;
 use ::unmanaged::UnmanagedVec;
 use ::unmanaged::vec::VecGuard;
 
-use crate::decode::{LazyMessage, ScannedRecord, ScannedValue, SharedWire, WireSpan};
+use crate::decode::{LazyMessage, ScannedRecord, ScannedValue, WireBuf, WireSpan};
 use crate::encode::field_number_const;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{DefaultIn, FieldDeallocate, MessageCommon, MessageCommonAlloc};
@@ -520,7 +520,7 @@ where
 
 impl<M, E, const FIELD: u32, A> RepeatedField<ProtoMessage<M>, E, FIELD, A>
 where
-    M: MessageEncode + LazyMessage<A> + DefaultIn<A>,
+    M: MessageEncode + DefaultIn<A>,
     E: RepeatedEncoding<ProtoMessage<M>, A>,
     A: Allocator + Clone,
 {
@@ -529,12 +529,17 @@ where
     /// Does not walk the child's tags. The child's first field getter parses
     /// stored regions. Distinct from singular last-wins: each occurrence is a
     /// new list element (same as eager repeated message).
-    pub fn merge_shared<Cx: MessageCommonAlloc<Alloc = A>>(
+    pub fn merge_shared<Cx, B>(
         &mut self,
-        root: &SharedWire<A>,
+        root: &B,
         span: WireSpan,
         common: &Cx,
-    ) -> Result<(), DecodeError> {
+    ) -> Result<(), DecodeError>
+    where
+        Cx: MessageCommonAlloc<Alloc = A>,
+        B: WireBuf,
+        M: LazyMessage<A, B>,
+    {
         let mut child = M::default_in(common.clone_alloc());
         child.merge_shared(root, span)?;
         self.push_in(child, common.clone_alloc());

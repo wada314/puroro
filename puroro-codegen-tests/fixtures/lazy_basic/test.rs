@@ -76,3 +76,17 @@ fn eager_parent_stores_pinned_lazy_child() {
     _child_is_eager(note.child_mut());
     _pinned_is_lazy(note.pinned_mut());
 }
+
+#[test]
+fn parse_title_borrows_caller_buffer() {
+    let mut note = Note::new();
+    note.title_mut().push_str("hi");
+    let wire = note.encode_to_vec();
+    let lazy = NoteLazy::parse(wire.as_slice()).unwrap();
+    let title = lazy.title().unwrap().get();
+    assert_eq!(title, "hi");
+    assert_eq!(
+        title.as_ptr(),
+        wire.windows(2).find(|w| *w == b"hi").unwrap().as_ptr()
+    );
+}

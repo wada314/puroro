@@ -137,6 +137,25 @@ where
             None => Ok(Optional::new(None)),
         }
     }
+
+    /// UTF-8 peek of variant `N` without promoting (borrowed lazy wire).
+    #[inline]
+    pub fn peek_str<'buf, Pb, U, L>(
+        self,
+        common: &MessageCommon<Pb, A, U, L>,
+        wire: &'buf [u8],
+    ) -> Result<Optional<&'buf str, D>, DecodeError>
+    where
+        U: UnknownStore<A>,
+        Pb: BitStorage,
+        D: HasDefault<&'buf str>,
+        MessageCommon<Pb, A, U, L>: MessageCommonSharedBits,
+    {
+        match self.bind(common).as_field() {
+            Some(field) => field.peek_str(common, wire),
+            None => Ok(Optional::new(None)),
+        }
+    }
 }
 
 impl<'a, E, const N: u32, C, A, const KIND: usize, D> OneofFieldRef<'a, E, N>
@@ -171,6 +190,25 @@ where
     {
         match self.bind(common).as_field() {
             Some(field) => field.try_bytes(common, wire),
+            None => Ok(Optional::new(None)),
+        }
+    }
+
+    /// Bytes peek of variant `N` without promoting (borrowed lazy wire).
+    #[inline]
+    pub fn peek_bytes<'buf, Pb, U, L>(
+        self,
+        common: &MessageCommon<Pb, A, U, L>,
+        wire: &'buf [u8],
+    ) -> Result<Optional<&'buf [u8], D>, DecodeError>
+    where
+        U: UnknownStore<A>,
+        Pb: BitStorage,
+        D: HasDefault<&'buf [u8]>,
+        MessageCommon<Pb, A, U, L>: MessageCommonSharedBits,
+    {
+        match self.bind(common).as_field() {
+            Some(field) => field.peek_bytes(common, wire),
             None => Ok(Optional::new(None)),
         }
     }

@@ -1,8 +1,11 @@
 # Wire buffer parameter
 
-**Status: design.** Not implemented. There is no `*View` message type.
-`TaskLazy<A>` stays the owned lazy message. Zero-copy is the same struct with
-a second type parameter.
+**Status: steps 1–4 done; plugin emits `B`, `parse_in` / peek, and `SharedWire`
+is gone.** `WireBuf` / `WireAppend` live in `puroro-rt/src/decode/wire_buf.rs`.
+`LazyScan::open` scans a finished buffer without appending. Sample and plugin
+`*Lazy` take `B: WireBuf = Bytes`, with `parse_in` / `parse` and peek string /
+bytes getters on `B = &'buf [u8]`. Map message values materialise as
+`NameLazy<A>` (Bytes), not `NameLazy<A, B>`. There is no `*View` message type.
 
 ## Public type
 
@@ -56,58 +59,25 @@ pub trait WireBuf: Clone {
     fn as_bytes(&self) -> &[u8];
 
     fn subslice(&self, span: WireSpan) -> Result<Self::Slice, DecodeError>;
+
+    /// Empty placeholder for nested `DefaultIn` before `adopt`.
+    /// Lives on `WireBuf` (not only `WireAppend`) so `&[u8]` can be `&[]`.
+    fn empty() -> Self;
 }
 
 /// Buffers that can grow. `&[u8]` does not implement this.
 pub trait WireAppend: WireBuf {
-    fn empty() -> Self;
     fn append(&mut self, chunk: &[u8]);
 }
 ```
 
 `subslice` returns an owned handle. For `&'buf [u8]` the implementation
 passes `*self` into `WireSpan::slice`, so the result is `&'buf [u8]`, not a
-borrow of the method receiver. For `Bytes` it is `Bytes::slice`.
-
-```rust
-impl<'buf> WireBuf for &'buf [u8] {
-    type Slice = &'buf [u8];
-
-    fn as_bytes(&self) -> &[u8] {
-        self
-    }
-
-    fn subslice(&self, span: WireSpan) -> Result<&'buf [u8], DecodeError> {
-        span.slice(*self)
-    }
-}
-
-impl WireBuf for Bytes {
-    type Slice = Bytes;
-
-    fn as_bytes(&self) -> &[u8] {
-        self
-    }
-
-    fn subslice(&self, span: WireSpan) -> Result<Bytes, DecodeError> {
-        let end = span.offset.checked_add(span.len).ok_or(DecodeError::TruncatedMessage)?;
-        Ok(self.slice(span.offset..end))
-    }
-}
-
-impl WireAppend for Bytes {
-    fn empty() -> Self {
-        Bytes::new()
-    }
-
-    fn append(&mut self, chunk: &[u8]) {
-        // Same COW as SharedWire::append: BytesMut::from(take) + extend + freeze.
-    }
-}
-```
+borrow of the method receiver. For `Bytes` it is `Bytes::slice` after a
+`checked_add` of `offset + len`.
 
 `A` is not a parameter of the buffer. Field vecs and `MessageCommon` already
-carry it. `Bytes` stays on the global allocator, as `SharedWire` does today.
+carry it. `Bytes` stays on the global allocator.
 
 ## Where the buffer sits
 
@@ -147,10 +117,9 @@ from `subslice` without changing the trait. Children still do not store it.
 that wants a single span as its own handle. A rope whose `Slice` is `Bytes`
 can implement the same trait later. This design does not add that rope.
 
-`SharedWire<A>`'s `Bytes` operations move onto `WireBuf` / `WireAppend`.
-`clone_handle` is `Clone`. `adopt` stores that clone. The wrapper goes away
-once `LazyScan` stores `B` directly. `A` on `SharedWire` is not the allocation
-of the bytes; the message already has `A`.
+`Bytes` operations live on `WireBuf` / `WireAppend`. `clone` is the shared
+handle. `adopt` stores that clone. The old `SharedWire` wrapper is gone;
+`LazyScan` stores `B` directly.
 
 ## Getters
 
@@ -217,18 +186,14 @@ on `TaskLazy<A, Bytes>` only.
 pub trait LazyMessage<A: Allocator + Clone, B: WireBuf = Bytes> {
     fn scan(&self) -> &LazyScan<A, B>;
     fn scan_mut(&mut self) -> &mut LazyScan<A, B>;
-    // ensure_scanned, encode, finish. No push.
-}
-
-pub trait LazyAppend<A: Allocator + Clone, B: WireAppend>: LazyMessage<A, B> {
-    fn push(&mut self, chunk: &[u8]) -> Result<(), DecodeError>;
-    fn ingest_buf<T: Buf>(&mut self, buf: &mut T) -> Result<(), DecodeError>;
+    // ensure_scanned, encode, finish.
+    // push / ingest_* are provided with `where B: WireAppend` (no LazyAppend).
 }
 ```
 
-`TaskLazy<A, &'buf [u8]>` implements `LazyMessage` and not `LazyAppend`.
-It has no public `new_in`. `TaskLazy<A, Bytes>::new_in` uses
-`WireAppend::empty`.
+There is no separate `LazyAppend` trait. `TaskLazy<A, &'buf [u8]>` implements
+`LazyMessage` and cannot call `push`. It has no public `new_in`.
+`TaskLazy<A, Bytes>::new_in` uses `WireBuf::empty`.
 
 A nested slot still needs a placeholder before `adopt`. `DefaultIn` is a
 public trait, and nested construction uses `DefaultIn::default_in`. For
@@ -249,9 +214,6 @@ parent buffer and records a non-empty region.
 
 ## Which document wins
 
-This file is the design for the unshipped buffer parameter. `DESIGN.md` §7
-still says there is no zero-copy decode, and §8 still names `TaskView<'buf>`
-as not part of the eager / lazy pair. `IMPLEMENTATION.md` still describes the
-shipped lazy alias. Those two stay the description of what is implemented.
-The implementation PR updates them when `TaskLazy<A, &'buf [u8]>` exists.
-Until then, a reviewer of this design reads this file.
+`DESIGN.md` §8 and `IMPLEMENTATION.md` describe the shipped surface. The plugin
+emits `B`, owned `try_*` getters, borrowed `peek_*` / `parse_in` / `parse`, and
+`SharedWire` is removed (`WireBuf` covers the old unit tests).

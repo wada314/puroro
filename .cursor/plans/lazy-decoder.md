@@ -25,17 +25,17 @@ at ingest). `merge_packed_buf` did not move typical `task_lazy/decode` or
 drifted a few percent; treat gaps under ~10% as noise. Typical TaskLazy
 decode is about 1.1× eager after rematch (1.08–1.14 across runs).
 Remaining ingest cost is the island copy (`append` / `copy_from_slice`).
-Island-first ingest (copy onto `SharedWire`, then scan; leftover as an
+Island-first ingest (copy onto the island `Bytes`, then scan; leftover as an
 offset; internal `push_bytes`) was tried and reverted: typical
 `task_lazy/decode` / `map/decode_lazy` did not move (+1.7% / +0.1%,
 noise), and it added a second leftover model plus truncate rollback.
 Do not re-land that shape to chase the island copy. `decode(&[u8])` on
 `TaskLazy<A, Bytes>` still copies. Zero-copy is `TaskLazy<A, &'buf [u8]>`
-([wire-buf.md](wire-buf.md)), designed and not implemented. Packed inners
-still walk the payload (unread packed-as-slice is out of v1).
+([wire-buf.md](wire-buf.md)). Packed inners still walk the payload
+(unread packed-as-slice is out of v1).
 
-Still out of v1: the buffer type parameter, lazy mutation, `MessageFallible` on the lazy
-alias, intra-field repeated cursors, zero-copy spanning LEN, packed repeated
+Still out of v1: lazy mutation, `MessageFallible` on the lazy alias,
+intra-field repeated cursors, zero-copy spanning LEN, packed repeated
 left unread.
 
 Discussion lock (2026-09-06). Sentences below that say "do not introduce
@@ -329,8 +329,8 @@ merge, not last-slice-only). Repeated `watchers` appends one child per
 occurrence.
 
 Updated (2026-09-07): nested children `adopt` the island-root
-[`SharedWire`](../../puroro-rt/src/decode/shared_wire.rs) (v1: `Bytes` +
-stored `A`) and record payload spans. No second copy of the LEN body.
+[`WireBuf`](../../puroro-rt/src/decode/wire_buf.rs) handle (v1: `Bytes`)
+and record payload spans. No second copy of the LEN body.
 
 ### Step 7 — Map as offset list
 

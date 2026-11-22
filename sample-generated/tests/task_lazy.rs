@@ -1368,3 +1368,97 @@ fn merge_group_reads_eager_and_lazy_records_in_place() {
     );
     assert_eq!(buf.remaining(), truncated.len());
 }
+
+#[test]
+fn parse_borrows_title_from_input() {
+    let mut wire = Vec::new();
+    encode_len_bytes(FIELD_TITLE, b"hello", &mut wire);
+    let lazy = TaskLazy::parse(&wire).unwrap();
+    let title = lazy.title().unwrap();
+    assert!(title.is_set());
+    let s = title.get();
+    assert_eq!(s, "hello");
+    // Same allocation as the caller's buffer (skip tag + length prefix).
+    let payload = &wire[wire.len() - s.len()..];
+    assert_eq!(s.as_ptr(), payload.as_ptr());
+}
+
+#[test]
+fn parse_in_owner_id_and_payload_borrow() {
+    let mut wire = Vec::new();
+    encode_len_bytes(FIELD_OWNER_ID, b"alice", &mut wire);
+    encode_len_bytes(FIELD_PAYLOAD, b"\x01\x02", &mut wire);
+    let lazy = TaskLazy::parse_in(&wire, Global).unwrap();
+    let owner = lazy.owner_id().unwrap().get();
+    let payload = lazy.payload().unwrap().get();
+    assert_eq!(owner, "alice");
+    assert_eq!(payload, b"\x01\x02");
+    assert_eq!(
+        owner.as_ptr(),
+        wire.windows(5).find(|w| *w == b"alice").unwrap().as_ptr()
+    );
+    assert_eq!(
+        payload.as_ptr(),
+        wire.windows(2)
+            .find(|w| *w == b"\x01\x02")
+            .unwrap()
+            .as_ptr()
+    );
+}
+
+#[test]
+fn parse_invalid_utf8_title_rechecks_every_get() {
+    let mut wire = Vec::new();
+    encode_len_bytes(FIELD_TITLE, b"\xff\xfe", &mut wire);
+    let lazy = TaskLazy::parse(&wire).unwrap();
+    assert_eq!(lazy.title().err(), Some(DecodeError::InvalidUtf8));
+    // No sticky Failed: a later get still reads the caller's bytes.
+    assert_eq!(lazy.title().err(), Some(DecodeError::InvalidUtf8));
+    assert!(lazy.has_title().unwrap());
+}
+
+#[test]
+fn parse_nested_assignee_street_borrows() {
+    let mut child = Vec::new();
+    encode_len_bytes(FIELD_STREET, b"Oak", &mut child);
+    let mut wire = Vec::new();
+    encode_len_bytes(FIELD_ASSIGNEE, &child, &mut wire);
+    let lazy = TaskLazy::parse(&wire).unwrap();
+    let street = lazy.assignee().unwrap().unwrap().street().unwrap().get();
+    assert_eq!(street, "Oak");
+    assert_eq!(
+        street.as_ptr(),
+        wire.windows(3).find(|w| *w == b"Oak").unwrap().as_ptr()
+    );
+}
+
+#[test]
+fn parse_oneof_email_borrows() {
+    let mut wire = Vec::new();
+    encode_len_bytes(FIELD_EMAIL_ADDRESS, b"a@b.c", &mut wire);
+    let lazy = TaskLazy::parse(&wire).unwrap();
+    assert_eq!(
+        lazy.notification().unwrap(),
+        Some(NotificationCase::EmailAddress)
+    );
+    let email = lazy.email_address().unwrap().get();
+    assert_eq!(email, "a@b.c");
+    assert_eq!(
+        email.as_ptr(),
+        wire.windows(5).find(|w| *w == b"a@b.c").unwrap().as_ptr()
+    );
+}
+
+#[test]
+fn parse_score_and_into_eager() {
+    let mut wire = Vec::new();
+    encode_u64_varint(u64::from(FIELD_SCORE) << 3, &mut wire);
+    encode_u64_varint(7, &mut wire);
+    encode_len_bytes(FIELD_TITLE, b"t", &mut wire);
+    let lazy = TaskLazy::parse(&wire).unwrap();
+    assert_eq!(lazy.score().unwrap(), 7);
+    assert_eq!(lazy.title().unwrap().get(), "t");
+    let eager = lazy.into_eager().unwrap();
+    assert_eq!(eager.score(), 7);
+    assert_eq!(eager.title().get(), "t");
+}

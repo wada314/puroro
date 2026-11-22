@@ -10,9 +10,9 @@ use ::syn::{Item, Type};
 /// How a lazy singular / oneof LEN getter reads the slot.
 #[derive(Clone, Copy)]
 pub(super) enum LenAccess {
-    /// `utf8_validation=VERIFY` string. `try_str`.
+    /// `utf8_validation=VERIFY` string. `try_str` / `peek_str`.
     Str,
-    /// `bytes` or `utf8_validation=NONE` string. `try_bytes`.
+    /// `bytes` or `utf8_validation=NONE` string. `try_bytes` / `peek_bytes`.
     Bytes,
 }
 
@@ -109,8 +109,10 @@ pub(super) fn render_module(
                 }
             }
 
-            impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> Layout<A>
-                for ::puroro_rt::Lazy<A>
+            impl<
+                A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
+                B: ::puroro_rt::decode::WireBuf,
+            > Layout<A> for ::puroro_rt::Lazy<A, B>
             {
                 type Bits = #lazy_bits;
                 #(#lazy_tys)*

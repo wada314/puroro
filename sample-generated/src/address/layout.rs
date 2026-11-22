@@ -10,6 +10,7 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
+use ::puroro_rt::decode::WireBuf;
 use ::puroro_rt::{
     BitStorage, Eager, InlineOrHeap, InteriorBitArray, Lazy, ProtoString, ValueLayout, WireOrSso,
 };
@@ -38,7 +39,7 @@ impl<A: Allocator> Layout<A> for Eager {
     }
 }
 
-impl<A: Allocator> Layout<A> for Lazy<A> {
+impl<A: Allocator, B: WireBuf> Layout<A> for Lazy<A, B> {
     type Bits = InteriorBitArray<2>;
     type StreetLen = WireOrSso<{ BIT_STREET_LAZY_KIND }>;
     type CityLen = WireOrSso<{ BIT_CITY_LAZY_KIND }>;
