@@ -19,7 +19,7 @@ use ::unmanaged::UnmanagedString;
 use ::unmanaged::UnmanagedVec;
 use ::unmanaged::vec::VecGuard;
 
-use crate::decode::{LazyMessage, ScannedRecord, ScannedValue, WireBuf, WireSpan};
+use crate::decode::{LazyMessage, ScannedRecord, ScannedValue, WireSpan};
 use crate::encode::field_number_const;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{DefaultIn, FieldDeallocate, MessageCommon, MessageCommonAlloc};
@@ -529,16 +529,16 @@ where
     /// Does not walk the child's tags. The child's first field getter parses
     /// stored regions. Distinct from singular last-wins: each occurrence is a
     /// new list element (same as eager repeated message).
-    pub fn merge_shared<Cx, B>(
+    pub fn merge_shared<Cx, Prof>(
         &mut self,
-        root: &B,
+        root: &Prof::Buf,
         span: WireSpan,
         common: &Cx,
     ) -> Result<(), DecodeError>
     where
         Cx: MessageCommonAlloc<Alloc = A>,
-        B: WireBuf,
-        M: LazyMessage<A, B>,
+        Prof: crate::decode::LazyProfile,
+        M: LazyMessage<A, Prof>,
     {
         let mut child = M::default_in(common.clone_alloc());
         child.merge_shared(root, span)?;

@@ -1,4 +1,4 @@
-//! Lazy getters on `Record<FooFields<A, Lazy<A, B>>, …>`.
+//! Lazy getters on `Record<FooFields<A, Lazy<A, P>>, …>`.
 
 use super::field_emit::{FieldEmit, GetterShape, MapEmit, RepeatedEmit, ScalarEmit};
 use super::layout::{LayoutAssoc, LayoutAssocKind, LenAccess, MessageApply};
@@ -11,9 +11,9 @@ use ::syn::{Item, Type};
 
 /// Lazy getters on the generated lazy newtype. Shell traits live in `puroro-rt`.
 ///
-/// Numerical / message / map / presence getters stay on `impl<A, B: WireBuf>`.
-/// Singular and oneof string / bytes split like the sample: `try_*` on
-/// `B = Bytes`, `peek_*` plus `parse_in` / `parse` on `B = &'buf [u8]`.
+/// All getters live on `impl<A, P: LazyProfile>`. Singular / oneof string and
+/// bytes use `profile_str` / `profile_bytes`. Zero-copy roots use
+/// `P = Borrowed<'buf>` via `parse_in` / `parse`.
 pub(super) fn render_items(
     fields: &[FieldEmit],
     eager_alias: &Ident,
@@ -22,13 +22,11 @@ pub(super) fn render_items(
     companion: &Ident,
 ) -> Result<Vec<Item>> {
     let generic_getters = render_generic_getters(fields, fields_name, companion);
-    let owned_len_getters = render_owned_len_getters(fields, fields_name, companion);
-    let borrowed_len_getters = render_borrowed_len_getters(fields, fields_name, companion);
     super::parse::parse_items(quote! {
         impl<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            B: ::puroro_rt::decode::WireBuf,
-        > #lazy_alias<A, B>
+            P: ::puroro_rt::decode::LazyProfile,
+        > #lazy_alias<A, P>
         {
             #(#generic_getters)*
 
@@ -37,21 +35,15 @@ pub(super) fn render_items(
                 self,
             ) -> ::core::result::Result<#eager_alias<A>, ::puroro::DecodeError> {
                 ::core::result::Result::Ok(#eager_alias {
-                    record: ::puroro_rt::Record::<_, A, ::puroro_rt::Lazy<A, B>, _>::decode_eager(
+                    record: ::puroro_rt::Record::<_, A, ::puroro_rt::Lazy<A, P>, _>::decode_eager(
                         self.record,
                     )?,
                 })
             }
         }
 
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone>
-            #lazy_alias<A, ::bytes::Bytes>
-        {
-            #(#owned_len_getters)*
-        }
-
         impl<'buf, A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone>
-            #lazy_alias<A, &'buf [u8]>
+            #lazy_alias<A, ::puroro_rt::decode::Borrowed<'buf>>
         {
             /// Scan `buf` once without copying it into [`::bytes::Bytes`].
             pub fn parse_in(
@@ -67,11 +59,9 @@ pub(super) fn render_items(
                 }
                 ::core::result::Result::Ok(msg)
             }
-
-            #(#borrowed_len_getters)*
         }
 
-        impl<'buf> #lazy_alias<::allocator_api2::alloc::Global, &'buf [u8]> {
+        impl<'buf> #lazy_alias<::allocator_api2::alloc::Global, ::puroro_rt::decode::Borrowed<'buf>> {
             /// [`Self::parse_in`] with [`::allocator_api2::alloc::Global`].
             pub fn parse(
                 buf: &'buf [u8],
@@ -103,67 +93,6 @@ fn render_generic_getters(
     out
 }
 
-fn render_owned_len_getters(
-    fields: &[FieldEmit],
-    fields_name: &Ident,
-    companion: &Ident,
-) -> Vec<TokenStream> {
-    let mut out = Vec::new();
-    for field in fields {
-        match field {
-            FieldEmit::Singular(field) => {
-                if let Some(ts) = singular_len_getter(field, fields_name, companion, LenMode::Try) {
-                    out.push(ts);
-                }
-            }
-            FieldEmit::Oneof(field) => {
-                out.extend(oneof_len_getters(
-                    field,
-                    fields_name,
-                    companion,
-                    LenMode::Try,
-                ));
-            }
-            FieldEmit::Repeated(_) | FieldEmit::Map(_) => {}
-        }
-    }
-    out
-}
-
-fn render_borrowed_len_getters(
-    fields: &[FieldEmit],
-    fields_name: &Ident,
-    companion: &Ident,
-) -> Vec<TokenStream> {
-    let mut out = Vec::new();
-    for field in fields {
-        match field {
-            FieldEmit::Singular(field) => {
-                if let Some(ts) = singular_len_getter(field, fields_name, companion, LenMode::Peek)
-                {
-                    out.push(ts);
-                }
-            }
-            FieldEmit::Oneof(field) => {
-                out.extend(oneof_len_getters(
-                    field,
-                    fields_name,
-                    companion,
-                    LenMode::Peek,
-                ));
-            }
-            FieldEmit::Repeated(_) | FieldEmit::Map(_) => {}
-        }
-    }
-    out
-}
-
-#[derive(Clone, Copy)]
-enum LenMode {
-    Try,
-    Peek,
-}
-
 fn scan_guard() -> TokenStream {
     quote! { ::puroro_rt::decode::LazyMessage::ensure_scanned(self)?; }
 }
@@ -179,23 +108,6 @@ fn optional_method(name: &Ident, optional_ty: &Type, body: TokenStream) -> Token
         where
             A: 'a,
         {
-            #body
-        }
-    }
-}
-
-fn borrowed_optional_method(
-    name: &Ident,
-    optional_ty: TokenStream,
-    body: TokenStream,
-) -> TokenStream {
-    quote! {
-        pub fn #name(
-            &self,
-        ) -> ::core::result::Result<
-            ::puroro::Optional<#optional_ty, impl ::puroro::HasDefault<#optional_ty>>,
-            ::puroro::DecodeError,
-        > {
             #body
         }
     }
@@ -227,7 +139,7 @@ fn singular_generic_getters(
                 fields_name,
                 companion,
                 &field.field_const,
-                LazyLayout::ParamB,
+                LazyLayout::ParamP,
             );
             out.push(quote! {
                 pub fn #has_name(&self) -> ::core::result::Result<bool, ::puroro::DecodeError> {
@@ -235,6 +147,9 @@ fn singular_generic_getters(
                     ::core::result::Result::Ok(#present.is_present(&self.record.common))
                 }
             });
+        }
+        if let Some(ts) = singular_len_getter(field, fields_name, companion) {
+            out.push(ts);
         }
         return out;
     }
@@ -271,58 +186,39 @@ fn singular_len_getter(
     field: &ScalarEmit,
     fields_name: &Ident,
     companion: &Ident,
-    mode: LenMode,
 ) -> Option<TokenStream> {
     let GetterShape::Len { access, .. } = field.getter_shape else {
         return None;
     };
     let ensured = scan_guard();
-    let layout = match mode {
-        LenMode::Try => LazyLayout::Bytes,
-        LenMode::Peek => LazyLayout::Borrowed,
+    let get = super::message::lazy_field(
+        fields_name,
+        companion,
+        &field.field_const,
+        LazyLayout::ParamP,
+    );
+    let read = match access {
+        LenAccess::Str => quote! {
+            #get.profile_str::<_, P>(
+                &self.record.common,
+                self.record.common.lazy.scan.wire_buf(),
+            )
+        },
+        LenAccess::Bytes => quote! {
+            #get.profile_bytes::<_, P>(
+                &self.record.common,
+                self.record.common.lazy.scan.wire_buf(),
+            )
+        },
     };
-    let get = super::message::lazy_field(fields_name, companion, &field.field_const, layout);
-    Some(match mode {
-        LenMode::Try => {
-            let read = match access {
-                LenAccess::Str => quote! {
-                    #get.try_str(&self.record.common, self.record.common.lazy.scan.wire())
-                },
-                LenAccess::Bytes => quote! {
-                    #get.try_bytes(&self.record.common, self.record.common.lazy.scan.wire())
-                },
-            };
-            optional_method(
-                &field.name,
-                &field.optional_ty,
-                quote! {
-                    #ensured
-                    #read
-                },
-            )
-        }
-        LenMode::Peek => {
-            let (optional_ty, read) = match access {
-                LenAccess::Str => (
-                    quote! { &'buf str },
-                    quote! { #get.peek_str(&self.record.common, wire) },
-                ),
-                LenAccess::Bytes => (
-                    quote! { &'buf [u8] },
-                    quote! { #get.peek_bytes(&self.record.common, wire) },
-                ),
-            };
-            borrowed_optional_method(
-                &field.name,
-                optional_ty,
-                quote! {
-                    #ensured
-                    let wire = *self.record.common.lazy.scan.wire_buf();
-                    #read
-                },
-            )
-        }
-    })
+    Some(optional_method(
+        &field.name,
+        &field.optional_ty,
+        quote! {
+            #ensured
+            #read
+        },
+    ))
 }
 
 fn repeated_getter(field: &RepeatedEmit, fields_name: &Ident, companion: &Ident) -> TokenStream {
@@ -334,7 +230,7 @@ fn repeated_getter(field: &RepeatedEmit, fields_name: &Ident, companion: &Ident)
             fields_name,
             companion,
             &field.field_const,
-            LazyLayout::ParamB,
+            LazyLayout::ParamP,
         );
         quote! {
             #get.bind(self.record.common.lazy.scan.wire(), &self.record.common)?.as_slice()
@@ -366,7 +262,7 @@ fn map_getter(field: &MapEmit, fields_name: &Ident, companion: &Ident) -> TokenS
         fields_name,
         companion,
         &field.field_const,
-        LazyLayout::ParamB,
+        LazyLayout::ParamP,
     );
     quote! {
         pub fn #name(
@@ -383,7 +279,7 @@ fn map_getter(field: &MapEmit, fields_name: &Ident, companion: &Ident) -> TokenS
 
 fn oneof_generic_getters(
     field: &OneofEmit,
-    _fields_name: &Ident,
+    fields_name: &Ident,
     companion: &Ident,
 ) -> Vec<TokenStream> {
     let name = &field.name;
@@ -399,7 +295,7 @@ fn oneof_generic_getters(
         > {
             #ensured
             ::core::result::Result::Ok(self.record.fields.#name.as_ref().map(
-                <#companion::#storage<A, ::puroro_rt::Lazy<A, B>> as ::puroro_rt::OneofGroup>::case,
+                <#companion::#storage<A, ::puroro_rt::Lazy<A, P>> as ::puroro_rt::OneofGroup>::case,
             ))
         }
     }];
@@ -430,6 +326,7 @@ fn oneof_generic_getters(
         };
         out.push(body);
     }
+    out.extend(oneof_len_getters(field, fields_name, companion));
     out
 }
 
@@ -437,7 +334,6 @@ fn oneof_len_getters(
     field: &OneofEmit,
     fields_name: &Ident,
     companion: &Ident,
-    mode: LenMode,
 ) -> Vec<TokenStream> {
     let ensured = scan_guard();
     field
@@ -449,52 +345,30 @@ fn oneof_len_getters(
             };
             let vname = &variant.name;
             let field_const = &variant.field_const;
-            let layout = match mode {
-                LenMode::Try => LazyLayout::Bytes,
-                LenMode::Peek => LazyLayout::Borrowed,
+            let get =
+                super::message::lazy_field(fields_name, companion, field_const, LazyLayout::ParamP);
+            let read = match access {
+                LenAccess::Str => quote! {
+                    #get.profile_str::<_, _, _, P>(
+                        &self.record.common,
+                        self.record.common.lazy.scan.wire_buf(),
+                    )
+                },
+                LenAccess::Bytes => quote! {
+                    #get.profile_bytes::<_, _, _, P>(
+                        &self.record.common,
+                        self.record.common.lazy.scan.wire_buf(),
+                    )
+                },
             };
-            let get = super::message::lazy_field(fields_name, companion, field_const, layout);
-            Some(match mode {
-                LenMode::Try => {
-                    let read = match access {
-                        LenAccess::Str => quote! {
-                            #get.try_str(&self.record.common, self.record.common.lazy.scan.wire())
-                        },
-                        LenAccess::Bytes => quote! {
-                            #get.try_bytes(&self.record.common, self.record.common.lazy.scan.wire())
-                        },
-                    };
-                    optional_method(
-                        vname,
-                        &variant.optional_ty,
-                        quote! {
-                            #ensured
-                            #read
-                        },
-                    )
-                }
-                LenMode::Peek => {
-                    let (optional_ty, read) = match access {
-                        LenAccess::Str => (
-                            quote! { &'buf str },
-                            quote! { #get.peek_str(&self.record.common, wire) },
-                        ),
-                        LenAccess::Bytes => (
-                            quote! { &'buf [u8] },
-                            quote! { #get.peek_bytes(&self.record.common, wire) },
-                        ),
-                    };
-                    borrowed_optional_method(
-                        vname,
-                        optional_ty,
-                        quote! {
-                            #ensured
-                            let wire = *self.record.common.lazy.scan.wire_buf();
-                            #read
-                        },
-                    )
-                }
-            })
+            Some(optional_method(
+                vname,
+                &variant.optional_ty,
+                quote! {
+                    #ensured
+                    #read
+                },
+            ))
         })
         .collect()
 }
@@ -573,7 +447,7 @@ fn lazy_child_view(
         && matches!(assoc.kind, LayoutAssocKind::Child { .. })
     {
         let name = &assoc.assoc;
-        return quote! { <::puroro_rt::Lazy<A, B> as #companion::Layout<A>>::#name };
+        return quote! { <::puroro_rt::Lazy<A, P> as #companion::Layout<A>>::#name };
     }
     quote! { #fallback }
 }
@@ -628,7 +502,7 @@ fn apply_arm(
                 let wire = common.lazy.scan.wire_buf().clone();
                 #slot.bind_mut(common).merge_scanned(
                     rec,
-                    wire.as_bytes(),
+                    ::puroro_rt::decode::WireBuf::as_bytes(&wire),
                     origin,
                 )
             }

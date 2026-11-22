@@ -6,6 +6,7 @@
 //! into a validated [`FieldNumber`] plus [`WireType`].
 
 mod group;
+mod lazy_profile;
 mod lazy_scan;
 mod record;
 mod slice_cursor;
@@ -16,6 +17,7 @@ pub use self::slice_cursor::{SliceCursor, contiguous_remaining};
 
 pub(crate) use group::{copy_group_body, measure_group};
 
+pub use self::lazy_profile::{Borrowed, LazyProfile, Owned};
 pub use self::lazy_scan::{Eager, Lazy, LazyMessage, LazyScan, MessageScan};
 pub use self::record::{
     RecordScanner, ScannedRecord, ScannedValue, WireSpan, for_each_len_field,

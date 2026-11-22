@@ -6,7 +6,7 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
-use ::puroro_rt::decode::WireBuf;
+use ::puroro_rt::decode::LazyProfile;
 use ::puroro_rt::{BitStorage, Eager, Lazy};
 
 /// Ingest bits for [`Point`](crate::Point) / [`PointLazy`](crate::PointLazy).
@@ -29,7 +29,7 @@ impl<A: Allocator> Layout<A> for Eager {
     }
 }
 
-impl<A: Allocator, B: WireBuf> Layout<A> for Lazy<A, B> {
+impl<A: Allocator, P: LazyProfile> Layout<A> for Lazy<A, P> {
     type Bits = BitArray<[u8; 1], Lsb0>;
 
     #[inline]

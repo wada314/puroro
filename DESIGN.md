@@ -1314,9 +1314,9 @@ A future design would need:
 
 ## 7. Design decisions and trade-offs
 
-### Zero-copy is a `WireBuf` parameter, not a second message type
+### Zero-copy is a `LazyProfile` parameter, not a second message type
 
-Giving every field a lifetime would force that lifetime onto every generated type. Instead, the lazy alias takes `B: WireBuf = Bytes`: `TaskLazy<A>` stays lifetime-free (owned island), and zero-copy is `TaskLazy<A, &'buf [u8]>` via `parse_in` / `parse` ([wire-buf](.cursor/plans/wire-buf.md)). Singular / oneof string and bytes getters on the borrowed message return `'buf`. Repeated string / bytes and maps still materialise. Map message values materialise as `NameLazy<A>` (`Bytes`), not `NameLazy<A, B>`, so span materialise can use `Message` / `WireAppend`. The plugin and sample both emit `B` and the borrowed getters. The archived `Address` view spike is history only ([`archive/address-view-spike`](archive/address-view-spike/)).
+Giving every field a lifetime would force that lifetime onto every generated type. Instead, the lazy alias takes `P: LazyProfile = Owned`: `TaskLazy<A>` stays lifetime-free (owned island), and zero-copy is `TaskLazy<A, Borrowed<'buf>>` via `parse_in` / `parse` ([lazy-profile](.cursor/plans/lazy-profile.md)). Singular / oneof string and bytes getters return `&str` / `&[u8]` tied to `&self`; Borrowed peeks without promoting. Repeated string / bytes and maps still materialise. Map message values materialise as `NameLazy<A>` (`Bytes`), not `NameLazy<A, B>`, so span materialise can use `Message` / `WireAppend`. The plugin and sample both emit `B` and the borrowed getters. The archived `Address` view spike is history only ([`archive/address-view-spike`](archive/address-view-spike/)).
 
 ### No builder / immutable-object pattern
 
@@ -1380,7 +1380,7 @@ Each successful run writes two files into the `--puroro_out` directory: `lib.rs`
 
 ### `Bytes` for lazy wire storage vs `A: Allocator` for decoded values
 
-Eager `Task<A>` stores decoded field data in allocator-less `unmanaged` containers (`UnmanagedString`, `UnmanagedVec<i32>`, …) that share the single `MessageCommon.alloc`. `TaskLazy<A, B>` stores the opaque wire stream as [`WireBuf`](puroro-rt/src/decode/wire_buf.rs) (`Bytes` or `&[u8]`) so a nested lazy child can share the parent's buffer through a span without copying the LEN payload. Allocator customisation applies to **owned decoded data**; the wire blob prioritises cheap sharing and sub-slicing over placing those bytes in `A`.
+Eager `Task<A>` stores decoded field data in allocator-less `unmanaged` containers (`UnmanagedString`, `UnmanagedVec<i32>`, …) that share the single `MessageCommon.alloc`. `TaskLazy<A, P>` stores the opaque wire stream behind [`LazyProfile`](puroro-rt/src/decode/lazy_profile.rs) (`Owned` / `Borrowed`) so a nested lazy child can share the parent's buffer through a span without copying the LEN payload. Allocator customisation applies to **owned decoded data**; the wire blob prioritises cheap sharing and sub-slicing over placing those bytes in `A`.
 
 ---
 
@@ -1397,18 +1397,18 @@ These traits are **not** yet emitted by `protoc-gen-puroro`. The hand-written [`
 
 ### Specialized message implementations
 
-Every message has an eager alias and a lazy alias. Zero-copy is the same lazy type with `B = &'buf [u8]` ([`WireBuf`](.cursor/plans/wire-buf.md)), not a separate `TaskView`. The archived `Address` spike lives in [`archive/address-view-spike`](archive/address-view-spike/). A shared `task::MessageFallible` impl for the eager and lazy aliases is not emitted yet ([Per-message traits](#per-message-traits-not-yet-generated)).
+Every message has an eager alias and a lazy alias. Zero-copy is the same lazy type with `P = Borrowed<'buf>` ([`LazyProfile`](.cursor/plans/lazy-profile.md)), not a separate `TaskView`. The archived `Address` spike lives in [`archive/address-view-spike`](archive/address-view-spike/). A shared `task::MessageFallible` impl for the eager and lazy aliases is not emitted yet ([Per-message traits](#per-message-traits-not-yet-generated)).
 
 #### `TaskLazy<A>` — lazy parse timing
 
-Shipped, on the sample and in the plugin. Both emit the same field struct and library shell with a `WireBuf` parameter:
+Shipped, on the sample and in the plugin. Both emit the same field struct and library shell with a `LazyProfile` parameter:
 
 ```rust
 pub struct TaskFields<A: Allocator + Clone = Global, L: task::Layout<A> = Eager> { /* slots */ }
 pub struct Task<A: Allocator + Clone = Global> {
     record: puroro_rt::Record<TaskFields<A, Eager>, A, Eager, UnknownFields<A>>,
 }
-pub struct TaskLazy<A: Allocator + Clone = Global, B: WireBuf = Bytes> {
+pub struct TaskLazy<A: Allocator + Clone = Global, P: LazyProfile = Owned> {
     record: puroro_rt::Record<TaskFields<A, Lazy<A, B>>, A, Lazy<A, B>, UnknownFields<A>>,
 }
 ```
@@ -1434,7 +1434,7 @@ pub struct TaskLazy<A: Allocator + Clone = Global, B: WireBuf = Bytes> {
 
 Child layout follows [Child parse timing](#child-parse-timing). A follow-parent field is a `Layout` associated type. A pin is a concrete child type on both aliases.
 
-The island buffer is [`WireBuf`](puroro-rt/src/decode/wire_buf.rs) (`Bytes` or `&[u8]`), stored on `LazyScan`. Owned ingest (`WireAppend`) appends each successful `push` chunk. `open` / `parse_in` store a finished buffer without copying it. The scanner does not copy a complete LEN body; it stores a span and callers slice the buffer. An incomplete record stays in leftover. When a later chunk completes it, leftover is already on the island from the earlier append, so the full record is one contiguous region. A lazy child clones the parent's `B` and records absolute spans. It does not copy the LEN body. Decoded values still allocate through `A`. Typical generated `TaskLazy` decode is about 1.1× eager after the span scanner and catalog `merge_scanned` (Criterion `generated`, pinned CPU; 1.08–1.14 across runs; gaps under ~10% are noise). Skipping the packed length-prefix rematch does not move that bench — typical Task packed fields are tiny. Map ingest stays a span list, so neither rematch nor packed apply moves `map/decode_lazy`.
+The island buffer is [`WireBuf`](puroro-rt/src/decode/wire_buf.rs) (`Bytes` or `&[u8]`), selected by [`LazyProfile`](puroro-rt/src/decode/lazy_profile.rs) and stored on `LazyScan`. Owned ingest (`WireAppend`) appends each successful `push` chunk. `open` / `parse_in` store a finished buffer without copying it. The scanner does not copy a complete LEN body; it stores a span and callers slice the buffer. An incomplete record stays in leftover. When a later chunk completes it, leftover is already on the island from the earlier append, so the full record is one contiguous region. A lazy child clones the parent's `B` and records absolute spans. It does not copy the LEN body. Decoded values still allocate through `A`. Typical generated `TaskLazy` decode is about 1.1× eager after the span scanner and catalog `merge_scanned` (Criterion `generated`, pinned CPU; 1.08–1.14 across runs; gaps under ~10% are noise). Skipping the packed length-prefix rematch does not move that bench — typical Task packed fields are tiny. Map ingest stays a span list, so neither rematch nor packed apply moves `map/decode_lazy`.
 
 **Encode and equality.** Encode of a finished preserve lazy message writes the ingested wire as-is. Discard and reject omit unrecognized tags and closed-enum unknowns of this message and keep the other records in ingest order. A child LEN blob is copied as stored, so a discard or reject child still contributes the unknown tags inside that blob. The child's own encode omits them. `into_eager` then encode is the form that matches an eager parent. Field order need not match an eager encode. After more than one `merge_from`, a preserve encode is the concatenated ingest. Discard and reject subtract this message's omitted records from that concatenation. `PartialEq` compares the eager messages when both sides build one. When both sides fail that build (unfinished input, `InvalidUtf8`, and the same class of error), it compares ingested body bytes, so a lazy value stays equal to itself and to a clone that holds the same body. One success and one failure is unequal. `Debug` prints the eager message, or a non-exhaustive stub when that build fails. `unknown_fields()` on a preserve lazy alias parses unrecognized tags and closed-enum unknowns from `_wire` (one source; the store copy of a closed-enum unknown is not also yielded). Discard and reject stay empty. Unknown tags on a preserve alias stay in the wire and appear on the eager message after `into_eager`.
 

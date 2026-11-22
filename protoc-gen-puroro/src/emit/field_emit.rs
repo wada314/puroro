@@ -539,7 +539,7 @@ fn emit_map(field: &PlannedField<'_>, companion: &Ident) -> Result<MapEmit> {
     let mut layouts = Vec::new();
     if let WireTypeKind::Message(child) = value {
         // Map values materialise through `Message`, so the lazy alias stays
-        // on the Bytes default rather than sharing the parent's `B`.
+        // on the Bytes default rather than sharing the parent's `P`.
         let pin = resolve_child_pin(name, child, field.child_parse(), FollowLazyBuf::OwnedBytes)?;
         if let Some(assoc) = pin.follow() {
             let assoc_name = &assoc.assoc;
@@ -821,7 +821,7 @@ fn assoc_ident(name: &str, suffix: &str) -> Ident {
 
 /// How a follow-parent lazy child stores its island buffer.
 enum FollowLazyBuf {
-    /// Share the parent's `B` (`NameLazy<A, B>`): singular / repeated / oneof.
+    /// Share the parent's `P` (`NameLazy<A, P>`): singular / repeated / oneof.
     ShareParent,
     /// Own a `Bytes` island (`NameLazy<A>`): map values materialise via `Message`.
     OwnedBytes,
@@ -834,7 +834,7 @@ fn child_type_pair(
     let eager = fqn_to_message_root_path(message)?;
     let lazy = fqn_to_message_lazy_path(message)?;
     let lazy_ty = match follow_lazy {
-        FollowLazyBuf::ShareParent => parse_quote! { #lazy<A, B> },
+        FollowLazyBuf::ShareParent => parse_quote! { #lazy<A, P> },
         FollowLazyBuf::OwnedBytes => parse_quote! { #lazy<A> },
     };
     Ok((parse_quote! { #eager<A> }, lazy_ty))
@@ -845,7 +845,7 @@ enum ChildPin {
     /// Child type is a `Layout` associated type and follows the parent alias.
     Follow(Box<LayoutAssoc>),
     /// Pinned to the lazy alias on both parents. Slot type is still a `Layout`
-    /// associated type so the lazy parent can use `NameLazy<A, B>`.
+    /// associated type so the lazy parent can use `NameLazy<A, P>`.
     Lazy {
         /// Eager child accepted by `set_*` (`Name` → `into_lazy`).
         set_from: Box<Type>,
@@ -884,8 +884,8 @@ fn resolve_child_pin(
                     kind: LayoutAssocKind::Child {
                         // Eager parent stores `NameLazy<A>` (Bytes).
                         eager: parse_quote! { #lazy_path<A> },
-                        // Lazy parent stores `NameLazy<A, B>`.
-                        lazy: parse_quote! { #lazy_path<A, B> },
+                        // Lazy parent stores `NameLazy<A, P>`.
+                        lazy: parse_quote! { #lazy_path<A, P> },
                     },
                 }),
             }

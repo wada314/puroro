@@ -1,3 +1,6 @@
+> Superseded for the `*Lazy` type parameter by [lazy-profile.md](lazy-profile.md).
+> `WireBuf` / `WireAppend` remain the island buffer traits.
+
 # Wire buffer parameter
 
 **Status: steps 1–4 done; plugin emits `B`, `parse_in` / peek, and `SharedWire`
