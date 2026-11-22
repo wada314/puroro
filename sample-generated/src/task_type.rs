@@ -495,19 +495,19 @@ impl<A: Allocator + Clone> LazyRecordApply<A> for TaskFields<A, Lazy<A>> {
             }
             FIELD_ASSIGNEE => {
                 let span = scanned_len_span(origin, rec)?;
-                let root = common.lazy.scan.shared().clone_handle();
+                let root = common.lazy.scan.wire_buf().clone();
                 <Self as HasField<{ FIELD_ASSIGNEE }>>::field_mut(self)
                     .merge_shared(&root, span, common)
             }
             FIELD_ORIGIN => {
                 let span = scanned_len_span(origin, rec)?;
-                let root = common.lazy.scan.shared().clone_handle();
+                let root = common.lazy.scan.wire_buf().clone();
                 <Self as HasField<{ FIELD_ORIGIN }>>::field_mut(self)
                     .merge_shared(&root, span, common)
             }
             FIELD_WATCHERS => {
                 let span = scanned_len_span(origin, rec)?;
-                let root = common.lazy.scan.shared().clone_handle();
+                let root = common.lazy.scan.wire_buf().clone();
                 <Self as HasField<{ FIELD_WATCHERS }>>::field_mut(self)
                     .merge_shared(&root, span, common)
             }
@@ -531,7 +531,7 @@ impl<A: Allocator + Clone> LazyRecordApply<A> for TaskFields<A, Lazy<A>> {
                 .merge_scanned(&rec.value),
             FIELD_POSTAL => {
                 let span = scanned_len_span(origin, rec)?;
-                let root = common.lazy.scan.shared().clone_handle();
+                let root = common.lazy.scan.wire_buf().clone();
                 <Self as HasField<{ FIELD_POSTAL }>>::field_mut(self)
                     .variant(common)
                     .merge_shared(&root, span, common)
@@ -563,16 +563,16 @@ impl<A: Allocator + Clone> LazyRecordApply<A> for TaskFields<A, Lazy<A>> {
                 .bind_mut(common)
                 .merge_scanned(&rec.value),
             FIELD_TAG_IDS => {
-                let wire = common.lazy.scan.shared().clone_handle();
+                let wire = common.lazy.scan.wire_buf().clone();
                 <Self as HasField<{ FIELD_TAG_IDS }>>::field_mut(self)
                     .bind_mut(common)
-                    .merge_scanned(rec, wire.as_bytes(), origin)
+                    .merge_scanned(rec, wire.as_ref(), origin)
             }
             FIELD_SCORES => {
-                let wire = common.lazy.scan.shared().clone_handle();
+                let wire = common.lazy.scan.wire_buf().clone();
                 <Self as HasField<{ FIELD_SCORES }>>::field_mut(self)
                     .bind_mut(common)
-                    .merge_scanned(rec, wire.as_bytes(), origin)
+                    .merge_scanned(rec, wire.as_ref(), origin)
             }
             FIELD_STATUS => {
                 let span = scanned_record_span(origin, rec)?;
@@ -601,10 +601,10 @@ impl<A: Allocator + Clone> LazyRecordApply<A> for TaskFields<A, Lazy<A>> {
                 .bind_mut(common)
                 .merge_scanned(&rec.value),
             FIELD_VOTES => {
-                let wire = common.lazy.scan.shared().clone_handle();
+                let wire = common.lazy.scan.wire_buf().clone();
                 <Self as HasField<{ FIELD_VOTES }>>::field_mut(self)
                     .bind_mut(common)
-                    .merge_scanned(rec, wire.as_bytes(), origin)
+                    .merge_scanned(rec, wire.as_ref(), origin)
             }
             _ => common.note_unrecognized_record(rec, origin),
         }

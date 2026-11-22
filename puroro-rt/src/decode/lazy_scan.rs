@@ -2,7 +2,7 @@
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::vec::Vec as AllocVec;
-use ::bytes::{Buf, BufMut};
+use ::bytes::{Buf, BufMut, Bytes};
 use ::core::cell::Cell;
 use ::core::cmp::PartialEq;
 use ::core::ptr;
@@ -11,7 +11,7 @@ use ::std::vec::Vec;
 
 use super::iter_unknown_fields;
 use super::record::{RecordScanner, ScannedRecord, WireSpan};
-use super::shared_wire::SharedWire;
+use super::wire_buf::{WireAppend, WireBuf};
 
 /// Ingest layout stored in [`MessageCommon`](crate::MessageCommon)::`lazy`.
 ///
@@ -31,8 +31,8 @@ pub trait MessageScan<A: Allocator>: Sized {
 pub struct Eager;
 
 /// Lazy ingest layout: owns the [`LazyScan`] machine.
-pub struct Lazy<A: Allocator = Global> {
-    pub scan: LazyScan<A>,
+pub struct Lazy<A: Allocator = Global, B: WireBuf = Bytes> {
+    pub scan: LazyScan<A, B>,
 }
 
 impl<A: Allocator> MessageScan<A> for Eager {
@@ -53,12 +53,12 @@ impl<A: Allocator> MessageScan<A> for Eager {
 /// name complete bodies on the island buffer, but the record scanner has not
 /// walked them yet. Field getters call [`LazyMessage::ensure_scanned`] and
 /// parse then. Encode / `into_eager` may use the regions without parsing.
-pub struct LazyScan<A: Allocator = Global> {
+pub struct LazyScan<A: Allocator = Global, B: WireBuf = Bytes> {
     scanner: RecordScanner<A>,
     finished: bool,
     /// `false` when [`regions`](Self::regions) are waiting for a first field get.
     applied: Cell<bool>,
-    wire: SharedWire<A>,
+    wire: B,
     /// Payload spans in [`wire`](Self::wire) when this node is not the island
     /// root. Empty means encode / replay uses the whole buffer.
     regions: AllocVec<WireSpan, A>,
@@ -70,12 +70,13 @@ pub struct LazyScan<A: Allocator = Global> {
     policy_spans: AllocVec<WireSpan, A>,
 }
 
-impl<A: Allocator> LazyScan<A> {
+impl<A: Allocator, B: WireBuf> LazyScan<A, B> {
     pub fn wire(&self) -> &[u8] {
         self.wire.as_bytes()
     }
 
-    pub fn shared(&self) -> &SharedWire<A> {
+    /// Handle to the stored buffer (`Bytes`, `&[u8]`, …).
+    pub fn wire_buf(&self) -> &B {
         &self.wire
     }
 
@@ -113,20 +114,20 @@ impl<A: Allocator> LazyScan<A> {
     }
 
     /// Write the message body as-is. Requires a finished stream.
-    pub fn encode<B: BufMut>(&self, buf: &mut B) -> Result<(), DecodeError> {
+    pub fn encode<Out: BufMut>(&self, buf: &mut Out) -> Result<(), DecodeError> {
         self.require_finished()?;
         self.write_bodies(buf)
     }
 
     pub fn body_len(&self) -> usize {
         if self.regions.is_empty() {
-            self.wire.len()
+            self.wire.as_bytes().len()
         } else {
             self.regions.iter().map(|s| s.len).sum()
         }
     }
 
-    pub fn write_bodies<B: BufMut>(&self, buf: &mut B) -> Result<(), DecodeError> {
+    pub fn write_bodies<Out: BufMut>(&self, buf: &mut Out) -> Result<(), DecodeError> {
         if self.regions.is_empty() {
             buf.put_slice(self.wire.as_bytes());
             return Ok(());
@@ -168,16 +169,53 @@ impl<A: Allocator> LazyScan<A> {
     }
 }
 
-impl<A: Allocator + Clone> LazyScan<A> {
+impl<A: Allocator + Clone, B: WireAppend> LazyScan<A, B> {
     pub fn new_in(alloc: A) -> Self {
         Self {
             scanner: RecordScanner::new_in(alloc.clone()),
             finished: true,
             applied: Cell::new(true),
-            wire: SharedWire::empty(alloc.clone()),
+            wire: B::empty(),
             regions: AllocVec::new_in(alloc.clone()),
             policy_spans: AllocVec::new_in(alloc),
         }
+    }
+
+    /// Parse `chunk` and, on success, append it to the island buffer.
+    ///
+    /// A scan error leaves `_wire`, the leftover, and the finished flag as they
+    /// were, so a rejected chunk cannot sit in the buffer ahead of the scanner.
+    /// Returns the origin of `leftover || chunk` in `_wire`, plus the records.
+    pub fn push(
+        &mut self,
+        chunk: &[u8],
+    ) -> Result<(usize, AllocVec<ScannedRecord, A>), DecodeError> {
+        debug_assert!(self.wire.as_bytes().ends_with(self.scanner.leftover()));
+        let origin = self.wire.as_bytes().len() - self.scanner.leftover().len();
+        let records = self.scanner.push(chunk)?;
+        self.finished = false;
+        self.wire.append(chunk);
+        debug_assert!(self.wire.as_bytes().ends_with(self.scanner.leftover()));
+        Ok((origin, records))
+    }
+
+    pub fn clone_in(&self, _alloc: A) -> Self {
+        Self {
+            scanner: self.scanner.clone(),
+            finished: self.finished,
+            applied: Cell::new(self.applied.get()),
+            wire: self.wire.clone(),
+            regions: self.regions.clone(),
+            policy_spans: self.policy_spans.clone(),
+        }
+    }
+}
+
+impl<A: Allocator + Clone, B: WireBuf> LazyScan<A, B> {
+    pub fn finish(&mut self) -> Result<(), DecodeError> {
+        self.scanner.finish()?;
+        self.finished = true;
+        Ok(())
     }
 
     pub fn policy_spans(&self) -> &[WireSpan] {
@@ -204,9 +242,9 @@ impl<A: Allocator + Clone> LazyScan<A> {
     }
 
     /// Writes the body, skipping `omit` records that sit inside it.
-    pub fn write_bodies_omitting<B: BufMut>(
+    pub fn write_bodies_omitting<Out: BufMut>(
         &self,
-        buf: &mut B,
+        buf: &mut Out,
         omit: &[WireSpan],
     ) -> Result<(), DecodeError> {
         let mut failed = Ok(());
@@ -234,7 +272,7 @@ impl<A: Allocator + Clone> LazyScan<A> {
         if self.regions.is_empty() {
             f(WireSpan {
                 offset: 0,
-                len: self.wire.len(),
+                len: self.wire.as_bytes().len(),
             });
         } else {
             for &span in &self.regions {
@@ -243,33 +281,9 @@ impl<A: Allocator + Clone> LazyScan<A> {
         }
     }
 
-    /// Parse `chunk` and, on success, append it to the island buffer.
-    ///
-    /// A scan error leaves `_wire`, the leftover, and the finished flag as they
-    /// were, so a rejected chunk cannot sit in the buffer ahead of the scanner.
-    /// Returns the origin of `leftover || chunk` in `_wire`, plus the records.
-    pub fn push(
-        &mut self,
-        chunk: &[u8],
-    ) -> Result<(usize, AllocVec<ScannedRecord, A>), DecodeError> {
-        debug_assert!(self.wire.as_bytes().ends_with(self.scanner.leftover()));
-        let origin = self.wire.len() - self.scanner.leftover().len();
-        let records = self.scanner.push(chunk)?;
-        self.finished = false;
-        self.wire.append(chunk);
-        debug_assert!(self.wire.as_bytes().ends_with(self.scanner.leftover()));
-        Ok((origin, records))
-    }
-
-    pub fn finish(&mut self) -> Result<(), DecodeError> {
-        self.scanner.finish()?;
-        self.finished = true;
-        Ok(())
-    }
-
     /// Point this scan at an existing island-root buffer (no payload copy).
-    pub fn adopt(&mut self, root: &SharedWire<A>) {
-        self.wire = root.clone_handle();
+    pub fn adopt(&mut self, root: &B) {
+        self.wire = root.clone();
     }
 
     /// Remember a complete message-body LEN inside the adopted island buffer.
@@ -282,11 +296,7 @@ impl<A: Allocator + Clone> LazyScan<A> {
     /// Returns [`Some`] when catalog slots are already applied and the caller
     /// must parse this occurrence immediately. The first region on an empty
     /// applied shell stays unparsed until the first field getter.
-    pub(crate) fn store_shared(
-        &mut self,
-        root: &SharedWire<A>,
-        span: WireSpan,
-    ) -> Option<WireSpan> {
+    pub(crate) fn store_shared(&mut self, root: &B, span: WireSpan) -> Option<WireSpan> {
         self.adopt(root);
         let first_region = self.regions.is_empty();
         let was_applied = self.is_applied();
@@ -313,20 +323,9 @@ impl<A: Allocator + Clone> LazyScan<A> {
         self.finished = true;
         Ok(records)
     }
-
-    pub fn clone_in(&self, alloc: A) -> Self {
-        Self {
-            scanner: self.scanner.clone(),
-            finished: self.finished,
-            applied: Cell::new(self.applied.get()),
-            wire: self.wire.clone_in(alloc.clone()),
-            regions: self.regions.clone(),
-            policy_spans: self.policy_spans.clone(),
-        }
-    }
 }
 
-impl<A: Allocator + Clone> MessageScan<A> for Lazy<A> {
+impl<A: Allocator + Clone, B: WireAppend> MessageScan<A> for Lazy<A, B> {
     #[inline]
     fn new_scan(alloc: A) -> Self {
         Self {
@@ -347,7 +346,7 @@ impl<A: Allocator + Clone> MessageScan<A> for Lazy<A> {
     }
 }
 
-impl<A: Allocator + Clone> Lazy<A> {
+impl<A: Allocator + Clone, B: WireBuf> Lazy<A, B> {
     /// Remember one unknown record span in this message's scan.
     #[inline]
     pub fn record_policy_span(&mut self, span: WireSpan) {
@@ -368,9 +367,9 @@ impl<A: Allocator + Clone> Lazy<A> {
 /// [`crate::MessageEncode`]. When both traits are in scope, call the
 /// `Result` methods with UFCS. [`puroro::Message::decode`] is the complete
 /// decode entry; generated `Message::merge_from` calls [`ingest_buf`](Self::ingest_buf).
-pub trait LazyMessage<A: Allocator + Clone> {
-    fn scan(&self) -> &LazyScan<A>;
-    fn scan_mut(&mut self) -> &mut LazyScan<A>;
+pub trait LazyMessage<A: Allocator + Clone, B: WireBuf = Bytes> {
+    fn scan(&self) -> &LazyScan<A, B>;
+    fn scan_mut(&mut self) -> &mut LazyScan<A, B>;
     fn apply_record(
         &mut self,
         rec: &ScannedRecord,
@@ -394,7 +393,7 @@ pub trait LazyMessage<A: Allocator + Clone> {
     ///
     /// The first field getter parses every stored region (protobuf merge). If
     /// slots were already applied, this occurrence is parsed immediately.
-    fn merge_shared(&mut self, root: &SharedWire<A>, span: WireSpan) -> Result<(), DecodeError> {
+    fn merge_shared(&mut self, root: &B, span: WireSpan) -> Result<(), DecodeError> {
         if let Some(span) = self.scan_mut().store_shared(root, span) {
             self.apply_span(span)?;
         }
@@ -433,7 +432,7 @@ pub trait LazyMessage<A: Allocator + Clone> {
     /// Same finish requirement as [`encoded_len`](Self::encoded_len). This is
     /// not a canonical field-by-field encode.
     #[inline]
-    fn encode<B: BufMut>(&self, buf: &mut B) -> Result<(), DecodeError> {
+    fn encode<Out: BufMut>(&self, buf: &mut Out) -> Result<(), DecodeError> {
         self.scan().encode(buf)
     }
 
@@ -446,21 +445,6 @@ pub trait LazyMessage<A: Allocator + Clone> {
         Ok(out)
     }
 
-    /// Parses `chunk`, appends it to the island buffer, and applies every
-    /// complete record.
-    fn push(&mut self, chunk: &[u8]) -> Result<(), DecodeError> {
-        self.push_with_depth(chunk, 0)
-    }
-
-    /// [`push`](Self::push) at nesting `depth` (0 is the top-level message).
-    fn push_with_depth(&mut self, chunk: &[u8], depth: usize) -> Result<(), DecodeError> {
-        let (origin, records) = self.scan_mut().push(chunk)?;
-        for rec in records {
-            self.apply_record(&rec, origin, depth)?;
-        }
-        Ok(())
-    }
-
     /// Closes the current input stream.
     ///
     /// Non-empty leftover is [`DecodeError::TruncatedMessage`].
@@ -469,18 +453,45 @@ pub trait LazyMessage<A: Allocator + Clone> {
         self.scan_mut().finish()
     }
 
+    /// Parses `chunk`, appends it to the island buffer, and applies every
+    /// complete record.
+    fn push(&mut self, chunk: &[u8]) -> Result<(), DecodeError>
+    where
+        B: WireAppend,
+    {
+        self.push_with_depth(chunk, 0)
+    }
+
+    /// [`push`](Self::push) at nesting `depth` (0 is the top-level message).
+    fn push_with_depth(&mut self, chunk: &[u8], depth: usize) -> Result<(), DecodeError>
+    where
+        B: WireAppend,
+    {
+        let (origin, records) = self.scan_mut().push(chunk)?;
+        for rec in records {
+            self.apply_record(&rec, origin, depth)?;
+        }
+        Ok(())
+    }
+
     /// Ingests one complete message: [`push`](Self::push) each non-empty
     /// chunk, then [`finish`](Self::finish).
     ///
     /// A later call merges another message (scalars last-wins, repeated
     /// appends). It does not continue an unfinished chunk sequence; use
     /// [`push`](Self::push) for that.
-    fn ingest_buf<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+    fn ingest_buf<In: Buf>(&mut self, buf: &mut In) -> Result<(), DecodeError>
+    where
+        B: WireAppend,
+    {
         self.ingest_with_depth(buf, 0)
     }
 
     /// [`ingest_buf`](Self::ingest_buf) at nesting `depth`.
-    fn ingest_with_depth<B: Buf>(&mut self, buf: &mut B, depth: usize) -> Result<(), DecodeError> {
+    fn ingest_with_depth<In: Buf>(&mut self, buf: &mut In, depth: usize) -> Result<(), DecodeError>
+    where
+        B: WireAppend,
+    {
         while buf.has_remaining() {
             let n = buf.chunk().len();
             if n == 0 {

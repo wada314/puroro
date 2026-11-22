@@ -379,10 +379,10 @@ fn apply_arm(
         },
         SlotApply::RepeatedNumerical => quote! {
             #companion::#field_const => {
-                let wire = common.lazy.scan.shared().clone_handle();
+                let wire = common.lazy.scan.wire_buf().clone();
                 #slot.bind_mut(common).merge_scanned(
                     rec,
-                    wire.as_bytes(),
+                    wire.as_ref(),
                     origin,
                 )
             }
@@ -411,7 +411,7 @@ fn message_apply_arm(
 ) -> TokenStream {
     let body = match apply {
         MessageApply::Shared => quote! {
-            let root = common.lazy.scan.shared().clone_handle();
+            let root = common.lazy.scan.wire_buf().clone();
             #slot.merge_shared(&root, span, common)
         },
         MessageApply::EagerSingular => quote! {

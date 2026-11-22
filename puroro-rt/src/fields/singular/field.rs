@@ -25,7 +25,7 @@ use ::bytes::BufMut;
 use crate::defaults::ProtoDefault;
 use ::puroro::{DecodeBuf, DecodeError, HasDefault, Optional, WireType};
 
-use crate::decode::{LazyMessage, ScannedValue, SharedWire, WireSpan, save_unknown_varint_field};
+use crate::decode::{LazyMessage, ScannedValue, WireBuf, WireSpan, save_unknown_varint_field};
 use crate::encode::field_number_const;
 use crate::fields::shared::FieldDeallocate;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
@@ -716,7 +716,7 @@ where
 
 impl<M, P, const FIELD: u32, A, D> SingularField<ProtoMessage<M>, P, FIELD, A, Inline, D>
 where
-    M: crate::MessageEncode + LazyMessage<A> + crate::DeallocateBound<A>,
+    M: crate::MessageEncode + crate::DeallocateBound<A>,
     P: FieldPresence,
     A: Allocator + Clone,
     <ProtoMessage<M> as crate::PayloadAccess>::Slot<A>: AddressableSlot + DefaultIn<A>,
@@ -727,12 +727,17 @@ where
     ///
     /// Does not walk the child's tags (`MessageMerge` / ingest). The child's
     /// first field getter parses stored regions.
-    pub fn merge_shared<Cx: MessageBindingMut<A>>(
+    pub fn merge_shared<Cx, B>(
         &mut self,
-        root: &SharedWire<A>,
+        root: &B,
         span: WireSpan,
         common: &mut Cx,
-    ) -> Result<(), DecodeError> {
+    ) -> Result<(), DecodeError>
+    where
+        Cx: MessageBindingMut<A>,
+        B: WireBuf,
+        M: LazyMessage<A, B>,
+    {
         let child: &mut M = self.bind_mut(common).get_mut();
         child.merge_shared(root, span)
     }
@@ -740,7 +745,7 @@ where
 
 impl<M, P, const FIELD: u32, A, D> SingularField<ProtoMessage<M>, P, FIELD, A, Boxed, D>
 where
-    M: crate::MessageEncode + LazyMessage<A> + crate::DeallocateIn<A> + DefaultIn<A>,
+    M: crate::MessageEncode + crate::DeallocateIn<A> + DefaultIn<A>,
     P: FieldPresence,
     A: Allocator + Clone,
     P::ValueSlot<<Boxed as ValueLayout<ProtoMessage<M>, A>>::Slot>:
@@ -750,12 +755,17 @@ where
     ///
     /// Does not walk the child's tags (`MessageMerge` / ingest). The child's
     /// first field getter parses stored regions.
-    pub fn merge_shared<Cx: MessageBindingMut<A>>(
+    pub fn merge_shared<Cx, B>(
         &mut self,
-        root: &SharedWire<A>,
+        root: &B,
         span: WireSpan,
         common: &mut Cx,
-    ) -> Result<(), DecodeError> {
+    ) -> Result<(), DecodeError>
+    where
+        Cx: MessageBindingMut<A>,
+        B: WireBuf,
+        M: LazyMessage<A, B>,
+    {
         let child: &mut M = self.bind_mut(common).get_mut();
         child.merge_shared(root, span)
     }
