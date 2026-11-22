@@ -13,18 +13,28 @@ pub struct TaskLazy<A: Allocator + Clone = Global, B: WireBuf = Bytes> {
 ```
 
 `TaskLazy<A>` means `TaskLazy<A, Bytes>`. Call sites that write `TaskLazy<A>`
-do not change. Zero-copy is `TaskLazy<A, &'buf [u8]>`.
+do not change. Zero-copy is `TaskLazy<A, &'buf [u8]>`. The allocator stays the
+first parameter so the owned name does not grow a lifetime. That argument
+order is an accepted cost of one struct name.
 
 `Message::decode` stays on `TaskLazy<A, Bytes>`. It copies the input into
-`Bytes`. `TaskLazy<A, &'buf [u8]>` is built with `parse`:
+`Bytes`. `Message` and the lazy arm of `forward_record!` require `new_in` and
+`merge_from`, so they are implemented only for `B: WireAppend`. The borrowed
+message does not implement `Message`. Its surface is `parse_in` / `parse` and
+`LazyMessage`.
 
 ```rust
 impl<'buf, A: Allocator + Clone> TaskLazy<A, &'buf [u8]> {
-    pub fn parse(buf: &'buf [u8]) -> Result<Self, DecodeError>;
+    pub fn parse_in(buf: &'buf [u8], alloc: A) -> Result<Self, DecodeError>;
+    pub fn parse(buf: &'buf [u8]) -> Result<Self, DecodeError> {
+        Self::parse_in(buf, Global)
+    }
 }
 ```
 
-`parse` scans once. It does not copy `buf` into `Bytes`.
+`parse_in` scans once. It does not copy `buf` into `Bytes`. Slots and the
+scan `Vec`s use `alloc`. Nested apply still builds a child with `DefaultIn`
+and then `merge_shared`.
 
 ## Trait
 
@@ -108,13 +118,24 @@ pub struct Lazy<A: Allocator = Global, B: WireBuf = Bytes> {
 `impl<A> Layout<A> for Lazy<A>` becomes `impl<A, B: WireBuf> Layout<A> for Lazy<A, B>`.
 With the default `B = Bytes`, the owned layout is the current one.
 
-A child message holds a **clone of the same `B`** plus one or more
-`WireSpan`s (the existing `regions` list). It does not store `B::Slice`.
-One singular child can contain several LEN occurrences, and those ranges are
-not one contiguous slice. `Clone` on `&'buf [u8]` copies the fat pointer.
-`Clone` on `Bytes` bumps the refcount. Both keep the parent's offsets valid.
-For the two buffers shipped here, `Slice = Self`, so the child type written
-as `AddressLazy<A, B>` is the same buffer type as the parent.
+Empty `regions` means the whole `wire` is the message body, as
+`LazyScan::body_len` does today. A root from `open` keeps `regions` empty:
+`wire` is that message. A child clones the parent's full `B` and records one
+or more absolute `WireSpan`s. Those `regions` are non-empty. An adopted child
+whose `regions` stayed empty would encode the entire parent buffer.
+
+The child does not store `B::Slice`. One singular child can contain several
+LEN occurrences, and those ranges are not one contiguous slice. `Clone` on
+`&'buf [u8]` copies the fat pointer. `Clone` on `Bytes` bumps the refcount.
+Both keep the parent's offsets valid. `SharedWire::append_after_clone_does_not_mutate_peer`
+is the owned case of that rule: a later append on the parent copies, and the
+child keeps the previous bytes. For the two buffers shipped here,
+`Slice = Self`, so the child type written as `AddressLazy<A, B>` is the same
+buffer type as the parent.
+
+`type Slice` stays on `WireBuf`. v1 does not add a rope, and both impls use
+`Slice = Self`. The associated type is what lets a later rope return `Bytes`
+from `subslice` without changing the trait. Children still do not store it.
 
 `subslice` is for one contiguous range: a string, a bytes field, or a caller
 that wants a single span as its own handle. A rope whose `Slice` is `Bytes`
@@ -127,14 +148,28 @@ of the bytes; the message already has `A`.
 
 ## Getters
 
+Two inherent impls exist only for singular and oneof string / bytes, because
+the return lifetime differs. Numericals, enums, bools, and child messages stay
+on one `impl<A, B: WireBuf>`. Repeated string / bytes and maps stay span lists
+and materialize on get. Zero-copy on the borrowed message is singular and
+oneof string / bytes only.
+
 `TaskLazy<A, Bytes>` keeps today's getters. `title()` returns
 `Optional<&str>` borrowed from `&self`, through `try_str` and `WireOrSso`.
+`WireOrSso::get_str` promotes and sticks `Failed`. A later get on that arm
+returns `InvalidUtf8` and does not read the wire again.
 
-`TaskLazy<A, &'buf [u8]>` is a second impl. `title()` returns
-`Optional<&'buf str>`. The body copies the stored `&'buf [u8]` out of the
-scan, `subslice`s the span, and checks UTF-8. That `&str` does not borrow
-`&self`. This path does not promote into `WireOrSso`: the bytes stay in the
-caller's buffer.
+`TaskLazy<A, &'buf [u8]>` is the second impl for those fields. `title()`
+returns `Optional<&'buf str>`. The body copies the stored `&'buf [u8]` out of
+the scan, slices the span, and checks UTF-8 on every get. That `&str` does
+not borrow `&self`. This path does not promote into `WireOrSso` and does not
+store a sticky `Failed` arm: the bytes stay in the caller's buffer, so each
+get validates them again.
+
+`into_eager`, `PartialEq`, and `Debug` stay on the current lazy rules. When
+building the eager message fails, including `InvalidUtf8`, equality compares
+ingested body bytes. One success and one failure is unequal. `Debug` prints
+the eager message, or the non-exhaustive stub when that build fails.
 
 ```rust
 impl<'buf, A: Allocator + Clone> TaskLazy<A, &'buf [u8]> {
@@ -160,9 +195,14 @@ impl<A: Allocator + Clone, B: WireBuf> LazyScan<A, B> {
 ```
 
 `open` stores `wire`, runs `RecordScanner::push` on `as_bytes()`, then
-`finish`. The scanner copies an incomplete tail into its leftover `Vec`.
-A successful `finish` leaves that leftover empty, so a complete buffer is
-not copied.
+`finish`. It does not call `LazyScan::push`. That method appends the chunk
+after a successful scan, which a borrowed buffer cannot do. The scanner
+copies an incomplete tail into its leftover `Vec`. A successful `finish`
+leaves that leftover empty, so a complete buffer is not copied. `open` on a
+root leaves `regions` empty.
+
+Groups stay out of scope for a borrowed `B`. The plugin still rejects
+`TYPE_GROUP` and `message_encoding = DELIMITED`.
 
 `push`, `ingest_buf`, and `Message::merge_from` need `WireAppend`. They stay
 on `TaskLazy<A, Bytes>` only.
@@ -181,8 +221,14 @@ pub trait LazyAppend<A: Allocator + Clone, B: WireAppend>: LazyMessage<A, B> {
 ```
 
 `TaskLazy<A, &'buf [u8]>` implements `LazyMessage` and not `LazyAppend`.
-It has no `new_in`: an empty value would need a buffer, and `&'buf [u8]`
-cannot invent one. `TaskLazy<A, Bytes>::new_in` uses `WireAppend::empty`.
+It has no public `new_in`. `TaskLazy<A, Bytes>::new_in` uses
+`WireAppend::empty`.
+
+A nested slot still needs a placeholder before `adopt`. That value is
+crate-private, built through `DefaultIn`. For `B = &'buf [u8]` its `wire` is
+`&[]`, which coerces to `'buf`. It is not a public empty borrowed message.
+`adopt` then replaces that wire with a clone of the parent buffer and records
+a non-empty region.
 
 ## Steps
 
@@ -190,6 +236,15 @@ cannot invent one. `TaskLazy<A, Bytes>::new_in` uses `WireAppend::empty`.
    for `'buf` on `subslice` and for COW `append`.
 2. Store `B` on `LazyScan<A, B>`. Default `B = Bytes` keeps `TaskLazy<A>`
    behavior, including `push` and `Message::decode`.
-3. Add `open` and `TaskLazy<A, &'buf [u8]>::parse`, plus the borrowed getters
-   on the handwritten sample.
+3. Add `open` and `TaskLazy<A, &'buf [u8]>::parse_in`, plus the borrowed
+   getters on the handwritten sample.
 4. Add zero-copy tests on `parse`. There is no `*View` message type.
+
+## Which document wins
+
+This file is the design for the unshipped buffer parameter. `DESIGN.md` §7
+still says there is no zero-copy decode, and §8 still names `TaskView<'buf>`
+as not part of the eager / lazy pair. `IMPLEMENTATION.md` still describes the
+shipped lazy alias. Those two stay the description of what is implemented.
+The implementation PR updates them when `TaskLazy<A, &'buf [u8]>` exists.
+Until then, a reviewer of this design reads this file.
