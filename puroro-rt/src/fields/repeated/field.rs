@@ -19,7 +19,7 @@ use ::unmanaged::UnmanagedString;
 use ::unmanaged::UnmanagedVec;
 use ::unmanaged::vec::VecGuard;
 
-use crate::decode::{LazyMessage, ScannedRecord, ScannedValue, WireSpan};
+use crate::decode::{LazyMessage, LazyProfile, ScannedRecord, ScannedValue, WireSpan};
 use crate::encode::field_number_const;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{DefaultIn, FieldDeallocate, MessageCommon, MessageCommonAlloc};
@@ -537,7 +537,7 @@ where
     ) -> Result<(), DecodeError>
     where
         Cx: MessageCommonAlloc<Alloc = A>,
-        Prof: crate::decode::LazyProfile,
+        Prof: LazyProfile,
         M: LazyMessage<A, Prof>,
     {
         let mut child = M::default_in(common.clone_alloc());

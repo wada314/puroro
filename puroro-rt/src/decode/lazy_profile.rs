@@ -106,7 +106,7 @@ impl<'buf> LazyProfile for Borrowed<'buf> {
         Self: 'msg,
     {
         // `'buf: 'msg` from `Self: 'msg`; shorten the peek to the message borrow.
-        Ok(slot.peek_str(arm, *wire)?)
+        slot.peek_str(arm, wire)
     }
 
     #[inline]
@@ -120,6 +120,6 @@ impl<'buf> LazyProfile for Borrowed<'buf> {
     where
         Self: 'msg,
     {
-        Ok(slot.peek_bytes(arm, *wire)?)
+        slot.peek_bytes(arm, wire)
     }
 }

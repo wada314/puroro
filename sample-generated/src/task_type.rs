@@ -15,7 +15,7 @@ use ::puroro::{
     RepeatedStringMut, WireType,
 };
 use ::puroro_rt::decode::{
-    LazyProfile, MessageScan, Owned, ScannedRecord, scanned_len_span, scanned_record_span,
+    LazyProfile, MessageScan, Owned, ScannedRecord, WireBuf, scanned_len_span, scanned_record_span,
 };
 use ::puroro_rt::{
     BitPacked, Boxed, CloneRecordFields, Closed, ConstructRecordFields, Eager, EagerRecordFields,
@@ -630,13 +630,13 @@ impl<A: Allocator + Clone, P: LazyProfile> LazyRecordApply<A, P> for TaskFields<
                 let wire = common.lazy.scan.wire_buf().clone();
                 <Self as HasField<{ FIELD_TAG_IDS }>>::field_mut(self)
                     .bind_mut(common)
-                    .merge_scanned(rec, ::puroro_rt::decode::WireBuf::as_bytes(&wire), origin)
+                    .merge_scanned(rec, wire.as_bytes(), origin)
             }
             FIELD_SCORES => {
                 let wire = common.lazy.scan.wire_buf().clone();
                 <Self as HasField<{ FIELD_SCORES }>>::field_mut(self)
                     .bind_mut(common)
-                    .merge_scanned(rec, ::puroro_rt::decode::WireBuf::as_bytes(&wire), origin)
+                    .merge_scanned(rec, wire.as_bytes(), origin)
             }
             FIELD_STATUS => {
                 let span = scanned_record_span(origin, rec)?;
@@ -668,7 +668,7 @@ impl<A: Allocator + Clone, P: LazyProfile> LazyRecordApply<A, P> for TaskFields<
                 let wire = common.lazy.scan.wire_buf().clone();
                 <Self as HasField<{ FIELD_VOTES }>>::field_mut(self)
                     .bind_mut(common)
-                    .merge_scanned(rec, ::puroro_rt::decode::WireBuf::as_bytes(&wire), origin)
+                    .merge_scanned(rec, wire.as_bytes(), origin)
             }
             _ => common.note_unrecognized_record(rec, origin),
         }

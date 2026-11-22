@@ -62,7 +62,7 @@ impl<A: Allocator + Clone, P: LazyProfile> TaskLazy<A, P> {
         )
     }
 
-    pub fn title<'a>(&'a self) -> Result<Optional<&'a str, impl HasDefault<&'a str>>, DecodeError>
+    pub fn title(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
     where
         A: Clone,
     {
@@ -71,9 +71,7 @@ impl<A: Allocator + Clone, P: LazyProfile> TaskLazy<A, P> {
             .profile_str::<_, P>(&self.record.common, self.record.common.lazy.scan.wire_buf())
     }
 
-    pub fn owner_id<'a>(
-        &'a self,
-    ) -> Result<Optional<&'a str, impl HasDefault<&'a str>>, DecodeError>
+    pub fn owner_id(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
     where
         A: Clone,
     {
@@ -82,9 +80,7 @@ impl<A: Allocator + Clone, P: LazyProfile> TaskLazy<A, P> {
             .profile_str::<_, P>(&self.record.common, self.record.common.lazy.scan.wire_buf())
     }
 
-    pub fn payload<'a>(
-        &'a self,
-    ) -> Result<Optional<&'a [u8], impl HasDefault<&'a [u8]>>, DecodeError>
+    pub fn payload(&self) -> Result<Optional<&[u8], impl HasDefault<&[u8]>>, DecodeError>
     where
         A: Clone,
     {
@@ -93,9 +89,7 @@ impl<A: Allocator + Clone, P: LazyProfile> TaskLazy<A, P> {
             .profile_bytes::<_, P>(&self.record.common, self.record.common.lazy.scan.wire_buf())
     }
 
-    pub fn email_address<'a>(
-        &'a self,
-    ) -> Result<Optional<&'a str, impl HasDefault<&'a str>>, DecodeError>
+    pub fn email_address(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
     where
         A: Clone,
     {
@@ -104,9 +98,7 @@ impl<A: Allocator + Clone, P: LazyProfile> TaskLazy<A, P> {
             .profile_str::<_, _, _, P>(&self.record.common, self.record.common.lazy.scan.wire_buf())
     }
 
-    pub fn phone_number<'a>(
-        &'a self,
-    ) -> Result<Optional<&'a str, impl HasDefault<&'a str>>, DecodeError>
+    pub fn phone_number(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
     where
         A: Clone,
     {

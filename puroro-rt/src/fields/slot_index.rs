@@ -27,6 +27,7 @@ use super::wire::repeated_element::RepeatedElement;
 use super::wire::singular_type::SingularType;
 use super::wire::wire_or_sso::WireOrSso;
 use crate::ProtoString;
+use crate::decode::LazyProfile;
 
 /// Map protobuf field number `N` to the value generated code reads and writes.
 ///
@@ -167,7 +168,7 @@ where
     where
         U: UnknownStore<A>,
         Pb: BitStorage,
-        Prof: crate::decode::LazyProfile + 'a,
+        Prof: LazyProfile + 'a,
         D: HasDefault<&'a str> + 'a,
         MessageCommon<Pb, A, U, L>: MessageCommonSharedBits,
     {
@@ -243,7 +244,7 @@ where
     where
         U: UnknownStore<A>,
         Pb: BitStorage,
-        Prof: crate::decode::LazyProfile + 'a,
+        Prof: LazyProfile + 'a,
         C: 'a,
         D: HasDefault<&'a [u8]> + 'a,
         MessageCommon<Pb, A, U, L>: MessageCommonSharedBits,

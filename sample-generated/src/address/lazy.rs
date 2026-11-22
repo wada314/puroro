@@ -33,7 +33,7 @@ impl<A: Allocator + Clone, P: LazyProfile> AddressLazy<A, P> {
         )
     }
 
-    pub fn street<'a>(&'a self) -> Result<Optional<&'a str, impl HasDefault<&'a str>>, DecodeError>
+    pub fn street(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
     where
         A: Clone,
     {
@@ -42,7 +42,7 @@ impl<A: Allocator + Clone, P: LazyProfile> AddressLazy<A, P> {
             .profile_str::<_, P>(&self.record.common, self.record.common.lazy.scan.wire_buf())
     }
 
-    pub fn city<'a>(&'a self) -> Result<Optional<&'a str, impl HasDefault<&'a str>>, DecodeError>
+    pub fn city(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
     where
         A: Clone,
     {

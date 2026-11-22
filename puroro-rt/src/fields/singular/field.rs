@@ -25,7 +25,7 @@ use ::bytes::BufMut;
 use crate::defaults::ProtoDefault;
 use ::puroro::{DecodeBuf, DecodeError, HasDefault, Optional, WireType};
 
-use crate::decode::{LazyMessage, ScannedValue, WireSpan, save_unknown_varint_field};
+use crate::decode::{LazyMessage, LazyProfile, ScannedValue, WireSpan, save_unknown_varint_field};
 use crate::encode::field_number_const;
 use crate::fields::shared::FieldDeallocate;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
@@ -735,7 +735,7 @@ where
     ) -> Result<(), DecodeError>
     where
         Cx: MessageBindingMut<A>,
-        Prof: crate::decode::LazyProfile,
+        Prof: LazyProfile,
         M: LazyMessage<A, Prof>,
     {
         let child: &mut M = self.bind_mut(common).get_mut();
@@ -763,7 +763,7 @@ where
     ) -> Result<(), DecodeError>
     where
         Cx: MessageBindingMut<A>,
-        Prof: crate::decode::LazyProfile,
+        Prof: LazyProfile,
         M: LazyMessage<A, Prof>,
     {
         let child: &mut M = self.bind_mut(common).get_mut();
@@ -849,7 +849,7 @@ where
     ) -> Result<Optional<&'a str, D>, DecodeError>
     where
         Cx: MessageBindingMut<A> + MessageCommonSharedBits,
-        Prof: crate::decode::LazyProfile + 'a,
+        Prof: LazyProfile + 'a,
         D: HasDefault<&'a str>,
     {
         if !P::is_set(common, || {
@@ -953,7 +953,7 @@ where
     ) -> Result<Optional<&'a [u8], D>, DecodeError>
     where
         Cx: MessageBindingMut<A> + MessageCommonSharedBits,
-        Prof: crate::decode::LazyProfile + 'a,
+        Prof: LazyProfile + 'a,
         D: HasDefault<&'a [u8]>,
     {
         if !P::is_set(common, || {
