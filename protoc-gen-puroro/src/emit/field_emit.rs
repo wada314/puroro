@@ -480,7 +480,7 @@ fn emit_repeated(field: &PlannedField<'_>, companion: &Ident) -> Result<Repeated
     if let WireTypeKind::Message(child) = wire {
         // A message element is not a span list. Follow-parent only changes
         // the element type; storage stays `RepeatedReady`.
-        let pin = resolve_child_pin(name, child, field.child_parse())?;
+        let pin = resolve_child_pin(name, child, field.child_parse(), FollowLazyBuf::ShareParent)?;
         message_apply = Some(pin.repeated_apply());
         if let Some(assoc) = pin.follow() {
             layout = Some(assoc.clone());
@@ -538,7 +538,9 @@ fn emit_map(field: &PlannedField<'_>, companion: &Ident) -> Result<MapEmit> {
     let mut value_view = value_wire.views.map_value;
     let mut layouts = Vec::new();
     if let WireTypeKind::Message(child) = value {
-        let pin = resolve_child_pin(name, child, field.child_parse())?;
+        // Map values materialise through `Message`, so the lazy alias stays
+        // on the Bytes default rather than sharing the parent's `B`.
+        let pin = resolve_child_pin(name, child, field.child_parse(), FollowLazyBuf::OwnedBytes)?;
         if let Some(assoc) = pin.follow() {
             let assoc_name = &assoc.assoc;
             // The `Layout` bound names the assoc on `Self`. The field
@@ -730,7 +732,7 @@ fn plan_singular(
     }
 
     if let WireTypeKind::Message(child) = wire {
-        let pin = resolve_child_pin(name, child, field.child_parse())?;
+        let pin = resolve_child_pin(name, child, field.child_parse(), FollowLazyBuf::ShareParent)?;
         message_apply = Some(pin.singular_apply());
         if let Some(assoc) = pin.follow() {
             layout_assoc = Some(assoc.clone());
@@ -817,18 +819,40 @@ fn assoc_ident(name: &str, suffix: &str) -> Ident {
     )
 }
 
-fn child_type_pair(message: &ResolvedMessage<'_>) -> Result<(Type, Type)> {
+/// How a follow-parent lazy child stores its island buffer.
+enum FollowLazyBuf {
+    /// Share the parent's `B` (`NameLazy<A, B>`): singular / repeated / oneof.
+    ShareParent,
+    /// Own a `Bytes` island (`NameLazy<A>`): map values materialise via `Message`.
+    OwnedBytes,
+}
+
+fn child_type_pair(
+    message: &ResolvedMessage<'_>,
+    follow_lazy: FollowLazyBuf,
+) -> Result<(Type, Type)> {
     let eager = fqn_to_message_root_path(message)?;
     let lazy = fqn_to_message_lazy_path(message)?;
-    Ok((parse_quote! { #eager<A> }, parse_quote! { #lazy<A> }))
+    let lazy_ty = match follow_lazy {
+        FollowLazyBuf::ShareParent => parse_quote! { #lazy<A, B> },
+        FollowLazyBuf::OwnedBytes => parse_quote! { #lazy<A> },
+    };
+    Ok((parse_quote! { #eager<A> }, lazy_ty))
 }
 
 /// Nested message pin, resolved once for every singular / repeated / map / oneof use.
 enum ChildPin {
     /// Child type is a `Layout` associated type and follows the parent alias.
     Follow(Box<LayoutAssoc>),
-    /// Pinned to the lazy alias on both the eager and lazy parent.
-    Lazy { eager: Box<Type>, lazy: Box<Type> },
+    /// Pinned to the lazy alias on both parents. Slot type is still a `Layout`
+    /// associated type so the lazy parent can use `NameLazy<A, B>`.
+    Lazy {
+        /// Eager child accepted by `set_*` (`Name` → `into_lazy`).
+        set_from: Box<Type>,
+        /// Eager parent's mut/get view (`NameLazy<A>` / Bytes default).
+        view: Box<Type>,
+        layout: Box<LayoutAssoc>,
+    },
     /// Pinned to the eager alias. The wire marker from [`wire_catalog`] stays.
     Eager { eager: Box<Type> },
 }
@@ -837,8 +861,9 @@ fn resolve_child_pin(
     field_name: &str,
     child: &ResolvedMessage<'_>,
     pin: ResolvedChildParse,
+    follow_lazy: FollowLazyBuf,
 ) -> Result<ChildPin> {
-    let (eager, lazy) = child_type_pair(child)?;
+    let (eager, lazy) = child_type_pair(child, follow_lazy)?;
     Ok(match pin {
         ResolvedChildParse::Follow => {
             let assoc = assoc_ident(field_name, "Msg");
@@ -847,10 +872,24 @@ fn resolve_child_pin(
                 kind: LayoutAssocKind::Child { eager, lazy },
             }))
         }
-        ResolvedChildParse::Lazy => ChildPin::Lazy {
-            eager: Box::new(eager),
-            lazy: Box::new(lazy),
-        },
+        ResolvedChildParse::Lazy => {
+            let eager_path = fqn_to_message_root_path(child)?;
+            let lazy_path = fqn_to_message_lazy_path(child)?;
+            let assoc = assoc_ident(field_name, "Msg");
+            ChildPin::Lazy {
+                set_from: Box::new(parse_quote! { #eager_path<A> }),
+                view: Box::new(parse_quote! { #lazy_path<A> }),
+                layout: Box::new(LayoutAssoc {
+                    assoc,
+                    kind: LayoutAssocKind::Child {
+                        // Eager parent stores `NameLazy<A>` (Bytes).
+                        eager: parse_quote! { #lazy_path<A> },
+                        // Lazy parent stores `NameLazy<A, B>`.
+                        lazy: parse_quote! { #lazy_path<A, B> },
+                    },
+                }),
+            }
+        }
         ResolvedChildParse::Eager => ChildPin::Eager {
             eager: Box::new(eager),
         },
@@ -876,11 +915,10 @@ impl ChildPin {
     /// `None` for an eager pin: keep the marker from [`wire_catalog`].
     fn field_marker(&self, layout: &Ident) -> Option<Type> {
         match self {
-            Self::Follow(assoc) => {
+            Self::Follow(assoc) | Self::Lazy { layout: assoc, .. } => {
                 let name = &assoc.assoc;
                 Some(parse_quote! { ::puroro_rt::ProtoMessage<<L as #layout::Layout<A>>::#name> })
             }
-            Self::Lazy { lazy, .. } => Some(parse_quote! { ::puroro_rt::ProtoMessage<#lazy> }),
             Self::Eager { .. } => None,
         }
     }
@@ -889,28 +927,27 @@ impl ChildPin {
     /// because the type alias has no `L: Layout<A>` bound.
     fn oneof_marker(&self) -> Option<Type> {
         match self {
-            Self::Follow(assoc) => {
+            Self::Follow(assoc) | Self::Lazy { layout: assoc, .. } => {
                 let name = &assoc.assoc;
                 Some(parse_quote! {
                     ::puroro_rt::ProtoMessage<<L as super::Layout<A>>::#name>
                 })
             }
-            // Follow is handled above. Lazy and Eager ignore the module.
-            other => other.field_marker(&Ident::new("super", Span::call_site())),
+            Self::Eager { .. } => None,
         }
     }
 
     fn follow(&self) -> Option<&LayoutAssoc> {
         match self {
-            Self::Follow(assoc) => Some(assoc),
-            Self::Lazy { .. } | Self::Eager { .. } => None,
+            Self::Follow(assoc) | Self::Lazy { layout: assoc, .. } => Some(assoc),
+            Self::Eager { .. } => None,
         }
     }
 
-    /// Eager and lazy aliases when the field is pinned to the lazy child.
+    /// Eager `set_*` source and mut/get view when the field is a lazy pin.
     fn lazy_pin(&self) -> Option<(&Type, &Type)> {
         match self {
-            Self::Lazy { eager, lazy } => Some((eager.as_ref(), lazy.as_ref())),
+            Self::Lazy { set_from, view, .. } => Some((set_from.as_ref(), view.as_ref())),
             Self::Follow(_) | Self::Eager { .. } => None,
         }
     }

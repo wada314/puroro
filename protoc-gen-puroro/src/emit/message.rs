@@ -121,51 +121,82 @@ pub(super) fn render_items(
                 #validate_method
             }
     };
-    let construct_record_impls = [
-        quote! { ::puroro_rt::Eager },
-        quote! { ::puroro_rt::Lazy<A> },
-    ]
-    .into_iter()
-    .map(|layout| {
-        quote! {
-            impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone>
-                ::puroro_rt::ConstructRecordFields<A, #layout> for #fields_name<A, #layout>
-            {
-                #[allow(unused_variables)]
-                fn new(alloc: A) -> Self {
-                    Self {
-                        #(#new_in_fields)*
-                        _layout: ::core::marker::PhantomData,
-                    }
+    let construct_eager = quote! {
+        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone>
+            ::puroro_rt::ConstructRecordFields<A, ::puroro_rt::Eager> for #fields_name<A, ::puroro_rt::Eager>
+        {
+            #[allow(unused_variables)]
+            fn new(alloc: A) -> Self {
+                Self {
+                    #(#new_in_fields)*
+                    _layout: ::core::marker::PhantomData,
                 }
             }
         }
-    })
-    .collect::<Vec<_>>();
-    let clone_record_impls = [
-        quote! { ::puroro_rt::Eager },
-        quote! { ::puroro_rt::Lazy<A> },
-    ]
-    .into_iter()
-    .map(|layout| {
-        quote! {
-            impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone>
-                ::puroro_rt::CloneRecordFields<A, #layout> for #fields_name<A, #layout>
-            {
-                #[allow(unused_variables)]
-                fn clone_fields(
-                    &self,
-                    dst: &mut Self,
-                    src_common: &::puroro_rt::MessageCommon<Self::Bits, A, Self::Unknown, #layout>,
-                    dst_common: &::puroro_rt::MessageCommon<Self::Bits, A, Self::Unknown, #layout>,
-                    alloc: A,
-                ) {
-                    #(#clone_stmts)*
+    };
+    let construct_lazy = quote! {
+        impl<
+            A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
+            B: ::puroro_rt::decode::WireBuf,
+        > ::puroro_rt::ConstructRecordFields<A, ::puroro_rt::Lazy<A, B>>
+            for #fields_name<A, ::puroro_rt::Lazy<A, B>>
+        {
+            #[allow(unused_variables)]
+            fn new(alloc: A) -> Self {
+                Self {
+                    #(#new_in_fields)*
+                    _layout: ::core::marker::PhantomData,
                 }
             }
         }
-    })
-    .collect::<Vec<_>>();
+    };
+    let construct_record_impls = [construct_eager, construct_lazy];
+    let clone_eager = quote! {
+        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone>
+            ::puroro_rt::CloneRecordFields<A, ::puroro_rt::Eager> for #fields_name<A, ::puroro_rt::Eager>
+        {
+            #[allow(unused_variables)]
+            fn clone_fields(
+                &self,
+                dst: &mut Self,
+                src_common: &::puroro_rt::MessageCommon<Self::Bits, A, Self::Unknown, ::puroro_rt::Eager>,
+                dst_common: &::puroro_rt::MessageCommon<Self::Bits, A, Self::Unknown, ::puroro_rt::Eager>,
+                alloc: A,
+            ) {
+                #(#clone_stmts)*
+            }
+        }
+    };
+    let clone_lazy = quote! {
+        impl<
+            A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
+            B: ::puroro_rt::decode::WireBuf,
+        > ::puroro_rt::CloneRecordFields<A, ::puroro_rt::Lazy<A, B>>
+            for #fields_name<A, ::puroro_rt::Lazy<A, B>>
+        {
+            #[allow(unused_variables)]
+            fn clone_fields(
+                &self,
+                dst: &mut Self,
+                src_common: &::puroro_rt::MessageCommon<
+                    Self::Bits,
+                    A,
+                    Self::Unknown,
+                    ::puroro_rt::Lazy<A, B>,
+                >,
+                dst_common: &::puroro_rt::MessageCommon<
+                    Self::Bits,
+                    A,
+                    Self::Unknown,
+                    ::puroro_rt::Lazy<A, B>,
+                >,
+                alloc: A,
+            ) {
+                #(#clone_stmts)*
+            }
+        }
+    };
+    let clone_record_impls = [clone_eager, clone_lazy];
     let eager_record_impl = quote! {
         impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone>
             ::puroro_rt::EagerRecordFields<A> for #fields_name<A, ::puroro_rt::Eager>
@@ -262,11 +293,13 @@ pub(super) fn render_items(
 
         pub struct #lazy_alias<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone = ::allocator_api2::alloc::Global,
+            B: ::puroro_rt::decode::WireBuf = ::bytes::Bytes,
         > {
+            #[allow(clippy::type_complexity)]
             record: ::puroro_rt::Record<
-                #fields_name<A, ::puroro_rt::Lazy<A>>,
+                #fields_name<A, ::puroro_rt::Lazy<A, B>>,
                 A,
-                ::puroro_rt::Lazy<A>,
+                ::puroro_rt::Lazy<A, B>,
                 #unknown_ty,
             >,
         }
@@ -282,8 +315,10 @@ pub(super) fn render_items(
 
         #eager_record_impl
 
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone>
-            ::puroro_rt::LazyRecordApply<A> for #fields_name<A, ::puroro_rt::Lazy<A>>
+        impl<
+            A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
+            B: ::puroro_rt::decode::WireBuf,
+        > ::puroro_rt::LazyRecordApply<A, B> for #fields_name<A, ::puroro_rt::Lazy<A, B>>
         {
             #[allow(unused_variables)]
             fn apply_record(
@@ -292,7 +327,7 @@ pub(super) fn render_items(
                     Self::Bits,
                     A,
                     Self::Unknown,
-                    ::puroro_rt::Lazy<A>,
+                    ::puroro_rt::Lazy<A, B>,
                 >,
                 rec: &::puroro_rt::decode::ScannedRecord,
                 origin: usize,
@@ -630,7 +665,7 @@ pub(super) fn lazy_field(
 ) -> TokenStream {
     message_field(
         fields_name,
-        &quote! { ::puroro_rt::Lazy<A> },
+        &quote! { ::puroro_rt::Lazy<A, B> },
         companion,
         field_const,
         false,

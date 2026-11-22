@@ -1,12 +1,11 @@
 # Wire buffer parameter
 
-**Status: steps 1–4 on the handwritten sample.** `WireBuf` / `WireAppend` live
-in `puroro-rt/src/decode/wire_buf.rs`. `LazyScan::open` scans a finished buffer
-without appending. Sample `TaskLazy` / `AddressLazy` / `PointLazy` take
-`B: WireBuf = Bytes`. Zero-copy is `TaskLazy<A, &'buf [u8]>` via `parse_in` /
-`parse` and peeking string/bytes getters. Plugin emit of `B` / borrowed getters
-is not done yet. `SharedWire` remains for its unit tests. There is no `*View`
-message type.
+**Status: steps 1–4 on the sample; plugin emits `B`.** `WireBuf` / `WireAppend`
+live in `puroro-rt/src/decode/wire_buf.rs`. `LazyScan::open` scans a finished
+buffer without appending. Sample and plugin `*Lazy` take `B: WireBuf = Bytes`.
+Zero-copy `parse_in` / peek getters are sample-only for now. Map message values
+materialise as `NameLazy<A>` (Bytes), not `NameLazy<A, B>`. `SharedWire` remains
+for its unit tests. There is no `*View` message type.
 
 ## Public type
 
@@ -253,8 +252,6 @@ parent buffer and records a non-empty region.
 
 ## Which document wins
 
-`DESIGN.md` §8 and `IMPLEMENTATION.md` describe the shipped sample surface
-(`TaskLazy<A, B>`, `parse_in`, peek getters). The plugin still emits the
-`Bytes` default without a `B` parameter or borrowed getters. This file keeps
-the trait shape and the steps. Removals of `SharedWire` and plugin emit of
-`B` are follow-ups.
+`DESIGN.md` §8 and `IMPLEMENTATION.md` describe the shipped surface. The plugin
+emits `B` and owned getters; sample adds `parse_in` / peek. Removals of
+`SharedWire` and plugin emit of borrowed getters are follow-ups.

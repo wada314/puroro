@@ -1,4 +1,4 @@
-//! Lazy getters on `Record<FooFields<A, Lazy<A>>, …>`.
+//! Lazy getters on `Record<FooFields<A, Lazy<A, B>>, …>`.
 
 use super::field_emit::{FieldEmit, GetterShape, MapEmit, RepeatedEmit, ScalarEmit};
 use super::layout::{LayoutAssoc, LayoutAssocKind, MessageApply};
@@ -18,7 +18,11 @@ pub(super) fn render_items(
 ) -> Result<Vec<Item>> {
     let getters = render_getters(fields, fields_name, companion);
     super::parse::parse_items(quote! {
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> #lazy_alias<A> {
+        impl<
+            A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
+            B: ::puroro_rt::decode::WireBuf,
+        > #lazy_alias<A, B>
+        {
             #(#getters)*
 
             /// Decode `_wire` into the eager message.
@@ -26,7 +30,9 @@ pub(super) fn render_items(
                 self,
             ) -> ::core::result::Result<#eager_alias<A>, ::puroro::DecodeError> {
                 ::core::result::Result::Ok(#eager_alias {
-                    record: ::puroro_rt::Record::decode_eager(self.record)?,
+                    record: ::puroro_rt::Record::<_, A, ::puroro_rt::Lazy<A, B>, _>::decode_eager(
+                        self.record,
+                    )?,
                 })
             }
         }
@@ -204,7 +210,7 @@ fn oneof_getters(field: &OneofEmit, fields_name: &Ident, companion: &Ident) -> V
         > {
             #ensured
             ::core::result::Result::Ok(self.record.fields.#name.as_ref().map(
-                <#companion::#storage<A, ::puroro_rt::Lazy<A>> as ::puroro_rt::OneofGroup>::case,
+                <#companion::#storage<A, ::puroro_rt::Lazy<A, B>> as ::puroro_rt::OneofGroup>::case,
             ))
         }
     }];
@@ -327,7 +333,7 @@ fn lazy_child_view(
         && matches!(assoc.kind, LayoutAssocKind::Child { .. })
     {
         let name = &assoc.assoc;
-        return quote! { <::puroro_rt::Lazy<A> as #companion::Layout<A>>::#name };
+        return quote! { <::puroro_rt::Lazy<A, B> as #companion::Layout<A>>::#name };
     }
     quote! { #fallback }
 }
@@ -382,7 +388,7 @@ fn apply_arm(
                 let wire = common.lazy.scan.wire_buf().clone();
                 #slot.bind_mut(common).merge_scanned(
                     rec,
-                    wire.as_ref(),
+                    wire.as_bytes(),
                     origin,
                 )
             }

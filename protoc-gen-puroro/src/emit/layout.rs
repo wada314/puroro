@@ -109,8 +109,10 @@ pub(super) fn render_module(
                 }
             }
 
-            impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> Layout<A>
-                for ::puroro_rt::Lazy<A>
+            impl<
+                A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
+                B: ::puroro_rt::decode::WireBuf,
+            > Layout<A> for ::puroro_rt::Lazy<A, B>
             {
                 type Bits = #lazy_bits;
                 #(#lazy_tys)*
