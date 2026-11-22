@@ -40,7 +40,7 @@ This document specifies the **public interface** of the `puroro` Protocol Buffer
 7. [Design decisions and trade-offs](#7-design-decisions-and-trade-offs)
 8. [Future work](#8-future-work)
    - 8.0 [Per-message traits (not yet generated)](#per-message-traits-not-yet-generated)
-   - 8.1 [Specialized message implementations](#specialized-message-implementations) (`TaskLazy<A>`, `TaskView<'buf>`) — includes [lazy parse timing](#tasklaya--lazy-parse-timing) and [eager / lazy semantic gaps](#eager-and-lazy-semantic-gaps)
+   - 8.1 [Specialized message implementations](#specialized-message-implementations) (`TaskLazy<A>`, `TaskLazy<A, &'buf [u8]>`) — includes [lazy parse timing](#tasklaya--lazy-parse-timing) and [eager / lazy semantic gaps](#eager-and-lazy-semantic-gaps)
    - 8.2 [Other future work](#other-future-work)
 
 ---
@@ -1316,7 +1316,7 @@ A future design would need:
 
 ### Zero-copy is a `WireBuf` parameter, not a second message type
 
-Giving every field a lifetime would force that lifetime onto every generated type. Instead, the lazy alias takes `B: WireBuf = Bytes`: `TaskLazy<A>` stays lifetime-free (owned island), and zero-copy is `TaskLazy<A, &'buf [u8]>` via `parse_in` / `parse` ([wire-buf](.cursor/plans/wire-buf.md)). Singular / oneof string and bytes getters on the borrowed message return `'buf`. Repeated string / bytes and maps still materialise. The plugin still emits the `Bytes` default only; sample ships both. The archived `Address` view spike is history only ([`archive/address-view-spike`](archive/address-view-spike/)).
+Giving every field a lifetime would force that lifetime onto every generated type. Instead, the lazy alias takes `B: WireBuf = Bytes`: `TaskLazy<A>` stays lifetime-free (owned island), and zero-copy is `TaskLazy<A, &'buf [u8]>` via `parse_in` / `parse` ([wire-buf](.cursor/plans/wire-buf.md)). Singular / oneof string and bytes getters on the borrowed message return `'buf`. Repeated string / bytes and maps still materialise. Map message values materialise as `NameLazy<A>` (`Bytes`), not `NameLazy<A, B>`, so span materialise can use `Message` / `WireAppend`. The plugin and sample both emit `B` and the borrowed getters. The archived `Address` view spike is history only ([`archive/address-view-spike`](archive/address-view-spike/)).
 
 ### No builder / immutable-object pattern
 
@@ -1401,7 +1401,7 @@ Every message has an eager alias and a lazy alias. Zero-copy is the same lazy ty
 
 #### `TaskLazy<A>` — lazy parse timing
 
-Shipped, on the sample and in the plugin. The plugin's two messages share one field struct and one library shell. The sample (and the design lock) parameterize the island buffer; the plugin still emits the `Bytes` default as `Lazy<A>`:
+Shipped, on the sample and in the plugin. Both emit the same field struct and library shell with a `WireBuf` parameter:
 
 ```rust
 pub struct TaskFields<A: Allocator + Clone = Global, L: task::Layout<A> = Eager> { /* slots */ }
@@ -1413,7 +1413,7 @@ pub struct TaskLazy<A: Allocator + Clone = Global, B: WireBuf = Bytes> {
 }
 ```
 
-`TaskLazy<A>` means `TaskLazy<A, Bytes>`. Zero-copy is `TaskLazy<A, &'buf [u8]>` via `parse_in` / `parse` (sample only until the plugin emits `B`). `Message` / `new_in` / `push` require `B: WireAppend` (`Bytes`). Borrowed roots do not implement `Message`.
+`TaskLazy<A>` means `TaskLazy<A, Bytes>`. Zero-copy is `TaskLazy<A, &'buf [u8]>` via `parse_in` / `parse`. `Message` / `new_in` / `push` require `B: WireAppend` (`Bytes`). Borrowed roots do not implement `Message`. Map message values stay `NameLazy<A>` (`Bytes`), not sharing the parent `B`.
 
 `record` is private in plugin output. `puroro_rt::forward_record!` forwards `Clone`, `Message`, and the other shell traits onto `Record`. Getters stay inherent on `Task` / `TaskLazy`. The hand-written sample uses the same newtypes and makes `record` `pub(crate)` so `task/lazy.rs` can call `self.record.field`. Eager and lazy are not a runtime enum inside `Task`. Slots that must differ (string / bytes, repeated LEN, maps, follow-parent children) are associated types on the companion `Layout` trait. Numericals, enums, and bools use the same catalog slots on both aliases.
 
@@ -1478,7 +1478,7 @@ task::MessageFallible (Result-returning trait, not emitted)
     ↑ impl
     Task<A>              (handwritten sample only, Error = Infallible)
     TaskLazy<A>          (inherent Result getters; Bytes default)
-    TaskLazy<A, &'buf [u8]>  (sample parse_in / peek getters; plugin TBD)
+    TaskLazy<A, &'buf [u8]>  (parse_in / peek getters; sample and plugin)
 ```
 
 Generic code that only reads fields is meant to use `task::MessageFallible` with `Task<A>` or `TaskLazy<A>`. Today only eager `Task` implements that trait. `TaskLazy` is a separate alias with its own inherent `Result` getters.

@@ -59,58 +59,25 @@ pub trait WireBuf: Clone {
     fn as_bytes(&self) -> &[u8];
 
     fn subslice(&self, span: WireSpan) -> Result<Self::Slice, DecodeError>;
+
+    /// Empty placeholder for nested `DefaultIn` before `adopt`.
+    /// Lives on `WireBuf` (not only `WireAppend`) so `&[u8]` can be `&[]`.
+    fn empty() -> Self;
 }
 
 /// Buffers that can grow. `&[u8]` does not implement this.
 pub trait WireAppend: WireBuf {
-    fn empty() -> Self;
     fn append(&mut self, chunk: &[u8]);
 }
 ```
 
 `subslice` returns an owned handle. For `&'buf [u8]` the implementation
 passes `*self` into `WireSpan::slice`, so the result is `&'buf [u8]`, not a
-borrow of the method receiver. For `Bytes` it is `Bytes::slice`.
-
-```rust
-impl<'buf> WireBuf for &'buf [u8] {
-    type Slice = &'buf [u8];
-
-    fn as_bytes(&self) -> &[u8] {
-        self
-    }
-
-    fn subslice(&self, span: WireSpan) -> Result<&'buf [u8], DecodeError> {
-        span.slice(*self)
-    }
-}
-
-impl WireBuf for Bytes {
-    type Slice = Bytes;
-
-    fn as_bytes(&self) -> &[u8] {
-        self
-    }
-
-    fn subslice(&self, span: WireSpan) -> Result<Bytes, DecodeError> {
-        let end = span.offset.checked_add(span.len).ok_or(DecodeError::TruncatedMessage)?;
-        Ok(self.slice(span.offset..end))
-    }
-}
-
-impl WireAppend for Bytes {
-    fn empty() -> Self {
-        Bytes::new()
-    }
-
-    fn append(&mut self, chunk: &[u8]) {
-        // Same COW as SharedWire::append: BytesMut::from(take) + extend + freeze.
-    }
-}
-```
+borrow of the method receiver. For `Bytes` it is `Bytes::slice` after a
+`checked_add` of `offset + len`.
 
 `A` is not a parameter of the buffer. Field vecs and `MessageCommon` already
-carry it. `Bytes` stays on the global allocator, as `SharedWire` does today.
+carry it. `Bytes` stays on the global allocator.
 
 ## Where the buffer sits
 
@@ -219,18 +186,14 @@ on `TaskLazy<A, Bytes>` only.
 pub trait LazyMessage<A: Allocator + Clone, B: WireBuf = Bytes> {
     fn scan(&self) -> &LazyScan<A, B>;
     fn scan_mut(&mut self) -> &mut LazyScan<A, B>;
-    // ensure_scanned, encode, finish. No push.
-}
-
-pub trait LazyAppend<A: Allocator + Clone, B: WireAppend>: LazyMessage<A, B> {
-    fn push(&mut self, chunk: &[u8]) -> Result<(), DecodeError>;
-    fn ingest_buf<T: Buf>(&mut self, buf: &mut T) -> Result<(), DecodeError>;
+    // ensure_scanned, encode, finish.
+    // push / ingest_* are provided with `where B: WireAppend` (no LazyAppend).
 }
 ```
 
-`TaskLazy<A, &'buf [u8]>` implements `LazyMessage` and not `LazyAppend`.
-It has no public `new_in`. `TaskLazy<A, Bytes>::new_in` uses
-`WireAppend::empty`.
+There is no separate `LazyAppend` trait. `TaskLazy<A, &'buf [u8]>` implements
+`LazyMessage` and cannot call `push`. It has no public `new_in`.
+`TaskLazy<A, Bytes>::new_in` uses `WireBuf::empty`.
 
 A nested slot still needs a placeholder before `adopt`. `DefaultIn` is a
 public trait, and nested construction uses `DefaultIn::default_in`. For

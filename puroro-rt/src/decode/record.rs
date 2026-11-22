@@ -197,6 +197,12 @@ impl<A: Allocator> RecordScanner<A> {
         &self.leftover
     }
 
+    /// Drop any unfinished tail. Used by [`LazyScan::open`](super::LazyScan::open)
+    /// before scanning a finished buffer from scratch.
+    pub fn clear(&mut self) {
+        self.leftover.clear();
+    }
+
     /// `true` when an unfinished record is held.
     pub fn needs_more(&self) -> bool {
         !self.leftover.is_empty()

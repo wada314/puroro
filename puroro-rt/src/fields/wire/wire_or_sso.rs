@@ -212,6 +212,10 @@ impl<A: Allocator> WireOrSsoSlot<UnmanagedString<A>> {
             }
             WireOrSsoKind::Inline | WireOrSsoKind::Heap => {
                 // Borrowed decode never promotes; Inline / Heap should not appear.
+                debug_assert!(
+                    false,
+                    "WireOrSso::peek_str: Inline/Heap arm is unreachable on borrowed wire"
+                );
                 Err(DecodeError::InvalidUtf8)
             }
         }
@@ -287,7 +291,13 @@ impl<A: Allocator> WireOrSsoSlot<UnmanagedVec<u8, A>> {
                 let span = unsafe { (*self.inner.get()).wire };
                 span.slice(wire)
             }
-            WireOrSsoKind::Inline | WireOrSsoKind::Heap => Err(DecodeError::TruncatedMessage),
+            WireOrSsoKind::Inline | WireOrSsoKind::Heap => {
+                debug_assert!(
+                    false,
+                    "WireOrSso::peek_bytes: Inline/Heap arm is unreachable on borrowed wire"
+                );
+                Err(DecodeError::TruncatedMessage)
+            }
         }
     }
 }

@@ -69,7 +69,10 @@ impl WireBuf for Bytes {
     #[inline]
     fn subslice(&self, span: WireSpan) -> Result<Bytes, DecodeError> {
         let _ = span.slice(self.as_bytes())?;
-        let end = span.offset + span.len;
+        let end = span
+            .offset
+            .checked_add(span.len)
+            .ok_or(DecodeError::TruncatedMessage)?;
         Ok(self.slice(span.offset..end))
     }
 

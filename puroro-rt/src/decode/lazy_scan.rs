@@ -194,10 +194,16 @@ impl<A: Allocator + Clone, B: WireBuf> LazyScan<A, B> {
 
     /// Scan a finished buffer. Does not append and does not copy `wire`.
     ///
+    /// Clears leftover, regions, and policy spans first so a retry after a
+    /// truncated `open` does not prepend stale leftover into the new buffer.
     /// Stores `wire`, runs the record scanner on `as_bytes()`, then finishes.
     /// A successful finish leaves leftover empty, so a complete buffer is not
     /// copied into the scanner. Root `open` leaves `regions` empty.
     pub fn open(&mut self, wire: B) -> Result<AllocVec<ScannedRecord, A>, DecodeError> {
+        self.scanner.clear();
+        self.regions.clear();
+        self.policy_spans.clear();
+        self.applied.set(true);
         self.wire = wire;
         self.finished = false;
         let records = self.scanner.push(self.wire.as_bytes())?;
@@ -652,6 +658,26 @@ mod open_tests {
         let mut scan = LazyScan::<Global, &[u8]>::new_in(Global);
         let records = scan.open(<&[u8] as WireBuf>::empty()).unwrap();
         assert!(records.is_empty());
+        assert!(scan.require_finished().is_ok());
+    }
+
+    #[test]
+    fn open_retries_after_truncated_without_stale_leftover() {
+        // Truncated Len: tag + length 2, only one payload byte.
+        let truncated: &[u8] = &[0x0a, 0x02, b'x'];
+        let mut scan = LazyScan::<Global, &[u8]>::new_in(Global);
+        assert!(matches!(
+            scan.open(truncated),
+            Err(::puroro::DecodeError::TruncatedMessage)
+        ));
+        assert!(scan.scanner.needs_more());
+
+        let complete: &[u8] = &[0x0a, 0x01, b'y'];
+        let records = scan.open(complete).unwrap();
+        assert_eq!(records.len(), 1);
+        assert!(scan.regions().is_empty());
+        assert!(scan.policy_spans().is_empty());
+        assert_eq!(scan.wire(), complete);
         assert!(scan.require_finished().is_ok());
     }
 }
