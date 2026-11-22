@@ -8,7 +8,6 @@
 mod group;
 mod lazy_scan;
 mod record;
-mod shared_wire;
 mod slice_cursor;
 mod varint;
 mod wire_buf;
@@ -22,7 +21,6 @@ pub use self::record::{
     RecordScanner, ScannedRecord, ScannedValue, WireSpan, for_each_len_field,
     scanned_group_body_span, scanned_len_payload, scanned_len_span, scanned_record_span,
 };
-pub use self::shared_wire::SharedWire;
 pub use self::varint::{
     ByteIterator, BytePair, ByteQuad, ChunkScan, ChunkScan1, ChunkScan2, ChunkScan4, ChunkScanHot2,
     ChunkScanHot4, ChunkScanHot8, ChunkScanHot10, ChunkScanHotAdapt, ChunkScanLikely1,
