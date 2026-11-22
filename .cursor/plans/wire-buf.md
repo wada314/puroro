@@ -1,11 +1,11 @@
 # Wire buffer parameter
 
-**Status: steps 1–4 on the sample; plugin emits `B`.** `WireBuf` / `WireAppend`
-live in `puroro-rt/src/decode/wire_buf.rs`. `LazyScan::open` scans a finished
-buffer without appending. Sample and plugin `*Lazy` take `B: WireBuf = Bytes`.
-Zero-copy `parse_in` / peek getters are sample-only for now. Map message values
-materialise as `NameLazy<A>` (Bytes), not `NameLazy<A, B>`. `SharedWire` remains
-for its unit tests. There is no `*View` message type.
+**Status: steps 1–4 done; plugin emits `B`, `parse_in` / peek, and `SharedWire`
+is gone.** `WireBuf` / `WireAppend` live in `puroro-rt/src/decode/wire_buf.rs`.
+`LazyScan::open` scans a finished buffer without appending. Sample and plugin
+`*Lazy` take `B: WireBuf = Bytes`, with `parse_in` / `parse` and peek string /
+bytes getters on `B = &'buf [u8]`. Map message values materialise as
+`NameLazy<A>` (Bytes), not `NameLazy<A, B>`. There is no `*View` message type.
 
 ## Public type
 
@@ -150,10 +150,9 @@ from `subslice` without changing the trait. Children still do not store it.
 that wants a single span as its own handle. A rope whose `Slice` is `Bytes`
 can implement the same trait later. This design does not add that rope.
 
-`SharedWire<A>`'s `Bytes` operations move onto `WireBuf` / `WireAppend`.
-`clone_handle` is `Clone`. `adopt` stores that clone. The wrapper goes away
-once `LazyScan` stores `B` directly. `A` on `SharedWire` is not the allocation
-of the bytes; the message already has `A`.
+`Bytes` operations live on `WireBuf` / `WireAppend`. `clone` is the shared
+handle. `adopt` stores that clone. The old `SharedWire` wrapper is gone;
+`LazyScan` stores `B` directly.
 
 ## Getters
 
@@ -253,5 +252,5 @@ parent buffer and records a non-empty region.
 ## Which document wins
 
 `DESIGN.md` §8 and `IMPLEMENTATION.md` describe the shipped surface. The plugin
-emits `B` and owned getters; sample adds `parse_in` / peek. Removals of
-`SharedWire` and plugin emit of borrowed getters are follow-ups.
+emits `B`, owned `try_*` getters, borrowed `peek_*` / `parse_in` / `parse`, and
+`SharedWire` is removed (`WireBuf` covers the old unit tests).

@@ -657,19 +657,30 @@ pub(super) fn bound_record_field(
     }
 }
 
+/// Layout type argument for [`lazy_field`].
+#[derive(Clone, Copy)]
+pub(super) enum LazyLayout {
+    /// `Lazy<A, B>` on `impl<A, B: WireBuf>`.
+    ParamB,
+    /// `Lazy<A, Bytes>` on the owned string / bytes getters.
+    Bytes,
+    /// `Lazy<A, &'buf [u8]>` on the borrowed peek getters.
+    Borrowed,
+}
+
 /// Borrowed projection inside a lazy message method.
 pub(super) fn lazy_field(
     fields_name: &Ident,
     companion: &Ident,
     field_const: &Ident,
+    layout: LazyLayout,
 ) -> TokenStream {
-    message_field(
-        fields_name,
-        &quote! { ::puroro_rt::Lazy<A, B> },
-        companion,
-        field_const,
-        false,
-    )
+    let layout_ty = match layout {
+        LazyLayout::ParamB => quote! { ::puroro_rt::Lazy<A, B> },
+        LazyLayout::Bytes => quote! { ::puroro_rt::Lazy<A, ::bytes::Bytes> },
+        LazyLayout::Borrowed => quote! { ::puroro_rt::Lazy<A, &'buf [u8]> },
+    };
+    message_field(fields_name, &layout_ty, companion, field_const, false)
 }
 
 fn message_field(
