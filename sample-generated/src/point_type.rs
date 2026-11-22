@@ -8,11 +8,12 @@
 //! [`Point`] / [`PointLazy`] are newtypes over [`puroro_rt::Record`].
 
 use ::allocator_api2::alloc::{Allocator, Global};
+use ::bytes::Bytes;
 use ::core::marker::PhantomData;
 use ::core::mem;
 use ::core::ops::{ControlFlow, DerefMut};
 use ::puroro::{DecodeBuf, DecodeError, WireType};
-use ::puroro_rt::decode::{MessageScan, ScannedRecord, scanned_record_span};
+use ::puroro_rt::decode::{MessageScan, ScannedRecord, WireBuf, scanned_record_span};
 use ::puroro_rt::{
     CloneRecordFields, ConstructRecordFields, Eager, EagerRecordFields, FieldCloneIn,
     FieldDeallocate, FieldPairVisitor, FieldVisitor, FieldVisitorMut, HasField, Implicit, Lazy,
@@ -69,8 +70,9 @@ pub struct Point<A: Allocator + Clone = Global> {
     pub(crate) record: Record<PointFields<A, Eager>, A, Eager, UnknownFields<A>>,
 }
 
-pub struct PointLazy<A: Allocator + Clone = Global> {
-    pub(crate) record: Record<PointFields<A, Lazy<A>>, A, Lazy<A>, UnknownFields<A>>,
+pub struct PointLazy<A: Allocator + Clone = Global, B: WireBuf = Bytes> {
+    #[allow(clippy::type_complexity)]
+    pub(crate) record: Record<PointFields<A, Lazy<A, B>>, A, Lazy<A, B>, UnknownFields<A>>,
 }
 
 ::puroro_rt::forward_record!(eager Point);
@@ -132,7 +134,37 @@ macro_rules! impl_point_build {
 }
 
 impl_point_build!(Eager);
-impl_point_build!(Lazy<A>);
+
+impl<A: Allocator + Clone, B: WireBuf> ConstructRecordFields<A, Lazy<A, B>>
+    for PointFields<A, Lazy<A, B>>
+{
+    fn new(alloc: A) -> Self {
+        Self {
+            x: SingularField::new_in(alloc.clone()),
+            y: SingularField::new_in(alloc),
+            _layout: PhantomData,
+        }
+    }
+}
+
+impl<A: Allocator + Clone, B: WireBuf> CloneRecordFields<A, Lazy<A, B>>
+    for PointFields<A, Lazy<A, B>>
+{
+    fn clone_fields(
+        &self,
+        dst: &mut Self,
+        src_common: &MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A, B>>,
+        dst_common: &MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A, B>>,
+        alloc: A,
+    ) {
+        let new = FieldCloneIn::clone_field(&self.x, src_common, alloc.clone());
+        let mut old = mem::replace(&mut dst.x, new);
+        FieldDeallocate::deallocate(&mut old, dst_common);
+        let new = FieldCloneIn::clone_field(&self.y, src_common, alloc.clone());
+        let mut old = mem::replace(&mut dst.y, new);
+        FieldDeallocate::deallocate(&mut old, dst_common);
+    }
+}
 
 impl<A: Allocator + Clone> EagerRecordFields<A> for PointFields<A, Eager> {
     fn visit_fields<V: FieldVisitor<MessageCommon<Self::Bits, A, Self::Unknown, Eager>>>(
@@ -180,10 +212,10 @@ impl<A: Allocator + Clone> EagerRecordFields<A> for PointFields<A, Eager> {
     }
 }
 
-impl<A: Allocator + Clone> LazyRecordApply<A> for PointFields<A, Lazy<A>> {
+impl<A: Allocator + Clone, B: WireBuf> LazyRecordApply<A, B> for PointFields<A, Lazy<A, B>> {
     fn apply_record(
         &mut self,
-        common: &mut MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A>>,
+        common: &mut MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A, B>>,
         rec: &ScannedRecord,
         origin: usize,
         _depth: usize,

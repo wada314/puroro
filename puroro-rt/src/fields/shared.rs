@@ -20,7 +20,7 @@ pub(crate) mod slot_init;
 pub(crate) mod value_layout;
 pub(crate) mod value_slot;
 
-pub use crate::decode::{Eager, Lazy};
+pub use crate::decode::{Eager, Lazy, WireBuf};
 pub use crate::fields::wire::wire_or_sso::WireOrSso;
 pub use crate::unknown_fields::{DiscardUnknowns, RejectUnknowns, UnknownFields, UnknownStore};
 pub use ::unmanaged::DefaultIn;
@@ -400,10 +400,11 @@ where
     }
 }
 
-impl<B, A, U> MessageCommon<B, A, U, Lazy<A>>
+impl<B, A, U, W> MessageCommon<B, A, U, Lazy<A, W>>
 where
     A: Allocator + Clone,
     U: UnknownStore<A>,
+    W: WireBuf,
 {
     /// Reject or remember one unrecognized lazy record.
     ///

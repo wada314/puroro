@@ -7,6 +7,7 @@
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::vec::Vec as AllocVec;
+use ::bytes::Bytes;
 use ::core::marker::PhantomData;
 use ::core::mem;
 use ::core::ops::{ControlFlow, Deref, DerefMut};
@@ -14,7 +15,9 @@ use ::puroro::{
     DecodeBuf, DecodeError, HasDefault, MapMut, OneofView, OneofViewMut, Optional,
     RepeatedStringMut, WireType,
 };
-use ::puroro_rt::decode::{MessageScan, ScannedRecord, scanned_len_span, scanned_record_span};
+use ::puroro_rt::decode::{
+    MessageScan, ScannedRecord, WireBuf, scanned_len_span, scanned_record_span,
+};
 use ::puroro_rt::{
     BitPacked, Boxed, CloneRecordFields, Closed, ConstructRecordFields, Eager, EagerRecordFields,
     Expanded, Explicit, FieldCloneIn, FieldDeallocate, FieldPairVisitor, FieldVisitor,
@@ -72,7 +75,7 @@ pub(crate) struct TaskFields<A: Allocator + Clone = Global, L: task::Layout<A> =
     >,
     /// Pinned lazy child (`(puroro.child_parse) = LAZY`), on both aliases.
     assignee:
-        SingularField<ProtoMessage<AddressLazy<A>>, MessagePresence, { FIELD_ASSIGNEE }, A, Boxed>,
+        SingularField<ProtoMessage<L::AssigneeMsg>, MessagePresence, { FIELD_ASSIGNEE }, A, Boxed>,
     /// Crate-visible so `task/lazy.rs` can read the group case. A oneof group
     /// is not one field number, so [`HasField`] does not cover this slot.
     pub(crate) notification: OneofSlot<NotificationStorage<A, L>>,
@@ -171,7 +174,7 @@ has_task_field!(
 has_task_field!(
     FIELD_ASSIGNEE,
     assignee,
-    SingularField<ProtoMessage<AddressLazy<A>>, MessagePresence, { FIELD_ASSIGNEE }, A, Boxed>
+    SingularField<ProtoMessage<L::AssigneeMsg>, MessagePresence, { FIELD_ASSIGNEE }, A, Boxed>
 );
 has_task_field!(
     FIELD_DONE,
@@ -235,8 +238,12 @@ pub struct Task<A: Allocator + Clone = Global> {
 }
 
 /// Lazy `Task`.
-pub struct TaskLazy<A: Allocator + Clone = Global> {
-    pub(crate) record: Record<TaskFields<A, Lazy<A>>, A, Lazy<A>, UnknownFields<A>>,
+///
+/// `B = Bytes` is the owned island buffer (`Message::decode`). Zero-copy is
+/// `TaskLazy<A, &'buf [u8]>` via [`TaskLazy::parse_in`].
+pub struct TaskLazy<A: Allocator + Clone = Global, B: WireBuf = Bytes> {
+    #[allow(clippy::type_complexity)]
+    pub(crate) record: Record<TaskFields<A, Lazy<A, B>>, A, Lazy<A, B>, UnknownFields<A>>,
 }
 
 ::puroro_rt::forward_record!(eager Task);
@@ -299,9 +306,9 @@ macro_rules! clone_task_slot {
     }};
 }
 
-macro_rules! impl_task_build {
-    ($layout:ty) => {
-        impl<A: Allocator + Clone> ConstructRecordFields<A, $layout> for TaskFields<A, $layout> {
+macro_rules! impl_task_build_eager {
+    () => {
+        impl<A: Allocator + Clone> ConstructRecordFields<A, Eager> for TaskFields<A, Eager> {
             fn new(alloc: A) -> Self {
                 Self {
                     title: SingularField::new_in(alloc.clone()),
@@ -327,12 +334,12 @@ macro_rules! impl_task_build {
             }
         }
 
-        impl<A: Allocator + Clone> CloneRecordFields<A, $layout> for TaskFields<A, $layout> {
+        impl<A: Allocator + Clone> CloneRecordFields<A, Eager> for TaskFields<A, Eager> {
             fn clone_fields(
                 &self,
                 dst: &mut Self,
-                src_common: &MessageCommon<Self::Bits, A, Self::Unknown, $layout>,
-                dst_common: &MessageCommon<Self::Bits, A, Self::Unknown, $layout>,
+                src_common: &MessageCommon<Self::Bits, A, Self::Unknown, Eager>,
+                dst_common: &MessageCommon<Self::Bits, A, Self::Unknown, Eager>,
                 alloc: A,
             ) {
                 clone_task_slot!(self, dst, src_common, dst_common, alloc, title);
@@ -358,8 +365,66 @@ macro_rules! impl_task_build {
     };
 }
 
-impl_task_build!(Eager);
-impl_task_build!(Lazy<A>);
+impl_task_build_eager!();
+
+impl<A: Allocator + Clone, B: WireBuf> ConstructRecordFields<A, Lazy<A, B>>
+    for TaskFields<A, Lazy<A, B>>
+{
+    fn new(alloc: A) -> Self {
+        Self {
+            title: SingularField::new_in(alloc.clone()),
+            score: SingularField::new_in(alloc.clone()),
+            max_retries: SingularField::new_in(alloc.clone()),
+            owner_id: SingularField::new_in(alloc.clone()),
+            payload: SingularField::new_in(alloc.clone()),
+            tag_ids: RepeatedField::new_in(alloc.clone()),
+            scores: RepeatedField::new_in(alloc.clone()),
+            labels: RepeatedField::new_in(alloc.clone()),
+            status: SingularField::new_in(alloc.clone()),
+            priority: SingularField::new_in(alloc.clone()),
+            assignee: SingularField::new_in(alloc.clone()),
+            notification: OneofSlot::new_in(alloc.clone()),
+            done: SingularField::new_in(alloc.clone()),
+            flag: SingularField::new_in(alloc.clone()),
+            watchers: RepeatedField::new_in(alloc.clone()),
+            votes: RepeatedField::new_in(alloc.clone()),
+            attributes: MapField::new_in(alloc.clone()),
+            origin: SingularField::new_in(alloc),
+            _layout: PhantomData,
+        }
+    }
+}
+
+impl<A: Allocator + Clone, B: WireBuf> CloneRecordFields<A, Lazy<A, B>>
+    for TaskFields<A, Lazy<A, B>>
+{
+    fn clone_fields(
+        &self,
+        dst: &mut Self,
+        src_common: &MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A, B>>,
+        dst_common: &MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A, B>>,
+        alloc: A,
+    ) {
+        clone_task_slot!(self, dst, src_common, dst_common, alloc, title);
+        clone_task_slot!(self, dst, src_common, dst_common, alloc, score);
+        clone_task_slot!(self, dst, src_common, dst_common, alloc, max_retries);
+        clone_task_slot!(self, dst, src_common, dst_common, alloc, owner_id);
+        clone_task_slot!(self, dst, src_common, dst_common, alloc, payload);
+        clone_task_slot!(self, dst, src_common, dst_common, alloc, tag_ids);
+        clone_task_slot!(self, dst, src_common, dst_common, alloc, scores);
+        clone_task_slot!(self, dst, src_common, dst_common, alloc, labels);
+        clone_task_slot!(self, dst, src_common, dst_common, alloc, status);
+        clone_task_slot!(self, dst, src_common, dst_common, alloc, priority);
+        clone_task_slot!(self, dst, src_common, dst_common, alloc, assignee);
+        clone_task_slot!(self, dst, src_common, dst_common, alloc, notification);
+        clone_task_slot!(self, dst, src_common, dst_common, alloc, done);
+        clone_task_slot!(self, dst, src_common, dst_common, alloc, flag);
+        clone_task_slot!(self, dst, src_common, dst_common, alloc, watchers);
+        clone_task_slot!(self, dst, src_common, dst_common, alloc, votes);
+        clone_task_slot!(self, dst, src_common, dst_common, alloc, attributes);
+        clone_task_slot!(self, dst, src_common, dst_common, alloc, origin);
+    }
+}
 
 macro_rules! merge_known_arm {
     ($self:ident, $common:ident, $wire_type:ident, $buf:ident, $depth:ident, $n:expr) => {{
@@ -468,10 +533,10 @@ impl<A: Allocator + Clone> EagerRecordFields<A> for TaskFields<A, Eager> {
     }
 }
 
-impl<A: Allocator + Clone> LazyRecordApply<A> for TaskFields<A, Lazy<A>> {
+impl<A: Allocator + Clone, B: WireBuf> LazyRecordApply<A, B> for TaskFields<A, Lazy<A, B>> {
     fn apply_record(
         &mut self,
-        common: &mut MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A>>,
+        common: &mut MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A, B>>,
         rec: &ScannedRecord,
         origin: usize,
         _depth: usize,
@@ -566,13 +631,13 @@ impl<A: Allocator + Clone> LazyRecordApply<A> for TaskFields<A, Lazy<A>> {
                 let wire = common.lazy.scan.wire_buf().clone();
                 <Self as HasField<{ FIELD_TAG_IDS }>>::field_mut(self)
                     .bind_mut(common)
-                    .merge_scanned(rec, wire.as_ref(), origin)
+                    .merge_scanned(rec, wire.as_bytes(), origin)
             }
             FIELD_SCORES => {
                 let wire = common.lazy.scan.wire_buf().clone();
                 <Self as HasField<{ FIELD_SCORES }>>::field_mut(self)
                     .bind_mut(common)
-                    .merge_scanned(rec, wire.as_ref(), origin)
+                    .merge_scanned(rec, wire.as_bytes(), origin)
             }
             FIELD_STATUS => {
                 let span = scanned_record_span(origin, rec)?;
@@ -604,7 +669,7 @@ impl<A: Allocator + Clone> LazyRecordApply<A> for TaskFields<A, Lazy<A>> {
                 let wire = common.lazy.scan.wire_buf().clone();
                 <Self as HasField<{ FIELD_VOTES }>>::field_mut(self)
                     .bind_mut(common)
-                    .merge_scanned(rec, wire.as_ref(), origin)
+                    .merge_scanned(rec, wire.as_bytes(), origin)
             }
             _ => common.note_unrecognized_record(rec, origin),
         }
@@ -670,7 +735,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.record.field::<{ FIELD_PRIORITY }>().optional()
     }
 
-    pub fn assignee(&self) -> Option<&AddressLazy<A>> {
+    pub fn assignee(&self) -> Option<&AddressLazy<A, Bytes>> {
         self.record.field::<{ FIELD_ASSIGNEE }>().get()
     }
 
@@ -827,7 +892,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.record.field_mut::<{ FIELD_PRIORITY }>().clear();
     }
 
-    pub fn assignee_mut(&mut self) -> &mut AddressLazy<A> {
+    pub fn assignee_mut(&mut self) -> &mut AddressLazy<A, Bytes> {
         self.record.field_mut::<{ FIELD_ASSIGNEE }>().get_mut()
     }
 

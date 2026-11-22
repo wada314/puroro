@@ -19,12 +19,17 @@ pub trait WireBuf: Clone {
     fn as_bytes(&self) -> &[u8];
 
     fn subslice(&self, span: WireSpan) -> Result<Self::Slice, DecodeError>;
+
+    /// Empty placeholder for a nested slot before [`super::LazyScan::adopt`].
+    ///
+    /// For `&[u8]` this is `&[]` (coerces to any `'buf`). For [`Bytes`] it is
+    /// an empty owned buffer. Roots that decode from a buffer use `open` /
+    /// `parse_in` instead of this constructor.
+    fn empty() -> Self;
 }
 
 /// Buffers that can grow. `&[u8]` does not implement this.
 pub trait WireAppend: WireBuf {
-    fn empty() -> Self;
-
     /// Append `chunk`. Shared buffers copy then append (COW).
     fn append(&mut self, chunk: &[u8]);
 }
@@ -46,6 +51,11 @@ impl<'buf> WireBuf for &'buf [u8] {
             span.slice(*self)
         }
     }
+
+    #[inline]
+    fn empty() -> Self {
+        &[]
+    }
 }
 
 impl WireBuf for Bytes {
@@ -62,14 +72,14 @@ impl WireBuf for Bytes {
         let end = span.offset + span.len;
         Ok(self.slice(span.offset..end))
     }
-}
 
-impl WireAppend for Bytes {
     #[inline]
     fn empty() -> Self {
         Bytes::new()
     }
+}
 
+impl WireAppend for Bytes {
     fn append(&mut self, chunk: &[u8]) {
         if chunk.is_empty() {
             return;
@@ -133,5 +143,11 @@ mod tests {
     #[test]
     fn bytes_empty_is_empty() {
         assert!(Bytes::empty().is_empty());
+    }
+
+    #[test]
+    fn slice_empty_is_empty() {
+        let e: &[u8] = <&[u8] as WireBuf>::empty();
+        assert!(e.is_empty());
     }
 }

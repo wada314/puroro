@@ -195,6 +195,27 @@ impl<A: Allocator> WireOrSsoSlot<UnmanagedString<A>> {
             }
         }
     }
+
+    /// UTF-8 check against `wire` without promoting the slot.
+    ///
+    /// Used by borrowed lazy getters (`B = &[u8]`). Does not set Failed.
+    pub fn peek_str<'buf>(
+        &self,
+        arm: WireOrSsoKind,
+        wire: &'buf [u8],
+    ) -> Result<&'buf str, DecodeError> {
+        match arm {
+            WireOrSsoKind::Wire | WireOrSsoKind::Failed => {
+                let span = unsafe { (*self.inner.get()).wire };
+                let bytes = span.slice(wire)?;
+                str::from_utf8(bytes).map_err(|_| DecodeError::InvalidUtf8)
+            }
+            WireOrSsoKind::Inline | WireOrSsoKind::Heap => {
+                // Borrowed decode never promotes; Inline / Heap should not appear.
+                Err(DecodeError::InvalidUtf8)
+            }
+        }
+    }
 }
 
 impl<A: Allocator> WireOrSsoSlot<UnmanagedVec<u8, A>> {
@@ -250,6 +271,23 @@ impl<A: Allocator> WireOrSsoSlot<UnmanagedVec<u8, A>> {
                     Ok(unsafe { (*self.inner.get()).heap.as_slice() })
                 }
             }
+        }
+    }
+
+    /// Slice the wire span without promoting the slot.
+    ///
+    /// Used by borrowed lazy getters (`B = &[u8]`).
+    pub fn peek_bytes<'buf>(
+        &self,
+        arm: WireOrSsoKind,
+        wire: &'buf [u8],
+    ) -> Result<&'buf [u8], DecodeError> {
+        match arm {
+            WireOrSsoKind::Wire | WireOrSsoKind::Failed => {
+                let span = unsafe { (*self.inner.get()).wire };
+                span.slice(wire)
+            }
+            WireOrSsoKind::Inline | WireOrSsoKind::Heap => Err(DecodeError::TruncatedMessage),
         }
     }
 }

@@ -169,7 +169,7 @@ impl<A: Allocator, B: WireBuf> LazyScan<A, B> {
     }
 }
 
-impl<A: Allocator + Clone, B: WireAppend> LazyScan<A, B> {
+impl<A: Allocator + Clone, B: WireBuf> LazyScan<A, B> {
     pub fn new_in(alloc: A) -> Self {
         Self {
             scanner: RecordScanner::new_in(alloc.clone()),
@@ -179,24 +179,6 @@ impl<A: Allocator + Clone, B: WireAppend> LazyScan<A, B> {
             regions: AllocVec::new_in(alloc.clone()),
             policy_spans: AllocVec::new_in(alloc),
         }
-    }
-
-    /// Parse `chunk` and, on success, append it to the island buffer.
-    ///
-    /// A scan error leaves `_wire`, the leftover, and the finished flag as they
-    /// were, so a rejected chunk cannot sit in the buffer ahead of the scanner.
-    /// Returns the origin of `leftover || chunk` in `_wire`, plus the records.
-    pub fn push(
-        &mut self,
-        chunk: &[u8],
-    ) -> Result<(usize, AllocVec<ScannedRecord, A>), DecodeError> {
-        debug_assert!(self.wire.as_bytes().ends_with(self.scanner.leftover()));
-        let origin = self.wire.as_bytes().len() - self.scanner.leftover().len();
-        let records = self.scanner.push(chunk)?;
-        self.finished = false;
-        self.wire.append(chunk);
-        debug_assert!(self.wire.as_bytes().ends_with(self.scanner.leftover()));
-        Ok((origin, records))
     }
 
     pub fn clone_in(&self, _alloc: A) -> Self {
@@ -209,9 +191,21 @@ impl<A: Allocator + Clone, B: WireAppend> LazyScan<A, B> {
             policy_spans: self.policy_spans.clone(),
         }
     }
-}
 
-impl<A: Allocator + Clone, B: WireBuf> LazyScan<A, B> {
+    /// Scan a finished buffer. Does not append and does not copy `wire`.
+    ///
+    /// Stores `wire`, runs the record scanner on `as_bytes()`, then finishes.
+    /// A successful finish leaves leftover empty, so a complete buffer is not
+    /// copied into the scanner. Root `open` leaves `regions` empty.
+    pub fn open(&mut self, wire: B) -> Result<AllocVec<ScannedRecord, A>, DecodeError> {
+        self.wire = wire;
+        self.finished = false;
+        let records = self.scanner.push(self.wire.as_bytes())?;
+        self.scanner.finish()?;
+        self.finished = true;
+        Ok(records)
+    }
+
     pub fn finish(&mut self) -> Result<(), DecodeError> {
         self.scanner.finish()?;
         self.finished = true;
@@ -325,7 +319,27 @@ impl<A: Allocator + Clone, B: WireBuf> LazyScan<A, B> {
     }
 }
 
-impl<A: Allocator + Clone, B: WireAppend> MessageScan<A> for Lazy<A, B> {
+impl<A: Allocator + Clone, B: WireAppend> LazyScan<A, B> {
+    /// Parse `chunk` and, on success, append it to the island buffer.
+    ///
+    /// A scan error leaves `_wire`, the leftover, and the finished flag as they
+    /// were, so a rejected chunk cannot sit in the buffer ahead of the scanner.
+    /// Returns the origin of `leftover || chunk` in `_wire`, plus the records.
+    pub fn push(
+        &mut self,
+        chunk: &[u8],
+    ) -> Result<(usize, AllocVec<ScannedRecord, A>), DecodeError> {
+        debug_assert!(self.wire.as_bytes().ends_with(self.scanner.leftover()));
+        let origin = self.wire.as_bytes().len() - self.scanner.leftover().len();
+        let records = self.scanner.push(chunk)?;
+        self.finished = false;
+        self.wire.append(chunk);
+        debug_assert!(self.wire.as_bytes().ends_with(self.scanner.leftover()));
+        Ok((origin, records))
+    }
+}
+
+impl<A: Allocator + Clone, B: WireBuf> MessageScan<A> for Lazy<A, B> {
     #[inline]
     fn new_scan(alloc: A) -> Self {
         Self {
@@ -613,6 +627,33 @@ fn write_range_omitting<B: BufMut>(
         buf.put_slice(wire.get(cursor..end).ok_or(DecodeError::TruncatedMessage)?);
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod open_tests {
+    use super::{LazyScan, WireBuf};
+    use ::allocator_api2::alloc::Global;
+
+    #[test]
+    fn open_slice_does_not_copy_wire() {
+        // field 1 / Len, length 1, payload 'x'
+        let wire: &[u8] = &[0x0a, 0x01, b'x'];
+        let ptr = wire.as_ptr();
+        let mut scan = LazyScan::<Global, &[u8]>::new_in(Global);
+        let records = scan.open(wire).unwrap();
+        assert_eq!(records.len(), 1);
+        assert_eq!(scan.wire().as_ptr(), ptr);
+        assert!(scan.regions().is_empty());
+        assert!(scan.require_finished().is_ok());
+    }
+
+    #[test]
+    fn open_empty_is_finished() {
+        let mut scan = LazyScan::<Global, &[u8]>::new_in(Global);
+        let records = scan.open(<&[u8] as WireBuf>::empty()).unwrap();
+        assert!(records.is_empty());
+        assert!(scan.require_finished().is_ok());
+    }
 }
 
 #[cfg(test)]

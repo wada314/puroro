@@ -810,6 +810,35 @@ where
         })?;
         Ok(Optional::new(Some(s)))
     }
+
+    /// UTF-8 read without promoting the slot (borrowed lazy wire).
+    pub fn peek_str<'buf, Cx>(
+        &self,
+        common: &Cx,
+        wire: &'buf [u8],
+    ) -> Result<Optional<&'buf str, D>, DecodeError>
+    where
+        Cx: MessageBindingMut<A> + MessageCommonSharedBits,
+        D: HasDefault<&'buf str>,
+    {
+        if !P::is_set(common, || {
+            match (*self.value).with(P::slot_init_view(), common).get() {
+                Some(slot) => {
+                    <WireOrSso<KIND> as ValueLayout<ProtoString, A>>::is_proto_empty(slot, common)
+                }
+                None => true,
+            }
+        }) {
+            return Ok(Optional::new(None));
+        }
+        let slot = (*self.value)
+            .with(P::slot_init_view(), common)
+            .get()
+            .expect("is_set implies initialized slot");
+        let arm = WireOrSso::<KIND>::kind(common);
+        let s = slot.peek_str(arm, wire)?;
+        Ok(Optional::new(Some(s)))
+    }
 }
 
 impl<P, const FIELD: u32, A, const KIND: usize, D, C>
@@ -850,6 +879,35 @@ where
         let bytes = slot.get_bytes(arm, wire, common.clone_alloc(), |new| {
             WireOrSso::<KIND>::set_kind_shared(common, new);
         })?;
+        Ok(Optional::new(Some(bytes)))
+    }
+
+    /// Bytes read without promoting the slot (borrowed lazy wire).
+    pub fn peek_bytes<'buf, Cx>(
+        &self,
+        common: &Cx,
+        wire: &'buf [u8],
+    ) -> Result<Optional<&'buf [u8], D>, DecodeError>
+    where
+        Cx: MessageBindingMut<A> + MessageCommonSharedBits,
+        D: HasDefault<&'buf [u8]>,
+    {
+        if !P::is_set(common, || {
+            match (*self.value).with(P::slot_init_view(), common).get() {
+                Some(slot) => {
+                    <WireOrSso<KIND> as ValueLayout<LenScalar<C>, A>>::is_proto_empty(slot, common)
+                }
+                None => true,
+            }
+        }) {
+            return Ok(Optional::new(None));
+        }
+        let slot = (*self.value)
+            .with(P::slot_init_view(), common)
+            .get()
+            .expect("is_set implies initialized slot");
+        let arm = WireOrSso::<KIND>::kind(common);
+        let bytes = slot.peek_bytes(arm, wire)?;
         Ok(Optional::new(Some(bytes)))
     }
 }
