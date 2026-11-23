@@ -7,7 +7,6 @@
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::vec::Vec as AllocVec;
-use ::bytes::Bytes;
 use ::core::marker::PhantomData;
 use ::core::mem;
 use ::core::ops::{ControlFlow, Deref, DerefMut};
@@ -16,7 +15,7 @@ use ::puroro::{
     RepeatedStringMut, WireType,
 };
 use ::puroro_rt::decode::{
-    MessageScan, ScannedRecord, WireBuf, scanned_len_span, scanned_record_span,
+    LazyProfile, MessageScan, Owned, ScannedRecord, WireBuf, scanned_len_span, scanned_record_span,
 };
 use ::puroro_rt::{
     BitPacked, Boxed, CloneRecordFields, Closed, ConstructRecordFields, Eager, EagerRecordFields,
@@ -239,11 +238,11 @@ pub struct Task<A: Allocator + Clone = Global> {
 
 /// Lazy `Task`.
 ///
-/// `B = Bytes` is the owned island buffer (`Message::decode`). Zero-copy is
-/// `TaskLazy<A, &'buf [u8]>` via [`TaskLazy::parse_in`].
-pub struct TaskLazy<A: Allocator + Clone = Global, B: WireBuf = Bytes> {
+/// `P = Owned` is the owned island buffer (`Message::decode`). Zero-copy is
+/// `TaskLazy<A, Borrowed<'buf>>` via [`TaskLazy::parse_in`].
+pub struct TaskLazy<A: Allocator + Clone = Global, P: LazyProfile = Owned> {
     #[allow(clippy::type_complexity)]
-    pub(crate) record: Record<TaskFields<A, Lazy<A, B>>, A, Lazy<A, B>, UnknownFields<A>>,
+    pub(crate) record: Record<TaskFields<A, Lazy<A, P>>, A, Lazy<A, P>, UnknownFields<A>>,
 }
 
 ::puroro_rt::forward_record!(eager Task);
@@ -367,8 +366,8 @@ macro_rules! impl_task_build_eager {
 
 impl_task_build_eager!();
 
-impl<A: Allocator + Clone, B: WireBuf> ConstructRecordFields<A, Lazy<A, B>>
-    for TaskFields<A, Lazy<A, B>>
+impl<A: Allocator + Clone, P: LazyProfile> ConstructRecordFields<A, Lazy<A, P>>
+    for TaskFields<A, Lazy<A, P>>
 {
     fn new(alloc: A) -> Self {
         Self {
@@ -395,14 +394,14 @@ impl<A: Allocator + Clone, B: WireBuf> ConstructRecordFields<A, Lazy<A, B>>
     }
 }
 
-impl<A: Allocator + Clone, B: WireBuf> CloneRecordFields<A, Lazy<A, B>>
-    for TaskFields<A, Lazy<A, B>>
+impl<A: Allocator + Clone, P: LazyProfile> CloneRecordFields<A, Lazy<A, P>>
+    for TaskFields<A, Lazy<A, P>>
 {
     fn clone_fields(
         &self,
         dst: &mut Self,
-        src_common: &MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A, B>>,
-        dst_common: &MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A, B>>,
+        src_common: &MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A, P>>,
+        dst_common: &MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A, P>>,
         alloc: A,
     ) {
         clone_task_slot!(self, dst, src_common, dst_common, alloc, title);
@@ -533,10 +532,10 @@ impl<A: Allocator + Clone> EagerRecordFields<A> for TaskFields<A, Eager> {
     }
 }
 
-impl<A: Allocator + Clone, B: WireBuf> LazyRecordApply<A, B> for TaskFields<A, Lazy<A, B>> {
+impl<A: Allocator + Clone, P: LazyProfile> LazyRecordApply<A, P> for TaskFields<A, Lazy<A, P>> {
     fn apply_record(
         &mut self,
-        common: &mut MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A, B>>,
+        common: &mut MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A, P>>,
         rec: &ScannedRecord,
         origin: usize,
         _depth: usize,
@@ -735,7 +734,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.record.field::<{ FIELD_PRIORITY }>().optional()
     }
 
-    pub fn assignee(&self) -> Option<&AddressLazy<A, Bytes>> {
+    pub fn assignee(&self) -> Option<&AddressLazy<A, Owned>> {
         self.record.field::<{ FIELD_ASSIGNEE }>().get()
     }
 
@@ -892,7 +891,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.record.field_mut::<{ FIELD_PRIORITY }>().clear();
     }
 
-    pub fn assignee_mut(&mut self) -> &mut AddressLazy<A, Bytes> {
+    pub fn assignee_mut(&mut self) -> &mut AddressLazy<A, Owned> {
         self.record.field_mut::<{ FIELD_ASSIGNEE }>().get_mut()
     }
 

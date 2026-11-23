@@ -13,7 +13,7 @@ use ::protobuf_core::FieldNumber;
 use ::puroro::{DecodeBuf, DecodeError, Message, RECURSION_LIMIT, WireType};
 
 use crate::decode::{
-    Eager, Lazy, LazyMessage, LazyScan, MessageScan, ScannedRecord, WireAppend, WireBuf,
+    Eager, Lazy, LazyMessage, LazyProfile, LazyScan, MessageScan, Owned, ScannedRecord, WireAppend,
     copy_group_body, measure_group, next_tag, skip_field_and_save_in,
 };
 use crate::fields::shared::{
@@ -143,9 +143,9 @@ where
 /// Lazy ingest of one scanned record.
 ///
 /// Separate from [`RecordFields`] because the body names `Lazy::scan`, which
-/// the eager alias does not have. `B` is the island buffer ([`bytes::Bytes`]
-/// or `&[u8]`).
-pub trait LazyRecordApply<A, B: WireBuf = ::bytes::Bytes>: RecordFields<A, Lazy<A, B>>
+/// the eager alias does not have. `P` is the lazy [`LazyProfile`] (buffer +
+/// singular LEN read policy).
+pub trait LazyRecordApply<A, P: LazyProfile = Owned>: RecordFields<A, Lazy<A, P>>
 where
     A: Allocator + Clone,
 {
@@ -157,7 +157,7 @@ where
     /// maximum, so this path does not reject a deep span.
     fn apply_record(
         &mut self,
-        common: &mut MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A, B>>,
+        common: &mut MessageCommon<Self::Bits, A, Self::Unknown, Lazy<A, P>>,
         rec: &ScannedRecord,
         origin: usize,
         depth: usize,
@@ -262,12 +262,12 @@ where
     }
 }
 
-impl<F, A, U, B> Record<F, A, Lazy<A, B>, U>
+impl<F, A, U, P> Record<F, A, Lazy<A, P>, U>
 where
     A: Allocator + Clone,
     U: UnknownStore<A>,
-    B: WireBuf,
-    F: RecordFields<A, Lazy<A, B>, Unknown = U>,
+    P: LazyProfile,
+    F: RecordFields<A, Lazy<A, P>, Unknown = U>,
     F::Bits: Clone,
 {
     /// Replay ingested bytes into an eager message `Z`.
@@ -418,15 +418,15 @@ where
     }
 }
 
-impl<F, A, U, B> PartialEq for Record<F, A, Lazy<A, B>, U>
+impl<F, A, U, P> PartialEq for Record<F, A, Lazy<A, P>, U>
 where
     A: Allocator + Clone,
     U: UnknownStore<A>,
-    B: WireBuf,
-    F: RecordFields<A, Lazy<A, B>, Unknown = U>
-        + LazyRecordApply<A, B>
-        + CloneRecordFields<A, Lazy<A, B>>
-        + ConstructRecordFields<A, Lazy<A, B>>,
+    P: LazyProfile,
+    F: RecordFields<A, Lazy<A, P>, Unknown = U>
+        + LazyRecordApply<A, P>
+        + CloneRecordFields<A, Lazy<A, P>>
+        + ConstructRecordFields<A, Lazy<A, P>>,
     F::Bits: Clone,
 {
     fn eq(&self, other: &Self) -> bool {
@@ -450,15 +450,15 @@ where
     }
 }
 
-impl<F, A, U, B> Debug for Record<F, A, Lazy<A, B>, U>
+impl<F, A, U, P> Debug for Record<F, A, Lazy<A, P>, U>
 where
     A: Allocator + Clone,
     U: UnknownStore<A>,
-    B: WireBuf,
-    F: RecordFields<A, Lazy<A, B>, Unknown = U>
-        + LazyRecordApply<A, B>
-        + CloneRecordFields<A, Lazy<A, B>>
-        + ConstructRecordFields<A, Lazy<A, B>>,
+    P: LazyProfile,
+    F: RecordFields<A, Lazy<A, P>, Unknown = U>
+        + LazyRecordApply<A, P>
+        + CloneRecordFields<A, Lazy<A, P>>
+        + ConstructRecordFields<A, Lazy<A, P>>,
     F::Bits: Clone,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -498,7 +498,7 @@ impl<F, A, U, W> MessageEncode for Record<F, A, Lazy<A, W>, U>
 where
     A: Allocator + Clone,
     U: UnknownStore<A>,
-    W: WireBuf,
+    W: LazyProfile,
     F: RecordFields<A, Lazy<A, W>, Unknown = U> + LazyRecordApply<A, W>,
     F::Bits: Clone,
 {
@@ -528,7 +528,7 @@ impl<F, A, U, W> Record<F, A, Lazy<A, W>, U>
 where
     A: Allocator + Clone,
     U: UnknownStore<A>,
-    W: WireBuf,
+    W: LazyProfile,
     F: RecordFields<A, Lazy<A, W>, Unknown = U> + LazyRecordApply<A, W>,
     F::Bits: Clone,
 {
@@ -587,8 +587,9 @@ impl<F, A, U, W> MessageMerge for Record<F, A, Lazy<A, W>, U>
 where
     A: Allocator + Clone,
     U: UnknownStore<A>,
-    W: WireAppend,
+    W: LazyProfile,
     F: RecordFields<A, Lazy<A, W>, Unknown = U> + LazyRecordApply<A, W>,
+    W::Buf: WireAppend,
     F::Bits: Clone,
 {
     fn merge_from_with_depth<In: DecodeBuf>(
@@ -625,19 +626,19 @@ where
     }
 }
 
-impl<F, A, U, B> LazyMessage<A, B> for Record<F, A, Lazy<A, B>, U>
+impl<F, A, U, P> LazyMessage<A, P> for Record<F, A, Lazy<A, P>, U>
 where
     A: Allocator + Clone,
     U: UnknownStore<A>,
-    B: WireBuf,
-    F: RecordFields<A, Lazy<A, B>, Unknown = U> + LazyRecordApply<A, B>,
+    P: LazyProfile,
+    F: RecordFields<A, Lazy<A, P>, Unknown = U> + LazyRecordApply<A, P>,
     F::Bits: Clone,
 {
-    fn scan(&self) -> &LazyScan<A, B> {
+    fn scan(&self) -> &LazyScan<A, P::Buf> {
         &self.common.lazy.scan
     }
 
-    fn scan_mut(&mut self) -> &mut LazyScan<A, B> {
+    fn scan_mut(&mut self) -> &mut LazyScan<A, P::Buf> {
         &mut self.common.lazy.scan
     }
 
@@ -732,7 +733,8 @@ impl<F, A, U, W> Message for Record<F, A, Lazy<A, W>, U>
 where
     A: Allocator + Clone,
     U: UnknownStore<A>,
-    W: WireAppend,
+    W: LazyProfile,
+    W::Buf: WireAppend,
     F: RecordFields<A, Lazy<A, W>, Unknown = U>
         + LazyRecordApply<A, W>
         + ConstructRecordFields<A, Lazy<A, W>>,
@@ -799,8 +801,8 @@ where
 ///
 /// `eager` / `lazy` pick the [`Record`] impls (`LazyMessage` is lazy-only).
 ///
-/// Lazy shells are `$name<A, B: WireBuf = Bytes>`. `Message` / `new_in` /
-/// `MessageMerge` require `B: WireAppend`. Borrowed roots use `parse_in`.
+/// Lazy shells are `$name<A, P: LazyProfile = Owned>`. `Message` / `new_in` /
+/// `MessageMerge` require `P::Buf: WireAppend`. Borrowed roots use `parse_in`.
 #[macro_export]
 macro_rules! forward_record {
     (eager $name:ident) => {
@@ -1012,8 +1014,10 @@ macro_rules! forward_record {
     (@shared_lazy $name:ident) => {
         impl<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            B: $crate::decode::WireAppend,
-        > $name<A, B>
+            P: $crate::decode::LazyProfile,
+        > $name<A, P>
+        where
+            P::Buf: $crate::decode::WireAppend,
         {
             /// Empty message using `alloc` for every slot.
             #[inline]
@@ -1024,7 +1028,7 @@ macro_rules! forward_record {
             }
         }
 
-        impl $name<::allocator_api2::alloc::Global, ::bytes::Bytes> {
+        impl $name<::allocator_api2::alloc::Global, $crate::decode::Owned> {
             /// Empty message using [`allocator_api2::alloc::Global`].
             #[inline]
             pub fn new() -> Self {
@@ -1036,8 +1040,8 @@ macro_rules! forward_record {
 
         impl<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            B: $crate::decode::WireBuf,
-        > ::core::clone::Clone for $name<A, B>
+            P: $crate::decode::LazyProfile,
+        > ::core::clone::Clone for $name<A, P>
         {
             #[inline]
             fn clone(&self) -> Self {
@@ -1049,8 +1053,8 @@ macro_rules! forward_record {
 
         impl<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            B: $crate::decode::WireBuf,
-        > ::core::cmp::PartialEq for $name<A, B>
+            P: $crate::decode::LazyProfile,
+        > ::core::cmp::PartialEq for $name<A, P>
         {
             #[inline]
             fn eq(&self, other: &Self) -> bool {
@@ -1060,8 +1064,8 @@ macro_rules! forward_record {
 
         impl<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            B: $crate::decode::WireBuf,
-        > ::core::fmt::Debug for $name<A, B>
+            P: $crate::decode::LazyProfile,
+        > ::core::fmt::Debug for $name<A, P>
         {
             #[inline]
             fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
@@ -1073,7 +1077,7 @@ macro_rules! forward_record {
             A: ::allocator_api2::alloc::Allocator
                 + ::core::clone::Clone
                 + ::core::default::Default,
-        > ::core::default::Default for $name<A, ::bytes::Bytes>
+        > ::core::default::Default for $name<A, $crate::decode::Owned>
         {
             #[inline]
             fn default() -> Self {
@@ -1085,8 +1089,8 @@ macro_rules! forward_record {
 
         impl<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            B: $crate::decode::WireBuf,
-        > $crate::CloneIn<A> for $name<A, B>
+            P: $crate::decode::LazyProfile,
+        > $crate::CloneIn<A> for $name<A, P>
         {
             #[inline]
             fn clone_in(&self, alloc: A) -> Self {
@@ -1098,8 +1102,8 @@ macro_rules! forward_record {
 
         impl<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            B: $crate::decode::WireBuf,
-        > $crate::DefaultIn<A> for $name<A, B>
+            P: $crate::decode::LazyProfile,
+        > $crate::DefaultIn<A> for $name<A, P>
         {
             #[inline]
             fn default_in(alloc: A) -> Self {
@@ -1111,8 +1115,8 @@ macro_rules! forward_record {
 
         impl<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            B: $crate::decode::WireBuf,
-        > $crate::DeallocateIn<A> for $name<A, B>
+            P: $crate::decode::LazyProfile,
+        > $crate::DeallocateIn<A> for $name<A, P>
         {
             #[inline]
             unsafe fn deallocate_in(self, alloc: &A) {
@@ -1122,8 +1126,8 @@ macro_rules! forward_record {
 
         impl<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            B: $crate::decode::WireBuf,
-        > $crate::DeallocateBound<A> for $name<A, B>
+            P: $crate::decode::LazyProfile,
+        > $crate::DeallocateBound<A> for $name<A, P>
         {
             #[inline]
             fn deallocate_bound<Cx: $crate::MessageBindingMut<A>>(self, common: &Cx) {
@@ -1133,8 +1137,8 @@ macro_rules! forward_record {
 
         impl<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            B: $crate::decode::WireBuf,
-        > $crate::CloneBound<A> for $name<A, B>
+            P: $crate::decode::LazyProfile,
+        > $crate::CloneBound<A> for $name<A, P>
         {
             #[inline]
             fn clone_bound<Cx: $crate::MessageBindingMut<A>>(
@@ -1148,8 +1152,8 @@ macro_rules! forward_record {
 
         impl<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            B: $crate::decode::WireBuf,
-        > $crate::MessageEncode for $name<A, B>
+            P: $crate::decode::LazyProfile,
+        > $crate::MessageEncode for $name<A, P>
         {
             #[inline]
             fn encoded_len(&self, ctx: &mut $crate::EncodeCtx) -> usize {
@@ -1164,8 +1168,10 @@ macro_rules! forward_record {
 
         impl<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            B: $crate::decode::WireAppend,
-        > $crate::MessageMerge for $name<A, B>
+            P: $crate::decode::LazyProfile,
+        > $crate::MessageMerge for $name<A, P>
+        where
+            P::Buf: $crate::decode::WireAppend,
         {
             #[inline]
             fn merge_from_with_depth<In: ::puroro::DecodeBuf>(
@@ -1185,8 +1191,10 @@ macro_rules! forward_record {
 
         impl<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            B: $crate::decode::WireAppend,
-        > ::puroro::Message for $name<A, B>
+            P: $crate::decode::LazyProfile,
+        > ::puroro::Message for $name<A, P>
+        where
+            P::Buf: $crate::decode::WireAppend,
         {
             type Alloc = A;
 
@@ -1237,16 +1245,16 @@ macro_rules! forward_record {
     (@lazy $name:ident) => {
         impl<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            B: $crate::decode::WireBuf,
-        > $crate::decode::LazyMessage<A, B> for $name<A, B>
+            P: $crate::decode::LazyProfile,
+        > $crate::decode::LazyMessage<A, P> for $name<A, P>
         {
             #[inline]
-            fn scan(&self) -> &$crate::decode::LazyScan<A, B> {
+            fn scan(&self) -> &$crate::decode::LazyScan<A, P::Buf> {
                 $crate::decode::LazyMessage::scan(&self.record)
             }
 
             #[inline]
-            fn scan_mut(&mut self) -> &mut $crate::decode::LazyScan<A, B> {
+            fn scan_mut(&mut self) -> &mut $crate::decode::LazyScan<A, P::Buf> {
                 $crate::decode::LazyMessage::scan_mut(&mut self.record)
             }
 

@@ -27,6 +27,7 @@ use super::wire::repeated_element::RepeatedElement;
 use super::wire::singular_type::SingularType;
 use super::wire::wire_or_sso::WireOrSso;
 use crate::ProtoString;
+use crate::decode::LazyProfile;
 
 /// Map protobuf field number `N` to the value generated code reads and writes.
 ///
@@ -156,6 +157,26 @@ where
             None => Ok(Optional::new(None)),
         }
     }
+
+    /// Profile-directed UTF-8 read of variant `N`.
+    #[inline]
+    pub fn profile_str<Pb, U, L, Prof>(
+        self,
+        common: &'a MessageCommon<Pb, A, U, L>,
+        wire: &'a Prof::Buf,
+    ) -> Result<Optional<&'a str, D>, DecodeError>
+    where
+        U: UnknownStore<A>,
+        Pb: BitStorage,
+        Prof: LazyProfile + 'a,
+        D: HasDefault<&'a str> + 'a,
+        MessageCommon<Pb, A, U, L>: MessageCommonSharedBits,
+    {
+        match self.bind(common).as_field() {
+            Some(field) => field.profile_str::<_, Prof>(common, wire),
+            None => Ok(Optional::new(None)),
+        }
+    }
 }
 
 impl<'a, E, const N: u32, C, A, const KIND: usize, D> OneofFieldRef<'a, E, N>
@@ -209,6 +230,27 @@ where
     {
         match self.bind(common).as_field() {
             Some(field) => field.peek_bytes(common, wire),
+            None => Ok(Optional::new(None)),
+        }
+    }
+
+    /// Profile-directed bytes read of variant `N`.
+    #[inline]
+    pub fn profile_bytes<Pb, U, L, Prof>(
+        self,
+        common: &'a MessageCommon<Pb, A, U, L>,
+        wire: &'a Prof::Buf,
+    ) -> Result<Optional<&'a [u8], D>, DecodeError>
+    where
+        U: UnknownStore<A>,
+        Pb: BitStorage,
+        Prof: LazyProfile + 'a,
+        C: 'a,
+        D: HasDefault<&'a [u8]> + 'a,
+        MessageCommon<Pb, A, U, L>: MessageCommonSharedBits,
+    {
+        match self.bind(common).as_field() {
+            Some(field) => field.profile_bytes::<_, Prof>(common, wire),
             None => Ok(Optional::new(None)),
         }
     }

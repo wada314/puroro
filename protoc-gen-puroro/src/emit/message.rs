@@ -137,9 +137,9 @@ pub(super) fn render_items(
     let construct_lazy = quote! {
         impl<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            B: ::puroro_rt::decode::WireBuf,
-        > ::puroro_rt::ConstructRecordFields<A, ::puroro_rt::Lazy<A, B>>
-            for #fields_name<A, ::puroro_rt::Lazy<A, B>>
+            P: ::puroro_rt::decode::LazyProfile,
+        > ::puroro_rt::ConstructRecordFields<A, ::puroro_rt::Lazy<A, P>>
+            for #fields_name<A, ::puroro_rt::Lazy<A, P>>
         {
             #[allow(unused_variables)]
             fn new(alloc: A) -> Self {
@@ -170,9 +170,9 @@ pub(super) fn render_items(
     let clone_lazy = quote! {
         impl<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            B: ::puroro_rt::decode::WireBuf,
-        > ::puroro_rt::CloneRecordFields<A, ::puroro_rt::Lazy<A, B>>
-            for #fields_name<A, ::puroro_rt::Lazy<A, B>>
+            P: ::puroro_rt::decode::LazyProfile,
+        > ::puroro_rt::CloneRecordFields<A, ::puroro_rt::Lazy<A, P>>
+            for #fields_name<A, ::puroro_rt::Lazy<A, P>>
         {
             #[allow(unused_variables)]
             fn clone_fields(
@@ -182,13 +182,13 @@ pub(super) fn render_items(
                     Self::Bits,
                     A,
                     Self::Unknown,
-                    ::puroro_rt::Lazy<A, B>,
+                    ::puroro_rt::Lazy<A, P>,
                 >,
                 dst_common: &::puroro_rt::MessageCommon<
                     Self::Bits,
                     A,
                     Self::Unknown,
-                    ::puroro_rt::Lazy<A, B>,
+                    ::puroro_rt::Lazy<A, P>,
                 >,
                 alloc: A,
             ) {
@@ -293,13 +293,13 @@ pub(super) fn render_items(
 
         pub struct #lazy_alias<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone = ::allocator_api2::alloc::Global,
-            B: ::puroro_rt::decode::WireBuf = ::bytes::Bytes,
+            P: ::puroro_rt::decode::LazyProfile = ::puroro_rt::decode::Owned,
         > {
             #[allow(clippy::type_complexity)]
             record: ::puroro_rt::Record<
-                #fields_name<A, ::puroro_rt::Lazy<A, B>>,
+                #fields_name<A, ::puroro_rt::Lazy<A, P>>,
                 A,
-                ::puroro_rt::Lazy<A, B>,
+                ::puroro_rt::Lazy<A, P>,
                 #unknown_ty,
             >,
         }
@@ -317,8 +317,8 @@ pub(super) fn render_items(
 
         impl<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            B: ::puroro_rt::decode::WireBuf,
-        > ::puroro_rt::LazyRecordApply<A, B> for #fields_name<A, ::puroro_rt::Lazy<A, B>>
+            P: ::puroro_rt::decode::LazyProfile,
+        > ::puroro_rt::LazyRecordApply<A, P> for #fields_name<A, ::puroro_rt::Lazy<A, P>>
         {
             #[allow(unused_variables)]
             fn apply_record(
@@ -327,7 +327,7 @@ pub(super) fn render_items(
                     Self::Bits,
                     A,
                     Self::Unknown,
-                    ::puroro_rt::Lazy<A, B>,
+                    ::puroro_rt::Lazy<A, P>,
                 >,
                 rec: &::puroro_rt::decode::ScannedRecord,
                 origin: usize,
@@ -660,12 +660,8 @@ pub(super) fn bound_record_field(
 /// Layout type argument for [`lazy_field`].
 #[derive(Clone, Copy)]
 pub(super) enum LazyLayout {
-    /// `Lazy<A, B>` on `impl<A, B: WireBuf>`.
-    ParamB,
-    /// `Lazy<A, Bytes>` on the owned string / bytes getters.
-    Bytes,
-    /// `Lazy<A, &'buf [u8]>` on the borrowed peek getters.
-    Borrowed,
+    /// `Lazy<A, P>` on `impl<A, P: LazyProfile>`.
+    ParamP,
 }
 
 /// Borrowed projection inside a lazy message method.
@@ -676,9 +672,7 @@ pub(super) fn lazy_field(
     layout: LazyLayout,
 ) -> TokenStream {
     let layout_ty = match layout {
-        LazyLayout::ParamB => quote! { ::puroro_rt::Lazy<A, B> },
-        LazyLayout::Bytes => quote! { ::puroro_rt::Lazy<A, ::bytes::Bytes> },
-        LazyLayout::Borrowed => quote! { ::puroro_rt::Lazy<A, &'buf [u8]> },
+        LazyLayout::ParamP => quote! { ::puroro_rt::Lazy<A, P> },
     };
     message_field(fields_name, &layout_ty, companion, field_const, false)
 }

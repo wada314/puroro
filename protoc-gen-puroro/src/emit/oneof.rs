@@ -522,24 +522,24 @@ fn render_module_body(
             }
         }
 
-        impl<A: Allocator + ::core::clone::Clone, B: ::puroro_rt::decode::WireBuf> OneofGroup
-            for #storage_name<A, ::puroro_rt::Lazy<A, B>>
+        impl<A: Allocator + ::core::clone::Clone, P: ::puroro_rt::decode::LazyProfile> OneofGroup
+            for #storage_name<A, ::puroro_rt::Lazy<A, P>>
         {
             type Case = #case_name;
             type Ref<'a>
                 = #case_name
             where
                 A: 'a,
-                B: 'a;
+                P: 'a;
             type Mut<'a>
                 = ()
             where
                 A: 'a,
-                B: 'a;
+                P: 'a;
             type Bits = #lazy_bits_ty;
             type Alloc = A;
             #unknown_assoc
-            type Layout = ::puroro_rt::Lazy<A, B>;
+            type Layout = ::puroro_rt::Lazy<A, P>;
 
             fn case(storage: &Self) -> Self::Case {
                 match &storage.value {

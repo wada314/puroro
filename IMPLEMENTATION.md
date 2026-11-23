@@ -463,7 +463,7 @@ pub(crate) struct TaskFields<A: Allocator + Clone = Global, L: task::Layout<A> =
 pub struct Task<A: Allocator + Clone = Global> {
     record: puroro_rt::Record<TaskFields<A, Eager>, A, Eager, UnknownFields<A>>,
 }
-pub struct TaskLazy<A: Allocator + Clone = Global, B: WireBuf = Bytes> {
+pub struct TaskLazy<A: Allocator + Clone = Global, P: LazyProfile = Owned> {
     record: puroro_rt::Record<TaskFields<A, Lazy<A, B>>, A, Lazy<A, B>, UnknownFields<A>>,
 }
 ```

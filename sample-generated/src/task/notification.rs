@@ -62,7 +62,7 @@ use ::allocator_api2::alloc::Allocator;
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::BufMut;
-use ::puroro_rt::decode::WireBuf;
+use ::puroro_rt::decode::LazyProfile;
 use ::puroro_rt::{
     BitPacked, FieldCloneIn, FieldDeallocate, FieldEncode, Inline, InlineOrHeap, InteriorBitArray,
     Lazy, MessageCommon, MessageCommonAlloc, MessageCommonBits, Oneof, OneofDeallocate,
@@ -256,7 +256,7 @@ impl<A: Allocator + Clone> OneofGroup
     }
 }
 
-impl<A: Allocator + Clone, B: WireBuf> OneofGroup
+impl<A: Allocator + Clone, P: LazyProfile> OneofGroup
     for Notification<
         SingularField<
             ProtoString,
@@ -273,7 +273,7 @@ impl<A: Allocator + Clone, B: WireBuf> OneofGroup
             WireOrSso<{ super::BIT_PHONE_NUMBER_LAZY_KIND }>,
         >,
         WebhookIdField<A>,
-        SingularField<ProtoMessage<AddressLazy<A, B>>, Oneof, { super::FIELD_POSTAL }, A>,
+        SingularField<ProtoMessage<AddressLazy<A, P>>, Oneof, { super::FIELD_POSTAL }, A>,
         UrgentField<A>,
     >
 {
@@ -282,16 +282,16 @@ impl<A: Allocator + Clone, B: WireBuf> OneofGroup
         = NotificationCase
     where
         A: 'a,
-        B: 'a;
+        P: 'a;
     type Mut<'a>
         = ()
     where
         A: 'a,
-        B: 'a;
+        P: 'a;
     type Bits = InteriorBitArray<4>;
     type Alloc = A;
     type Unknown = UnknownFields<A>;
-    type Layout = Lazy<A, B>;
+    type Layout = Lazy<A, P>;
 
     fn case(storage: &Self) -> Self::Case {
         match storage {

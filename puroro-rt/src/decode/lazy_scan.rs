@@ -10,6 +10,7 @@ use ::puroro::{DecodeError, UnknownField};
 use ::std::vec::Vec;
 
 use super::iter_unknown_fields;
+use super::lazy_profile::{LazyProfile, Owned};
 use super::record::{RecordScanner, ScannedRecord, WireSpan};
 use super::wire_buf::{WireAppend, WireBuf};
 
@@ -31,8 +32,8 @@ pub trait MessageScan<A: Allocator>: Sized {
 pub struct Eager;
 
 /// Lazy ingest layout: owns the [`LazyScan`] machine.
-pub struct Lazy<A: Allocator = Global, B: WireBuf = Bytes> {
-    pub scan: LazyScan<A, B>,
+pub struct Lazy<A: Allocator = Global, P: LazyProfile = Owned> {
+    pub scan: LazyScan<A, P::Buf>,
 }
 
 impl<A: Allocator> MessageScan<A> for Eager {
@@ -345,7 +346,7 @@ impl<A: Allocator + Clone, B: WireAppend> LazyScan<A, B> {
     }
 }
 
-impl<A: Allocator + Clone, B: WireBuf> MessageScan<A> for Lazy<A, B> {
+impl<A: Allocator + Clone, P: LazyProfile> MessageScan<A> for Lazy<A, P> {
     #[inline]
     fn new_scan(alloc: A) -> Self {
         Self {
@@ -366,7 +367,7 @@ impl<A: Allocator + Clone, B: WireBuf> MessageScan<A> for Lazy<A, B> {
     }
 }
 
-impl<A: Allocator + Clone, B: WireBuf> Lazy<A, B> {
+impl<A: Allocator + Clone, P: LazyProfile> Lazy<A, P> {
     /// Remember one unknown record span in this message's scan.
     #[inline]
     pub fn record_policy_span(&mut self, span: WireSpan) {
@@ -387,9 +388,9 @@ impl<A: Allocator + Clone, B: WireBuf> Lazy<A, B> {
 /// [`crate::MessageEncode`]. When both traits are in scope, call the
 /// `Result` methods with UFCS. [`puroro::Message::decode`] is the complete
 /// decode entry; generated `Message::merge_from` calls [`ingest_buf`](Self::ingest_buf).
-pub trait LazyMessage<A: Allocator + Clone, B: WireBuf = Bytes> {
-    fn scan(&self) -> &LazyScan<A, B>;
-    fn scan_mut(&mut self) -> &mut LazyScan<A, B>;
+pub trait LazyMessage<A: Allocator + Clone, P: LazyProfile = Owned> {
+    fn scan(&self) -> &LazyScan<A, P::Buf>;
+    fn scan_mut(&mut self) -> &mut LazyScan<A, P::Buf>;
     fn apply_record(
         &mut self,
         rec: &ScannedRecord,
@@ -404,7 +405,7 @@ pub trait LazyMessage<A: Allocator + Clone, B: WireBuf = Bytes> {
             return Ok(());
         }
         // SAFETY: field getters hold `&self` only; ingest uses `&mut self` and
-        // does not overlap. The first get walks stored regions once.
+        // do not overlap. The first get walks stored regions once.
         let this = ptr::from_ref(self).cast_mut();
         unsafe { (*this).apply_pending() }
     }
@@ -413,7 +414,7 @@ pub trait LazyMessage<A: Allocator + Clone, B: WireBuf = Bytes> {
     ///
     /// The first field getter parses every stored region (protobuf merge). If
     /// slots were already applied, this occurrence is parsed immediately.
-    fn merge_shared(&mut self, root: &B, span: WireSpan) -> Result<(), DecodeError> {
+    fn merge_shared(&mut self, root: &P::Buf, span: WireSpan) -> Result<(), DecodeError> {
         if let Some(span) = self.scan_mut().store_shared(root, span) {
             self.apply_span(span)?;
         }
@@ -477,7 +478,7 @@ pub trait LazyMessage<A: Allocator + Clone, B: WireBuf = Bytes> {
     /// complete record.
     fn push(&mut self, chunk: &[u8]) -> Result<(), DecodeError>
     where
-        B: WireAppend,
+        P::Buf: WireAppend,
     {
         self.push_with_depth(chunk, 0)
     }
@@ -485,7 +486,7 @@ pub trait LazyMessage<A: Allocator + Clone, B: WireBuf = Bytes> {
     /// [`push`](Self::push) at nesting `depth` (0 is the top-level message).
     fn push_with_depth(&mut self, chunk: &[u8], depth: usize) -> Result<(), DecodeError>
     where
-        B: WireAppend,
+        P::Buf: WireAppend,
     {
         let (origin, records) = self.scan_mut().push(chunk)?;
         for rec in records {
@@ -502,7 +503,7 @@ pub trait LazyMessage<A: Allocator + Clone, B: WireBuf = Bytes> {
     /// [`push`](Self::push) for that.
     fn ingest_buf<In: Buf>(&mut self, buf: &mut In) -> Result<(), DecodeError>
     where
-        B: WireAppend,
+        P::Buf: WireAppend,
     {
         self.ingest_with_depth(buf, 0)
     }
@@ -510,7 +511,7 @@ pub trait LazyMessage<A: Allocator + Clone, B: WireBuf = Bytes> {
     /// [`ingest_buf`](Self::ingest_buf) at nesting `depth`.
     fn ingest_with_depth<In: Buf>(&mut self, buf: &mut In, depth: usize) -> Result<(), DecodeError>
     where
-        B: WireAppend,
+        P::Buf: WireAppend,
     {
         while buf.has_remaining() {
             let n = buf.chunk().len();

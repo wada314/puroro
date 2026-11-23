@@ -20,7 +20,7 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
-use ::puroro_rt::decode::WireBuf;
+use ::puroro_rt::decode::LazyProfile;
 use ::puroro_rt::{
     BitStorage, DeallocateBound, DeallocateIn, Eager, Expanded, InlineOrHeap, InteriorBitArray,
     Lazy, MapLayout, MapReady, MapSpans, MessageEncode, ProtoBytes, ProtoInt32, ProtoString,
@@ -53,17 +53,17 @@ pub trait Layout<A: Allocator>: Sized {
     /// Map storage (`MapReady` or `MapSpans`).
     type Map: MapLayout<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>;
 
-    /// Nested `origin` message (`Point<A>` or `PointLazy<A, B>`).
+    /// Nested `origin` message (`Point<A>` or `PointLazy<A, P>`).
     type OriginMsg: MessageEncode + DeallocateBound<A>;
-    /// Nested `watchers` element (`Address<A>` or `AddressLazy<A, B>`).
+    /// Nested `watchers` element (`Address<A>` or `AddressLazy<A, P>`).
     type WatchersMsg: MessageEncode + DeallocateBound<A> + DeallocateIn<A>;
-    /// Pinned lazy `assignee` (`AddressLazy<A, B>` on both aliases; eager uses `Bytes`).
+    /// Pinned lazy `assignee` (`AddressLazy<A, P>` on both aliases; eager uses `Owned`).
     type AssigneeMsg: MessageEncode + DeallocateBound<A> + DeallocateIn<A>;
 
     /// `notification` string slots (`InlineOrHeap<{SSO}>` or `WireOrSso<{KIND}>`).
     type EmailLen: ValueLayout<ProtoString, A>;
     type PhoneLen: ValueLayout<ProtoString, A>;
-    /// `notification.postal` (`Address<A>` or `AddressLazy<A, B>`).
+    /// `notification.postal` (`Address<A>` or `AddressLazy<A, P>`).
     type PostalMsg: MessageEncode + DeallocateBound<A> + DeallocateIn<A>;
 
     fn empty_bits() -> Self::Bits;
@@ -89,19 +89,19 @@ impl<A: Allocator + Clone> Layout<A> for Eager {
     }
 }
 
-impl<A: Allocator + Clone, B: WireBuf> Layout<A> for Lazy<A, B> {
+impl<A: Allocator + Clone, P: LazyProfile> Layout<A> for Lazy<A, P> {
     type Bits = InteriorBitArray<4>;
     type TitleLen = WireOrSso<{ BIT_TITLE_LAZY_KIND }>;
     type OwnerIdLen = WireOrSso<{ BIT_OWNER_ID_LAZY_KIND }>;
     type PayloadLen = WireOrSso<{ BIT_PAYLOAD_LAZY_KIND }>;
     type Repeated = RepeatedSpans;
     type Map = MapSpans;
-    type OriginMsg = PointLazy<A, B>;
-    type WatchersMsg = AddressLazy<A, B>;
-    type AssigneeMsg = AddressLazy<A, B>;
+    type OriginMsg = PointLazy<A, P>;
+    type WatchersMsg = AddressLazy<A, P>;
+    type AssigneeMsg = AddressLazy<A, P>;
     type EmailLen = WireOrSso<{ BIT_EMAIL_ADDRESS_LAZY_KIND }>;
     type PhoneLen = WireOrSso<{ BIT_PHONE_NUMBER_LAZY_KIND }>;
-    type PostalMsg = AddressLazy<A, B>;
+    type PostalMsg = AddressLazy<A, P>;
 
     #[inline]
     fn empty_bits() -> Self::Bits {

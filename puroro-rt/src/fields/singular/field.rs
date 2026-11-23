@@ -25,7 +25,7 @@ use ::bytes::BufMut;
 use crate::defaults::ProtoDefault;
 use ::puroro::{DecodeBuf, DecodeError, HasDefault, Optional, WireType};
 
-use crate::decode::{LazyMessage, ScannedValue, WireBuf, WireSpan, save_unknown_varint_field};
+use crate::decode::{LazyMessage, LazyProfile, ScannedValue, WireSpan, save_unknown_varint_field};
 use crate::encode::field_number_const;
 use crate::fields::shared::FieldDeallocate;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
@@ -727,16 +727,16 @@ where
     ///
     /// Does not walk the child's tags (`MessageMerge` / ingest). The child's
     /// first field getter parses stored regions.
-    pub fn merge_shared<Cx, B>(
+    pub fn merge_shared<Cx, Prof>(
         &mut self,
-        root: &B,
+        root: &Prof::Buf,
         span: WireSpan,
         common: &mut Cx,
     ) -> Result<(), DecodeError>
     where
         Cx: MessageBindingMut<A>,
-        B: WireBuf,
-        M: LazyMessage<A, B>,
+        Prof: LazyProfile,
+        M: LazyMessage<A, Prof>,
     {
         let child: &mut M = self.bind_mut(common).get_mut();
         child.merge_shared(root, span)
@@ -755,16 +755,16 @@ where
     ///
     /// Does not walk the child's tags (`MessageMerge` / ingest). The child's
     /// first field getter parses stored regions.
-    pub fn merge_shared<Cx, B>(
+    pub fn merge_shared<Cx, Prof>(
         &mut self,
-        root: &B,
+        root: &Prof::Buf,
         span: WireSpan,
         common: &mut Cx,
     ) -> Result<(), DecodeError>
     where
         Cx: MessageBindingMut<A>,
-        B: WireBuf,
-        M: LazyMessage<A, B>,
+        Prof: LazyProfile,
+        M: LazyMessage<A, Prof>,
     {
         let child: &mut M = self.bind_mut(common).get_mut();
         child.merge_shared(root, span)
@@ -839,6 +839,39 @@ where
         let s = slot.peek_str(arm, wire)?;
         Ok(Optional::new(Some(s)))
     }
+
+    /// Profile-directed string get ([`crate::decode::Owned`] promote or
+    /// [`crate::decode::Borrowed`] peek).
+    pub fn profile_str<'a, Cx, Prof>(
+        &'a self,
+        common: &'a Cx,
+        wire: &'a Prof::Buf,
+    ) -> Result<Optional<&'a str, D>, DecodeError>
+    where
+        Cx: MessageBindingMut<A> + MessageCommonSharedBits,
+        Prof: LazyProfile + 'a,
+        D: HasDefault<&'a str>,
+    {
+        if !P::is_set(common, || {
+            match (*self.value).with(P::slot_init_view(), common).get() {
+                Some(slot) => {
+                    <WireOrSso<KIND> as ValueLayout<ProtoString, A>>::is_proto_empty(slot, common)
+                }
+                None => true,
+            }
+        }) {
+            return Ok(Optional::new(None));
+        }
+        let slot = (*self.value)
+            .with(P::slot_init_view(), common)
+            .get()
+            .expect("is_set implies initialized slot");
+        let arm = WireOrSso::<KIND>::kind(common);
+        let s = Prof::get_str(slot, arm, wire, common.clone_alloc(), |new| {
+            WireOrSso::<KIND>::set_kind_shared(common, new);
+        })?;
+        Ok(Optional::new(Some(s)))
+    }
 }
 
 impl<P, const FIELD: u32, A, const KIND: usize, D, C>
@@ -908,6 +941,39 @@ where
             .expect("is_set implies initialized slot");
         let arm = WireOrSso::<KIND>::kind(common);
         let bytes = slot.peek_bytes(arm, wire)?;
+        Ok(Optional::new(Some(bytes)))
+    }
+
+    /// Profile-directed bytes get ([`crate::decode::Owned`] promote or
+    /// [`crate::decode::Borrowed`] peek).
+    pub fn profile_bytes<'a, Cx, Prof>(
+        &'a self,
+        common: &'a Cx,
+        wire: &'a Prof::Buf,
+    ) -> Result<Optional<&'a [u8], D>, DecodeError>
+    where
+        Cx: MessageBindingMut<A> + MessageCommonSharedBits,
+        Prof: LazyProfile + 'a,
+        D: HasDefault<&'a [u8]>,
+    {
+        if !P::is_set(common, || {
+            match (*self.value).with(P::slot_init_view(), common).get() {
+                Some(slot) => {
+                    <WireOrSso<KIND> as ValueLayout<LenScalar<C>, A>>::is_proto_empty(slot, common)
+                }
+                None => true,
+            }
+        }) {
+            return Ok(Optional::new(None));
+        }
+        let slot = (*self.value)
+            .with(P::slot_init_view(), common)
+            .get()
+            .expect("is_set implies initialized slot");
+        let arm = WireOrSso::<KIND>::kind(common);
+        let bytes = Prof::get_bytes(slot, arm, wire, common.clone_alloc(), |new| {
+            WireOrSso::<KIND>::set_kind_shared(common, new);
+        })?;
         Ok(Optional::new(Some(bytes)))
     }
 }
