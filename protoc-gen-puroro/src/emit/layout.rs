@@ -16,21 +16,32 @@ pub(super) enum LenAccess {
     Bytes,
 }
 
-/// How a lazy parent records one message LEN.
+/// Length-prefixed vs group framing for a nested message apply arm.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum MessageFraming {
+    LengthPrefixed,
+    Group,
+}
+
+/// How a lazy parent records one nested message.
 ///
 /// A child that implements `LazyMessage` stores the span with `merge_shared`,
 /// whether the slot is singular, repeated, or a oneof variant. Eager singular
 /// and eager repeated still differ: the latter names the type used to
-/// construct one value per LEN. Nesting is not counted here; an eager child
-/// receives `depth + 1` from the apply arm.
+/// construct one value per occurrence. Nesting is not counted here; an eager
+/// child receives `depth + 1` from the apply arm. Group framing uses the
+/// scanned group body (no length prefix); length-prefixed uses the LEN payload.
 #[derive(Clone)]
 pub(super) enum MessageApply {
     /// Child implements `LazyMessage`. Singular, repeated, and oneof call `merge_shared`.
-    Shared,
-    /// Singular or oneof child is the eager type. Decode the LEN into the slot.
-    EagerSingular,
-    /// Repeated child is the eager type. Construct one value per LEN and push it.
-    EagerRepeated(Box<Type>),
+    Shared(MessageFraming),
+    /// Singular or oneof child is the eager type. Decode the body into the slot.
+    EagerSingular(MessageFraming),
+    /// Repeated child is the eager type. Construct one value per occurrence and push it.
+    EagerRepeated {
+        child: Box<Type>,
+        framing: MessageFraming,
+    },
 }
 
 /// One associated type on `mod layout::Layout`.

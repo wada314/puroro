@@ -7,7 +7,8 @@
 //! is a start-group tag, the child fields, and a matching end-group tag. There
 //! is no length prefix.
 //!
-//! Codegen does not emit this marker yet. A hand-written field is
+//! Codegen emits this for `TYPE_GROUP` and `message_encoding=DELIMITED`.
+//! A hand-written field is
 //! `SingularField<ProtoGroup<M>, Message, FIELD, A, Inline>` (or `Boxed`).
 
 use ::allocator_api2::alloc::Allocator;

@@ -62,6 +62,8 @@ pub enum WireTypeKind<'a> {
     SInt32,
     SInt64,
     Message(&'a Message<'a>),
+    /// Same storage as [`Self::Message`], framed with `SGroup` / `EGroup`.
+    Group(&'a Message<'a>),
     Enum {
         ty: &'a Enum<'a>,
         openness: EnumType,
@@ -167,12 +169,36 @@ impl<'a> WireTypeKind<'a> {
             TypeRef::SFixed64 => Self::SFixed64,
             TypeRef::SInt32 => Self::SInt32,
             TypeRef::SInt64 => Self::SInt64,
-            TypeRef::Message(m) => Self::Message(m),
+            TypeRef::Message(m) => {
+                if field.is_group_wire() {
+                    Self::Group(m)
+                } else {
+                    Self::Message(m)
+                }
+            }
             TypeRef::Enum(e) => Self::Enum {
                 ty: e,
                 openness: e.openness(),
             },
         }
+    }
+
+    /// Nested message type for [`Self::Message`] / [`Self::Group`].
+    pub fn as_nested_message(self) -> Option<&'a Message<'a>> {
+        match self {
+            Self::Message(m) | Self::Group(m) => Some(m),
+            _ => None,
+        }
+    }
+
+    /// Length-prefixed message or group-framed message.
+    pub fn is_nested_message(self) -> bool {
+        self.as_nested_message().is_some()
+    }
+
+    /// Group wire framing (`SGroup` / `EGroup`).
+    pub fn is_group(self) -> bool {
+        matches!(self, Self::Group(_))
     }
 
     /// Protobuf map keys are integral, `bool`, or `string`.
@@ -197,6 +223,7 @@ impl<'a> WireTypeKind<'a> {
             | Self::Float
             | Self::Bytes { .. }
             | Self::Message(_)
+            | Self::Group(_)
             | Self::Enum { .. } => false,
         }
     }
@@ -204,7 +231,7 @@ impl<'a> WireTypeKind<'a> {
     /// Whether the type may use packed repeated wire encoding.
     pub fn is_packable(self) -> bool {
         match self {
-            Self::String { .. } | Self::Bytes { .. } | Self::Message(_) => false,
+            Self::String { .. } | Self::Bytes { .. } | Self::Message(_) | Self::Group(_) => false,
             Self::Double
             | Self::Float
             | Self::Int64

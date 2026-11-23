@@ -291,13 +291,6 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
         file: &ProtoFile,
         oneof_remap: &OneofRemap,
     ) -> Result<Field<'a>> {
-        if field.type_ == FieldType::Group {
-            return Err(Error::Codegen(format!(
-                "field `{owner_fqn}.{}`: deprecated group fields are not supported",
-                field.name
-            )));
-        }
-
         if matches!(file.syntax, Syntax::Editions(_)) {
             field
                 .features
@@ -305,22 +298,14 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
         }
 
         let features = FinalizedFeatureSet::resolve_field(file, field, self.proto2_utf8);
-
-        if matches!(field.type_, FieldType::Message)
-            && features.message_encoding == MessageEncoding::Delimited
-        {
-            return Err(Error::Codegen(format!(
-                "field `{owner_fqn}.{}`: features.message_encoding=DELIMITED is not supported",
-                field.name
-            )));
-        }
-
         let type_ref = self.resolve_type_ref(field, owner_fqn)?;
+        let occurrence = FieldOccurrence::resolve(field, &features, &type_ref);
+        let group_wire = group_wire(field, &features, &occurrence);
 
         Ok(Field {
             name: field.name.clone(),
             number: field.number,
-            occurrence: FieldOccurrence::resolve(field, &features, &type_ref),
+            occurrence,
             type_ref,
             oneof_index: oneof_remap.index(field, owner_fqn)?,
             default_value: field.default_value.clone(),
@@ -330,6 +315,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             message_layout: field.message_layout,
             child_parse: field.child_parse,
             legacy_required: features.field_presence == FieldPresence::LegacyRequired,
+            group_wire,
         })
     }
 
@@ -350,7 +336,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             FieldType::SFixed64 => TypeRef::SFixed64,
             FieldType::SInt32 => TypeRef::SInt32,
             FieldType::SInt64 => TypeRef::SInt64,
-            FieldType::Message => {
+            FieldType::Message | FieldType::Group => {
                 let type_name = field.type_name.as_ref().ok_or_else(|| {
                     Error::Codegen(format!(
                         "field `{owner_fqn}.{}` has message type but no type_name",
@@ -380,7 +366,6 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
                 })?;
                 TypeRef::Enum(target)
             }
-            FieldType::Group => unreachable!("rejected above"),
         })
     }
 
@@ -487,7 +472,7 @@ impl FieldOccurrence {
             return Self::Singular(SingularPresence::Oneof);
         }
 
-        if field.type_ == FieldType::Message {
+        if matches!(field.type_, FieldType::Message | FieldType::Group) {
             return Self::Singular(SingularPresence::Message);
         }
 
@@ -497,6 +482,20 @@ impl FieldOccurrence {
             FieldPresence::LegacyRequired => SingularPresence::LegacyRequired,
         })
     }
+}
+
+/// `TYPE_GROUP`, or a non-map message with `message_encoding=DELIMITED`.
+fn group_wire(
+    field: &FieldDesc,
+    features: &FinalizedFeatureSet,
+    occurrence: &FieldOccurrence,
+) -> bool {
+    if field.type_ == FieldType::Group {
+        return true;
+    }
+    matches!(field.type_, FieldType::Message)
+        && features.message_encoding == MessageEncoding::Delimited
+        && !matches!(occurrence, FieldOccurrence::Map)
 }
 
 impl Utf8Validation {
@@ -1222,7 +1221,7 @@ mod tests {
     }
 
     #[test]
-    fn editions_delimited_message_encoding_errors() {
+    fn editions_delimited_message_encoding_sets_group_wire() {
         use crate::descriptor::features::MessageEncoding;
 
         let arena = Arena::new();
@@ -1245,19 +1244,26 @@ mod tests {
             ],
             vec![],
         )];
-        let err = resolve(&arena, &files).unwrap_err();
-        assert!(err.to_string().contains("DELIMITED"));
+        let file_set = resolve(&arena, &files).unwrap();
+        let outer = lookup_message(&file_set, ".ed.Outer").unwrap();
+        let inner = outer.fields().next().unwrap();
+        assert!(inner.is_group_wire());
+        assert!(matches!(inner.type_ref(), TypeRef::Message(_)));
+        assert_eq!(
+            inner.occurrence(),
+            FieldOccurrence::Singular(SingularPresence::Message)
+        );
     }
 
     #[test]
-    fn group_field_is_rejected() {
+    fn group_field_sets_group_wire() {
         let arena = Arena::new();
         let files = [proto_file(
             "p2",
             Syntax::Proto2,
             vec![MessageDesc {
                 fields: vec![FieldDesc {
-                    type_name: Some(ProtoFqn::parse(".p2.G")),
+                    type_name: Some(ProtoFqn::parse(".p2.M.G")),
                     ..desc::field("g", 1, FieldType::Group)
                 }],
                 nested_messages: vec![desc::message("G")],
@@ -1265,8 +1271,15 @@ mod tests {
             }],
             vec![],
         )];
-        let err = resolve(&arena, &files).unwrap_err();
-        assert!(err.to_string().contains("group"), "unexpected error: {err}");
+        let file_set = resolve(&arena, &files).unwrap();
+        let m = lookup_message(&file_set, ".p2.M").unwrap();
+        let g = m.fields().next().unwrap();
+        assert!(g.is_group_wire());
+        assert!(matches!(g.type_ref(), TypeRef::Message(_)));
+        assert_eq!(
+            g.occurrence(),
+            FieldOccurrence::Singular(SingularPresence::Message)
+        );
     }
 
     #[test]

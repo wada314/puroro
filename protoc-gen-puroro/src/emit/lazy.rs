@@ -537,28 +537,45 @@ fn message_apply_arm(
     companion: &Ident,
     apply: &MessageApply,
 ) -> TokenStream {
-    let body = match apply {
-        MessageApply::Shared => quote! {
-            let root = common.lazy.scan.wire_buf().clone();
-            #slot.merge_shared(&root, span, common)
+    let (framing, body) = match apply {
+        MessageApply::Shared(framing) => (
+            framing,
+            quote! {
+                let root = common.lazy.scan.wire_buf().clone();
+                #slot.merge_shared(&root, span, common)
+            },
+        ),
+        MessageApply::EagerSingular(framing) => (
+            framing,
+            quote! {
+                let payload = span.slice(common.lazy.scan.wire())?;
+                let child = #slot.bind_mut(common).get_mut();
+                ::puroro_rt::MessageMerge::merge_from_slice(child, payload, depth + 1)?;
+                ::core::result::Result::Ok(())
+            },
+        ),
+        MessageApply::EagerRepeated { child, framing } => (
+            framing,
+            quote! {
+                let payload = span.slice(common.lazy.scan.wire())?;
+                let mut child = #child::new_in(common.alloc.clone());
+                ::puroro_rt::MessageMerge::merge_from_slice(&mut child, payload, depth + 1)?;
+                #slot.push_in(child, common.alloc.clone());
+                ::core::result::Result::Ok(())
+            },
+        ),
+    };
+    let span = match framing {
+        super::layout::MessageFraming::LengthPrefixed => quote! {
+            ::puroro_rt::decode::scanned_len_span(origin, rec)?
         },
-        MessageApply::EagerSingular => quote! {
-            let payload = span.slice(common.lazy.scan.wire())?;
-            let child = #slot.bind_mut(common).get_mut();
-            ::puroro_rt::MessageMerge::merge_from_slice(child, payload, depth + 1)?;
-            ::core::result::Result::Ok(())
-        },
-        MessageApply::EagerRepeated(child_ty) => quote! {
-            let payload = span.slice(common.lazy.scan.wire())?;
-            let mut child = #child_ty::new_in(common.alloc.clone());
-            ::puroro_rt::MessageMerge::merge_from_slice(&mut child, payload, depth + 1)?;
-            #slot.push_in(child, common.alloc.clone());
-            ::core::result::Result::Ok(())
+        super::layout::MessageFraming::Group => quote! {
+            ::puroro_rt::decode::scanned_group_body_span(origin, rec)?
         },
     };
     quote! {
         #companion::#field_const => {
-            let span = ::puroro_rt::decode::scanned_len_span(origin, rec)?;
+            let span = #span;
             #body
         }
     }

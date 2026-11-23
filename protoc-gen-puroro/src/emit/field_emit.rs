@@ -6,7 +6,7 @@
 
 use super::defaults;
 use super::ident::{escape_ident, is_simple_ident, to_pascal_case};
-use super::layout::{LayoutAssoc, LayoutAssocKind, LenAccess, MessageApply};
+use super::layout::{LayoutAssoc, LayoutAssocKind, LenAccess, MessageApply, MessageFraming};
 use super::oneof::{OneofEmit, OneofVariantEmit};
 use super::type_path::{fqn_to_enum_root_path, fqn_to_message_lazy_path, fqn_to_message_root_path};
 use crate::default_value::CustomDefault;
@@ -279,7 +279,7 @@ fn scalar_getter_shape(wire: &WireTypeKind<'_>, presence: &PlannedPresence) -> G
         };
         return GetterShape::Len { eager, access };
     }
-    if matches!(wire, WireTypeKind::Message(_)) {
+    if wire.is_nested_message() {
         return GetterShape::Message;
     }
     if explicit || is_enum {
@@ -295,7 +295,7 @@ fn oneof_getter_shape(wire: &WireTypeKind<'_>) -> GetterShape {
             eager: LenEagerRead::Optional,
             access,
         }
-    } else if matches!(wire, WireTypeKind::Message(_)) {
+    } else if wire.is_nested_message() {
         GetterShape::Message
     } else {
         GetterShape::Optional
@@ -477,15 +477,16 @@ fn emit_repeated(field: &PlannedField<'_>, companion: &Ident) -> Result<Repeated
     let mut slice_elem_ty = catalog.views.slice_elem;
     let mut layout = None;
     let mut message_apply = None;
-    if let WireTypeKind::Message(child) = wire {
+    if let Some(child) = wire.as_nested_message() {
         // A message element is not a span list. Follow-parent only changes
         // the element type; storage stays `RepeatedReady`.
+        let framing = message_framing(wire);
         let pin = resolve_child_pin(name, child, field.child_parse(), FollowLazyBuf::ShareParent)?;
-        message_apply = Some(pin.repeated_apply());
+        message_apply = Some(pin.repeated_apply(framing));
         if let Some(assoc) = pin.follow() {
             layout = Some(assoc.clone());
         }
-        if let Some(ty) = pin.field_marker(companion) {
+        if let Some(ty) = pin.field_marker(companion, framing) {
             marker = ty;
         }
         if let Some((_, lazy)) = pin.lazy_pin() {
@@ -537,21 +538,24 @@ fn emit_map(field: &PlannedField<'_>, companion: &Ident) -> Result<MapEmit> {
     let mut map_value_bound = value_marker.clone();
     let mut value_view = value_wire.views.map_value;
     let mut layouts = Vec::new();
-    if let WireTypeKind::Message(child) = value {
+    if let Some(child) = value.as_nested_message() {
         // Map values materialise through `Message`, so the lazy alias stays
-        // on the Bytes default rather than sharing the parent's `P`.
+        // on the Bytes default rather than sharing the parent's `P`. Group
+        // map values are rejected in `plan_map_field`.
+        let framing = message_framing(value);
         let pin = resolve_child_pin(name, child, field.child_parse(), FollowLazyBuf::OwnedBytes)?;
         if let Some(assoc) = pin.follow() {
             let assoc_name = &assoc.assoc;
             // The `Layout` bound names the assoc on `Self`. The field
             // marker names it on the message's `L` parameter.
-            map_value_bound = parse_quote! { ::puroro_rt::ProtoMessage<Self::#assoc_name> };
+            let marker_path = nested_marker_path(framing);
+            map_value_bound = parse_quote! { #marker_path<Self::#assoc_name> };
             layouts.push(assoc.clone());
         }
         if let Some((_, lazy)) = pin.lazy_pin() {
             value_view = lazy.clone();
         }
-        if let Some(ty) = pin.field_marker(companion) {
+        if let Some(ty) = pin.field_marker(companion, framing) {
             value_marker = ty;
         }
         if pin.lazy_pin().is_some() {
@@ -731,15 +735,16 @@ fn plan_singular(
         layout_assoc = Some(assoc);
     }
 
-    if let WireTypeKind::Message(child) = wire {
+    if let Some(child) = wire.as_nested_message() {
+        let framing = message_framing(wire);
         let pin = resolve_child_pin(name, child, field.child_parse(), FollowLazyBuf::ShareParent)?;
-        message_apply = Some(pin.singular_apply());
+        message_apply = Some(pin.singular_apply(framing));
         if let Some(assoc) = pin.follow() {
             layout_assoc = Some(assoc.clone());
         }
         let child_marker = match site {
-            SingularSite::Field { companion } => pin.field_marker(companion),
-            SingularSite::Oneof => pin.oneof_marker(),
+            SingularSite::Field { companion } => pin.field_marker(companion, framing),
+            SingularSite::Oneof => pin.oneof_marker(framing),
         };
         if let Some(ty) = child_marker {
             marker = ty;
@@ -906,27 +911,31 @@ fn resolve_child_pin(
 }
 
 impl ChildPin {
-    fn singular_apply(&self) -> MessageApply {
+    fn singular_apply(&self, framing: MessageFraming) -> MessageApply {
         match self {
-            Self::Follow(_) | Self::Lazy { .. } => MessageApply::Shared,
-            Self::Eager { .. } => MessageApply::EagerSingular,
+            Self::Follow(_) | Self::Lazy { .. } => MessageApply::Shared(framing),
+            Self::Eager { .. } => MessageApply::EagerSingular(framing),
         }
     }
 
-    fn repeated_apply(&self) -> MessageApply {
+    fn repeated_apply(&self, framing: MessageFraming) -> MessageApply {
         match self {
-            Self::Follow(_) | Self::Lazy { .. } => MessageApply::Shared,
-            Self::Eager { eager } => MessageApply::EagerRepeated(eager.clone()),
+            Self::Follow(_) | Self::Lazy { .. } => MessageApply::Shared(framing),
+            Self::Eager { eager } => MessageApply::EagerRepeated {
+                child: eager.clone(),
+                framing,
+            },
         }
     }
 
     /// Marker on the message impl. `layout` is `#companion::Layout<A>`.
     /// `None` for an eager pin: keep the marker from [`wire_catalog`].
-    fn field_marker(&self, layout: &Ident) -> Option<Type> {
+    fn field_marker(&self, layout: &Ident, framing: MessageFraming) -> Option<Type> {
         match self {
             Self::Follow(assoc) | Self::Lazy { layout: assoc, .. } => {
                 let name = &assoc.assoc;
-                Some(parse_quote! { ::puroro_rt::ProtoMessage<<L as #layout::Layout<A>>::#name> })
+                let marker = nested_marker_path(framing);
+                Some(parse_quote! { #marker<<L as #layout::Layout<A>>::#name> })
             }
             Self::Eager { .. } => None,
         }
@@ -934,12 +943,13 @@ impl ChildPin {
 
     /// Marker inside a oneof module. The follow-parent path names `super::Layout`
     /// because the type alias has no `L: Layout<A>` bound.
-    fn oneof_marker(&self) -> Option<Type> {
+    fn oneof_marker(&self, framing: MessageFraming) -> Option<Type> {
         match self {
             Self::Follow(assoc) | Self::Lazy { layout: assoc, .. } => {
                 let name = &assoc.assoc;
+                let marker = nested_marker_path(framing);
                 Some(parse_quote! {
-                    ::puroro_rt::ProtoMessage<<L as super::Layout<A>>::#name>
+                    #marker<<L as super::Layout<A>>::#name>
                 })
             }
             Self::Eager { .. } => None,
@@ -1058,11 +1068,12 @@ fn wire_catalog(wire: &WireTypeKind<'_>) -> Result<WireCatalog> {
                 views: copy_views(parse_quote! { #path }),
             }
         }
-        WireTypeKind::Message(m) => {
+        WireTypeKind::Message(m) | WireTypeKind::Group(m) => {
             let path = fqn_to_message_root_path(m)?;
             let ty: Type = parse_quote! { #path<A> };
+            let marker_path = nested_marker_path(message_framing(wire));
             WireCatalog {
-                marker: parse_quote! { ::puroro_rt::ProtoMessage<#ty> },
+                marker: parse_quote! { #marker_path<#ty> },
                 views: WireViews {
                     implicit: parse_quote! { () },
                     optional: parse_quote! { () },
@@ -1074,6 +1085,21 @@ fn wire_catalog(wire: &WireTypeKind<'_>) -> Result<WireCatalog> {
             }
         }
     })
+}
+
+fn message_framing(wire: &WireTypeKind<'_>) -> MessageFraming {
+    if wire.is_group() {
+        MessageFraming::Group
+    } else {
+        MessageFraming::LengthPrefixed
+    }
+}
+
+fn nested_marker_path(framing: MessageFraming) -> Type {
+    match framing {
+        MessageFraming::LengthPrefixed => parse_quote! { ::puroro_rt::ProtoMessage },
+        MessageFraming::Group => parse_quote! { ::puroro_rt::ProtoGroup },
+    }
 }
 
 /// Rust types projected from a proto wire kind for generated signatures.
