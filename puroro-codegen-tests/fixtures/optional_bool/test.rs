@@ -45,3 +45,19 @@ fn clear_returns_to_unset() {
     assert!(!msg.flag().is_set());
     assert!(msg.encode_to_vec().is_empty());
 }
+
+#[test]
+fn repeated_bool_round_trip() {
+    let mut msg = FlagHolder::new();
+    msg.votes_mut().push(true);
+    msg.votes_mut().push(false);
+    msg.votes_mut().push(true);
+    assert_eq!(msg.votes(), &[true, false, true]);
+
+    let decoded: FlagHolder = FlagHolder::decode(&msg.encode_to_vec()[..]).expect("decode");
+    assert_eq!(decoded.votes(), &[true, false, true]);
+
+    msg.clear_votes();
+    assert!(msg.votes().is_empty());
+    assert!(msg.encode_to_vec().is_empty());
+}

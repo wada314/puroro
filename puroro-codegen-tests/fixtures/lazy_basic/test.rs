@@ -1,6 +1,6 @@
 //! Eager and lazy aliases, follow-parent children, and a field-level lazy pin.
 
-use crate::lazy_basic::{Child, ChildLazy, Note, NoteLazy};
+use crate::lazy_basic::{Board, Child, ChildLazy, Note, NoteLazy};
 use ::allocator_api2::alloc::Global;
 use puroro::{Message, RepeatedStringMut, StringMut};
 use ::puroro_rt::decode::LazyMessage;
@@ -75,6 +75,23 @@ fn eager_parent_stores_pinned_lazy_child() {
     let mut note = Note::new();
     _child_is_eager(note.child_mut());
     _pinned_is_lazy(note.pinned_mut());
+}
+
+#[test]
+fn message_child_parse_lazy_defaults_unspecified_children() {
+    let mut board = Board::new();
+    *board.id_mut() = 1;
+    // Message-level CHILD_PARSE_LAZY → `note` is ChildLazy even on eager Board.
+    _pinned_is_lazy(board.note_mut());
+    board.set_note({
+        let mut child = Child::new();
+        *child.n_mut() = 9;
+        child
+    });
+    assert_eq!(board.note().unwrap().n().unwrap(), 9);
+
+    let decoded = Board::decode(board.encode_to_vec().as_slice()).unwrap();
+    assert_eq!(decoded, board);
 }
 
 #[test]

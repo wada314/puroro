@@ -28,10 +28,11 @@ fn allocator_is_stored_per_inlined_message() {
     // MessageCommon stores one `A` per message. Map fields also own a
     // HashMap-embedded `A`. Inlined `origin` is a full `Point`. The oneof
     // `postal` variant is an inlined `Address`, so the enum slot also embeds
-    // `A`. Expect: parent + map + origin + postal ≈ 4× sizeof(Padded).
+    // `A`. Expect: parent + map + origin + postal.
+    const TASK_ALLOCATOR_COPIES: usize = 4;
     assert_eq!(
         delta,
-        4 * mem::size_of::<Padded>(),
+        TASK_ALLOCATOR_COPIES * mem::size_of::<Padded>(),
         "Task<Padded> grew by {delta} bytes over Task<Global>; allocator copies exceeded MessageCommon + map + inlined origin + oneof postal"
     );
     assert!(
@@ -47,9 +48,10 @@ fn school_inlined_chain_stores_allocator_per_message() {
     let delta = padded - global;
     // School + inlined Student + inlined Point + inlined Address (home).
     // Each has its own MessageCommon `A`.
+    const SCHOOL_ALLOCATOR_COPIES: usize = 4;
     assert_eq!(
         delta,
-        4 * mem::size_of::<Padded>(),
+        SCHOOL_ALLOCATOR_COPIES * mem::size_of::<Padded>(),
         "School<Padded> grew by {delta} bytes; expected one allocator per inlined message on the chain"
     );
     assert!(

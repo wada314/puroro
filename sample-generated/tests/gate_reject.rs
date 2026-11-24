@@ -7,6 +7,7 @@ use ::core::mem::size_of;
 use ::puroro::{DecodeError, Message};
 use ::puroro_rt::encode::{encode_varint_field, field_number_const};
 use ::puroro_rt::{MessageCommon, RejectUnknowns, Varint};
+use ::puroro_sample_generated::gate::FIELD_N;
 use ::puroro_sample_generated::{Gate, Marker};
 
 #[test]
@@ -23,7 +24,11 @@ fn reject_store_is_zst_like_discard() {
 #[test]
 fn gate_accepts_known_fields() {
     let mut wire = Vec::new();
-    encode_varint_field(field_number_const::<1>(), Varint::from_int32(3), &mut wire);
+    encode_varint_field(
+        field_number_const::<FIELD_N>(),
+        Varint::from_int32(3),
+        &mut wire,
+    );
 
     let decoded: Gate = Gate::decode(&wire[..]).expect("decode");
     assert_eq!(decoded.n(), 3);
@@ -34,7 +39,11 @@ fn gate_accepts_known_fields() {
 #[test]
 fn gate_rejects_unknown_tag() {
     let mut wire = Vec::new();
-    encode_varint_field(field_number_const::<1>(), Varint::from_int32(3), &mut wire);
+    encode_varint_field(
+        field_number_const::<FIELD_N>(),
+        Varint::from_int32(3),
+        &mut wire,
+    );
     encode_varint_field(
         field_number_const::<99>(),
         Varint::from_uint64(5),

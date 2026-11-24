@@ -13,3 +13,10 @@ message Note {
   Child pinned = 4 [(puroro.child_parse) = CHILD_PARSE_LAZY];
   repeated string labels = 5;
 }
+
+// Message-level default: every unspecified child field stores Lazy.
+message Board {
+  option (puroro.message_child_parse) = CHILD_PARSE_LAZY;
+  int32 id = 1;
+  Child note = 2;
+}
