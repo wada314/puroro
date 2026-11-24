@@ -16,7 +16,7 @@ use crate::{Address, AddressLazy, Marker, Point, PointLazy, School, Student, Tas
 /// preserved from `CodeGeneratorRequest.proto_file`.
 pub const FILE_DESCRIPTOR_SET: FileDescriptorSetBytes = FileDescriptorSetBytes::new(&[]);
 
-macro_rules! described {
+macro_rules! impl_described_message {
     ($ty:ident, $file:expr) => {
         impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> DescribedMessage
             for $ty<A>
@@ -26,7 +26,7 @@ macro_rules! described {
     };
 }
 
-macro_rules! described_lazy {
+macro_rules! impl_described_message_lazy {
     ($ty:ident, $file:expr) => {
         impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone, P: LazyProfile>
             DescribedMessage for $ty<A, P>
@@ -39,15 +39,15 @@ macro_rules! described_lazy {
 }
 
 // DESIGN.md reference schema lives in a fictional `example.proto`.
-described!(Task, "example.proto");
-described_lazy!(TaskLazy, "example.proto");
-described!(Address, "example.proto");
-described_lazy!(AddressLazy, "example.proto");
-described!(Point, "example.proto");
-described_lazy!(PointLazy, "example.proto");
-described!(School, "example.proto");
-described!(Student, "example.proto");
-described!(Marker, "example.proto");
+impl_described_message!(Task, "example.proto");
+impl_described_message_lazy!(TaskLazy, "example.proto");
+impl_described_message!(Address, "example.proto");
+impl_described_message_lazy!(AddressLazy, "example.proto");
+impl_described_message!(Point, "example.proto");
+impl_described_message_lazy!(PointLazy, "example.proto");
+impl_described_message!(School, "example.proto");
+impl_described_message!(Student, "example.proto");
+impl_described_message!(Marker, "example.proto");
 
 #[cfg(test)]
 mod tests {
