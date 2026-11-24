@@ -10,6 +10,7 @@
 //! I64 / enums) and [`len`] (string / bytes).
 
 pub(crate) mod encode_type;
+pub(crate) mod lazy_len;
 pub(crate) mod len;
 pub(crate) mod numerical;
 pub(crate) mod proto_group;
@@ -17,12 +18,17 @@ pub(crate) mod proto_message;
 pub(crate) mod proto_ref_ops;
 pub(crate) mod repeated_element;
 pub(crate) mod singular_type;
+pub(crate) mod span_only;
 pub(crate) mod sso_buf;
 pub(crate) mod sso_bytes;
 pub(crate) mod sso_string;
 pub(crate) mod wire_or_sso;
 pub(crate) mod wire_payload;
 
+pub use lazy_len::{
+    BytesSlotNew, LazyBytesGet, LazyBytesLen, LazyLenStore, LazyStringGet, LazyStringLen,
+    StringSlotNew,
+};
 pub use len::{ProtoBytes, ProtoString, ProtoStringUnchecked};
 pub use numerical::{
     Closed, ClosedEnum, Open, OpenEnum, ProtoBool, ProtoDouble, ProtoEnum, ProtoEnumStorage,

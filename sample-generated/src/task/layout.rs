@@ -4,7 +4,8 @@
 //! [`MessageCommon`](::puroro_rt::MessageCommon) ingest. This trait only names
 //! the catalog layouts that actually change:
 //!
-//! - singular string / bytes value slot (`InlineOrHeap` vs `WireOrSso`)
+//! - singular string / bytes value slot (`InlineOrHeap` vs `P::StringLen` /
+//!   `P::BytesLen`: `WireOrSso` or `SpanOnly`)
 //! - repeated / map storage (`*Ready` vs `*Spans`)
 //! - nested message type (`Point<A>` / `PointLazy<A>`, `Address<A>` / `AddressLazy<A>`)
 //! - oneof string slots and `postal` child
@@ -24,7 +25,7 @@ use ::puroro_rt::decode::LazyProfile;
 use ::puroro_rt::{
     BitStorage, DeallocateBound, DeallocateIn, Eager, Expanded, InlineOrHeap, InteriorBitArray,
     Lazy, MapLayout, MapReady, MapSpans, MessageEncode, ProtoBytes, ProtoInt32, ProtoString,
-    RepeatedLayout, RepeatedReady, RepeatedSpans, ValueLayout, WireOrSso,
+    RepeatedLayout, RepeatedReady, RepeatedSpans, ValueLayout,
 };
 
 use crate::Address;
@@ -43,7 +44,7 @@ pub trait Layout<A: Allocator>: Sized {
     /// Presence / SSO / lazy-kind bits packed into [`MessageCommon`](::puroro_rt::MessageCommon).
     type Bits: Default + Clone + BitStorage;
 
-    /// Singular string / bytes slot (`InlineOrHeap<{SSO}>` or `WireOrSso<{KIND}>`).
+    /// Singular string / bytes slot (`InlineOrHeap<{SSO}>` or profile LEN layout).
     type TitleLen: ValueLayout<ProtoString, A>;
     type OwnerIdLen: ValueLayout<ProtoString, A>;
     type PayloadLen: ValueLayout<ProtoBytes, A>;
@@ -60,7 +61,7 @@ pub trait Layout<A: Allocator>: Sized {
     /// Pinned lazy `assignee` (`AddressLazy<A, P>` on both aliases; eager uses `Owned`).
     type AssigneeMsg: MessageEncode + DeallocateBound<A> + DeallocateIn<A>;
 
-    /// `notification` string slots (`InlineOrHeap<{SSO}>` or `WireOrSso<{KIND}>`).
+    /// `notification` string slots (`InlineOrHeap<{SSO}>` or profile LEN layout).
     type EmailLen: ValueLayout<ProtoString, A>;
     type PhoneLen: ValueLayout<ProtoString, A>;
     /// `notification.postal` (`Address<A>` or `AddressLazy<A, P>`).
@@ -91,16 +92,16 @@ impl<A: Allocator + Clone> Layout<A> for Eager {
 
 impl<A: Allocator + Clone, P: LazyProfile> Layout<A> for Lazy<A, P> {
     type Bits = InteriorBitArray<4>;
-    type TitleLen = WireOrSso<{ BIT_TITLE_LAZY_KIND }>;
-    type OwnerIdLen = WireOrSso<{ BIT_OWNER_ID_LAZY_KIND }>;
-    type PayloadLen = WireOrSso<{ BIT_PAYLOAD_LAZY_KIND }>;
+    type TitleLen = P::StringLen<A, { BIT_TITLE_LAZY_KIND }>;
+    type OwnerIdLen = P::StringLen<A, { BIT_OWNER_ID_LAZY_KIND }>;
+    type PayloadLen = P::BytesLen<A, { BIT_PAYLOAD_LAZY_KIND }>;
     type Repeated = RepeatedSpans;
     type Map = MapSpans;
     type OriginMsg = PointLazy<A, P>;
     type WatchersMsg = AddressLazy<A, P>;
     type AssigneeMsg = AddressLazy<A, P>;
-    type EmailLen = WireOrSso<{ BIT_EMAIL_ADDRESS_LAZY_KIND }>;
-    type PhoneLen = WireOrSso<{ BIT_PHONE_NUMBER_LAZY_KIND }>;
+    type EmailLen = P::StringLen<A, { BIT_EMAIL_ADDRESS_LAZY_KIND }>;
+    type PhoneLen = P::StringLen<A, { BIT_PHONE_NUMBER_LAZY_KIND }>;
     type PostalMsg = AddressLazy<A, P>;
 
     #[inline]

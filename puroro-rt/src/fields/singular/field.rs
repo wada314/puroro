@@ -45,12 +45,12 @@ use crate::fields::shared::{
     },
 };
 use crate::fields::wire::encode_type::{encode_field, encoded_len_field};
+use crate::fields::wire::lazy_len::{LazyBytesGet, LazyLenStore, LazyStringGet};
 use crate::fields::wire::len::{BytesLikeLenCodec, LenScalar, ProtoString};
 use crate::fields::wire::numerical::{BoolCodec, Numerical, NumericalType, ProtoBool};
 use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::proto_ref_ops::{ProtoRefDebug, ProtoRefEq};
 use crate::fields::wire::singular_type::{PayloadAccess, SingularType};
-use crate::fields::wire::wire_or_sso::{WireOrSso, WireOrSsoKind, WireOrSsoStore};
 use crate::fields::wire::wire_payload::{CopyWirePayload, VarintPayload};
 use crate::message_encode::EncodeCtx;
 
@@ -157,6 +157,18 @@ where
     {
         Self {
             value: ManuallyDrop::new(ValueSlotNew::new_in(alloc)),
+            _marker: PhantomData,
+        }
+    }
+
+    /// Oneof install from a ready always-initialized slot.
+    #[inline]
+    pub(crate) fn from_oneof_slot(slot: L::Slot) -> Self
+    where
+        P::ValueSlot<L::Slot>: From<L::Slot>,
+    {
+        Self {
+            value: ManuallyDrop::new(P::ValueSlot::from(slot)),
             _marker: PhantomData,
         }
     }
@@ -689,28 +701,18 @@ where
     }
 }
 
-impl<T, P, const FIELD: u32, A, const KIND: usize, D>
-    SingularField<T, P, FIELD, A, WireOrSso<KIND>, D>
+impl<T, P, const FIELD: u32, A, L, D> SingularField<T, P, FIELD, A, L, D>
 where
     T: SingularType,
     P: FieldPresence,
     A: Allocator + Clone,
-    WireOrSso<KIND>: ValueLayout<T, A>,
-    <WireOrSso<KIND> as ValueLayout<T, A>>::Slot:
-        AddressableSlot + DefaultIn<A> + WireOrSsoStore<A>,
-    P::ValueSlot<<WireOrSso<KIND> as ValueLayout<T, A>>::Slot>:
-        ValueSlot<<WireOrSso<KIND> as ValueLayout<T, A>>::Slot, A>,
+    L: LazyLenStore<T, A>,
+    L::Slot: AddressableSlot,
+    P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     /// Record a LEN payload that already lives in the island buffer.
     pub fn store_len_span<Cx: MessageBindingMut<A>>(&mut self, span: WireSpan, common: &mut Cx) {
-        let init = P::slot_init_mut();
-        let old = WireOrSso::<KIND>::kind(common);
-        let alloc = common.clone_alloc();
-        {
-            let slot = ValueSlot::with_mut(&mut *self.value, init, common).get_mut();
-            slot.store_wire(span, old, &alloc);
-        }
-        WireOrSso::<KIND>::set_kind(common, WireOrSsoKind::Wire);
+        L::store_len_span(&mut *self.value, P::slot_init_mut(), common, span);
     }
 }
 
@@ -771,17 +773,16 @@ where
     }
 }
 
-impl<P, const FIELD: u32, A, const KIND: usize, D>
-    SingularField<ProtoString, P, FIELD, A, WireOrSso<KIND>, D>
+impl<P, const FIELD: u32, A, L, D> SingularField<ProtoString, P, FIELD, A, L, D>
 where
     P: FieldPresence,
     A: Allocator + Clone,
-    <WireOrSso<KIND> as ValueLayout<ProtoString, A>>::Slot: AddressableSlot,
-    P::ValueSlot<<WireOrSso<KIND> as ValueLayout<ProtoString, A>>::Slot>:
-        ValueSlot<<WireOrSso<KIND> as ValueLayout<ProtoString, A>>::Slot, A>,
+    L: LazyStringGet<A>,
+    L::Slot: AddressableSlot,
+    P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
-    /// Decode / promote a UTF-8 string. Failed is sticky.
-    pub fn try_str<'a, Cx>(
+    /// Layout-directed string get ([`crate::WireOrSso`] promote or [`crate::SpanOnly`] peek).
+    pub fn profile_str<'a, Cx>(
         &'a self,
         common: &'a Cx,
         wire: &'a [u8],
@@ -792,9 +793,7 @@ where
     {
         if !P::is_set(common, || {
             match (*self.value).with(P::slot_init_view(), common).get() {
-                Some(slot) => {
-                    <WireOrSso<KIND> as ValueLayout<ProtoString, A>>::is_proto_empty(slot, common)
-                }
+                Some(slot) => L::is_proto_empty(slot, common),
                 None => true,
             }
         }) {
@@ -804,88 +803,22 @@ where
             .with(P::slot_init_view(), common)
             .get()
             .expect("is_set implies initialized slot");
-        let arm = WireOrSso::<KIND>::kind(common);
-        let s = slot.get_str(arm, wire, common.clone_alloc(), |new| {
-            WireOrSso::<KIND>::set_kind_shared(common, new);
-        })?;
-        Ok(Optional::new(Some(s)))
-    }
-
-    /// UTF-8 read without promoting the slot (borrowed lazy wire).
-    pub fn peek_str<'buf, Cx>(
-        &self,
-        common: &Cx,
-        wire: &'buf [u8],
-    ) -> Result<Optional<&'buf str, D>, DecodeError>
-    where
-        Cx: MessageBindingMut<A> + MessageCommonSharedBits,
-        D: HasDefault<&'buf str>,
-    {
-        if !P::is_set(common, || {
-            match (*self.value).with(P::slot_init_view(), common).get() {
-                Some(slot) => {
-                    <WireOrSso<KIND> as ValueLayout<ProtoString, A>>::is_proto_empty(slot, common)
-                }
-                None => true,
-            }
-        }) {
-            return Ok(Optional::new(None));
-        }
-        let slot = (*self.value)
-            .with(P::slot_init_view(), common)
-            .get()
-            .expect("is_set implies initialized slot");
-        let arm = WireOrSso::<KIND>::kind(common);
-        let s = slot.peek_str(arm, wire)?;
-        Ok(Optional::new(Some(s)))
-    }
-
-    /// Profile-directed string get ([`crate::decode::Owned`] promote or
-    /// [`crate::decode::Borrowed`] peek).
-    pub fn profile_str<'a, Cx, Prof>(
-        &'a self,
-        common: &'a Cx,
-        wire: &'a Prof::Buf,
-    ) -> Result<Optional<&'a str, D>, DecodeError>
-    where
-        Cx: MessageBindingMut<A> + MessageCommonSharedBits,
-        Prof: LazyProfile + 'a,
-        D: HasDefault<&'a str>,
-    {
-        if !P::is_set(common, || {
-            match (*self.value).with(P::slot_init_view(), common).get() {
-                Some(slot) => {
-                    <WireOrSso<KIND> as ValueLayout<ProtoString, A>>::is_proto_empty(slot, common)
-                }
-                None => true,
-            }
-        }) {
-            return Ok(Optional::new(None));
-        }
-        let slot = (*self.value)
-            .with(P::slot_init_view(), common)
-            .get()
-            .expect("is_set implies initialized slot");
-        let arm = WireOrSso::<KIND>::kind(common);
-        let s = Prof::get_str(slot, arm, wire, common.clone_alloc(), |new| {
-            WireOrSso::<KIND>::set_kind_shared(common, new);
-        })?;
+        let s = L::get_str(slot, common, wire, common.clone_alloc())?;
         Ok(Optional::new(Some(s)))
     }
 }
 
-impl<P, const FIELD: u32, A, const KIND: usize, D, C>
-    SingularField<LenScalar<C>, P, FIELD, A, WireOrSso<KIND>, D>
+impl<P, const FIELD: u32, A, L, D, C> SingularField<LenScalar<C>, P, FIELD, A, L, D>
 where
     P: FieldPresence,
     A: Allocator + Clone,
     C: BytesLikeLenCodec,
-    <WireOrSso<KIND> as ValueLayout<LenScalar<C>, A>>::Slot: AddressableSlot,
-    P::ValueSlot<<WireOrSso<KIND> as ValueLayout<LenScalar<C>, A>>::Slot>:
-        ValueSlot<<WireOrSso<KIND> as ValueLayout<LenScalar<C>, A>>::Slot, A>,
+    L: LazyBytesGet<C, A>,
+    L::Slot: AddressableSlot,
+    P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
-    /// Copy a bytes payload into Inline / Heap.
-    pub fn try_bytes<'a, Cx>(
+    /// Layout-directed bytes get ([`crate::WireOrSso`] promote or [`crate::SpanOnly`] peek).
+    pub fn profile_bytes<'a, Cx>(
         &'a self,
         common: &'a Cx,
         wire: &'a [u8],
@@ -896,9 +829,7 @@ where
     {
         if !P::is_set(common, || {
             match (*self.value).with(P::slot_init_view(), common).get() {
-                Some(slot) => {
-                    <WireOrSso<KIND> as ValueLayout<LenScalar<C>, A>>::is_proto_empty(slot, common)
-                }
+                Some(slot) => L::is_proto_empty(slot, common),
                 None => true,
             }
         }) {
@@ -908,72 +839,7 @@ where
             .with(P::slot_init_view(), common)
             .get()
             .expect("is_set implies initialized slot");
-        let arm = WireOrSso::<KIND>::kind(common);
-        let bytes = slot.get_bytes(arm, wire, common.clone_alloc(), |new| {
-            WireOrSso::<KIND>::set_kind_shared(common, new);
-        })?;
-        Ok(Optional::new(Some(bytes)))
-    }
-
-    /// Bytes read without promoting the slot (borrowed lazy wire).
-    pub fn peek_bytes<'buf, Cx>(
-        &self,
-        common: &Cx,
-        wire: &'buf [u8],
-    ) -> Result<Optional<&'buf [u8], D>, DecodeError>
-    where
-        Cx: MessageBindingMut<A> + MessageCommonSharedBits,
-        D: HasDefault<&'buf [u8]>,
-    {
-        if !P::is_set(common, || {
-            match (*self.value).with(P::slot_init_view(), common).get() {
-                Some(slot) => {
-                    <WireOrSso<KIND> as ValueLayout<LenScalar<C>, A>>::is_proto_empty(slot, common)
-                }
-                None => true,
-            }
-        }) {
-            return Ok(Optional::new(None));
-        }
-        let slot = (*self.value)
-            .with(P::slot_init_view(), common)
-            .get()
-            .expect("is_set implies initialized slot");
-        let arm = WireOrSso::<KIND>::kind(common);
-        let bytes = slot.peek_bytes(arm, wire)?;
-        Ok(Optional::new(Some(bytes)))
-    }
-
-    /// Profile-directed bytes get ([`crate::decode::Owned`] promote or
-    /// [`crate::decode::Borrowed`] peek).
-    pub fn profile_bytes<'a, Cx, Prof>(
-        &'a self,
-        common: &'a Cx,
-        wire: &'a Prof::Buf,
-    ) -> Result<Optional<&'a [u8], D>, DecodeError>
-    where
-        Cx: MessageBindingMut<A> + MessageCommonSharedBits,
-        Prof: LazyProfile + 'a,
-        D: HasDefault<&'a [u8]>,
-    {
-        if !P::is_set(common, || {
-            match (*self.value).with(P::slot_init_view(), common).get() {
-                Some(slot) => {
-                    <WireOrSso<KIND> as ValueLayout<LenScalar<C>, A>>::is_proto_empty(slot, common)
-                }
-                None => true,
-            }
-        }) {
-            return Ok(Optional::new(None));
-        }
-        let slot = (*self.value)
-            .with(P::slot_init_view(), common)
-            .get()
-            .expect("is_set implies initialized slot");
-        let arm = WireOrSso::<KIND>::kind(common);
-        let bytes = Prof::get_bytes(slot, arm, wire, common.clone_alloc(), |new| {
-            WireOrSso::<KIND>::set_kind_shared(common, new);
-        })?;
+        let bytes = L::get_bytes(slot, common, wire, common.clone_alloc())?;
         Ok(Optional::new(Some(bytes)))
     }
 }

@@ -199,15 +199,19 @@ fn singular_len_getter(
     );
     let read = match access {
         LenAccess::Str => quote! {
-            #get.profile_str::<_, P>(
+            #get.profile_str(
                 &self.record.common,
-                self.record.common.lazy.scan.wire_buf(),
+                ::puroro_rt::decode::WireBuf::as_bytes(
+                    self.record.common.lazy.scan.wire_buf(),
+                ),
             )
         },
         LenAccess::Bytes => quote! {
-            #get.profile_bytes::<_, P>(
+            #get.profile_bytes(
                 &self.record.common,
-                self.record.common.lazy.scan.wire_buf(),
+                ::puroro_rt::decode::WireBuf::as_bytes(
+                    self.record.common.lazy.scan.wire_buf(),
+                ),
             )
         },
     };
@@ -349,15 +353,19 @@ fn oneof_len_getters(
                 super::message::lazy_field(fields_name, companion, field_const, LazyLayout::ParamP);
             let read = match access {
                 LenAccess::Str => quote! {
-                    #get.profile_str::<_, _, _, P>(
+                    #get.profile_str(
                         &self.record.common,
-                        self.record.common.lazy.scan.wire_buf(),
+                        ::puroro_rt::decode::WireBuf::as_bytes(
+                            self.record.common.lazy.scan.wire_buf(),
+                        ),
                     )
                 },
                 LenAccess::Bytes => quote! {
-                    #get.profile_bytes::<_, _, _, P>(
+                    #get.profile_bytes(
                         &self.record.common,
-                        self.record.common.lazy.scan.wire_buf(),
+                        ::puroro_rt::decode::WireBuf::as_bytes(
+                            self.record.common.lazy.scan.wire_buf(),
+                        ),
                     )
                 },
             };

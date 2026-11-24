@@ -172,7 +172,7 @@ impl SingularMutStyle {
 /// How a singular field or oneof variant is read.
 ///
 /// A len slot (string / bytes) still has an eager arm: lazy getters call
-/// `try_str` / `try_bytes`, and eager getters use [`LenEagerRead`].
+/// `profile_str` / `profile_bytes`, and eager getters use [`LenEagerRead`].
 #[derive(Clone, Copy)]
 pub(super) enum GetterShape {
     /// `.value()` → `implicit_ty`.
@@ -723,7 +723,7 @@ fn plan_singular(
                 .clone()
                 .unwrap_or_else(|| parse_quote! { ::puroro_rt::Inline }),
         };
-        let assoc = wire_or_sso_assoc(name, &marker, &kind_ident, eager_layout);
+        let assoc = wire_or_sso_assoc(name, &marker, &kind_ident, eager_layout, len_access(wire));
         if let SingularSite::Field { companion } = site {
             let assoc_name = assoc.assoc.clone();
             layout_ty = Some(parse_quote! { <L as #companion::Layout<A>>::#assoc_name });
@@ -801,13 +801,22 @@ fn wire_or_sso_assoc(
     marker: &Type,
     kind_ident: &Ident,
     eager: Type,
+    access: Option<LenAccess>,
 ) -> LayoutAssoc {
+    let lazy = match access {
+        Some(LenAccess::Str) => {
+            parse_quote! { <P as ::puroro_rt::decode::LazyProfile>::StringLen<A, { super::#kind_ident }> }
+        }
+        Some(LenAccess::Bytes) | None => {
+            parse_quote! { <P as ::puroro_rt::decode::LazyProfile>::BytesLen<A, { super::#kind_ident }> }
+        }
+    };
     LayoutAssoc {
         assoc: assoc_ident(field_name, "Len"),
         kind: LayoutAssocKind::SingularLen {
             marker: marker.clone(),
             eager,
-            lazy: parse_quote! { ::puroro_rt::WireOrSso<{ super::#kind_ident }> },
+            lazy,
         },
     }
 }

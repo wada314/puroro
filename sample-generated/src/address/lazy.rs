@@ -6,7 +6,7 @@
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::puroro::{DecodeError, HasDefault, Optional};
-use ::puroro_rt::decode::{Borrowed, LazyMessage, LazyProfile};
+use ::puroro_rt::decode::{Borrowed, LazyMessage, LazyProfile, WireBuf};
 use ::puroro_rt::{DefaultIn, HasField, Lazy, Record};
 
 use crate::Address;
@@ -39,7 +39,10 @@ impl<A: Allocator + Clone, P: LazyProfile> AddressLazy<A, P> {
     {
         LazyMessage::ensure_scanned(self)?;
         <AddressFields<A, Lazy<A, P>> as HasField<{ FIELD_STREET }>>::field(&self.record.fields)
-            .profile_str::<_, P>(&self.record.common, self.record.common.lazy.scan.wire_buf())
+            .profile_str(
+                &self.record.common,
+                self.record.common.lazy.scan.wire_buf().as_bytes(),
+            )
     }
 
     pub fn city(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
@@ -48,7 +51,10 @@ impl<A: Allocator + Clone, P: LazyProfile> AddressLazy<A, P> {
     {
         LazyMessage::ensure_scanned(self)?;
         <AddressFields<A, Lazy<A, P>> as HasField<{ FIELD_CITY }>>::field(&self.record.fields)
-            .profile_str::<_, P>(&self.record.common, self.record.common.lazy.scan.wire_buf())
+            .profile_str(
+                &self.record.common,
+                self.record.common.lazy.scan.wire_buf().as_bytes(),
+            )
     }
 
     pub fn postal_code<'a>(&'a self) -> Result<Optional<u32, impl HasDefault<u32>>, DecodeError>

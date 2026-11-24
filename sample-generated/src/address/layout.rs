@@ -1,7 +1,7 @@
 //! Per-ingest **kinds** for [`Address`](crate::Address) / [`AddressLazy`](crate::AddressLazy).
 //!
 //! Numericals stay on the struct. This trait only names the string value
-//! slots that change (`InlineOrHeap` vs `WireOrSso`).
+//! slots that change (`InlineOrHeap` vs `P::StringLen`).
 //!
 //! Not a [`MessageScan`](::puroro_rt::decode::MessageScan) supertrait.
 //! [`Address`](crate::Address) requires `A: Clone` on the
@@ -12,7 +12,7 @@ use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::puroro_rt::decode::LazyProfile;
 use ::puroro_rt::{
-    BitStorage, Eager, InlineOrHeap, InteriorBitArray, Lazy, ProtoString, ValueLayout, WireOrSso,
+    BitStorage, Eager, InlineOrHeap, InteriorBitArray, Lazy, ProtoString, ValueLayout,
 };
 
 use super::{BIT_CITY_LAZY_KIND, BIT_CITY_SSO, BIT_STREET_LAZY_KIND, BIT_STREET_SSO};
@@ -21,7 +21,7 @@ use super::{BIT_CITY_LAZY_KIND, BIT_CITY_SSO, BIT_STREET_LAZY_KIND, BIT_STREET_S
 pub trait Layout<A: Allocator>: Sized {
     type Bits: Default + Clone + BitStorage;
 
-    /// Singular string slot (`InlineOrHeap<{SSO}>` or `WireOrSso<{KIND}>`).
+    /// Singular string slot (`InlineOrHeap<{SSO}>` or profile `StringLen`).
     type StreetLen: ValueLayout<ProtoString, A>;
     type CityLen: ValueLayout<ProtoString, A>;
 
@@ -39,10 +39,10 @@ impl<A: Allocator> Layout<A> for Eager {
     }
 }
 
-impl<A: Allocator, P: LazyProfile> Layout<A> for Lazy<A, P> {
+impl<A: Allocator + Clone, P: LazyProfile> Layout<A> for Lazy<A, P> {
     type Bits = InteriorBitArray<2>;
-    type StreetLen = WireOrSso<{ BIT_STREET_LAZY_KIND }>;
-    type CityLen = WireOrSso<{ BIT_CITY_LAZY_KIND }>;
+    type StreetLen = P::StringLen<A, { BIT_STREET_LAZY_KIND }>;
+    type CityLen = P::StringLen<A, { BIT_CITY_LAZY_KIND }>;
 
     #[inline]
     fn empty_bits() -> Self::Bits {

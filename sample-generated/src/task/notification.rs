@@ -67,7 +67,7 @@ use ::puroro_rt::{
     BitPacked, FieldCloneIn, FieldDeallocate, FieldEncode, Inline, InlineOrHeap, InteriorBitArray,
     Lazy, MessageCommon, MessageCommonAlloc, MessageCommonBits, Oneof, OneofDeallocate,
     OneofEncodable, OneofGroup, OneofVariant, ProtoBool, ProtoInt32, ProtoMessage, ProtoString,
-    SingularField, SingularFieldAccess, UnknownFields, UnknownStore, WireOrSso,
+    SingularField, SingularFieldAccess, UnknownFields, UnknownStore,
 };
 
 use crate::Address;
@@ -263,14 +263,14 @@ impl<A: Allocator + Clone, P: LazyProfile> OneofGroup
             Oneof,
             { super::FIELD_EMAIL_ADDRESS },
             A,
-            WireOrSso<{ super::BIT_EMAIL_ADDRESS_LAZY_KIND }>,
+            P::StringLen<A, { super::BIT_EMAIL_ADDRESS_LAZY_KIND }>,
         >,
         SingularField<
             ProtoString,
             Oneof,
             { super::FIELD_PHONE_NUMBER },
             A,
-            WireOrSso<{ super::BIT_PHONE_NUMBER_LAZY_KIND }>,
+            P::StringLen<A, { super::BIT_PHONE_NUMBER_LAZY_KIND }>,
         >,
         WebhookIdField<A>,
         SingularField<ProtoMessage<AddressLazy<A, P>>, Oneof, { super::FIELD_POSTAL }, A>,

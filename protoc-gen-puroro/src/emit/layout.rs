@@ -10,9 +10,9 @@ use ::syn::{Item, Type};
 /// How a lazy singular / oneof LEN getter reads the slot.
 #[derive(Clone, Copy)]
 pub(super) enum LenAccess {
-    /// `utf8_validation=VERIFY` string. `try_str` / `peek_str`.
+    /// `utf8_validation=VERIFY` string. `profile_str`.
     Str,
-    /// `bytes` or `utf8_validation=NONE` string. `try_bytes` / `peek_bytes`.
+    /// `bytes` or `utf8_validation=NONE` string. `profile_bytes`.
     Bytes,
 }
 
@@ -42,7 +42,8 @@ pub(super) struct LayoutAssoc {
 
 #[derive(Clone)]
 pub(super) enum LayoutAssocKind {
-    /// Singular string / bytes: `InlineOrHeap` or `Inline` vs `WireOrSso`.
+    /// Singular string / bytes: `InlineOrHeap` or `Inline` vs `P::StringLen` /
+    /// `P::BytesLen` (`WireOrSso` or `SpanOnly`).
     SingularLen {
         marker: Type,
         eager: Type,
