@@ -26,6 +26,7 @@ use crate::fields::shared::{DefaultIn, FieldDeallocate, MessageCommon, MessageCo
 use crate::fields::span_list::SpanList;
 use crate::fields::wire::len::{ProtoBytes, ProtoString, ProtoStringUnchecked};
 use crate::fields::wire::numerical::{Numerical, NumericalType};
+use crate::fields::wire::proto_group::ProtoGroup;
 use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedVecMut,
@@ -529,6 +530,34 @@ where
     /// Does not walk the child's tags. The child's first field getter parses
     /// stored regions. Distinct from singular last-wins: each occurrence is a
     /// new list element (same as eager repeated message).
+    pub fn merge_shared<Cx, Prof>(
+        &mut self,
+        root: &Prof::Buf,
+        span: WireSpan,
+        common: &Cx,
+    ) -> Result<(), DecodeError>
+    where
+        Cx: MessageCommonAlloc<Alloc = A>,
+        Prof: LazyProfile,
+        M: LazyMessage<A, Prof>,
+    {
+        let mut child = M::default_in(common.clone_alloc());
+        child.merge_shared(root, span)?;
+        self.push_in(child, common.clone_alloc());
+        Ok(())
+    }
+}
+
+impl<M, E, const FIELD: u32, A> RepeatedField<ProtoGroup<M>, E, FIELD, A>
+where
+    M: MessageEncode + DefaultIn<A>,
+    E: RepeatedEncoding<ProtoGroup<M>, A>,
+    A: Allocator + Clone,
+{
+    /// Append one still-lazy child that records the group body on the island.
+    ///
+    /// `span` is the interior only. Distinct from singular last-wins: each
+    /// occurrence is a new list element.
     pub fn merge_shared<Cx, Prof>(
         &mut self,
         root: &Prof::Buf,

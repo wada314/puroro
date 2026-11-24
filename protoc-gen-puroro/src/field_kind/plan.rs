@@ -299,8 +299,8 @@ fn plan_field<'a>(
         }
         FieldOccurrence::Singular(presence) => {
             let wire = WireTypeKind::from_field(field);
-            let inline_nested = matches!(wire, WireTypeKind::Message(_))
-                && storage.is_inline(owner, field.number());
+            let inline_nested =
+                wire.is_nested_message() && storage.is_inline(owner, field.number());
             // Oneof variants keep `Oneof` presence (no extra bit). Non-oneof
             // inlined children need an Explicit / LegacyRequired presence bit.
             let planned_presence = if inline_nested && !matches!(presence, SingularPresence::Oneof)
@@ -314,7 +314,7 @@ fn plan_field<'a>(
             } else {
                 PlannedPresence::from_singular(presence, field.name(), next_bit)
             };
-            let layout = if matches!(wire, WireTypeKind::Message(_)) {
+            let layout = if wire.is_nested_message() {
                 if inline_nested {
                     PlannedLayout::Inline
                 } else {
@@ -402,6 +402,14 @@ fn plan_map_field<'a>(field: &'a Field<'a>) -> Result<FieldKind<'a>> {
     let key = WireTypeKind::from_field(key_field);
     let value = WireTypeKind::from_field(value_field);
     validate_map_key_wire(&key, field.name())?;
+    // Defense in depth: resolve keeps map-entry fields length-prefixed even
+    // under file-scoped DELIMITED. A group here would be an IR bug.
+    if value.is_group() {
+        return Err(Error::internal(format!(
+            "map field `{}`: map-entry value resolved as group wire",
+            field.name()
+        )));
+    }
     // Any non-map value is allowed. Descriptors do not emit maps of maps.
 
     Ok(FieldKind::Map { key, value })

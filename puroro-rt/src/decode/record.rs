@@ -108,8 +108,9 @@ pub fn scanned_len_span(origin: usize, rec: &ScannedRecord) -> Result<WireSpan, 
 
 /// Group interior in `_wire`, given `origin` of `leftover || chunk`.
 ///
-/// The span excludes the start tag and the matching end tag. Known group
-/// fields are not applied yet; callers that need the bytes slice this span.
+/// The span excludes the start tag and the matching end tag. Lazy known-group
+/// apply passes this to `merge_shared` the same way LEN uses
+/// [`scanned_len_span`].
 pub fn scanned_group_body_span(
     origin: usize,
     rec: &ScannedRecord,

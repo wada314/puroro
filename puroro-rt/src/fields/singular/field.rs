@@ -48,6 +48,7 @@ use crate::fields::wire::encode_type::{encode_field, encoded_len_field};
 use crate::fields::wire::lazy_len::{LazyBytesGet, LazyLenStore, LazyStringGet};
 use crate::fields::wire::len::{BytesLikeLenCodec, LenScalar, ProtoString};
 use crate::fields::wire::numerical::{BoolCodec, Numerical, NumericalType, ProtoBool};
+use crate::fields::wire::proto_group::ProtoGroup;
 use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::proto_ref_ops::{ProtoRefDebug, ProtoRefEq};
 use crate::fields::wire::singular_type::{PayloadAccess, SingularType};
@@ -757,6 +758,61 @@ where
     ///
     /// Does not walk the child's tags (`MessageMerge` / ingest). The child's
     /// first field getter parses stored regions.
+    pub fn merge_shared<Cx, Prof>(
+        &mut self,
+        root: &Prof::Buf,
+        span: WireSpan,
+        common: &mut Cx,
+    ) -> Result<(), DecodeError>
+    where
+        Cx: MessageBindingMut<A>,
+        Prof: LazyProfile,
+        M: LazyMessage<A, Prof>,
+    {
+        let child: &mut M = self.bind_mut(common).get_mut();
+        child.merge_shared(root, span)
+    }
+}
+
+impl<M, P, const FIELD: u32, A, D> SingularField<ProtoGroup<M>, P, FIELD, A, Inline, D>
+where
+    M: crate::MessageEncode + crate::DeallocateBound<A>,
+    P: FieldPresence,
+    A: Allocator + Clone,
+    <ProtoGroup<M> as crate::PayloadAccess>::Slot<A>: AddressableSlot + DefaultIn<A>,
+    P::ValueSlot<<Inline as ValueLayout<ProtoGroup<M>, A>>::Slot>:
+        ValueSlot<<Inline as ValueLayout<ProtoGroup<M>, A>>::Slot, A>,
+{
+    /// Ensure the child exists, then record the group body span on the island.
+    ///
+    /// `span` is the interior only (no start/end tags), same as a LEN payload.
+    pub fn merge_shared<Cx, Prof>(
+        &mut self,
+        root: &Prof::Buf,
+        span: WireSpan,
+        common: &mut Cx,
+    ) -> Result<(), DecodeError>
+    where
+        Cx: MessageBindingMut<A>,
+        Prof: LazyProfile,
+        M: LazyMessage<A, Prof>,
+    {
+        let child: &mut M = self.bind_mut(common).get_mut();
+        child.merge_shared(root, span)
+    }
+}
+
+impl<M, P, const FIELD: u32, A, D> SingularField<ProtoGroup<M>, P, FIELD, A, Boxed, D>
+where
+    M: crate::MessageEncode + crate::DeallocateIn<A> + DefaultIn<A>,
+    P: FieldPresence,
+    A: Allocator + Clone,
+    P::ValueSlot<<Boxed as ValueLayout<ProtoGroup<M>, A>>::Slot>:
+        ValueSlot<<Boxed as ValueLayout<ProtoGroup<M>, A>>::Slot, A>,
+{
+    /// Ensure the child exists, then record the group body span on the island.
+    ///
+    /// `span` is the interior only (no start/end tags), same as a LEN payload.
     pub fn merge_shared<Cx, Prof>(
         &mut self,
         root: &Prof::Buf,

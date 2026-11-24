@@ -70,13 +70,13 @@ The puroro project comprises several crates and tools with distinct roles:
 |---|---|---|
 | `utf8_validation` (`VERIFY` / `NONE`) | Generated decode paths honour the per-field Editions setting. `NONE` uses bytes views (`&[u8]`), not `&str`. `VERIFY` failure is `DecodeError::InvalidUtf8` and is not diverted into unknown fields. | **Done** — `ProtoString` (`VERIFY`, `&str`) vs `ProtoStringUnchecked` (`NONE`, `&[u8]`). proto2 default is `NONE`; overlay with `proto2_utf8=verify`. Eager merge fails immediately; lazy checks on the getter ([eager / lazy gaps](#eager-and-lazy-semantic-gaps)). |
 | Recursion limit | Eager nested-message merge caps its call stack; excess depth → `DecodeError::RecursionLimitExceeded`. This is not a wire-format maximum. | **Done for eager** — `puroro_rt::MessageMerge::merge_from_with_depth` + `RECURSION_LIMIT` (100); user `Message::merge_from` wraps `merge_message` at depth 0. Nested eager catalog paths pass `depth + 1`. Lazy ingest does not count nesting. |
-| Deprecated groups (`SGroup` / `EGroup`) | Not generated. Unknown start-groups are preserved (raw bytes through the matching end-group). A hand-written `ProtoGroup<M>` merges and encodes a known group. | Unknown groups round-trip on the preserve path. A mismatched end-group is `DecodeError::MismatchedEndGroup`. A bare end-group is `DecodeError::InvalidTag`. |
+| Deprecated groups (`SGroup` / `EGroup`) | Generated as `ProtoGroup<M>` for proto2 `group` and editions `message_encoding=DELIMITED`. Unknown start-groups are preserved (raw bytes through the matching end-group). | Unknown groups round-trip on the preserve path. A mismatched end-group is `DecodeError::MismatchedEndGroup`. A bare end-group is `DecodeError::InvalidTag`. |
 
 ---
 
 ## 1. Goals
 
-- **Protobuf spec compliance.** Support the canonical wire format (varints, I32, I64, LEN records, packed repeated, oneofs, unknown fields) for proto2, proto3, and editions. The compliant unknown-field behavior is preserve-and-round-trip. Opt-in `DISCARD` and `REJECT` leave that rule ([§4.9](#49-unknown-fields)). Group fields are not generated. A hand-written `ProtoGroup<M>` merges and encodes a known group. An unknown start-group is preserved on the preserve path (see [§0](#0-project-architecture)).
+- **Protobuf spec compliance.** Support the canonical wire format (varints, I32, I64, LEN records, packed repeated, oneofs, unknown fields) for proto2, proto3, and editions. The compliant unknown-field behavior is preserve-and-round-trip. Opt-in `DISCARD` and `REJECT` leave that rule ([§4.9](#49-unknown-fields)). Group fields (`TYPE_GROUP` / `message_encoding=DELIMITED`) generate as `ProtoGroup<M>`. An unknown start-group is preserved on the preserve path (see [§0](#0-project-architecture)).
 - **Allocator support.** Every generated message is generic over `A: Allocator + Clone` using the `allocator-api2` crate ([why `Clone` is on the struct](#why-a-clone-is-a-struct-bound)). Arena allocators (e.g. `bumpalo`) and custom pools are first-class citizens.
 - **Performance-oriented interface.** Accessors return borrowed references (`&str`, `&[u8]`, `&[T]`), never freshly allocated containers. The `encode_to_vec` / `encode_to_bytes` convenience methods allocate; `Message::encode` writes into a caller-owned buffer. Wire-body sizing / writing (`encoded_len` / `encode_raw` with `EncodeCtx`) lives on `puroro_rt::MessageEncode`, not on `Message`.
 - **Rust idioms.** Private fields accessed via generated accessor methods; `Optional<T, impl HasDefault<T>>` for explicit-presence scalar, string, and enum fields; singular nested messages return `Option<&M>` / `&mut M` (inlined children are a full `M` with their own `MessageCommon`); no `unsafe` in user-visible APIs.
@@ -99,7 +99,7 @@ value      := varint         for wire_type 0 (VARINT)
             | 4 bytes LE     for wire_type 5 (I32)
 ```
 
-Wire types 3 and 4 (SGROUP / EGROUP) are deprecated. The encoder does not emit them, and a known field is not decoded as a group yet. An unknown start-group is preserved on the preserve path: the raw bytes run through the matching end-group. A mismatched end-group number is `DecodeError::MismatchedEndGroup`. A bare end-group is `DecodeError::InvalidTag` (see [§0](#0-project-architecture)).
+Wire types 3 and 4 (SGROUP / EGROUP) are deprecated. Known group fields emit and decode them via `ProtoGroup<M>`. An unknown start-group is preserved on the preserve path: the raw bytes run through the matching end-group. A mismatched end-group number is `DecodeError::MismatchedEndGroup`. A bare end-group is `DecodeError::InvalidTag` (see [§0](#0-project-architecture)).
 
 | Protobuf type | Wire type |
 |---|---|
@@ -1333,7 +1333,7 @@ Note: **edition 2024 defaults to `EXPLICIT` field presence**, which is the oppos
 | `field_presence` | `IMPLICIT` / `EXPLICIT` / `LEGACY_REQUIRED` | Presence query methods generated or not; `validate()` for `LEGACY_REQUIRED` |
 | `repeated_field_encoding` | `PACKED` / `EXPANDED` | Affects encode format (decode always accepts both) |
 | `enum_type` | `OPEN` / `CLOSED` | Generated newtype implements `OpenEnum` vs `ClosedEnum`; field is `ProtoEnum<E, Open>` vs `ProtoEnum<E, Closed>` (unknown closed values → unknown fields) |
-| `message_encoding` | `LENGTH_PREFIXED` / `DELIMITED` | `DELIMITED` (groups) is deprecated; not generated |
+| `message_encoding` | `LENGTH_PREFIXED` / `DELIMITED` | `DELIMITED` generates `ProtoGroup<M>` (same as proto2 `group`); map fields and synthetic map-entry key/value stay length-prefixed even under a file-scoped `DELIMITED` |
 | `utf8_validation` | `VERIFY` / `NONE` | `VERIFY`: `ProtoString`; getters `&str` / `StringMut`; invalid UTF-8 → `DecodeError::InvalidUtf8` (not an unknown-field divert). `NONE`: `ProtoStringUnchecked`; getters `&[u8]` / `BytesMut` (proto2 syntax default). Overlay proto2 with plugin option `proto2_utf8=verify`. |
 | `json_format` | `ALLOW` / `LEGACY_BEST_EFFORT` | JSON mapping is not emitted. `ALLOW` (edition 2023 default, and an explicit `ALLOW`) is accepted. `LEGACY_BEST_EFFORT` is `Error::Codegen`. The check covers file, message, enum, and field `FeatureSet`s. `json_format` is runtime retention and targets messages, so a message option reaches the plugin. |
 | `enforce_naming_style` | `STYLE_LEGACY` / `STYLE2024` | Names are not checked. `STYLE_LEGACY` is the implemented behaviour. `STYLE2024` is `Error::Codegen`. This feature is source retention, so protoc does not pass an explicit override to the plugin. An edition 2024 file therefore always fails: its default is `STYLE2024`, and accepting the file would ignore that default. |
@@ -1406,7 +1406,7 @@ puroro is a greenfield design. Generated types, trait names, and module layout a
 
 ### Deprecated group wire types
 
-Groups (`SGroup` / `EGroup`) are not generated. Unknown start-groups are stored with the other unknown fields and round-trip as raw bytes. A known group is the runtime marker `ProtoGroup<M>`: the child reads the caller's buffer from the already-consumed start tag through the matching end tag, in place, and encode writes the start tag, the child body, and the end tag, with no length prefix. Codegen still rejects `TYPE_GROUP` and `message_encoding=DELIMITED`. Lazy span apply does not record group bodies yet. A mismatched end-group is `DecodeError::MismatchedEndGroup`. A bare end-group is `DecodeError::InvalidTag`. An end-group wire type on `encode_field` panics.
+Groups (`SGroup` / `EGroup`) generate as `ProtoGroup<M>` for proto2 `group` and editions `message_encoding=DELIMITED` (non-map). Unknown start-groups are stored with the other unknown fields and round-trip as raw bytes. A known group merges in place from the already-consumed start tag through the matching end tag, and encode writes the start tag, the child body, and the end tag, with no length prefix. Lazy apply records the group body span (interior only) via `merge_shared`. A mismatched end-group is `DecodeError::MismatchedEndGroup`. A bare end-group is `DecodeError::InvalidTag`. An end-group wire type on `encode_field` panics.
 
 ### Module layout: package-first, rename when needed
 

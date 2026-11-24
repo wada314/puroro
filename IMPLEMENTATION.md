@@ -159,7 +159,7 @@ protobuf-core           Varint, Tag, WireType
 | `protoc-gen-puroro` plugin I/O (`CodeGeneratorRequest` / `Response`) | **Done** |
 | Descriptor decode (messages / fields / enums / oneofs / features subset) | **Done** (intentional subset; `default_value` and `map_entry` decoded; services / extensions not in IR yet) |
 | Type resolve (`FileSet`, `TypeRef`, presence / occurrence) | **Done** — [`generate()`](protoc-gen-puroro/src/generate.rs) resolves the full request, then prepare / forest / layout |
-| Editions features in resolve / FieldKind | **Partial** — `field_presence`, `enum_type`, `repeated_field_encoding`, `utf8_validation` resolved and emitted (`ProtoString` / `ProtoStringUnchecked`); `message_encoding=DELIMITED` rejected; JSON / naming / visibility still traps |
+| Editions features in resolve / FieldKind | **Partial** — `field_presence`, `enum_type`, `repeated_field_encoding`, `utf8_validation` resolved and emitted (`ProtoString` / `ProtoStringUnchecked`); `message_encoding=DELIMITED` / proto2 `group` emit `ProtoGroup`; JSON / naming / visibility still traps |
 | Module forest + `ModuleLayout::SingleFile` | **Done** (`FileTree` deferred) |
 | Empty-message emission (no fields / nested types) | **Done** — compile-tested via [`puroro-codegen-tests`](puroro-codegen-tests/) (`protoc` + plugin) |
 | FieldKind IR (`plan_fields`, bit assignment, catalog kind) | **Done** — scalars / repeated / enum / oneof / map / custom defaults; synthetic `map_entry` messages planned as `FieldKind::Map` (not emitted as structs) |

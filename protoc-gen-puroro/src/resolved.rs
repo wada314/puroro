@@ -110,6 +110,11 @@ pub struct Field<'a> {
     child_parse: Option<ChildParse>,
     /// proto2 / editions `LEGACY_REQUIRED` (needed when inlining a message).
     legacy_required: bool,
+    /// Wire-framed as a group (`TYPE_GROUP` or `message_encoding=DELIMITED`).
+    ///
+    /// Storage still uses [`TypeRef::Message`]; emit picks `ProtoGroup` when
+    /// this is set.
+    group_wire: bool,
 }
 
 /// Resolved type of a field.
@@ -299,6 +304,11 @@ impl<'a> Field<'a> {
     /// Whether this field is proto2 / editions `LEGACY_REQUIRED`.
     pub fn is_legacy_required(&self) -> bool {
         self.legacy_required
+    }
+
+    /// Whether the field uses group framing on the wire (`SGroup` / `EGroup`).
+    pub fn is_group_wire(&self) -> bool {
+        self.group_wire
     }
 }
 

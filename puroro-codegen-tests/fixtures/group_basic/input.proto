@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package demo;
+
+message Envelope {
+  optional group Header = 1 {
+    optional string name = 1;
+    optional int32 id = 2;
+  }
+  optional string note = 2;
+  repeated group Item = 3 {
+    optional int32 qty = 1;
+  }
+}

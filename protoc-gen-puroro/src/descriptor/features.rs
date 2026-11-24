@@ -33,12 +33,13 @@ impl FeatureSet {
     /// Trap explicit overrides of features resolve / codegen do not apply yet.
     ///
     /// Consumed today: `field_presence`, `enum_type`, `repeated_field_encoding`,
-    /// `utf8_validation`, and `message_encoding` (LENGTH_PREFIXED only).
-    /// `json_format = ALLOW`, `enforce_naming_style = STYLE_LEGACY`, and
-    /// `default_symbol_visibility = EXPORT_ALL` match what this plugin already
-    /// emits, so an explicit copy of those values is accepted. Any other value
-    /// (`LEGACY_BEST_EFFORT`, `STYLE2024`, `EXPORT_TOP_LEVEL`, `LOCAL_ALL`,
-    /// `STRICT`) is a codegen error, not a panic and not a silent ignore.
+    /// `utf8_validation`, and `message_encoding` (`LENGTH_PREFIXED` /
+    /// `DELIMITED`). `json_format = ALLOW`, `enforce_naming_style =
+    /// STYLE_LEGACY`, and `default_symbol_visibility = EXPORT_ALL` match what
+    /// this plugin already emits, so an explicit copy of those values is
+    /// accepted. Any other value (`LEGACY_BEST_EFFORT`, `STYLE2024`,
+    /// `EXPORT_TOP_LEVEL`, `LOCAL_ALL`, `STRICT`) is a codegen error, not a
+    /// panic and not a silent ignore.
     pub(crate) fn reject_unimplemented_overrides(&self, context: &str) -> Result<()> {
         if let Some(value) = self.json_format
             && !matches!(value, JsonFormat::Allow)
