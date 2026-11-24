@@ -17,14 +17,53 @@ use crate::resolved::{Arena, resolve_with};
 /// Package name written into the generated `Cargo.toml` when `crate_name` is unset.
 const DEFAULT_CRATE_NAME: &str = "generated";
 
+/// One crate listed under `[dependencies]` in the generated `Cargo.toml`.
+struct GeneratedDependency {
+    name: &'static str,
+    version: &'static str,
+    /// When `false`, emit a table with `default-features = false` (needed so the
+    /// generated crate can opt into `puroro/descriptors` via its own feature).
+    default_features: bool,
+}
+
+impl GeneratedDependency {
+    const fn version_only(name: &'static str, version: &'static str) -> Self {
+        Self {
+            name,
+            version,
+            default_features: true,
+        }
+    }
+
+    const fn without_default_features(name: &'static str, version: &'static str) -> Self {
+        Self {
+            name,
+            version,
+            default_features: false,
+        }
+    }
+
+    /// One `[dependencies]` line, including the trailing newline.
+    fn toml_line(&self) -> String {
+        if self.default_features {
+            format!("{} = \"{}\"\n", self.name, self.version)
+        } else {
+            format!(
+                "{} = {{ version = \"{}\", default-features = false }}\n",
+                self.name, self.version
+            )
+        }
+    }
+}
+
 /// Crates that generated `lib.rs` names directly, with the package version from
 /// the `Cargo.lock` that compiled this plugin (`build.rs`).
-const GENERATED_DEPENDENCIES: &[(&str, &str)] = &[
-    ("allocator-api2", env!("PURORO_GEN_DEP_ALLOCATOR_API2")),
-    ("bitvec", env!("PURORO_GEN_DEP_BITVEC")),
-    ("bytes", env!("PURORO_GEN_DEP_BYTES")),
-    ("puroro", env!("PURORO_GEN_DEP_PURORO")),
-    ("puroro-rt", env!("PURORO_GEN_DEP_PURORO_RT")),
+const GENERATED_DEPENDENCIES: &[GeneratedDependency] = &[
+    GeneratedDependency::version_only("allocator-api2", env!("PURORO_GEN_DEP_ALLOCATOR_API2")),
+    GeneratedDependency::version_only("bitvec", env!("PURORO_GEN_DEP_BITVEC")),
+    GeneratedDependency::version_only("bytes", env!("PURORO_GEN_DEP_BYTES")),
+    GeneratedDependency::without_default_features("puroro", env!("PURORO_GEN_DEP_PURORO")),
+    GeneratedDependency::version_only("puroro-rt", env!("PURORO_GEN_DEP_PURORO_RT")),
 ];
 
 /// Generate-time knobs parsed from [`CodegenRequest`] `parameter`.
@@ -84,18 +123,8 @@ fn parse_crate_name(value: &str) -> Result<String> {
 /// from [`GENERATED_DEPENDENCIES`].
 fn cargo_manifest(crate_name: &str) -> ResponseFile {
     let mut dependencies = String::new();
-    for (name, version) in GENERATED_DEPENDENCIES {
-        if *name == "puroro" {
-            // Opt into `descriptors` via the generated crate feature below.
-            dependencies.push_str("puroro = { version = \"");
-            dependencies.push_str(version);
-            dependencies.push_str("\", default-features = false }\n");
-        } else {
-            dependencies.push_str(name);
-            dependencies.push_str(" = \"");
-            dependencies.push_str(version);
-            dependencies.push_str("\"\n");
-        }
+    for dep in GENERATED_DEPENDENCIES {
+        dependencies.push_str(&dep.toml_line());
     }
     ResponseFile {
         name: "Cargo.toml".to_owned(),
@@ -304,13 +333,10 @@ mod tests {
             "missing descriptors feature: {}",
             manifest.content
         );
-        for (name, version) in GENERATED_DEPENDENCIES {
-            let line = if *name == "puroro" {
-                format!("puroro = {{ version = \"{version}\", default-features = false }}")
-            } else {
-                format!("{name} = \"{version}\"")
-            };
-            assert!(manifest.content.contains(&line), "missing {line}");
+        for dep in GENERATED_DEPENDENCIES {
+            let line = dep.toml_line();
+            let line = line.trim_end();
+            assert!(manifest.content.contains(line), "missing {line}");
         }
         let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("..");
         assert_eq!(
