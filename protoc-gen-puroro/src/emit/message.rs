@@ -308,8 +308,8 @@ pub(super) fn render_items(
             >,
         }
 
-        ::puroro_rt::forward_record!(eager #name, #full_name);
-        ::puroro_rt::forward_record!(lazy #lazy_alias, #full_name);
+        ::puroro_rt::forward_record!(eager #name, #fields_name);
+        ::puroro_rt::forward_record!(lazy #lazy_alias, #fields_name);
 
         #record_fields_impl
 

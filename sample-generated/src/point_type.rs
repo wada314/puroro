@@ -74,8 +74,8 @@ pub struct PointLazy<A: Allocator + Clone = Global, P: LazyProfile = Owned> {
     pub(crate) record: Record<PointFields<A, Lazy<A, P>>, A, Lazy<A, P>, UnknownFields<A>>,
 }
 
-::puroro_rt::forward_record!(eager Point, "example.Point");
-::puroro_rt::forward_record!(lazy PointLazy, "example.Point");
+::puroro_rt::forward_record!(eager Point, PointFields);
+::puroro_rt::forward_record!(lazy PointLazy, PointFields);
 
 impl<A: Allocator + Clone, L: point::Layout<A> + MessageScan<A>> RecordFields<A, L>
     for PointFields<A, L>

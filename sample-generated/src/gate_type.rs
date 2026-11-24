@@ -7,6 +7,7 @@
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
+use ::core::marker::PhantomData;
 use ::core::mem;
 use ::core::ops::{ControlFlow, DerefMut};
 use ::puroro::{DecodeBuf, DecodeError, WireType};
@@ -21,11 +22,13 @@ use crate::gate::FIELD_N;
 
 type Bits = BitArray<[u8; 1], Lsb0>;
 
-pub(crate) struct GateFields<A: Allocator + Clone = Global> {
+/// Eager-only sample; `L` matches generated `*Fields<A, L>` shape.
+pub(crate) struct GateFields<A: Allocator + Clone = Global, L = Eager> {
     n: SingularField<ProtoInt32, Implicit, { FIELD_N }, A>,
+    _layout: PhantomData<L>,
 }
 
-impl<A: Allocator + Clone> HasField<{ FIELD_N }> for GateFields<A> {
+impl<A: Allocator + Clone, L> HasField<{ FIELD_N }> for GateFields<A, L> {
     type Ref<'a>
         = &'a SingularField<ProtoInt32, Implicit, { FIELD_N }, A>
     where
@@ -45,12 +48,12 @@ impl<A: Allocator + Clone> HasField<{ FIELD_N }> for GateFields<A> {
 }
 
 pub struct Gate<A: Allocator + Clone = Global> {
-    pub(crate) record: Record<GateFields<A>, A, Eager, RejectUnknowns>,
+    pub(crate) record: Record<GateFields<A, Eager>, A, Eager, RejectUnknowns>,
 }
 
-::puroro_rt::forward_record!(eager Gate, "example.Gate");
+::puroro_rt::forward_record!(eager Gate, GateFields);
 
-impl<A: Allocator + Clone> RecordFields<A, Eager> for GateFields<A> {
+impl<A: Allocator + Clone> RecordFields<A, Eager> for GateFields<A, Eager> {
     type Bits = Bits;
     type Unknown = RejectUnknowns;
     type EagerMessage = Gate<A>;
@@ -72,15 +75,16 @@ impl<A: Allocator + Clone> RecordFields<A, Eager> for GateFields<A> {
     }
 }
 
-impl<A: Allocator + Clone> ConstructRecordFields<A, Eager> for GateFields<A> {
+impl<A: Allocator + Clone> ConstructRecordFields<A, Eager> for GateFields<A, Eager> {
     fn new(alloc: A) -> Self {
         Self {
             n: SingularField::new_in(alloc),
+            _layout: PhantomData,
         }
     }
 }
 
-impl<A: Allocator + Clone> CloneRecordFields<A, Eager> for GateFields<A> {
+impl<A: Allocator + Clone> CloneRecordFields<A, Eager> for GateFields<A, Eager> {
     fn clone_fields(
         &self,
         dst: &mut Self,
@@ -94,7 +98,7 @@ impl<A: Allocator + Clone> CloneRecordFields<A, Eager> for GateFields<A> {
     }
 }
 
-impl<A: Allocator + Clone> EagerRecordFields<A> for GateFields<A> {
+impl<A: Allocator + Clone> EagerRecordFields<A> for GateFields<A, Eager> {
     fn visit_fields<V: FieldVisitor<MessageCommon<Self::Bits, A, Self::Unknown, Eager>>>(
         &self,
         v: &mut V,

@@ -8,6 +8,7 @@
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
+use ::core::marker::PhantomData;
 use ::core::mem;
 use ::core::ops::{ControlFlow, DerefMut};
 use ::puroro::{DecodeBuf, DecodeError, HasDefault, Optional, WireType};
@@ -23,16 +24,18 @@ use crate::student::{BIT_HOME, BIT_LOCATION, BIT_YEAR, FIELD_HOME, FIELD_LOCATIO
 
 type Bits = BitArray<[u8; 1], Lsb0>;
 
-pub(crate) struct StudentFields<A: Allocator + Clone = Global> {
+/// Eager-only sample; `L` matches generated `*Fields<A, L>` shape.
+pub(crate) struct StudentFields<A: Allocator + Clone = Global, L = Eager> {
     year: SingularField<ProtoInt32, Explicit<{ BIT_YEAR }>, { FIELD_YEAR }, A>,
     location:
         SingularField<ProtoMessage<Point<A>>, Explicit<{ BIT_LOCATION }>, { FIELD_LOCATION }, A>,
     home: SingularField<ProtoMessage<Address<A>>, Explicit<{ BIT_HOME }>, { FIELD_HOME }, A>,
+    _layout: PhantomData<L>,
 }
 
 macro_rules! has_student_field {
     ($n:expr, $slot:ident, $ty:ty) => {
-        impl<A: Allocator + Clone> HasField<{ $n }> for StudentFields<A> {
+        impl<A: Allocator + Clone, L> HasField<{ $n }> for StudentFields<A, L> {
             type Ref<'a>
                 = &'a $ty
             where
@@ -70,12 +73,12 @@ has_student_field!(
 );
 
 pub struct Student<A: Allocator + Clone = Global> {
-    pub(crate) record: Record<StudentFields<A>, A, Eager, UnknownFields<A>>,
+    pub(crate) record: Record<StudentFields<A, Eager>, A, Eager, UnknownFields<A>>,
 }
 
-::puroro_rt::forward_record!(eager Student, "example.Student");
+::puroro_rt::forward_record!(eager Student, StudentFields);
 
-impl<A: Allocator + Clone> RecordFields<A, Eager> for StudentFields<A> {
+impl<A: Allocator + Clone> RecordFields<A, Eager> for StudentFields<A, Eager> {
     type Bits = Bits;
     type Unknown = UnknownFields<A>;
     type EagerMessage = Student<A>;
@@ -99,12 +102,13 @@ impl<A: Allocator + Clone> RecordFields<A, Eager> for StudentFields<A> {
     }
 }
 
-impl<A: Allocator + Clone> ConstructRecordFields<A, Eager> for StudentFields<A> {
+impl<A: Allocator + Clone> ConstructRecordFields<A, Eager> for StudentFields<A, Eager> {
     fn new(alloc: A) -> Self {
         Self {
             year: SingularField::new_in(alloc.clone()),
             location: SingularField::new_in(alloc.clone()),
             home: SingularField::new_in(alloc),
+            _layout: PhantomData,
         }
     }
 }
@@ -117,7 +121,7 @@ macro_rules! clone_student {
     }};
 }
 
-impl<A: Allocator + Clone> CloneRecordFields<A, Eager> for StudentFields<A> {
+impl<A: Allocator + Clone> CloneRecordFields<A, Eager> for StudentFields<A, Eager> {
     fn clone_fields(
         &self,
         dst: &mut Self,
@@ -131,7 +135,7 @@ impl<A: Allocator + Clone> CloneRecordFields<A, Eager> for StudentFields<A> {
     }
 }
 
-impl<A: Allocator + Clone> EagerRecordFields<A> for StudentFields<A> {
+impl<A: Allocator + Clone> EagerRecordFields<A> for StudentFields<A, Eager> {
     fn visit_fields<V: FieldVisitor<MessageCommon<Self::Bits, A, Self::Unknown, Eager>>>(
         &self,
         v: &mut V,

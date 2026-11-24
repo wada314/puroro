@@ -804,19 +804,22 @@ where
 /// ```
 ///
 /// `eager` / `lazy` pick the [`Record`] impls (`LazyMessage` is lazy-only).
+/// `$fields` is the catalog type (`TaskFields`); [`Message::FULL_NAME`] comes
+/// from [`RecordFields::FULL_NAME`] on `$fields<A, Eager>` / `$fields<A, Lazy<…>>`
+/// so the protobuf type name is written once.
 ///
 /// Lazy shells are `$name<A, P: LazyProfile = Owned>`. `Message` / `new_in` /
 /// `MessageMerge` require `P::Buf: WireAppend`. Borrowed roots use `parse_in`.
 #[macro_export]
 macro_rules! forward_record {
-    (eager $name:ident, $full_name:expr) => {
-        $crate::forward_record!(@shared $name, $full_name);
+    (eager $name:ident, $fields:ident) => {
+        $crate::forward_record!(@shared $name, $fields);
     };
-    (lazy $name:ident, $full_name:expr) => {
-        $crate::forward_record!(@shared_lazy $name, $full_name);
+    (lazy $name:ident, $fields:ident) => {
+        $crate::forward_record!(@shared_lazy $name, $fields);
         $crate::forward_record!(@lazy $name);
     };
-    (@shared $name:ident, $full_name:expr) => {
+    (@shared $name:ident, $fields:ident) => {
         impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> $name<A> {
             /// Empty message using `alloc` for every slot.
             #[inline]
@@ -970,7 +973,10 @@ macro_rules! forward_record {
             for $name<A>
         {
             type Alloc = A;
-            const FULL_NAME: &'static str = $full_name;
+            const FULL_NAME: &'static str = <$fields<
+                A,
+                $crate::Eager,
+            > as $crate::RecordFields<A, $crate::Eager>>::FULL_NAME;
 
             #[inline]
             fn new_in(alloc: A) -> Self
@@ -1016,7 +1022,7 @@ macro_rules! forward_record {
             }
         }
     };
-    (@shared_lazy $name:ident, $full_name:expr) => {
+    (@shared_lazy $name:ident, $fields:ident) => {
         impl<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
             P: $crate::decode::LazyProfile,
@@ -1202,7 +1208,10 @@ macro_rules! forward_record {
             P::Buf: $crate::decode::WireAppend,
         {
             type Alloc = A;
-            const FULL_NAME: &'static str = $full_name;
+            const FULL_NAME: &'static str = <$fields<
+                A,
+                $crate::Lazy<A, P>,
+            > as $crate::RecordFields<A, $crate::Lazy<A, P>>>::FULL_NAME;
 
             #[inline]
             fn new_in(alloc: A) -> Self

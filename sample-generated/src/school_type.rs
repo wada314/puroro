@@ -8,6 +8,7 @@
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
+use ::core::marker::PhantomData;
 use ::core::mem;
 use ::core::ops::ControlFlow;
 use ::puroro::{DecodeBuf, DecodeError, HasDefault, Optional, WireType};
@@ -22,7 +23,8 @@ use crate::school::{BIT_NAME, BIT_NAME_SSO, BIT_STUDENT, FIELD_NAME, FIELD_STUDE
 
 type Bits = BitArray<[u8; 1], Lsb0>;
 
-pub(crate) struct SchoolFields<A: Allocator + Clone = Global> {
+/// Eager-only sample; `L` matches generated `*Fields<A, L>` shape.
+pub(crate) struct SchoolFields<A: Allocator + Clone = Global, L = Eager> {
     name: SingularField<
         ProtoString,
         Explicit<{ BIT_NAME }>,
@@ -32,9 +34,10 @@ pub(crate) struct SchoolFields<A: Allocator + Clone = Global> {
     >,
     student:
         SingularField<ProtoMessage<Student<A>>, Explicit<{ BIT_STUDENT }>, { FIELD_STUDENT }, A>,
+    _layout: PhantomData<L>,
 }
 
-impl<A: Allocator + Clone> HasField<{ FIELD_NAME }> for SchoolFields<A> {
+impl<A: Allocator + Clone, L> HasField<{ FIELD_NAME }> for SchoolFields<A, L> {
     type Ref<'a>
         = &'a SingularField<
         ProtoString,
@@ -65,7 +68,7 @@ impl<A: Allocator + Clone> HasField<{ FIELD_NAME }> for SchoolFields<A> {
     }
 }
 
-impl<A: Allocator + Clone> HasField<{ FIELD_STUDENT }> for SchoolFields<A> {
+impl<A: Allocator + Clone, L> HasField<{ FIELD_STUDENT }> for SchoolFields<A, L> {
     type Ref<'a>
         =
         &'a SingularField<ProtoMessage<Student<A>>, Explicit<{ BIT_STUDENT }>, { FIELD_STUDENT }, A>
@@ -91,12 +94,12 @@ impl<A: Allocator + Clone> HasField<{ FIELD_STUDENT }> for SchoolFields<A> {
 }
 
 pub struct School<A: Allocator + Clone = Global> {
-    pub(crate) record: Record<SchoolFields<A>, A, Eager, UnknownFields<A>>,
+    pub(crate) record: Record<SchoolFields<A, Eager>, A, Eager, UnknownFields<A>>,
 }
 
-::puroro_rt::forward_record!(eager School, "example.School");
+::puroro_rt::forward_record!(eager School, SchoolFields);
 
-impl<A: Allocator + Clone> RecordFields<A, Eager> for SchoolFields<A> {
+impl<A: Allocator + Clone> RecordFields<A, Eager> for SchoolFields<A, Eager> {
     type Bits = Bits;
     type Unknown = UnknownFields<A>;
     type EagerMessage = School<A>;
@@ -119,16 +122,17 @@ impl<A: Allocator + Clone> RecordFields<A, Eager> for SchoolFields<A> {
     }
 }
 
-impl<A: Allocator + Clone> ConstructRecordFields<A, Eager> for SchoolFields<A> {
+impl<A: Allocator + Clone> ConstructRecordFields<A, Eager> for SchoolFields<A, Eager> {
     fn new(alloc: A) -> Self {
         Self {
             name: SingularField::new_in(alloc.clone()),
             student: SingularField::new_in(alloc),
+            _layout: PhantomData,
         }
     }
 }
 
-impl<A: Allocator + Clone> CloneRecordFields<A, Eager> for SchoolFields<A> {
+impl<A: Allocator + Clone> CloneRecordFields<A, Eager> for SchoolFields<A, Eager> {
     fn clone_fields(
         &self,
         dst: &mut Self,
@@ -145,7 +149,7 @@ impl<A: Allocator + Clone> CloneRecordFields<A, Eager> for SchoolFields<A> {
     }
 }
 
-impl<A: Allocator + Clone> EagerRecordFields<A> for SchoolFields<A> {
+impl<A: Allocator + Clone> EagerRecordFields<A> for SchoolFields<A, Eager> {
     fn visit_fields<V: FieldVisitor<MessageCommon<Self::Bits, A, Self::Unknown, Eager>>>(
         &self,
         v: &mut V,

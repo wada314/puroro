@@ -561,7 +561,7 @@ mod tests {
             "discard must bake DiscardUnknowns: {content}"
         );
         assert!(
-            content.contains("::puroro_rt::forward_record!(eager Marker, \"Marker\")"),
+            content.contains("::puroro_rt::forward_record!(eager Marker, MarkerFields)"),
             "discard still uses the Record shell, which calls skip_field_and_save_in: {content}"
         );
     }
