@@ -106,6 +106,7 @@ pub fn decode_request(bytes: &[u8]) -> Result<CodegenRequest> {
         let mut file_to_generate = Vec::new();
         let mut parameter = None;
         let mut proto_files = Vec::new();
+        let mut proto_file_raw = Vec::new();
 
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
@@ -116,7 +117,11 @@ pub fn decode_request(bytes: &[u8]) -> Result<CodegenRequest> {
                 2 => parameter = Some(expect_string(&field)?),
                 // optional Version compiler_version = 3; (ignored)
                 // repeated FileDescriptorProto proto_file = 15;
-                15 => proto_files.push(decode_file_descriptor(expect_len(&field)?)?),
+                15 => {
+                    let raw = expect_len(&field)?.to_vec();
+                    proto_files.push(decode_file_descriptor(&raw)?);
+                    proto_file_raw.push(raw);
+                }
                 // repeated FileDescriptorProto source_file_descriptors = 17; (ignored)
                 _ => {}
             }
@@ -128,8 +133,22 @@ pub fn decode_request(bytes: &[u8]) -> Result<CodegenRequest> {
                 parameter,
             },
             proto_files,
+            proto_file_raw,
         })
     })
+}
+
+/// Encode raw `FileDescriptorProto` bodies as a `FileDescriptorSet` wire message.
+///
+/// `google.protobuf.FileDescriptorSet.file` is field 1 (length-delimited). Bodies
+/// are written in the given order without re-parsing.
+pub fn encode_file_descriptor_set(proto_file_raw: &[Vec<u8>]) -> Result<Vec<u8>> {
+    let mut out = Vec::new();
+    for body in proto_file_raw {
+        // repeated FileDescriptorProto file = 1;
+        write_len_field(&mut out, 1, body)?;
+    }
+    Ok(out)
 }
 
 fn decode_file_descriptor(bytes: &[u8]) -> Result<ProtoFile> {
@@ -694,6 +713,7 @@ mod tests {
         assert_eq!(decoded.meta.file_to_generate, vec!["example.proto"]);
         assert_eq!(decoded.meta.parameter.as_deref(), Some("rename=foo"));
         assert_eq!(decoded.proto_files.len(), 1);
+        assert_eq!(decoded.proto_file_raw, vec![file]);
         assert_eq!(decoded.proto_files[0].name, "example.proto");
         assert_eq!(decoded.proto_files[0].package, "example");
         // syntax field omitted → proto2 default

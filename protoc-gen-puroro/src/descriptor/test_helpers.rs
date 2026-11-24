@@ -92,6 +92,9 @@ pub(crate) fn proto_file(name: impl Into<String>, package: impl Into<String>) ->
 }
 
 /// Request that generates every file in `proto_files` (`parameter` unset).
+///
+/// `proto_file_raw` is left empty; only wire-decoded requests carry embedding
+/// bytes for `descriptors::FILE_DESCRIPTOR_SET`.
 pub(crate) fn request(proto_files: Vec<ProtoFile>) -> CodegenRequest {
     CodegenRequest {
         meta: CodegenMeta {
@@ -99,5 +102,6 @@ pub(crate) fn request(proto_files: Vec<ProtoFile>) -> CodegenRequest {
             parameter: None,
         },
         proto_files,
+        proto_file_raw: Vec::new(),
     }
 }

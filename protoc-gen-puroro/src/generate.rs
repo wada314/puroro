@@ -11,7 +11,7 @@ use crate::error::{Error, Result};
 use crate::field_kind::plan_message_storage;
 use crate::module_tree::ModuleForest;
 use crate::module_tree::layout::{ModuleLayout, render};
-use crate::plugin_io::{CodeGeneratorResponse, ResponseFile};
+use crate::plugin_io::{CodeGeneratorResponse, ResponseFile, encode_file_descriptor_set};
 use crate::resolved::{Arena, resolve_with};
 
 /// Package name written into the generated `Cargo.toml` when `crate_name` is unset.
@@ -134,8 +134,8 @@ path = \"lib.rs\"
 
 [features]
 default = []
-# Embed encoded `FileDescriptorSet` bytes as `descriptors::FILE_DESCRIPTOR_SET`.
-# `Message::FULL_NAME` is always available without this.
+# Embed encoded `FileDescriptorSet` (raw CodeGeneratorRequest.proto_file bodies)
+# as `descriptors::FILE_DESCRIPTOR_SET`. `Message::FULL_NAME` needs no feature.
 descriptors = []
 
 [dependencies]
@@ -184,11 +184,13 @@ pub fn generate(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
         forest.install_file(prepare_file(file, &storage)?);
     }
 
+    let file_descriptor_set = encode_file_descriptor_set(&request.proto_file_raw)?;
     let mut files = render(
         &forest,
         &ModuleLayout::SingleFile {
             path: "lib.rs".into(),
         },
+        &file_descriptor_set,
     )?;
     let file = files
         .pop()
@@ -210,13 +212,14 @@ mod tests {
         FieldLabel, FieldType, MessageDesc, MessageLayout, ProtoFile, ProtoFqn, StringLayout,
         Syntax, UnknownFieldsPolicy,
     };
-    use crate::plugin_io::decode_request;
+    use crate::plugin_io::{decode_request, encode_file_descriptor_set};
     use ::protobuf_core::{AsRefExtProtobuf, Field, FieldNumber, FieldValue, WriteExtProtobuf};
     use ::std::env;
     use ::std::fs;
     use ::std::path::{Path, PathBuf};
     use ::std::process::{self, Command};
     use ::std::thread;
+    use ::syn::{Expr, Item, Lit};
 
     /// Successful `generate` results are also written under `generated-preview/`
     /// (gitignored) so the pretty-printed Rust can be inspected. Overwritten
@@ -1034,10 +1037,52 @@ mod tests {
             vec![DESCRIPTOR_PROTO, PLUGIN_PROTO]
         );
         assert_eq!(request.proto_files.len(), 2);
+        assert_eq!(request.proto_file_raw.len(), 2);
+
+        let expected_set = encode_file_descriptor_set(&request.proto_file_raw).unwrap();
+        assert_eq!(expected_set, fds);
 
         let response = generate(&request).unwrap();
         assert_eq!(response.files.len(), 2);
-        assert!(response.files.iter().any(|file| file.name == "lib.rs"));
+        let lib = response
+            .files
+            .iter()
+            .find(|file| file.name == "lib.rs")
+            .expect("lib.rs");
         assert!(response.files.iter().any(|file| file.name == "Cargo.toml"));
+
+        let embedded = extract_file_descriptor_set_literal(&lib.content);
+        assert_eq!(embedded, expected_set);
+    }
+
+    /// Pull `descriptors::FILE_DESCRIPTOR_SET`'s byte literal out of generated Rust.
+    fn extract_file_descriptor_set_literal(lib_rs: &str) -> Vec<u8> {
+        let file: syn::File = syn::parse_str(lib_rs).expect("parse generated lib.rs");
+        for item in file.items {
+            let Item::Mod(module) = item else {
+                continue;
+            };
+            if module.ident != "descriptors" {
+                continue;
+            }
+            let (_, items) = module.content.expect("descriptors mod has a body");
+            for item in items {
+                let Item::Const(item) = item else {
+                    continue;
+                };
+                if item.ident != "FILE_DESCRIPTOR_SET" {
+                    continue;
+                }
+                let Expr::Lit(expr) = *item.expr else {
+                    panic!("FILE_DESCRIPTOR_SET is not a literal");
+                };
+                let Lit::ByteStr(lit) = expr.lit else {
+                    panic!("FILE_DESCRIPTOR_SET is not a byte string");
+                };
+                return lit.value();
+            }
+            panic!("FILE_DESCRIPTOR_SET const missing");
+        }
+        panic!("descriptors module missing");
     }
 }
