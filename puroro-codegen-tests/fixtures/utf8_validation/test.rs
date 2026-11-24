@@ -1,7 +1,7 @@
 //! Editions `utf8_validation=VERIFY` vs `NONE` on string fields.
 
-use crate::utf8_validation::Utf8Fields;
-use puroro::{BytesMut, DecodeError, Message};
+use crate::utf8_validation::{Utf8Fields, Utf8FieldsLazy};
+use puroro::{BytesMut, DecodeError, Message, StringMut};
 
 fn len_field(number: u32, payload: &[u8]) -> Vec<u8> {
     let mut out = Vec::new();
@@ -16,6 +16,28 @@ fn len_field(number: u32, payload: &[u8]) -> Vec<u8> {
 fn verify_rejects_invalid_utf8() {
     let result: Result<Utf8Fields, _> = Utf8Fields::decode(&len_field(1, &[0xff])[..]);
     assert_eq!(result.unwrap_err(), DecodeError::InvalidUtf8);
+}
+
+#[test]
+fn verify_accepts_valid_utf8_round_trip() {
+    let mut msg = Utf8Fields::new();
+    msg.verified_mut().set("こんにちは");
+    assert_eq!(msg.verified().get(), "こんにちは");
+
+    let decoded: Utf8Fields = Utf8Fields::decode(&msg.encode_to_vec()[..]).expect("decode");
+    assert_eq!(decoded.verified().get(), "こんにちは");
+}
+
+#[test]
+fn verify_lazy_fails_on_getter_not_decode() {
+    let wire = len_field(1, &[0xff]);
+    let lazy: Utf8FieldsLazy = Utf8FieldsLazy::decode(&wire[..]).expect("lazy decode Ok");
+    assert_eq!(lazy.verified().err(), Some(DecodeError::InvalidUtf8));
+    assert_eq!(lazy.verified().err(), Some(DecodeError::InvalidUtf8));
+    assert_eq!(
+        lazy.clone().into_eager().err(),
+        Some(DecodeError::InvalidUtf8)
+    );
 }
 
 #[test]
