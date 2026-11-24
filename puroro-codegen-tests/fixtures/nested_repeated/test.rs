@@ -31,3 +31,12 @@ fn repeated_scalars_and_messages_round_trip() {
     assert_eq!(decoded.kind().get(), Kind::A);
     assert_eq!(decoded.child().unwrap().name().get(), "y");
 }
+
+/// proto3 packable `repeated int32` encodes as a single LEN (PACKED default).
+#[test]
+fn packable_repeated_encodes_as_packed_len() {
+    let mut msg = Outer::new();
+    msg.tag_ids_mut().extend_from_slice(&[1, 2, 3]);
+    // field 1 Len tag 0x0A, length 3, payload 01 02 03
+    assert_eq!(msg.encode_to_vec(), vec![0x0A, 3, 1, 2, 3]);
+}

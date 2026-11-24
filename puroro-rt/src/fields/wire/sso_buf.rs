@@ -331,3 +331,39 @@ impl<H, A: Allocator> DefaultIn<A> for SsoBuf<H> {
         Self::empty_inline()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::InlineBuf;
+
+    #[test]
+    fn write_at_does_not_zero_the_uninitialized_tail() {
+        let mut inline = InlineBuf::empty();
+        // Poison every slot, then overwrite only a short prefix the way
+        // `from_bytes` / merge writes do. A regression that zero-fills the
+        // whole `[MaybeUninit; INLINE_CAP]` would clear the poison.
+        for slot in &mut inline.data {
+            slot.write(0xA5);
+        }
+        inline.write_at(0, b"hi");
+        inline.len = 2;
+
+        assert_eq!(inline.as_bytes(), b"hi");
+        for (i, slot) in inline.data.iter().enumerate().skip(2) {
+            // SAFETY: we initialized every slot with `write` above; only the
+            // prefix is part of the public `as_bytes()` contract.
+            assert_eq!(
+                unsafe { slot.assume_init() },
+                0xA5,
+                "tail byte {i} must stay untouched"
+            );
+        }
+    }
+
+    #[test]
+    fn from_bytes_only_exposes_the_initialized_prefix() {
+        let inline = InlineBuf::from_bytes(b"abc");
+        assert_eq!(inline.as_bytes(), b"abc");
+        assert_eq!(inline.len as usize, 3);
+    }
+}

@@ -22,4 +22,13 @@ message Holder {
   map<int32, Kind> kinds = 6;
   map<int32, Peer> peers = 7;
   map<string, string> aliases = 8;
+  // Remaining legal integral / fixed key types (values stay int32 for brevity).
+  map<uint32, int32> u32_keys = 9;
+  map<uint64, int32> u64_keys = 10;
+  map<sint32, int32> s32_keys = 11;
+  map<sint64, int32> s64_keys = 12;
+  map<fixed32, int32> f32_keys = 13;
+  map<fixed64, int32> f64_keys = 14;
+  map<sfixed32, int32> sf32_keys = 15;
+  map<sfixed64, int32> sf64_keys = 16;
 }
