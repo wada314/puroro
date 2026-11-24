@@ -128,8 +128,8 @@ impl<A: Allocator> BytesSlotNew<A> for SpanOnly {
 /// Bundle of layout + store + get for a lazy UTF-8 string slot.
 ///
 /// `Slot: DefaultIn` is required so proto3 [`Implicit`](crate::Implicit)
-/// fields can call [`ValueSlotNew`](crate::fields::shared::value_slot::ValueSlotNew)
-/// through an abstract [`LazyProfile`](crate::decode::LazyProfile)::`StringLen`.
+/// fields can construct an empty slot through an abstract
+/// [`LazyProfile`](crate::decode::LazyProfile)::`StringLen`.
 pub trait LazyStringLen<A: Allocator + Clone>:
     ValueLayout<ProtoString, A, Slot: DefaultIn<A>>
     + ValueLayoutClone<ProtoString, A>
@@ -146,7 +146,7 @@ impl<A: Allocator + Clone> LazyStringLen<A> for SpanOnly {}
 ///
 /// Same `Slot: DefaultIn` rationale as [`LazyStringLen`] (proto3 Implicit).
 /// `ProtoBytes` and `ProtoStringUnchecked` share one physical slot type so
-/// oneof install can convert `BytesSlotNew::new_slot()` without knowing `P`.
+/// oneof install can convert [`BytesSlotNew::new_slot()`] without knowing `P`.
 pub trait LazyBytesLen<A: Allocator + Clone>:
     ValueLayout<ProtoBytes, A, Slot: DefaultIn<A>>
     + ValueLayoutClone<ProtoBytes, A>

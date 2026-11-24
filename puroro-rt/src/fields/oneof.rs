@@ -350,9 +350,8 @@ impl<'f, 'c, E, Pb, A: Allocator, U: UnknownStore<A>, L> OneofSlotMut<'f, 'c, E,
     }
 
     /// Ensures the active variant is `FIELD`; otherwise frees any existing
-    /// variant and installs a fresh one via [`DefaultIn`] on
-    /// [`OneofVariant::Value`]. Returns a mutable reference to the variant's
-    /// field wrapper.
+    /// variant and installs a fresh empty one. Returns a mutable reference to
+    /// the variant's field wrapper.
     ///
     /// Because `E` may own non-droppable storage, switching variants always goes
     /// through this method (or [`set`](Self::set) / [`clear`](Self::clear)) so the
