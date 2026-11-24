@@ -26,6 +26,10 @@ pub const RECURSION_LIMIT: usize = 100;
 /// getter wins method resolution; call the trait method via UFCS
 /// (e.g. [`Message::validate`]).
 ///
+/// [`FULL_NAME`](Self::FULL_NAME) is always present. Encoded descriptor bytes
+/// and `DescribedMessage` need the `descriptors` Cargo feature
+/// (see `DESIGN.md` §3.1).
+///
 /// Wire body sizing / writing (`encoded_len` / `encode_raw` with an encode
 /// context) lives on `puroro_rt::MessageEncode` — not on this trait. Depth-aware
 /// merge lives on `puroro_rt::MessageMerge`. Generated code implements
@@ -49,6 +53,14 @@ pub const RECURSION_LIMIT: usize = 100;
 pub trait Message: Sized {
     /// Allocator that owns this message's heap allocations.
     type Alloc: Allocator;
+
+    /// Absolute protobuf type name without a leading `.`.
+    ///
+    /// Examples: `example.Task`, `example.Task.Inner`, or `Empty` when the file
+    /// has no `package`. Matches the name used in `type.googleapis.com/…` URLs
+    /// (not the descriptor FQN's leading-dot form). Always emitted; independent
+    /// of the `descriptors` Cargo feature.
+    const FULL_NAME: &'static str;
 
     /// Creates an empty message with the given allocator.
     ///

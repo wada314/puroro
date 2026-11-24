@@ -100,7 +100,11 @@ pub(crate) struct PreparedFile {
     messages: Vec<PreparedMessage>,
 }
 
-fn prepare_message(message: &Message<'_>, storage: &MessageStoragePlan) -> Result<PreparedMessage> {
+fn prepare_message(
+    message: &Message<'_>,
+    storage: &MessageStoragePlan,
+    file_name: &str,
+) -> Result<PreparedMessage> {
     if !ident::is_simple_ident(message.name()) {
         return Err(Error::Codegen(format!(
             "cannot use message name `{}` as a Rust identifier",
@@ -110,7 +114,15 @@ fn prepare_message(message: &Message<'_>, storage: &MessageStoragePlan) -> Resul
     let module_name = type_name_to_module_ident(message.name());
     let type_name = ident::escape_ident(message.name());
     let field_plan = plan_fields(message, storage)?;
-    let rendered = message::render_items(&field_plan, &type_name, message.name(), &module_name)?;
+    let full_name = message.fqn().without_leading_dot();
+    let rendered = message::render_items(
+        &field_plan,
+        &type_name,
+        message.name(),
+        &module_name,
+        full_name,
+        file_name,
+    )?;
 
     let nested_enums = message
         .nested_enums()
@@ -119,7 +131,7 @@ fn prepare_message(message: &Message<'_>, storage: &MessageStoragePlan) -> Resul
     let nested = message
         .nested_messages()
         .filter(|m| !m.is_map_entry())
-        .map(|m| prepare_message(m, storage))
+        .map(|m| prepare_message(m, storage, file_name))
         .collect::<Result<Vec<_>>>()?;
 
     Ok(PreparedMessage {
@@ -139,12 +151,13 @@ fn prepare_enum(enumeration: &Enum<'_>) -> Result<PreparedEnum> {
 }
 
 pub(crate) fn prepare_file(file: &File<'_>, storage: &MessageStoragePlan) -> Result<PreparedFile> {
+    let file_name = file.name();
     Ok(PreparedFile {
         package: file.package().to_owned(),
         enums: file.enums().map(prepare_enum).collect::<Result<Vec<_>>>()?,
         messages: file
             .messages()
-            .map(|m| prepare_message(m, storage))
+            .map(|m| prepare_message(m, storage, file_name))
             .collect::<Result<Vec<_>>>()?,
     })
 }

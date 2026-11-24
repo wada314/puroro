@@ -29,6 +29,12 @@ workspace = true
 [lib]
 bench = false
 
+[features]
+default = []
+# Embedded FileDescriptorSet helpers and [`DescribedMessage`]. Generated crates
+# mirror this as `descriptors = ["puroro/descriptors"]`.
+descriptors = []
+
 [dependencies]
 allocator-api2 = "0.2"
 bytes = "1"

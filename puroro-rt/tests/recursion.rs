@@ -112,6 +112,7 @@ impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for Nest<A> {
 
 impl<A: Allocator + Clone> Message for Nest<A> {
     type Alloc = A;
+    const FULL_NAME: &'static str = "test.Nest";
 
     fn new_in(alloc: A) -> Self {
         Self::new_in(alloc)

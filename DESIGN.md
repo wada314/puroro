@@ -178,6 +178,8 @@ The user-facing trait is slimmer than the generated catalog traits. Wire-body si
 ```rust
 pub trait Message: Sized {
     type Alloc: Allocator; // Clone is required on new_in / merge_from, not on the associated type
+    /// Absolute protobuf type name without a leading `.` (`example.Task`).
+    const FULL_NAME: &'static str;
     fn new_in(alloc: Self::Alloc) -> Self
     where
         Self::Alloc: Clone;
@@ -203,6 +205,52 @@ pub trait Message: Sized {
 ```
 
 `encode` / `merge_from` are generic over `BufMut` / `Buf` so the compiler can monomorphise; the trait is **non-object-safe** by design.
+
+### 3.1 Message identity and descriptors
+
+Two layers. Light identity is always on; encoded descriptor bytes are opt-in.
+
+#### Always on — `Message::FULL_NAME`
+
+Every generated message (eager and lazy) sets [`Message::FULL_NAME`](src/message.rs) to the absolute protobuf type name **without** a leading `.` (`example.Task`, nested `example.Task.Inner`, or `Empty` when the file has no `package`). That matches `type.googleapis.com/…` URLs. The catalog stores the same string as [`RecordFields::FULL_NAME`](puroro-rt/src/message_record.rs); `forward_record!(eager Task, "example.Task")` forwards it onto the user type.
+
+This is not a reflection API: there is no field table, no dynamic get/set, and no `DynamicMessage`.
+
+#### Opt-in — Cargo feature `descriptors`
+
+| Crate | Feature | Effect |
+|---|---|---|
+| `puroro` | `descriptors` | Exposes [`descriptors`](src/descriptors.rs): [`FileDescriptorSetBytes`](src/descriptors.rs), [`DescribedMessage`](src/descriptors.rs) |
+| Generated crate (and `puroro-sample-generated`) | `descriptors = ["puroro/descriptors"]` | Crate-root `descriptors::FILE_DESCRIPTOR_SET` plus `DescribedMessage` on each message |
+
+Default features stay empty on both sides so ordinary encode/decode builds do not pull schema bytes.
+
+```rust
+// puroro (feature = "descriptors")
+pub struct FileDescriptorSetBytes(/* &'static [u8] */);
+impl FileDescriptorSetBytes {
+    pub const fn new(bytes: &'static [u8]) -> Self;
+    pub const fn as_bytes(self) -> &'static [u8];
+}
+
+pub trait DescribedMessage: Message {
+    /// `FileDescriptorProto.name` of the declaring file.
+    const FILE_NAME: &'static str;
+}
+
+// generated crate (feature = "descriptors")
+pub mod descriptors {
+    pub const FILE_DESCRIPTOR_SET: ::puroro::descriptors::FileDescriptorSetBytes = /* … */;
+}
+```
+
+Embedding unit is **one crate-wide `FileDescriptorSet`**, not a copy per message. Each message only records `FILE_NAME` so a consumer can find its `FileDescriptorProto` inside the set (needed for gRPC server reflection and similar). Nested messages use the outer file's name.
+
+**Plugin status.** The generator already emits `FULL_NAME`, the generated `Cargo.toml` `descriptors` feature, per-message `DescribedMessage` impls, and a cfg-gated `descriptors` module. The set bytes are still an **empty stub**. A follow-up should preserve raw `CodeGeneratorRequest.proto_file` LEN bodies (the IR is a lossy subset) and wrap them as a `FileDescriptorSet` in that constant — prefer a Rust byte literal (or `ResponseFile` content as `Vec<u8>`) over assuming UTF-8 `string` content.
+
+**Sample.** [`sample-generated`](sample-generated/) enables the same feature flag and sketches `descriptors::FILE_DESCRIPTOR_SET` plus `DescribedMessage` for `Task` / `Address` / ….
+
+**Out of scope here.** Runtime field reflection, `DynamicMessage`, and a parsed `MessageDescriptor` object graph. Those stay under [Other future work](#other-future-work).
 
 **Merge semantics** (identical across proto2, proto3, editions): singular scalar — last wins; singular message — recursive merge; repeated — append; unknown fields — accumulated for round-trip.
 
@@ -1491,6 +1539,7 @@ Generic code that only reads fields is meant to use `task::MessageFallible` with
 - **Unknown-field reject-on-decode.** Shipped as `(puroro.unknown_fields) = REJECT` ([§4.9](#49-unknown-fields)). This failure is outside the protobuf spec. File-level / package default is not wired, same as Discard.
 - **Service / RPC definitions.** Out of scope for the runtime library.
 - **Well-known types.** `google.protobuf.Timestamp`, `Duration`, `Any`, etc.
-- **Reflection / descriptors.** Runtime introspection of message schema.
+- **Descriptor set embedding.** [`Message::FULL_NAME`](#31-message-identity-and-descriptors) and the `descriptors` feature surface are sketched; embedding real `FileDescriptorSet` bytes from the plugin request is still open.
+- **Reflection / `DynamicMessage`.** Runtime field introspection and schema object graphs (beyond the opt-in byte embedding above).
 - **Extensions.** See §6.5.
 - **Repeated / map string and bytes SSO.** Singular string / bytes SSO and singular message inline-or-box are shipped. Repeated and map payloads stay on the heap — see [IMPLEMENTATION.md §17.2](IMPLEMENTATION.md#172-string--bytes-inline-optimisation).

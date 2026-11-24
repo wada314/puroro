@@ -191,6 +191,7 @@ impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for FlatScalars<A> {
 
 impl<A: Allocator + Clone> Message for FlatScalars<A> {
     type Alloc = A;
+    const FULL_NAME: &'static str = "bench.FlatScalars";
 
     fn new_in(alloc: A) -> Self {
         Self::new_in(alloc)
@@ -337,6 +338,7 @@ impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for Nest<A> {
 
 impl<A: Allocator + Clone> Message for Nest<A> {
     type Alloc = A;
+    const FULL_NAME: &'static str = "bench.Nest";
 
     fn new_in(alloc: A) -> Self {
         Self::new_in(alloc)
@@ -471,6 +473,7 @@ impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for Leaf<A> {
 
 impl<A: Allocator + Clone> Message for Leaf<A> {
     type Alloc = A;
+    const FULL_NAME: &'static str = "bench.Leaf";
 
     fn new_in(alloc: A) -> Self {
         Self::new_in(alloc)
@@ -617,6 +620,7 @@ macro_rules! impl_wrap_message {
 
         impl<A: Allocator + Clone> Message for $ty<A> {
             type Alloc = A;
+            const FULL_NAME: &'static str = "bench.MacroMsg";
 
             fn new_in(alloc: A) -> Self {
                 Self::new_in(alloc)
@@ -757,6 +761,7 @@ impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for PackedInts<A> {
 
 impl<A: Allocator + Clone> Message for PackedInts<A> {
     type Alloc = A;
+    const FULL_NAME: &'static str = "bench.PackedInts";
 
     fn new_in(alloc: A) -> Self {
         Self::new_in(alloc)
@@ -948,6 +953,7 @@ impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for StringHeavy<A> {
 
 impl<A: Allocator + Clone> Message for StringHeavy<A> {
     type Alloc = A;
+    const FULL_NAME: &'static str = "bench.StringHeavy";
 
     fn new_in(alloc: A) -> Self {
         Self::new_in(alloc)
@@ -1126,6 +1132,7 @@ impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for ShortStrings<A> {
 
 impl<A: Allocator + Clone> Message for ShortStrings<A> {
     type Alloc = A;
+    const FULL_NAME: &'static str = "bench.ShortStrings";
 
     fn new_in(alloc: A) -> Self {
         Self::new_in(alloc)

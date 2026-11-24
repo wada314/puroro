@@ -223,6 +223,7 @@ macro_rules! impl_eight_string_message {
 
         impl<A: Allocator + Clone> Message for $ty<A> {
             type Alloc = A;
+            const FULL_NAME: &'static str = "bench.StringLayout";
 
             fn new_in(alloc: A) -> Self {
                 Self::new_in(alloc)

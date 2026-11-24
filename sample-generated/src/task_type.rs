@@ -245,8 +245,8 @@ pub struct TaskLazy<A: Allocator + Clone = Global, P: LazyProfile = Owned> {
     pub(crate) record: Record<TaskFields<A, Lazy<A, P>>, A, Lazy<A, P>, UnknownFields<A>>,
 }
 
-::puroro_rt::forward_record!(eager Task);
-::puroro_rt::forward_record!(lazy TaskLazy);
+::puroro_rt::forward_record!(eager Task, "example.Task");
+::puroro_rt::forward_record!(lazy TaskLazy, "example.Task");
 
 impl<A: Allocator + Clone, L: task::Layout<A> + MessageScan<A>> RecordFields<A, L>
     for TaskFields<A, L>
@@ -257,6 +257,7 @@ impl<A: Allocator + Clone, L: task::Layout<A> + MessageScan<A>> RecordFields<A, 
 
     const EAGER_NAME: &'static str = "Task";
     const LAZY_NAME: &'static str = "TaskLazy";
+    const FULL_NAME: &'static str = "example.Task";
     const CHECKS_REQUIRED: bool = true;
 
     fn empty_bits() -> Self::Bits {

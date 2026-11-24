@@ -62,6 +62,14 @@ impl ProtoFqn {
         &self.0
     }
 
+    /// Absolute type name without the leading `.` (`example.v1.Task`).
+    ///
+    /// Used for `puroro::Message::FULL_NAME`. The package-root sentinel `"."`
+    /// yields an empty string (not a message name).
+    pub fn without_leading_dot(&self) -> &str {
+        self.0.strip_prefix('.').unwrap_or(&self.0)
+    }
+
     /// Whether this is the synthetic empty-package root (`"."`), not a real type.
     pub fn is_package_root(&self) -> bool {
         self.0 == "."
@@ -114,6 +122,15 @@ mod tests {
     fn parse_adds_leading_dot() {
         assert_eq!(ProtoFqn::parse("example.Task").as_str(), ".example.Task");
         assert_eq!(ProtoFqn::parse(".example.Task").as_str(), ".example.Task");
+    }
+
+    #[test]
+    fn without_leading_dot_strips_prefix() {
+        assert_eq!(
+            ProtoFqn::parse(".example.Task").without_leading_dot(),
+            "example.Task"
+        );
+        assert_eq!(ProtoFqn::from_package("").without_leading_dot(), "");
     }
 
     #[test]

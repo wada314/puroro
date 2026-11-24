@@ -54,6 +54,7 @@ fn render_node_items(node: &ModuleNode, is_forest_root: bool) -> Vec<Item> {
     let mut items = Vec::new();
     if is_forest_root {
         items.push(puroro_reexport());
+        items.push(descriptors_module_stub());
         items.extend(node.items().iter().cloned());
         items.push(root_alias_item(true));
         items.extend(node.children().iter().map(render_child_mod));
@@ -84,6 +85,25 @@ fn render_child_mod(child: &ModuleNode) -> Item {
 fn puroro_reexport() -> Item {
     parse_quote! {
         pub use ::puroro;
+    }
+}
+
+/// Opt-in `FileDescriptorSet` embedding (`descriptors` feature).
+///
+/// Bytes are an empty stub until the plugin preserves raw
+/// `CodeGeneratorRequest.proto_file` payloads (see DESIGN.md §3.1).
+fn descriptors_module_stub() -> Item {
+    parse_quote! {
+        /// Encoded `google.protobuf.FileDescriptorSet` for this crate (opt-in).
+        ///
+        /// Enable this crate's `descriptors` feature. The payload is currently an
+        /// empty stub; a later change embeds the request's `proto_file` blobs.
+        #[cfg(feature = "descriptors")]
+        pub mod descriptors {
+            /// Crate-wide descriptor set (empty stub until embedding lands).
+            pub const FILE_DESCRIPTOR_SET: ::puroro::descriptors::FileDescriptorSetBytes =
+                ::puroro::descriptors::FileDescriptorSetBytes::new(&[]);
+        }
     }
 }
 
@@ -169,6 +189,8 @@ mod tests {
         assert!(file.content.contains("pub struct Empty"));
         assert!(file.content.contains("allow"));
         assert!(file.content.contains("pub use ::puroro"));
+        assert!(file.content.contains("mod descriptors"));
+        assert!(file.content.contains("FILE_DESCRIPTOR_SET"));
         assert!(file.content.contains("mod _root"));
         assert!(file.content.contains("use super::*;"));
     }

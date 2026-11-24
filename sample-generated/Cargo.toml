@@ -8,11 +8,16 @@ description = "Hand-written sample of puroro protoc plugin output (Task / Addres
 [lints]
 workspace = true
 
+[features]
+default = []
+# Mirrors generated crates: opt-in FileDescriptorSet helpers on `puroro`.
+descriptors = ["puroro/descriptors"]
+
 [dependencies]
 allocator-api2 = "0.2"
 bitvec = "1"
 bytes = "1"
-puroro = { path = ".." }
+puroro = { path = "..", default-features = false }
 puroro-rt = { path = "../puroro-rt" }
 
 [dev-dependencies]

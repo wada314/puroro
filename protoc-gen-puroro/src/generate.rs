@@ -85,10 +85,17 @@ fn parse_crate_name(value: &str) -> Result<String> {
 fn cargo_manifest(crate_name: &str) -> ResponseFile {
     let mut dependencies = String::new();
     for (name, version) in GENERATED_DEPENDENCIES {
-        dependencies.push_str(name);
-        dependencies.push_str(" = \"");
-        dependencies.push_str(version);
-        dependencies.push_str("\"\n");
+        if *name == "puroro" {
+            // Opt into `descriptors` via the generated crate feature below.
+            dependencies.push_str("puroro = { version = \"");
+            dependencies.push_str(version);
+            dependencies.push_str("\", default-features = false }\n");
+        } else {
+            dependencies.push_str(name);
+            dependencies.push_str(" = \"");
+            dependencies.push_str(version);
+            dependencies.push_str("\"\n");
+        }
     }
     ResponseFile {
         name: "Cargo.toml".to_owned(),
@@ -106,6 +113,12 @@ publish = false
 
 [lib]
 path = \"lib.rs\"
+
+[features]
+default = []
+# Embed `FileDescriptorSet` helpers (`puroro::descriptors`) and per-message
+# `DescribedMessage`. `Message::FULL_NAME` is always available without this.
+descriptors = [\"puroro/descriptors\"]
 
 [dependencies]
 {dependencies}"
@@ -284,8 +297,19 @@ mod tests {
             .find(|file| file.name == "Cargo.toml")
             .expect("Cargo.toml");
         assert!(manifest.content.contains("name = \"library-proto\""));
+        assert!(
+            manifest
+                .content
+                .contains("descriptors = [\"puroro/descriptors\"]"),
+            "missing descriptors feature: {}",
+            manifest.content
+        );
         for (name, version) in GENERATED_DEPENDENCIES {
-            let line = format!("{name} = \"{version}\"");
+            let line = if *name == "puroro" {
+                format!("puroro = {{ version = \"{version}\", default-features = false }}")
+            } else {
+                format!("{name} = \"{version}\"")
+            };
             assert!(manifest.content.contains(&line), "missing {line}");
         }
         let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("..");
@@ -503,7 +527,7 @@ mod tests {
             "discard must bake DiscardUnknowns: {content}"
         );
         assert!(
-            content.contains("::puroro_rt::forward_record!(eager Marker)"),
+            content.contains("::puroro_rt::forward_record!(eager Marker, \"Marker\")"),
             "discard still uses the Record shell, which calls skip_field_and_save_in: {content}"
         );
     }
