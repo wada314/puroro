@@ -85,8 +85,8 @@ pub struct AddressLazy<A: Allocator + Clone = Global, P: LazyProfile = Owned> {
     pub(crate) record: Record<AddressFields<A, Lazy<A, P>>, A, Lazy<A, P>, UnknownFields<A>>,
 }
 
-::puroro_rt::forward_record!(eager Address, "example.Address");
-::puroro_rt::forward_record!(lazy AddressLazy, "example.Address");
+::puroro_rt::forward_record!(eager Address, AddressFields);
+::puroro_rt::forward_record!(lazy AddressLazy, AddressFields);
 
 impl<A: Allocator + Clone, L: address::Layout<A> + MessageScan<A>> RecordFields<A, L>
     for AddressFields<A, L>

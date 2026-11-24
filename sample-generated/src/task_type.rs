@@ -245,8 +245,8 @@ pub struct TaskLazy<A: Allocator + Clone = Global, P: LazyProfile = Owned> {
     pub(crate) record: Record<TaskFields<A, Lazy<A, P>>, A, Lazy<A, P>, UnknownFields<A>>,
 }
 
-::puroro_rt::forward_record!(eager Task, "example.Task");
-::puroro_rt::forward_record!(lazy TaskLazy, "example.Task");
+::puroro_rt::forward_record!(eager Task, TaskFields);
+::puroro_rt::forward_record!(lazy TaskLazy, TaskFields);
 
 impl<A: Allocator + Clone, L: task::Layout<A> + MessageScan<A>> RecordFields<A, L>
     for TaskFields<A, L>

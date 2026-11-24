@@ -220,7 +220,7 @@ Two layers. Light identity is always on; encoded descriptor bytes are opt-in on 
 
 #### Always on — `Message::FULL_NAME`
 
-Every generated message (eager and lazy) sets [`Message::FULL_NAME`](src/message.rs) to the absolute protobuf type name **without** a leading `.` (`example.Task`, nested `example.Task.Inner`, or `Empty` when the file has no `package`). That matches `type.googleapis.com/…` URLs. The catalog stores the same string as [`RecordFields::FULL_NAME`](puroro-rt/src/message_record.rs); `forward_record!(eager Task, "example.Task")` forwards it onto the user type.
+Every generated message (eager and lazy) sets [`Message::FULL_NAME`](src/message.rs) to the absolute protobuf type name **without** a leading `.` (`example.Task`, nested `example.Task.Inner`, or `Empty` when the file has no `package`). That matches `type.googleapis.com/…` URLs. The catalog owns the string as [`RecordFields::FULL_NAME`](puroro-rt/src/message_record.rs); `forward_record!(eager Task, TaskFields)` forwards it onto the user type from `$fields<A, Eager>` / `$fields<A, Lazy<…>>`.
 
 This is not a reflection API: there is no field table, no dynamic get/set, and no `DynamicMessage`. Look up a message inside an embedded set by this name when needed.
 
