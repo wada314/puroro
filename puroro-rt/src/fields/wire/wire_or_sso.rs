@@ -71,14 +71,21 @@ impl<H> WireOrSsoSlot<H> {
         }
     }
 
+    /// Overwrite the union as a Wire span. Does not free a previous Heap arm;
+    /// callers must start from [`empty()`](Self::empty) or free the old
+    /// payload first.
+    pub fn set_wire(&mut self, span: WireSpan) {
+        unsafe {
+            *self.inner.get() = WireOrSsoUnion { wire: span };
+        }
+    }
+
     fn store_wire_inner<A: Allocator>(&mut self, span: WireSpan, old_arm: WireOrSsoKind, alloc: &A)
     where
         H: SsoHeap<A>,
     {
         self.deallocate_inner(old_arm, alloc);
-        unsafe {
-            *self.inner.get() = WireOrSsoUnion { wire: span };
-        }
+        self.set_wire(span);
     }
 
     fn deallocate_inner<A: Allocator>(&mut self, arm: WireOrSsoKind, alloc: &A)
@@ -198,31 +205,6 @@ impl<A: Allocator> WireOrSsoSlot<UnmanagedString<A>> {
             }
         }
     }
-
-    /// UTF-8 check against `wire` without promoting the slot.
-    ///
-    /// Used by borrowed lazy getters (`B = &[u8]`). Does not set Failed.
-    pub fn peek_str<'buf>(
-        &self,
-        arm: WireOrSsoKind,
-        wire: &'buf [u8],
-    ) -> Result<&'buf str, DecodeError> {
-        match arm {
-            WireOrSsoKind::Wire | WireOrSsoKind::Failed => {
-                let span = unsafe { (*self.inner.get()).wire };
-                let bytes = span.slice(wire)?;
-                str::from_utf8(bytes).map_err(|_| DecodeError::InvalidUtf8)
-            }
-            WireOrSsoKind::Inline | WireOrSsoKind::Heap => {
-                // Borrowed decode never promotes; Inline / Heap should not appear.
-                debug_assert!(
-                    false,
-                    "WireOrSso::peek_str: Inline/Heap arm is unreachable on borrowed wire"
-                );
-                Err(DecodeError::InvalidUtf8)
-            }
-        }
-    }
 }
 
 impl<A: Allocator> WireOrSsoSlot<UnmanagedVec<u8, A>> {
@@ -277,29 +259,6 @@ impl<A: Allocator> WireOrSsoSlot<UnmanagedVec<u8, A>> {
                     set_arm(WireOrSsoKind::Heap);
                     Ok(unsafe { (*self.inner.get()).heap.as_slice() })
                 }
-            }
-        }
-    }
-
-    /// Slice the wire span without promoting the slot.
-    ///
-    /// Used by borrowed lazy getters (`B = &[u8]`).
-    pub fn peek_bytes<'buf>(
-        &self,
-        arm: WireOrSsoKind,
-        wire: &'buf [u8],
-    ) -> Result<&'buf [u8], DecodeError> {
-        match arm {
-            WireOrSsoKind::Wire | WireOrSsoKind::Failed => {
-                let span = unsafe { (*self.inner.get()).wire };
-                span.slice(wire)
-            }
-            WireOrSsoKind::Inline | WireOrSsoKind::Heap => {
-                debug_assert!(
-                    false,
-                    "WireOrSso::peek_bytes: Inline/Heap arm is unreachable on borrowed wire"
-                );
-                Err(DecodeError::TruncatedMessage)
             }
         }
     }
@@ -471,7 +430,7 @@ impl<A: Allocator, const KIND: usize> LazyLenStore<ProtoString, A> for WireOrSso
         let old = Self::kind(common);
         let alloc = common.clone_alloc();
         let mut next: WireOrSsoSlot<UnmanagedString<A>> = WireOrSsoSlot::empty();
-        next.store_wire(span, WireOrSsoKind::Wire, &alloc);
+        next.set_wire(span);
         if let Some(mut prev) = ValueSlot::with_mut(slot, init, common).replace(next) {
             prev.deallocate(old, &alloc);
         }
@@ -492,7 +451,7 @@ impl<A: Allocator, const KIND: usize, C: BytesLikeLenCodec> LazyLenStore<LenScal
         let old = Self::kind(common);
         let alloc = common.clone_alloc();
         let mut next: WireOrSsoSlot<UnmanagedVec<u8, A>> = WireOrSsoSlot::empty();
-        next.store_wire(span, WireOrSsoKind::Wire, &alloc);
+        next.set_wire(span);
         if let Some(mut prev) = ValueSlot::with_mut(slot, init, common).replace(next) {
             prev.deallocate(old, &alloc);
         }

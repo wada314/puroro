@@ -172,7 +172,7 @@ impl SingularMutStyle {
 /// How a singular field or oneof variant is read.
 ///
 /// A len slot (string / bytes) still has an eager arm: lazy getters call
-/// `try_str` / `try_bytes`, and eager getters use [`LenEagerRead`].
+/// `profile_str` / `profile_bytes`, and eager getters use [`LenEagerRead`].
 #[derive(Clone, Copy)]
 pub(super) enum GetterShape {
     /// `.value()` → `implicit_ty`.

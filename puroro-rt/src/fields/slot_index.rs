@@ -26,7 +26,6 @@ use super::wire::lazy_len::{LazyBytesGet, LazyStringGet};
 use super::wire::len::{BytesLikeLenCodec, LenScalar};
 use super::wire::repeated_element::RepeatedElement;
 use super::wire::singular_type::SingularType;
-use super::wire::wire_or_sso::WireOrSso;
 use crate::ProtoString;
 
 /// Map protobuf field number `N` to the value generated code reads and writes.
@@ -105,60 +104,6 @@ impl<'a, E, const N: u32> OneofFieldRef<'a, E, N> {
     }
 }
 
-impl<'a, E, const N: u32, A, const KIND: usize, D> OneofFieldRef<'a, E, N>
-where
-    A: Allocator + Clone,
-    E: OneofVariant<
-            N,
-            Value = SingularField<
-                ProtoString,
-                super::shared::field_presence::Oneof,
-                N,
-                A,
-                WireOrSso<KIND>,
-                D,
-            >,
-        >,
-{
-    /// UTF-8 read of variant `N`. Absent when another variant is active.
-    #[inline]
-    pub fn try_str<Pb, U, L>(
-        self,
-        common: &'a MessageCommon<Pb, A, U, L>,
-        wire: &'a [u8],
-    ) -> Result<Optional<&'a str, D>, DecodeError>
-    where
-        U: UnknownStore<A>,
-        Pb: BitStorage,
-        D: HasDefault<&'a str> + 'a,
-        MessageCommon<Pb, A, U, L>: MessageCommonSharedBits,
-    {
-        match self.bind(common).as_field() {
-            Some(field) => field.try_str(common, wire),
-            None => Ok(Optional::new(None)),
-        }
-    }
-
-    /// UTF-8 peek of variant `N` without promoting (borrowed lazy wire).
-    #[inline]
-    pub fn peek_str<'buf, Pb, U, L>(
-        self,
-        common: &MessageCommon<Pb, A, U, L>,
-        wire: &'buf [u8],
-    ) -> Result<Optional<&'buf str, D>, DecodeError>
-    where
-        U: UnknownStore<A>,
-        Pb: BitStorage,
-        D: HasDefault<&'buf str>,
-        MessageCommon<Pb, A, U, L>: MessageCommonSharedBits,
-    {
-        match self.bind(common).as_field() {
-            Some(field) => field.peek_str(common, wire),
-            None => Ok(Optional::new(None)),
-        }
-    }
-}
-
 impl<'a, E, const N: u32, A, Len, D> OneofFieldRef<'a, E, N>
 where
     A: Allocator + Clone,
@@ -183,62 +128,6 @@ where
     {
         match self.bind(common).as_field() {
             Some(field) => field.profile_str(common, wire),
-            None => Ok(Optional::new(None)),
-        }
-    }
-}
-
-impl<'a, E, const N: u32, C, A, const KIND: usize, D> OneofFieldRef<'a, E, N>
-where
-    C: BytesLikeLenCodec,
-    A: Allocator + Clone,
-    E: OneofVariant<
-            N,
-            Value = SingularField<
-                LenScalar<C>,
-                super::shared::field_presence::Oneof,
-                N,
-                A,
-                WireOrSso<KIND>,
-                D,
-            >,
-        >,
-{
-    /// Bytes read of variant `N`. Absent when another variant is active.
-    #[inline]
-    pub fn try_bytes<Pb, U, L>(
-        self,
-        common: &'a MessageCommon<Pb, A, U, L>,
-        wire: &'a [u8],
-    ) -> Result<Optional<&'a [u8], D>, DecodeError>
-    where
-        U: UnknownStore<A>,
-        Pb: BitStorage,
-        C: 'a,
-        D: HasDefault<&'a [u8]> + 'a,
-        MessageCommon<Pb, A, U, L>: MessageCommonSharedBits,
-    {
-        match self.bind(common).as_field() {
-            Some(field) => field.try_bytes(common, wire),
-            None => Ok(Optional::new(None)),
-        }
-    }
-
-    /// Bytes peek of variant `N` without promoting (borrowed lazy wire).
-    #[inline]
-    pub fn peek_bytes<'buf, Pb, U, L>(
-        self,
-        common: &MessageCommon<Pb, A, U, L>,
-        wire: &'buf [u8],
-    ) -> Result<Optional<&'buf [u8], D>, DecodeError>
-    where
-        U: UnknownStore<A>,
-        Pb: BitStorage,
-        D: HasDefault<&'buf [u8]>,
-        MessageCommon<Pb, A, U, L>: MessageCommonSharedBits,
-    {
-        match self.bind(common).as_field() {
-            Some(field) => field.peek_bytes(common, wire),
             None => Ok(Optional::new(None)),
         }
     }

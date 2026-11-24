@@ -75,8 +75,8 @@ pub trait ValueLayout<T: SingularType, A: Allocator>: Copy {
 }
 
 /// Infallible slot view. Kept off [`ValueLayout`] so layouts that need an
-/// island buffer ([`WireOrSso`](crate::WireOrSso)) promote via `try_str` /
-/// `try_bytes` instead of returning a dummy empty view.
+/// island buffer ([`WireOrSso`](crate::WireOrSso) / [`crate::SpanOnly`]) read
+/// via `profile_str` / `profile_bytes` instead of returning a dummy empty view.
 pub trait ValueLayoutGet<T: SingularType, A: Allocator>: ValueLayout<T, A> {
     fn get<'a, Cx>(slot: &'a Self::Slot, common: &'a Cx) -> T::View<'a, A>
     where

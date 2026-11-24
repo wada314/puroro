@@ -40,12 +40,16 @@ Public string/bytes getters return `&'msg str` / `&'msg [u8]` tied to
    getters via `P::get_str`. Both profiles still used `WireOrSso`.
 2. **Phase B (this):** `StringLen` / `BytesLen` on the profile. `Owned` keeps
    `WireOrSso`; `Borrowed` uses `SpanOnly` (no Inline/Heap/Failed). Kind bit
-   allocations stay for v1 (`SpanOnly` ignores `KIND`). Bit-planner shrink is
-   a follow-up.
+   allocations stay for v1 (`SpanOnly` ignores `KIND`).
+
+## Follow-ups
+
+- [ ] Bit-planner shrink: drop the two kind bits per singular LEN when the
+  profile is span-only (`Borrowed` / future `NoCache`), so `Borrowed` messages
+  do not permanently pay unused bits.
 
 ## Non-goals
 
 - GAT-free `&str` in fully generic signatures
 - Rope / `&Vec<u8>` as `Buf`
 - Public `as_borrowed` dual getters
-- Shrinking lazy bit maps when every LEN slot is span-only
