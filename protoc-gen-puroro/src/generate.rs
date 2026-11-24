@@ -27,22 +27,6 @@ struct GeneratedDependency {
 }
 
 impl GeneratedDependency {
-    const fn version_only(name: &'static str, version: &'static str) -> Self {
-        Self {
-            name,
-            version,
-            default_features: true,
-        }
-    }
-
-    const fn without_default_features(name: &'static str, version: &'static str) -> Self {
-        Self {
-            name,
-            version,
-            default_features: false,
-        }
-    }
-
     /// One `[dependencies]` line, including the trailing newline.
     fn toml_line(&self) -> String {
         if self.default_features {
@@ -59,11 +43,31 @@ impl GeneratedDependency {
 /// Crates that generated `lib.rs` names directly, with the package version from
 /// the `Cargo.lock` that compiled this plugin (`build.rs`).
 const GENERATED_DEPENDENCIES: &[GeneratedDependency] = &[
-    GeneratedDependency::version_only("allocator-api2", env!("PURORO_GEN_DEP_ALLOCATOR_API2")),
-    GeneratedDependency::version_only("bitvec", env!("PURORO_GEN_DEP_BITVEC")),
-    GeneratedDependency::version_only("bytes", env!("PURORO_GEN_DEP_BYTES")),
-    GeneratedDependency::without_default_features("puroro", env!("PURORO_GEN_DEP_PURORO")),
-    GeneratedDependency::version_only("puroro-rt", env!("PURORO_GEN_DEP_PURORO_RT")),
+    GeneratedDependency {
+        name: "allocator-api2",
+        version: env!("PURORO_GEN_DEP_ALLOCATOR_API2"),
+        default_features: true,
+    },
+    GeneratedDependency {
+        name: "bitvec",
+        version: env!("PURORO_GEN_DEP_BITVEC"),
+        default_features: true,
+    },
+    GeneratedDependency {
+        name: "bytes",
+        version: env!("PURORO_GEN_DEP_BYTES"),
+        default_features: true,
+    },
+    GeneratedDependency {
+        name: "puroro",
+        version: env!("PURORO_GEN_DEP_PURORO"),
+        default_features: false,
+    },
+    GeneratedDependency {
+        name: "puroro-rt",
+        version: env!("PURORO_GEN_DEP_PURORO_RT"),
+        default_features: true,
+    },
 ];
 
 /// Generate-time knobs parsed from [`CodegenRequest`] `parameter`.
