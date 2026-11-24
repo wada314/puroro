@@ -245,9 +245,9 @@ One crate-wide byte slice — not a copy per message, not a newtype, and no per-
 
 Inside that set, each `FileDescriptorProto.name` is a path relative to the proto source-tree root with `/` separators (e.g. `foo/bar/baz.proto`). It is **not** a host OS path; protoc canonicalizes Windows `\` to `/` before the plugin sees the request.
 
-**Plugin status.** The generator already emits `FULL_NAME`, the generated `Cargo.toml` `descriptors` feature, and a cfg-gated `descriptors` module. The set bytes are still an **empty stub**: `FILE_DESCRIPTOR_SET` is `&[]`. Enabling the feature compiles the module in, but that slice is **not** a usable set for gRPC server reflection (empty does not mean “no files in the schema”). A follow-up should preserve raw `CodeGeneratorRequest.proto_file` LEN bodies (the IR is a lossy subset) and wrap them as a `FileDescriptorSet` in that constant — prefer a Rust byte literal (or `ResponseFile` content as `Vec<u8>`) over assuming UTF-8 `string` content.
+**Plugin status.** The generator emits `FULL_NAME`, the generated `Cargo.toml` `descriptors` feature, and a cfg-gated `descriptors` module. `FILE_DESCRIPTOR_SET` is a Rust byte literal built from the preserved raw `CodeGeneratorRequest.proto_file` LEN bodies (the IR is a lossy subset and is not re-encoded), wrapped as `FileDescriptorSet.file` in protoc's order. Hand-built / test requests without wire payloads still emit an empty literal.
 
-**Sample.** [`sample-generated`](sample-generated/) uses the same feature flag and sketches `descriptors::FILE_DESCRIPTOR_SET`.
+**Sample.** [`sample-generated`](sample-generated/) uses the same feature flag. Its `FILE_DESCRIPTOR_SET` stays an empty sketch because that crate is hand-written, not produced by `protoc`.
 
 **Out of scope here.** Runtime field reflection, `DynamicMessage`, and a parsed `MessageDescriptor` object graph. Those stay under [Other future work](#other-future-work).
 
@@ -1535,7 +1535,7 @@ Generic code that only reads fields is meant to use `task::MessageFallible` with
 - **Unknown-field reject-on-decode.** Shipped as `(puroro.unknown_fields) = REJECT` ([§4.9](#49-unknown-fields)). This failure is outside the protobuf spec. File-level / package default is not wired, same as Discard.
 - **Service / RPC definitions.** Out of scope for the runtime library.
 - **Well-known types.** `google.protobuf.Timestamp`, `Duration`, `Any`, etc.
-- **Descriptor set embedding.** [`Message::FULL_NAME`](#31-message-identity-and-descriptors) and the `descriptors` feature surface are sketched; embedding real `FileDescriptorSet` bytes from the plugin request is still open.
+- **Descriptor set embedding.** [`Message::FULL_NAME`](#31-message-identity-and-descriptors) and the generated-crate `descriptors::FILE_DESCRIPTOR_SET` embedding (raw `proto_file` LEN bodies) are shipped. Parsed descriptor object graphs are not.
 - **Reflection / `DynamicMessage`.** Runtime field introspection and schema object graphs (beyond the opt-in byte embedding above).
 - **Extensions.** See §6.5.
 - **Repeated / map string and bytes SSO.** Singular string / bytes SSO and singular message inline-or-box are shipped. Repeated and map payloads stay on the heap — see [IMPLEMENTATION.md §17.2](IMPLEMENTATION.md#172-string--bytes-inline-optimisation).

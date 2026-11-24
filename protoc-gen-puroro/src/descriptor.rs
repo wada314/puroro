@@ -34,6 +34,12 @@ pub struct CodegenRequest {
     pub meta: CodegenMeta,
     /// Descriptor set (`proto_file`), in dependency order as provided by protoc.
     pub proto_files: Vec<ProtoFile>,
+    /// Raw `FileDescriptorProto` LEN bodies from wire field `proto_file = 15`.
+    ///
+    /// Same order and length as [`Self::proto_files`] when the request came from
+    /// `decode_request`. Empty for hand-built test requests (the IR alone cannot
+    /// rebuild a faithful set). Used to emit `descriptors::FILE_DESCRIPTOR_SET`.
+    pub proto_file_raw: Vec<Vec<u8>>,
 }
 
 /// Language mode of a `.proto` file.

@@ -11,8 +11,9 @@ use super::ModuleForest;
 use super::ModuleNode;
 use crate::error::{Error, Result};
 use crate::plugin_io::ResponseFile;
+use ::proc_macro2::Span;
 use ::syn::parse_quote;
-use ::syn::{File, Item};
+use ::syn::{File, Item, LitByteStr};
 
 /// How to materialise a [`ModuleForest`] as `CodeGeneratorResponse` files.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -26,35 +27,52 @@ pub enum ModuleLayout {
 }
 
 /// Render a forest according to `layout`.
-pub fn render(forest: &ModuleForest, layout: &ModuleLayout) -> Result<Vec<ResponseFile>> {
+///
+/// `file_descriptor_set` is the encoded `google.protobuf.FileDescriptorSet`
+/// embedded under `descriptors::FILE_DESCRIPTOR_SET` when the feature is on.
+pub fn render(
+    forest: &ModuleForest,
+    layout: &ModuleLayout,
+    file_descriptor_set: &[u8],
+) -> Result<Vec<ResponseFile>> {
     reject_reserved_root_names(forest.root())?;
     match layout {
-        ModuleLayout::SingleFile { path } => Ok(vec![render_single_file(forest, path)]),
+        ModuleLayout::SingleFile { path } => {
+            Ok(vec![render_single_file(forest, path, file_descriptor_set)])
+        }
     }
 }
 
 /// Expand `forest` into one source file with nested `pub mod` blocks.
-pub fn render_single_file(forest: &ModuleForest, path: &str) -> ResponseFile {
-    let file = render_file(forest.root());
+pub fn render_single_file(
+    forest: &ModuleForest,
+    path: &str,
+    file_descriptor_set: &[u8],
+) -> ResponseFile {
+    let file = render_file(forest.root(), file_descriptor_set);
     ResponseFile {
         name: path.to_owned(),
         content: ::prettyplease::unparse(&file),
     }
 }
 
-fn render_file(root: &ModuleNode) -> File {
+fn render_file(root: &ModuleNode, file_descriptor_set: &[u8]) -> File {
     File {
         shebang: None,
         attrs: root.inner_attrs().to_vec(),
-        items: render_node_items(root, /* is_forest_root */ true),
+        items: render_node_items(root, /* is_forest_root */ true, file_descriptor_set),
     }
 }
 
-fn render_node_items(node: &ModuleNode, is_forest_root: bool) -> Vec<Item> {
+fn render_node_items(
+    node: &ModuleNode,
+    is_forest_root: bool,
+    file_descriptor_set: &[u8],
+) -> Vec<Item> {
     let mut items = Vec::new();
     if is_forest_root {
         items.push(puroro_reexport());
-        items.push(descriptors_module_stub());
+        items.push(descriptors_module(file_descriptor_set));
         items.extend(node.items().iter().cloned());
         items.push(root_alias_item(true));
         items.extend(node.children().iter().map(render_child_mod));
@@ -72,7 +90,8 @@ fn render_child_mod(child: &ModuleNode) -> Item {
         .expect("layout-eligible child modules must be named")
         .clone();
     let inner_attrs = child.inner_attrs();
-    let items = render_node_items(child, /* is_forest_root */ false);
+    // Nested packages never own the crate-wide descriptor set.
+    let items = render_node_items(child, /* is_forest_root */ false, &[]);
     parse_quote! {
         pub mod #name {
             #(#inner_attrs)*
@@ -90,27 +109,22 @@ fn puroro_reexport() -> Item {
 
 /// Opt-in `FileDescriptorSet` embedding (`descriptors` feature).
 ///
-/// Bytes are an empty stub until the plugin preserves raw
-/// `CodeGeneratorRequest.proto_file` payloads (see DESIGN.md §3.1).
-fn descriptors_module_stub() -> Item {
+/// `file_descriptor_set` is the encoded set built from preserved
+/// `CodeGeneratorRequest.proto_file` LEN bodies (see DESIGN.md §3.1). An empty
+/// slice yields `b""` — only expected for hand-built requests without wire
+/// payloads, not for a normal `protoc` run.
+fn descriptors_module(file_descriptor_set: &[u8]) -> Item {
+    let lit = LitByteStr::new(file_descriptor_set, Span::call_site());
     parse_quote! {
         /// Encoded `google.protobuf.FileDescriptorSet` for this crate (opt-in).
         ///
         /// Enable this crate's `descriptors` feature to compile this module in.
-        ///
-        /// # Interim empty stub
-        ///
-        /// `FILE_DESCRIPTOR_SET` is currently `&[]`. That is intentional until the
-        /// plugin embeds `CodeGeneratorRequest.proto_file` blobs — **not** a valid
-        /// set for gRPC server reflection or similar consumers. Do not treat an
-        /// empty slice as “no files in the schema”.
+        /// The bytes are every `CodeGeneratorRequest.proto_file` entry, wrapped
+        /// as `FileDescriptorSet.file`, in protoc's dependency order.
         #[cfg(feature = "descriptors")]
         pub mod descriptors {
             /// Crate-wide encoded `FileDescriptorSet`.
-            ///
-            /// Interim: always empty (`&[]`). Real embedding is a follow-up; see
-            /// the module docs. Empty does **not** mean the schema has no files.
-            pub const FILE_DESCRIPTOR_SET: &'static [u8] = &[];
+            pub const FILE_DESCRIPTOR_SET: &'static [u8] = #lit;
         }
     }
 }
@@ -198,7 +212,7 @@ mod tests {
             pub struct Empty;
         }]);
 
-        let file = render_single_file(&forest, "empty.rs");
+        let file = render_single_file(&forest, "empty.rs", &[]);
         assert_eq!(file.name, "empty.rs");
         assert!(file.content.contains("pub struct Empty"));
         assert!(file.content.contains("allow"));
@@ -210,6 +224,19 @@ mod tests {
     }
 
     #[test]
+    fn descriptors_module_embeds_byte_literal() {
+        let forest = ModuleForest::new();
+        let file = render_single_file(&forest, "lib.rs", &[0x0a, 0x01, b'x']);
+        assert!(file.content.contains("FILE_DESCRIPTOR_SET"));
+        assert!(file.content.contains("b\""));
+        assert!(
+            !file
+                .content
+                .contains("FILE_DESCRIPTOR_SET: &'static [u8] = b\"\";")
+        );
+    }
+
+    #[test]
     fn root_module_named_puroro_is_rejected() {
         let mut forest = ModuleForest::new();
         forest.ensure_package("puroro");
@@ -218,6 +245,7 @@ mod tests {
             &ModuleLayout::SingleFile {
                 path: "lib.rs".into(),
             },
+            &[],
         )
         .unwrap_err();
         assert!(err.to_string().contains("reserved"));
@@ -232,6 +260,7 @@ mod tests {
             &ModuleLayout::SingleFile {
                 path: "lib.rs".into(),
             },
+            &[],
         )
         .unwrap_err();
         assert!(err.to_string().contains("reserved"));
@@ -247,6 +276,7 @@ mod tests {
             &ModuleLayout::SingleFile {
                 path: "lib.rs".into(),
             },
+            &[],
         )
         .unwrap();
     }
@@ -260,6 +290,7 @@ mod tests {
             &ModuleLayout::SingleFile {
                 path: "lib.rs".into(),
             },
+            &[],
         )
         .unwrap();
     }
@@ -280,7 +311,7 @@ mod tests {
             pub const FIELD_TITLE: u32 = 1;
         }]);
 
-        let file = render_single_file(&forest, "lib.rs");
+        let file = render_single_file(&forest, "lib.rs", &[]);
         assert!(file.content.contains("pub mod example"));
         assert!(file.content.contains("pub struct Status"));
         assert!(file.content.contains("pub mod task"));
@@ -302,7 +333,7 @@ mod tests {
             pub type Assignee = self::_root::example::Address;
         }]);
 
-        let file = render_single_file(&forest, "lib.rs");
+        let file = render_single_file(&forest, "lib.rs", &[]);
         assert!(file.content.contains("self::_root::example::Address"));
         let _ = file;
     }

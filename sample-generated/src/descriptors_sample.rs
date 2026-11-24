@@ -1,19 +1,20 @@
 //! Sample of the opt-in `descriptors` feature surface.
 //!
 //! Production plugin output puts `FILE_DESCRIPTOR_SET` in a crate-root
-//! `descriptors` module. This hand-written crate mirrors that shape.
+//! `descriptors` module as a Rust byte literal of the request's
+//! `FileDescriptorSet`. This hand-written crate mirrors that shape.
 //!
-//! # Interim empty stub
+//! # Empty sketch
 //!
-//! The constant is `&[]` on purpose. This sample is not produced by `protoc`,
-//! and the plugin's generated stub is empty until embedding lands. Do **not**
-//! treat emptiness as “no files in the schema” or as a usable reflection set.
+//! The constant is `&[]` here because this crate is not produced by `protoc`.
+//! Generated crates embed the preserved `CodeGeneratorRequest.proto_file`
+//! bodies. Do not treat emptiness in *this* sample as the generated-crate
+//! behaviour.
 
 /// Crate-wide encoded `FileDescriptorSet`.
 ///
-/// Always empty here (`&[]`). Generated crates will replace this with bytes
-/// preserved from `CodeGeneratorRequest.proto_file`. Empty does **not** mean
-/// the schema has no files — see the module docs.
+/// Always empty in this hand-written sample (`&[]`). Plugin output replaces
+/// this with a `b"…"` literal of the request's descriptor set.
 pub const FILE_DESCRIPTOR_SET: &[u8] = &[];
 
 #[cfg(test)]
@@ -36,7 +37,7 @@ mod tests {
     }
 
     #[test]
-    fn file_descriptor_set_is_empty_stub() {
+    fn file_descriptor_set_is_empty_in_hand_written_sample() {
         assert!(FILE_DESCRIPTOR_SET.is_empty());
     }
 }
