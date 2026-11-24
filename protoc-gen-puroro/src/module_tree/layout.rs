@@ -27,7 +27,7 @@ pub enum ModuleLayout {
 
 /// Render a forest according to `layout`.
 pub fn render(forest: &ModuleForest, layout: &ModuleLayout) -> Result<Vec<ResponseFile>> {
-    reject_reserved_puroro(forest.root())?;
+    reject_reserved_root_names(forest.root())?;
     match layout {
         ModuleLayout::SingleFile { path } => Ok(vec![render_single_file(forest, path)]),
     }
@@ -106,29 +106,35 @@ fn descriptors_module_stub() -> Item {
     }
 }
 
-/// `puroro` at the forest root is the runtime re-export, not a proto module.
-fn reject_reserved_puroro(root: &ModuleNode) -> Result<()> {
-    if root.get_child("puroro").is_some() || root.items().iter().any(item_binds_puroro) {
-        return Err(Error::Codegen(
-            "`puroro` is reserved at the generated crate root; the runtime crate is re-exported as that module"
-                .to_owned(),
-        ));
+/// Root names reserved for layout-owned modules (`puroro`, `descriptors`).
+const RESERVED_ROOT_NAMES: &[&str] = &["puroro", "descriptors"];
+
+/// `puroro` is the runtime re-export; `descriptors` holds the opt-in FDS bytes.
+fn reject_reserved_root_names(root: &ModuleNode) -> Result<()> {
+    for name in RESERVED_ROOT_NAMES {
+        if root.get_child(name).is_some()
+            || root.items().iter().any(|item| item_binds_name(item, name))
+        {
+            return Err(Error::Codegen(format!(
+                "`{name}` is reserved at the generated crate root"
+            )));
+        }
     }
     Ok(())
 }
 
-fn item_binds_puroro(item: &Item) -> bool {
+fn item_binds_name(item: &Item, name: &str) -> bool {
     match item {
-        Item::Struct(item) => item.ident == "puroro",
-        Item::Enum(item) => item.ident == "puroro",
-        Item::Type(item) => item.ident == "puroro",
-        Item::Union(item) => item.ident == "puroro",
-        Item::Trait(item) => item.ident == "puroro",
-        Item::TraitAlias(item) => item.ident == "puroro",
-        Item::Fn(item) => item.sig.ident == "puroro",
-        Item::Const(item) => item.ident == "puroro",
-        Item::Static(item) => item.ident == "puroro",
-        Item::Mod(item) => item.ident == "puroro",
+        Item::Struct(item) => item.ident == name,
+        Item::Enum(item) => item.ident == name,
+        Item::Type(item) => item.ident == name,
+        Item::Union(item) => item.ident == name,
+        Item::Trait(item) => item.ident == name,
+        Item::TraitAlias(item) => item.ident == name,
+        Item::Fn(item) => item.sig.ident == name,
+        Item::Const(item) => item.ident == name,
+        Item::Static(item) => item.ident == name,
+        Item::Mod(item) => item.ident == name,
         _ => false,
     }
 }
@@ -209,9 +215,37 @@ mod tests {
     }
 
     #[test]
+    fn root_module_named_descriptors_is_rejected() {
+        let mut forest = ModuleForest::new();
+        forest.ensure_package("descriptors");
+        let err = render(
+            &forest,
+            &ModuleLayout::SingleFile {
+                path: "lib.rs".into(),
+            },
+        )
+        .unwrap_err();
+        assert!(err.to_string().contains("reserved"));
+        assert!(err.to_string().contains("descriptors"));
+    }
+
+    #[test]
     fn nested_module_named_puroro_is_allowed() {
         let mut forest = ModuleForest::new();
         forest.ensure_package("shop.puroro");
+        render(
+            &forest,
+            &ModuleLayout::SingleFile {
+                path: "lib.rs".into(),
+            },
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn nested_module_named_descriptors_is_allowed() {
+        let mut forest = ModuleForest::new();
+        forest.ensure_package("shop.descriptors");
         render(
             &forest,
             &ModuleLayout::SingleFile {

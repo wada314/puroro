@@ -382,9 +382,23 @@ mod tests {
     }
 
     #[test]
+    fn package_descriptors_is_reserved_at_the_crate_root() {
+        let err = generate(&empty_request_with_package("Empty", "descriptors")).unwrap_err();
+        assert!(err.to_string().contains("reserved"));
+        assert!(err.to_string().contains("descriptors"));
+    }
+
+    #[test]
     fn file_level_message_puroro_is_reserved_at_the_crate_root() {
         let err = generate(&empty_request("Puroro")).unwrap_err();
         assert!(err.to_string().contains("reserved"));
+    }
+
+    #[test]
+    fn file_level_message_descriptors_is_reserved_at_the_crate_root() {
+        let err = generate(&empty_request("Descriptors")).unwrap_err();
+        assert!(err.to_string().contains("reserved"));
+        assert!(err.to_string().contains("descriptors"));
     }
 
     #[test]
