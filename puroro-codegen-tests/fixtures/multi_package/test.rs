@@ -1,4 +1,6 @@
 //! Distinct packages in one generation response.
+//!
+//! Compile gate: `pkg::a::Foo` resolves via the `use` below.
 
 use crate::multi_package::pkg::a::Foo;
 use crate::multi_package::pkg::b::Bar;
@@ -12,5 +14,5 @@ fn cross_package_message_round_trip() {
     let decoded: Bar = Bar::decode(&bar.encode_to_vec()[..]).expect("decode");
     assert_eq!(decoded.foo().unwrap().x(), 42);
 
-    let _: Foo = Foo::new();
+    assert!(Foo::new().encode_to_vec().is_empty());
 }

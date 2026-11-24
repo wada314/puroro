@@ -1,4 +1,6 @@
 //! Cross-file message import (`task.proto` → `address.proto`).
+//!
+//! Compile gate: imported peer `Address` resolves via the `use` below.
 
 use crate::message_import::demo::{Address, Task};
 use ::puroro::{Message, StringMut};
@@ -10,6 +12,5 @@ fn imported_address_round_trip() {
     let decoded: Task = Task::decode(&task.encode_to_vec()[..]).expect("decode");
     assert_eq!(decoded.assignee().unwrap().street().get(), "Side");
 
-    // Type is reachable as the shared package peer.
-    let _: Address = Address::new();
+    assert!(Address::new().encode_to_vec().is_empty());
 }

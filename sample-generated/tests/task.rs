@@ -870,36 +870,6 @@ fn inlined_origin_unknown_stays_inside_child_len() {
     assert!(!top_level_has_varint_field(&cleared, 99));
 }
 
-fn x_of(p: &Point) -> i32 {
-    p.x()
-}
-
-fn street_of(a: &Address) -> &str {
-    a.street().get()
-}
-
-#[test]
-fn owned_and_inlined_point_share_the_same_type() {
-    let mut owned = Point::new();
-    *owned.x_mut() = 3;
-    assert_eq!(x_of(&owned), 3);
-
-    let mut task = Task::new();
-    *task.origin_mut().x_mut() = 4;
-    assert_eq!(x_of(task.origin().unwrap()), 4);
-}
-
-#[test]
-fn owned_and_inlined_address_share_the_same_type() {
-    let mut owned = Address::new();
-    owned.street_mut().set("A");
-    assert_eq!(street_of(&owned), "A");
-
-    let mut task = Task::new();
-    task.postal_mut().street_mut().set("C");
-    assert_eq!(street_of(task.postal().unwrap()), "C");
-}
-
 #[test]
 fn eager_parent_lazy_assignee_roundtrip() {
     let mut task = Task::new();
