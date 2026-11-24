@@ -276,6 +276,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             fields.push(self.resolve_field(
                 field,
                 &pending.message.fqn,
+                pending.message.is_map_entry(),
                 pending.file,
                 &pending.oneof_remap,
             )?);
@@ -288,6 +289,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
         &self,
         field: &FieldDesc,
         owner_fqn: &ProtoFqn,
+        owner_is_map_entry: bool,
         file: &ProtoFile,
         oneof_remap: &OneofRemap,
     ) -> Result<Field<'a>> {
@@ -300,7 +302,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
         let features = FinalizedFeatureSet::resolve_field(file, field, self.proto2_utf8);
         let type_ref = self.resolve_type_ref(field, owner_fqn)?;
         let occurrence = FieldOccurrence::resolve(field, &features, &type_ref);
-        let group_wire = group_wire(field, &features, &occurrence);
+        let group_wire = group_wire(field, &features, &occurrence, owner_is_map_entry);
 
         Ok(Field {
             name: field.name.clone(),
@@ -337,15 +339,20 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             FieldType::SInt32 => TypeRef::SInt32,
             FieldType::SInt64 => TypeRef::SInt64,
             FieldType::Message | FieldType::Group => {
+                let kind = if field.type_ == FieldType::Group {
+                    "group"
+                } else {
+                    "message"
+                };
                 let type_name = field.type_name.as_ref().ok_or_else(|| {
                     Error::Codegen(format!(
-                        "field `{owner_fqn}.{}` has message type but no type_name",
+                        "field `{owner_fqn}.{}` has {kind} type but no type_name",
                         field.name
                     ))
                 })?;
                 let target = self.lookup_message(type_name).ok_or_else(|| {
                     Error::Codegen(format!(
-                        "field `{owner_fqn}.{}` references unknown message type `{type_name}`",
+                        "field `{owner_fqn}.{}` references unknown {kind} type `{type_name}`",
                         field.name
                     ))
                 })?;
@@ -485,17 +492,23 @@ impl FieldOccurrence {
 }
 
 /// `TYPE_GROUP`, or a non-map message with `message_encoding=DELIMITED`.
+///
+/// Synthetic map-entry fields always stay length-prefixed: a file-scoped
+/// `DELIMITED` must not turn `map<K, Message>` values into groups.
 fn group_wire(
     field: &FieldDesc,
     features: &FinalizedFeatureSet,
     occurrence: &FieldOccurrence,
+    owner_is_map_entry: bool,
 ) -> bool {
+    if owner_is_map_entry || matches!(occurrence, FieldOccurrence::Map) {
+        return false;
+    }
     if field.type_ == FieldType::Group {
         return true;
     }
     matches!(field.type_, FieldType::Message)
         && features.message_encoding == MessageEncoding::Delimited
-        && !matches!(occurrence, FieldOccurrence::Map)
 }
 
 impl Utf8Validation {
@@ -1253,6 +1266,53 @@ mod tests {
             inner.occurrence(),
             FieldOccurrence::Singular(SingularPresence::Message)
         );
+    }
+
+    #[test]
+    fn file_delimited_does_not_group_map_entry_value() {
+        use crate::descriptor::features::MessageEncoding;
+
+        let arena = Arena::new();
+        let file = ProtoFile {
+            syntax: Syntax::Editions(Edition::Edition2023),
+            features: FeatureSet {
+                message_encoding: Some(MessageEncoding::Delimited),
+                ..FeatureSet::default()
+            },
+            messages: vec![
+                desc::message("Value"),
+                MessageDesc {
+                    fields: vec![FieldDesc {
+                        label: FieldLabel::Repeated,
+                        type_name: Some(ProtoFqn::parse(".ed.Holder.AttrsEntry")),
+                        ..desc::field("attrs", 1, FieldType::Message)
+                    }],
+                    nested_messages: vec![desc::map_entry(
+                        "AttrsEntry",
+                        desc::field("key", 1, FieldType::String),
+                        FieldDesc {
+                            type_name: Some(ProtoFqn::parse(".ed.Value")),
+                            ..desc::field("value", 2, FieldType::Message)
+                        },
+                    )],
+                    ..desc::message("Holder")
+                },
+            ],
+            ..desc::proto_file("a.proto", "ed")
+        };
+        let file_set = resolve(&arena, &[file]).unwrap();
+        let holder = lookup_message(&file_set, ".ed.Holder").unwrap();
+        let entry = lookup_message(&file_set, ".ed.Holder.AttrsEntry").unwrap();
+        let map_field = holder.fields().next().unwrap();
+        assert_eq!(map_field.occurrence(), FieldOccurrence::Map);
+        assert!(!map_field.is_group_wire());
+
+        let mut entry_fields = entry.fields();
+        let key = entry_fields.next().unwrap();
+        let value = entry_fields.next().unwrap();
+        assert!(!key.is_group_wire());
+        assert!(!value.is_group_wire());
+        assert!(matches!(value.type_ref(), TypeRef::Message(_)));
     }
 
     #[test]

@@ -402,13 +402,15 @@ fn plan_map_field<'a>(field: &'a Field<'a>) -> Result<FieldKind<'a>> {
     let key = WireTypeKind::from_field(key_field);
     let value = WireTypeKind::from_field(value_field);
     validate_map_key_wire(&key, field.name())?;
+    // Defense in depth: resolve keeps map-entry fields length-prefixed even
+    // under file-scoped DELIMITED. A group here would be an IR bug.
     if value.is_group() {
-        return Err(Error::Codegen(format!(
-            "map field `{}`: group-framed map values are not supported",
+        return Err(Error::internal(format!(
+            "map field `{}`: map-entry value resolved as group wire",
             field.name()
         )));
     }
-    // Any non-map, non-group value is allowed. Descriptors do not emit maps of maps.
+    // Any non-map value is allowed. Descriptors do not emit maps of maps.
 
     Ok(FieldKind::Map { key, value })
 }

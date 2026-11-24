@@ -64,7 +64,7 @@ Fix new fmt/clippy issues. Do not silence lints unless this repo already does fo
 
 ## Groups
 
-Unknown `SGroup` is preserved, skipped, or rejected through the matching `EGroup`. A known group is `ProtoGroup<M>`: the child reads the caller's buffer from the consumed start tag until that field number's end tag. Do not copy the interior into a side buffer. Encode writes start tag + body + end tag with no length prefix. A lazy child records the group body span (no start/end tags) via `merge_shared`, same island model as LEN. `protoc-gen-puroro` emits `ProtoGroup` for `TYPE_GROUP` and for non-map `message_encoding=DELIMITED`. Group-framed map values are rejected.
+Unknown `SGroup` is preserved, skipped, or rejected through the matching `EGroup`. A known group is `ProtoGroup<M>`: the child reads the caller's buffer from the consumed start tag until that field number's end tag. Do not copy the interior into a side buffer. Encode writes start tag + body + end tag with no length prefix. A lazy child records the group body span (no start/end tags) via `merge_shared`, same island model as LEN. `protoc-gen-puroro` emits `ProtoGroup` for `TYPE_GROUP` and for non-map `message_encoding=DELIMITED`. Synthetic map-entry key/value fields stay length-prefixed even when the file sets `DELIMITED`.
 
 ## Unknown-field reject
 

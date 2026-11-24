@@ -1,7 +1,7 @@
 //! Lazy getters on `Record<FooFields<A, Lazy<A, P>>, …>`.
 
 use super::field_emit::{FieldEmit, GetterShape, MapEmit, RepeatedEmit, ScalarEmit};
-use super::layout::{LayoutAssoc, LayoutAssocKind, LenAccess, MessageApply};
+use super::layout::{LayoutAssoc, LayoutAssocKind, LenAccess, MessageApply, MessageFraming};
 use super::message::LazyLayout;
 use super::oneof::OneofEmit;
 use crate::error::Result;
@@ -566,10 +566,10 @@ fn message_apply_arm(
         ),
     };
     let span = match framing {
-        super::layout::MessageFraming::LengthPrefixed => quote! {
+        MessageFraming::LengthPrefixed => quote! {
             ::puroro_rt::decode::scanned_len_span(origin, rec)?
         },
-        super::layout::MessageFraming::Group => quote! {
+        MessageFraming::Group => quote! {
             ::puroro_rt::decode::scanned_group_body_span(origin, rec)?
         },
     };
