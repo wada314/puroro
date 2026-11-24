@@ -96,11 +96,20 @@ fn descriptors_module_stub() -> Item {
     parse_quote! {
         /// Encoded `google.protobuf.FileDescriptorSet` for this crate (opt-in).
         ///
-        /// Enable this crate's `descriptors` feature. The payload is currently an
-        /// empty stub; a later change embeds the request's `proto_file` blobs.
+        /// Enable this crate's `descriptors` feature to compile this module in.
+        ///
+        /// # Interim empty stub
+        ///
+        /// `FILE_DESCRIPTOR_SET` is currently `&[]`. That is intentional until the
+        /// plugin embeds `CodeGeneratorRequest.proto_file` blobs — **not** a valid
+        /// set for gRPC server reflection or similar consumers. Do not treat an
+        /// empty slice as “no files in the schema”.
         #[cfg(feature = "descriptors")]
         pub mod descriptors {
-            /// Crate-wide descriptor set (empty stub until embedding lands).
+            /// Crate-wide encoded `FileDescriptorSet`.
+            ///
+            /// Interim: always empty (`&[]`). Real embedding is a follow-up; see
+            /// the module docs. Empty does **not** mean the schema has no files.
             pub const FILE_DESCRIPTOR_SET: &'static [u8] = &[];
         }
     }

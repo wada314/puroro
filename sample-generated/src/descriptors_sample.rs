@@ -2,12 +2,18 @@
 //!
 //! Production plugin output puts `FILE_DESCRIPTOR_SET` in a crate-root
 //! `descriptors` module. This hand-written crate mirrors that shape.
+//!
+//! # Interim empty stub
+//!
+//! The constant is `&[]` on purpose. This sample is not produced by `protoc`,
+//! and the plugin's generated stub is empty until embedding lands. Do **not**
+//! treat emptiness as “no files in the schema” or as a usable reflection set.
 
-/// Crate-wide descriptor set.
+/// Crate-wide encoded `FileDescriptorSet`.
 ///
-/// Empty stub: the sample is not produced by `protoc`, so there is no real
-/// `FileDescriptorSet` to embed. Generated crates will replace this with bytes
-/// preserved from `CodeGeneratorRequest.proto_file`.
+/// Always empty here (`&[]`). Generated crates will replace this with bytes
+/// preserved from `CodeGeneratorRequest.proto_file`. Empty does **not** mean
+/// the schema has no files — see the module docs.
 pub const FILE_DESCRIPTOR_SET: &[u8] = &[];
 
 #[cfg(test)]

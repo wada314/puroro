@@ -245,7 +245,7 @@ One crate-wide byte slice — not a copy per message, not a newtype, and no per-
 
 Inside that set, each `FileDescriptorProto.name` is a path relative to the proto source-tree root with `/` separators (e.g. `foo/bar/baz.proto`). It is **not** a host OS path; protoc canonicalizes Windows `\` to `/` before the plugin sees the request.
 
-**Plugin status.** The generator already emits `FULL_NAME`, the generated `Cargo.toml` `descriptors` feature, and a cfg-gated `descriptors` module. The set bytes are still an **empty stub** (enabling the feature does not yet yield a usable set for gRPC reflection). A follow-up should preserve raw `CodeGeneratorRequest.proto_file` LEN bodies (the IR is a lossy subset) and wrap them as a `FileDescriptorSet` in that constant — prefer a Rust byte literal (or `ResponseFile` content as `Vec<u8>`) over assuming UTF-8 `string` content.
+**Plugin status.** The generator already emits `FULL_NAME`, the generated `Cargo.toml` `descriptors` feature, and a cfg-gated `descriptors` module. The set bytes are still an **empty stub**: `FILE_DESCRIPTOR_SET` is `&[]`. Enabling the feature compiles the module in, but that slice is **not** a usable set for gRPC server reflection (empty does not mean “no files in the schema”). A follow-up should preserve raw `CodeGeneratorRequest.proto_file` LEN bodies (the IR is a lossy subset) and wrap them as a `FileDescriptorSet` in that constant — prefer a Rust byte literal (or `ResponseFile` content as `Vec<u8>`) over assuming UTF-8 `string` content.
 
 **Sample.** [`sample-generated`](sample-generated/) uses the same feature flag and sketches `descriptors::FILE_DESCRIPTOR_SET`.
 
