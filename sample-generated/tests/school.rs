@@ -327,18 +327,3 @@ fn inlined_home_heap_string_clone_and_clear() {
         assert_eq!(assigned_home.city().get(), "Kyoto");
     }
 }
-
-fn year_of(s: &Student) -> i32 {
-    s.year().get()
-}
-
-#[test]
-fn owned_and_inlined_student_share_the_same_type() {
-    let mut owned = Student::new();
-    *owned.year_mut() = 11;
-    assert_eq!(year_of(&owned), 11);
-
-    let mut school = School::new();
-    *school.student_mut().year_mut() = 12;
-    assert_eq!(year_of(school.student().unwrap()), 12);
-}

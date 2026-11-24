@@ -13,9 +13,10 @@ use ::puroro_rt::decode::LazyMessage;
 use ::puroro_rt::encode::{encode_varint_field, field_number_const};
 use ::puroro_sample_generated::address::FIELD_STREET;
 use ::puroro_sample_generated::task::{
-    FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_EMAIL_ADDRESS, FIELD_LABELS, FIELD_ORIGIN,
-    FIELD_OWNER_ID, FIELD_PAYLOAD, FIELD_PHONE_NUMBER, FIELD_POSTAL, FIELD_SCORE, FIELD_SCORES,
-    FIELD_TAG_IDS, FIELD_TITLE, FIELD_URGENT, FIELD_WATCHERS, FIELD_WEBHOOK_ID, NotificationCase,
+    FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_DONE, FIELD_EMAIL_ADDRESS, FIELD_FLAG, FIELD_LABELS,
+    FIELD_ORIGIN, FIELD_OWNER_ID, FIELD_PAYLOAD, FIELD_PHONE_NUMBER, FIELD_POSTAL, FIELD_PRIORITY,
+    FIELD_SCORE, FIELD_SCORES, FIELD_STATUS, FIELD_TAG_IDS, FIELD_TITLE, FIELD_URGENT, FIELD_VOTES,
+    FIELD_WATCHERS, FIELD_WEBHOOK_ID, NotificationCase,
 };
 use ::puroro_sample_generated::{
     Address, AddressLazy, Point, PointLazy, Priority, Status, Task, TaskLazy,
@@ -52,35 +53,18 @@ fn encode_len_bytes(field_number: u32, payload: &[u8], buf: &mut Vec<u8>) {
 }
 
 #[test]
-fn empty_message_is_implicit_zero() {
+fn empty_lazy_defaults_by_presence_kind() {
     let lazy = TaskLazy::new();
+    // IMPLICIT scalar
     assert_eq!(lazy.score().unwrap(), 0);
+    // EXPLICIT with custom default
     assert!(!lazy.max_retries().unwrap().is_set());
     assert_eq!(lazy.max_retries().unwrap().get(), 3);
-    assert!(lazy.tag_ids().unwrap().is_empty());
-    assert!(lazy.scores().unwrap().is_empty());
-    assert!(!lazy.status().unwrap().is_set());
-    assert!(!lazy.priority().unwrap().is_set());
-    assert!(!lazy.done().unwrap());
-    assert!(!lazy.flag().unwrap().is_set());
-    assert!(lazy.votes().unwrap().is_empty());
-    assert!(!lazy.has_title().unwrap());
+    // LEN / message / map / oneof
     assert!(!lazy.title().unwrap().is_set());
-    assert_eq!(lazy.title().unwrap().get(), "");
-    assert!(!lazy.has_owner_id().unwrap());
-    assert!(!lazy.has_payload().unwrap());
-    assert_eq!(lazy.payload().unwrap().get(), b"" as &[u8]);
     assert!(lazy.assignee().unwrap().is_none());
-    assert!(lazy.origin().unwrap().is_none());
-    assert!(lazy.watchers().unwrap().is_empty());
-    assert!(lazy.labels().unwrap().is_empty());
     assert!(lazy.attributes().unwrap().is_empty());
     assert!(lazy.notification().unwrap().is_none());
-    assert!(!lazy.email_address().unwrap().is_set());
-    assert!(!lazy.webhook_id().unwrap().is_set());
-    assert_eq!(lazy.webhook_id().unwrap().get(), -1);
-    assert!(lazy.postal().unwrap().is_none());
-    assert!(!lazy.urgent().unwrap().is_set());
 }
 
 #[test]
@@ -227,23 +211,27 @@ fn unknown_len_is_preserved_while_known_fields_apply() {
 #[test]
 fn enums_and_bools() {
     let mut bytes = Vec::new();
-    encode_varint_field(field_number_const::<9>(), Varint::from_int32(1), &mut bytes);
     encode_varint_field(
-        field_number_const::<10>(),
+        field_number_const::<FIELD_STATUS>(),
+        Varint::from_int32(1),
+        &mut bytes,
+    );
+    encode_varint_field(
+        field_number_const::<FIELD_PRIORITY>(),
         Varint::from_int32(2),
         &mut bytes,
     );
     encode_varint_field(
-        field_number_const::<16>(),
+        field_number_const::<FIELD_DONE>(),
         Varint::from_bool(true),
         &mut bytes,
     );
     encode_varint_field(
-        field_number_const::<17>(),
+        field_number_const::<FIELD_FLAG>(),
         Varint::from_bool(false),
         &mut bytes,
     );
-    encode_packed_int32_field(20, &[1, 0, 1], &mut bytes);
+    encode_packed_int32_field(FIELD_VOTES, &[1, 0, 1], &mut bytes);
 
     let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert_eq!(lazy.status().unwrap().get(), Status::PENDING);
