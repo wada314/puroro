@@ -3,4 +3,6 @@ syntax = "proto3";
 // EXPLICIT presence + BitPacked bool (distinct from IMPLICIT `bool` in scalars).
 message FlagHolder {
   optional bool flag = 1;
+  // PACKED repeated bool (codegen path; sample covers Task.votes separately).
+  repeated bool votes = 2;
 }

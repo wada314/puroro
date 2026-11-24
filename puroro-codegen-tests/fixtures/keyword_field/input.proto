@@ -3,4 +3,7 @@ syntax = "proto3";
 message KeywordFields {
   optional int32 type = 1;
   optional string match = 2;
+  optional bool async = 3;
+  optional int64 for = 4;
+  optional bytes mod = 5;
 }

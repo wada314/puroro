@@ -8,6 +8,8 @@ use ::core::mem::size_of;
 use ::puroro::Message;
 use ::puroro_rt::encode::{encode_varint_field, field_number_const};
 use ::puroro_rt::{DiscardUnknowns, MessageCommon, UnknownFields, Varint};
+use ::puroro_sample_generated::marker::FIELD_N;
+use ::puroro_sample_generated::point::{FIELD_X, FIELD_Y};
 use ::puroro_sample_generated::{Marker, Point};
 
 #[test]
@@ -28,7 +30,11 @@ fn discard_store_is_zst_on_common() {
 #[test]
 fn marker_drops_unknowns_and_encodes_known_only() {
     let mut wire = Vec::new();
-    encode_varint_field(field_number_const::<1>(), Varint::from_int32(3), &mut wire);
+    encode_varint_field(
+        field_number_const::<FIELD_N>(),
+        Varint::from_int32(3),
+        &mut wire,
+    );
     encode_varint_field(
         field_number_const::<99>(),
         Varint::from_uint64(5),
@@ -43,7 +49,11 @@ fn marker_drops_unknowns_and_encodes_known_only() {
     assert_ne!(encoded, wire, "discard encode must omit the unknown tag");
     assert_eq!(encoded, {
         let mut known = Vec::new();
-        encode_varint_field(field_number_const::<1>(), Varint::from_int32(3), &mut known);
+        encode_varint_field(
+            field_number_const::<FIELD_N>(),
+            Varint::from_int32(3),
+            &mut known,
+        );
         known
     });
 }
@@ -51,13 +61,21 @@ fn marker_drops_unknowns_and_encodes_known_only() {
 #[test]
 fn point_still_preserves_unknowns() {
     let mut wire = Vec::new();
-    encode_varint_field(field_number_const::<1>(), Varint::from_int32(3), &mut wire);
+    encode_varint_field(
+        field_number_const::<FIELD_X>(),
+        Varint::from_int32(3),
+        &mut wire,
+    );
     encode_varint_field(
         field_number_const::<99>(),
         Varint::from_uint64(5),
         &mut wire,
     );
-    encode_varint_field(field_number_const::<2>(), Varint::from_int32(7), &mut wire);
+    encode_varint_field(
+        field_number_const::<FIELD_Y>(),
+        Varint::from_int32(7),
+        &mut wire,
+    );
 
     let preserved: Point = Point::decode(&wire[..]).expect("preserve decode");
     assert_eq!(preserved.x(), 3);
