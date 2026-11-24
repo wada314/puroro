@@ -11,13 +11,16 @@ use ::core::str;
 use ::puroro::DecodeError;
 use ::unmanaged::{DefaultIn, String as AllocString, UnmanagedString, UnmanagedVec};
 
+use super::lazy_len::{LazyBytesGet, LazyLenStore, LazyStringGet};
 use super::len::{BytesLikeLenCodec, LenScalar, ProtoString};
 use super::sso_buf::{INLINE_CAP, InlineBuf, SsoHeap};
 use crate::decode::WireSpan;
 use crate::fields::shared::slot_init::SlotInitMut;
 use crate::fields::shared::value_layout::{ValueLayout, ValueLayoutClone};
 use crate::fields::shared::value_slot::{ValueSlot, ValueSlotMutAccess};
-use crate::fields::shared::{MessageBindingMut, MessageCommonBits, MessageCommonSharedBits};
+use crate::fields::shared::{
+    MessageBindingMut, MessageCommonAlloc, MessageCommonBits, MessageCommonSharedBits,
+};
 
 /// Two-bit kind stored at [`WireOrSso`]’s `KIND` bit and the next bit (lazy messages only).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -314,23 +317,6 @@ impl<A: Allocator> DefaultIn<A> for WireOrSsoSlot<UnmanagedVec<u8, A>> {
     }
 }
 
-/// [`ValueLayout::Slot`] store used by [`WireOrSso`].
-pub trait WireOrSsoStore<A: Allocator> {
-    fn store_wire(&mut self, span: WireSpan, old_arm: WireOrSsoKind, alloc: &A);
-}
-
-impl<A: Allocator> WireOrSsoStore<A> for WireOrSsoSlot<UnmanagedString<A>> {
-    fn store_wire(&mut self, span: WireSpan, old_arm: WireOrSsoKind, alloc: &A) {
-        self.store_wire_inner(span, old_arm, alloc);
-    }
-}
-
-impl<A: Allocator> WireOrSsoStore<A> for WireOrSsoSlot<UnmanagedVec<u8, A>> {
-    fn store_wire(&mut self, span: WireSpan, old_arm: WireOrSsoKind, alloc: &A) {
-        self.store_wire_inner(span, old_arm, alloc);
-    }
-}
-
 /// Singular `string` / `bytes` layout: [`WireOrSsoSlot`] + a 2-bit kind at `KIND`.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct WireOrSso<const KIND: usize>;
@@ -472,6 +458,82 @@ unsafe fn inline_str<H>(slot: &WireOrSsoUnion<H>) -> &str {
 unsafe fn heap_str<A: Allocator>(slot: &WireOrSsoUnion<UnmanagedString<A>>) -> &str {
     let heap: &UnmanagedString<A> = unsafe { &slot.heap };
     heap
+}
+
+impl<A: Allocator, const KIND: usize> LazyLenStore<ProtoString, A> for WireOrSso<KIND> {
+    fn store_len_span<VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx, span: WireSpan)
+    where
+        VS: ValueSlot<Self::Slot, A>,
+        I: SlotInitMut,
+        Cx: MessageBindingMut<A>,
+        A: Clone,
+    {
+        let old = Self::kind(common);
+        let alloc = common.clone_alloc();
+        let mut next: WireOrSsoSlot<UnmanagedString<A>> = WireOrSsoSlot::empty();
+        next.store_wire(span, WireOrSsoKind::Wire, &alloc);
+        if let Some(mut prev) = ValueSlot::with_mut(slot, init, common).replace(next) {
+            prev.deallocate(old, &alloc);
+        }
+        Self::set_kind(common, WireOrSsoKind::Wire);
+    }
+}
+
+impl<A: Allocator, const KIND: usize, C: BytesLikeLenCodec> LazyLenStore<LenScalar<C>, A>
+    for WireOrSso<KIND>
+{
+    fn store_len_span<VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx, span: WireSpan)
+    where
+        VS: ValueSlot<Self::Slot, A>,
+        I: SlotInitMut,
+        Cx: MessageBindingMut<A>,
+        A: Clone,
+    {
+        let old = Self::kind(common);
+        let alloc = common.clone_alloc();
+        let mut next: WireOrSsoSlot<UnmanagedVec<u8, A>> = WireOrSsoSlot::empty();
+        next.store_wire(span, WireOrSsoKind::Wire, &alloc);
+        if let Some(mut prev) = ValueSlot::with_mut(slot, init, common).replace(next) {
+            prev.deallocate(old, &alloc);
+        }
+        Self::set_kind(common, WireOrSsoKind::Wire);
+    }
+}
+
+impl<A: Allocator, const KIND: usize> LazyStringGet<A> for WireOrSso<KIND> {
+    fn get_str<'msg, Cx>(
+        slot: &'msg Self::Slot,
+        common: &'msg Cx,
+        wire: &'msg [u8],
+        alloc: A,
+    ) -> Result<&'msg str, DecodeError>
+    where
+        Cx: MessageCommonSharedBits + MessageCommonAlloc<Alloc = A>,
+        A: Clone,
+    {
+        let arm = Self::kind(common);
+        slot.get_str(arm, wire, alloc, |new| {
+            Self::set_kind_shared(common, new);
+        })
+    }
+}
+
+impl<C: BytesLikeLenCodec, A: Allocator, const KIND: usize> LazyBytesGet<C, A> for WireOrSso<KIND> {
+    fn get_bytes<'msg, Cx>(
+        slot: &'msg Self::Slot,
+        common: &'msg Cx,
+        wire: &'msg [u8],
+        alloc: A,
+    ) -> Result<&'msg [u8], DecodeError>
+    where
+        Cx: MessageCommonSharedBits + MessageCommonAlloc<Alloc = A>,
+        A: Clone,
+    {
+        let arm = Self::kind(common);
+        slot.get_bytes(arm, wire, alloc, |new| {
+            Self::set_kind_shared(common, new);
+        })
+    }
 }
 
 /// `WireOrSsoSlot` for singular `string`.

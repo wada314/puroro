@@ -18,16 +18,16 @@ use super::repeated::{RepeatedField, RepeatedFieldMut, RepeatedFieldRef};
 use super::shared::field_presence::FieldPresence;
 use super::shared::value_slot::ValueSlot;
 use super::shared::{
-    AddressableSlot, BitStorage, DefaultIn, MessageBindingMut, MessageCommon, MessageCommonAlloc,
+    AddressableSlot, BitStorage, MessageBindingMut, MessageCommon, MessageCommonAlloc,
     MessageCommonSharedBits, UnknownStore, ValueLayout,
 };
 use super::singular::{SingularField, SingularFieldMut, SingularFieldRef};
+use super::wire::lazy_len::{LazyBytesGet, LazyStringGet};
 use super::wire::len::{BytesLikeLenCodec, LenScalar};
 use super::wire::repeated_element::RepeatedElement;
 use super::wire::singular_type::SingularType;
 use super::wire::wire_or_sso::WireOrSso;
 use crate::ProtoString;
-use crate::decode::LazyProfile;
 
 /// Map protobuf field number `N` to the value generated code reads and writes.
 ///
@@ -157,23 +157,32 @@ where
             None => Ok(Optional::new(None)),
         }
     }
+}
 
-    /// Profile-directed UTF-8 read of variant `N`.
+impl<'a, E, const N: u32, A, Len, D> OneofFieldRef<'a, E, N>
+where
+    A: Allocator + Clone,
+    Len: LazyStringGet<A> + 'a,
+    E: OneofVariant<
+            N,
+            Value = SingularField<ProtoString, super::shared::field_presence::Oneof, N, A, Len, D>,
+        >,
+{
+    /// Layout-directed UTF-8 read of variant `N`.
     #[inline]
-    pub fn profile_str<Pb, U, L, Prof>(
+    pub fn profile_str<Pb, U, L>(
         self,
         common: &'a MessageCommon<Pb, A, U, L>,
-        wire: &'a Prof::Buf,
+        wire: &'a [u8],
     ) -> Result<Optional<&'a str, D>, DecodeError>
     where
         U: UnknownStore<A>,
         Pb: BitStorage,
-        Prof: LazyProfile + 'a,
         D: HasDefault<&'a str> + 'a,
         MessageCommon<Pb, A, U, L>: MessageCommonSharedBits,
     {
         match self.bind(common).as_field() {
-            Some(field) => field.profile_str::<_, Prof>(common, wire),
+            Some(field) => field.profile_str(common, wire),
             None => Ok(Optional::new(None)),
         }
     }
@@ -233,24 +242,34 @@ where
             None => Ok(Optional::new(None)),
         }
     }
+}
 
-    /// Profile-directed bytes read of variant `N`.
+impl<'a, E, const N: u32, C, A, Len, D> OneofFieldRef<'a, E, N>
+where
+    C: BytesLikeLenCodec,
+    A: Allocator + Clone,
+    Len: LazyBytesGet<C, A> + 'a,
+    E: OneofVariant<
+            N,
+            Value = SingularField<LenScalar<C>, super::shared::field_presence::Oneof, N, A, Len, D>,
+        >,
+{
+    /// Layout-directed bytes read of variant `N`.
     #[inline]
-    pub fn profile_bytes<Pb, U, L, Prof>(
+    pub fn profile_bytes<Pb, U, L>(
         self,
         common: &'a MessageCommon<Pb, A, U, L>,
-        wire: &'a Prof::Buf,
+        wire: &'a [u8],
     ) -> Result<Optional<&'a [u8], D>, DecodeError>
     where
         U: UnknownStore<A>,
         Pb: BitStorage,
-        Prof: LazyProfile + 'a,
         C: 'a,
         D: HasDefault<&'a [u8]> + 'a,
         MessageCommon<Pb, A, U, L>: MessageCommonSharedBits,
     {
         match self.bind(common).as_field() {
-            Some(field) => field.profile_bytes::<_, Prof>(common, wire),
+            Some(field) => field.profile_bytes(common, wire),
             None => Ok(Optional::new(None)),
         }
     }
@@ -281,7 +300,7 @@ impl<'a, E, const N: u32> OneofFieldMut<'a, E, N> {
         A: Allocator + Clone,
         U: UnknownStore<A>,
         E: OneofVariant<N> + OneofGroup<Bits = Pb, Alloc = A, Unknown = U, Layout = L>,
-        <E as OneofVariant<N>>::Value: DefaultIn<A>,
+        <E as OneofVariant<N>>::Value: super::oneof::OneofInstall<A>,
     {
         self.slot.bind_mut(common).variant_mut::<N>()
     }
@@ -311,7 +330,8 @@ impl<'a, E, const N: u32> OneofFieldMut<'a, E, N> {
                 N,
                 Value = SingularField<T, super::shared::field_presence::Oneof, N, A, L, D>,
             > + OneofGroup<Bits = Pb, Alloc = A, Unknown = U, Layout = Ly>,
-        SingularField<T, super::shared::field_presence::Oneof, N, A, L, D>: DefaultIn<A>,
+        SingularField<T, super::shared::field_presence::Oneof, N, A, L, D>:
+            super::oneof::OneofInstall<A>,
         MessageCommon<Pb, A, U, Ly>: super::shared::MessageBindingMut<A>,
     {
         let field: &'a mut SingularField<T, super::shared::field_presence::Oneof, N, A, L, D> =
@@ -443,7 +463,7 @@ where
     A: Allocator + Clone,
     U: UnknownStore<A>,
     E: OneofVariant<N> + OneofGroup<Bits = Pb, Alloc = A, Unknown = U, Layout = Ly>,
-    <E as OneofVariant<N>>::Value: DefaultIn<A>,
+    <E as OneofVariant<N>>::Value: super::oneof::OneofInstall<A>,
     &'a mut <E as OneofVariant<N>>::Value: BindFieldMut<'a, 'c, MessageCommon<Pb, A, U, Ly>>,
 {
     type Bound = <&'a mut <E as OneofVariant<N>>::Value as BindFieldMut<

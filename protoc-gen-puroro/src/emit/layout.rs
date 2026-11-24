@@ -42,7 +42,8 @@ pub(super) struct LayoutAssoc {
 
 #[derive(Clone)]
 pub(super) enum LayoutAssocKind {
-    /// Singular string / bytes: `InlineOrHeap` or `Inline` vs `WireOrSso`.
+    /// Singular string / bytes: `InlineOrHeap` or `Inline` vs `P::StringLen` /
+    /// `P::BytesLen` (`WireOrSso` or `SpanOnly`).
     SingularLen {
         marker: Type,
         eager: Type,

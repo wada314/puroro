@@ -45,7 +45,7 @@ pub use fields::shared::{
     FieldDeallocVisitor, FieldDeallocate, FieldEncode, FieldEqVisitor, FieldPairVisitor,
     FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Inline, InlineOrHeap, InteriorBitArray,
     Lazy, LazyMessageCommon, MessageBinding, MessageBindingMut, MessageCommon, MessageCommonAlloc,
-    MessageCommonBits, MessageCommonSharedBits, RejectUnknowns, SSO_HEAP, SSO_INLINE,
+    MessageCommonBits, MessageCommonSharedBits, RejectUnknowns, SSO_HEAP, SSO_INLINE, SpanOnly,
     UnknownFields, UnknownStore, ValueLayout, WireOrSso,
 };
 pub use fields::singular::{
@@ -53,11 +53,13 @@ pub use fields::singular::{
 };
 pub use fields::slot_index::{BindField, BindFieldMut, HasField, OneofFieldMut, OneofFieldRef};
 pub use fields::wire::{
-    Closed, ClosedEnum, INLINE_CAP, LazyBytesSlot, LazyStringSlot, Open, OpenEnum, PayloadAccess,
+    BytesSlotNew, Closed, ClosedEnum, INLINE_CAP, LazyBytesGet, LazyBytesLen, LazyBytesSlot,
+    LazyLenStore, LazyStringGet, LazyStringLen, LazyStringSlot, Open, OpenEnum, PayloadAccess,
     ProtoBool, ProtoBytes, ProtoDouble, ProtoEnum, ProtoEnumStorage, ProtoFixed32, ProtoFixed64,
     ProtoFloat, ProtoGroup, ProtoInt32, ProtoInt64, ProtoMessage, ProtoSFixed32, ProtoSFixed64,
     ProtoSInt32, ProtoSInt64, ProtoString, ProtoStringUnchecked, ProtoUInt32, ProtoUInt64,
-    SingularType, SsoBytes, SsoBytesMut, SsoString, SsoStringMut, WireOrSsoKind, WireOrSsoSlot,
+    SingularType, SsoBytes, SsoBytesMut, SsoString, SsoStringMut, StringSlotNew, WireOrSsoKind,
+    WireOrSsoSlot,
 };
 pub use message_encode::{EncodeCtx, MessageEncode, encode_message, encode_message_to_vec};
 pub use message_merge::{MessageMerge, merge_message};

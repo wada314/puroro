@@ -16,7 +16,7 @@ use ::puroro::wire_type;
 use ::puroro::{DecodeError, WireType};
 
 /// Byte range of one field payload inside a parent `_wire` buffer.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct WireSpan {
     pub offset: usize,
     pub len: usize,

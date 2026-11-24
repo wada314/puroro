@@ -16,12 +16,16 @@
 use crate::fields::oneof_variant::OneofVariant;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{
-    DefaultIn, Eager, FieldDeallocate, MessageCommon, MessageCommonAlloc, MessageCommonBits,
+    Eager, FieldDeallocate, MessageCommon, MessageCommonAlloc, MessageCommonBits,
     field_presence::{FieldPresence, Oneof},
-    value_layout::ValueLayoutGet,
-    value_slot::{AddressableSlot, ValueSlot},
+    value_layout::{ValueLayout, ValueLayoutGet},
+    value_slot::{AddressableSlot, ValueSlot, ValueSlotNew},
 };
 use crate::fields::singular::field::SingularField;
+use crate::fields::wire::lazy_len::{BytesSlotNew, StringSlotNew};
+use crate::fields::wire::len::{BytesLikeLenCodec, LenScalar, ProtoBytes, ProtoString};
+use crate::fields::wire::numerical::{Numerical, NumericalType};
+use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::singular_type::SingularType;
 use crate::message_encode::EncodeCtx;
 use crate::unknown_fields::{UnknownFields, UnknownStore};
@@ -31,6 +35,69 @@ use ::core::fmt::{self, Debug, Formatter, Result as FmtResult};
 use ::puroro::{
     HasDefault, OneofView as OneofViewTrait, OneofViewMut as OneofViewMutTrait, Optional,
 };
+
+/// Install a fresh oneof variant payload.
+pub trait OneofInstall<A: Allocator> {
+    fn install(alloc: A) -> Self;
+}
+
+impl<const FIELD: u32, A, L, D> OneofInstall<A>
+    for SingularField<ProtoString, Oneof, FIELD, A, L, D>
+where
+    A: Allocator + Clone,
+    L: StringSlotNew<A>,
+    L::Slot: AddressableSlot,
+{
+    #[inline]
+    fn install(alloc: A) -> Self {
+        SingularField::from_oneof_slot(L::new_slot(alloc))
+    }
+}
+
+impl<C, const FIELD: u32, A, L, D> OneofInstall<A>
+    for SingularField<LenScalar<C>, Oneof, FIELD, A, L, D>
+where
+    C: BytesLikeLenCodec,
+    A: Allocator + Clone,
+    L: BytesSlotNew<A> + ValueLayout<LenScalar<C>, A>,
+    <L as ValueLayout<LenScalar<C>, A>>::Slot: AddressableSlot,
+    <L as ValueLayout<LenScalar<C>, A>>::Slot: From<<L as ValueLayout<ProtoBytes, A>>::Slot>,
+{
+    #[inline]
+    fn install(alloc: A) -> Self {
+        SingularField::from_oneof_slot(L::new_slot(alloc).into())
+    }
+}
+
+impl<T, const FIELD: u32, A, L, D> OneofInstall<A>
+    for SingularField<Numerical<T>, Oneof, FIELD, A, L, D>
+where
+    T: NumericalType,
+    A: Allocator,
+    L: ValueLayout<Numerical<T>, A>,
+    L::Slot: AddressableSlot,
+    <Oneof as FieldPresence>::ValueSlot<L::Slot>: ValueSlotNew<L::Slot, A>,
+{
+    #[inline]
+    fn install(alloc: A) -> Self {
+        SingularField::new_in(alloc)
+    }
+}
+
+impl<M, const FIELD: u32, A, L, D> OneofInstall<A>
+    for SingularField<ProtoMessage<M>, Oneof, FIELD, A, L, D>
+where
+    A: Allocator,
+    L: ValueLayout<ProtoMessage<M>, A>,
+    L::Slot: AddressableSlot,
+    <Oneof as FieldPresence>::ValueSlot<L::Slot>: ValueSlotNew<L::Slot, A>,
+    M: crate::MessageEncode,
+{
+    #[inline]
+    fn install(alloc: A) -> Self {
+        SingularField::new_in(alloc)
+    }
+}
 
 /// Explicit release of a generated `oneof` storage enum.
 ///
@@ -299,7 +366,7 @@ impl<'f, 'c, E, Pb, A: Allocator, U: UnknownStore<A>, L> OneofSlotMut<'f, 'c, E,
     pub fn variant_mut<const FIELD: u32>(self) -> &'f mut <E as OneofVariant<FIELD>>::Value
     where
         E: OneofVariant<FIELD> + OneofGroup<Bits = Pb, Alloc = A, Unknown = U, Layout = L>,
-        <E as OneofVariant<FIELD>>::Value: DefaultIn<A>,
+        <E as OneofVariant<FIELD>>::Value: OneofInstall<A>,
         A: Clone,
     {
         let slot = self.slot;
@@ -313,7 +380,7 @@ impl<'f, 'c, E, Pb, A: Allocator, U: UnknownStore<A>, L> OneofSlotMut<'f, 'c, E,
         if needs_install {
             release_active::<E, Pb, A, U, L>(slot, common);
             slot.set(<E as OneofVariant<FIELD>>::from_variant(
-                DefaultIn::default_in(common.alloc.clone()),
+                OneofInstall::install(common.alloc.clone()),
             ));
         }
 

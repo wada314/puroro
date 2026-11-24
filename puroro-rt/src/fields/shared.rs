@@ -21,6 +21,7 @@ pub(crate) mod value_layout;
 pub(crate) mod value_slot;
 
 pub use crate::decode::{Eager, Lazy, LazyProfile, WireBuf};
+pub use crate::fields::wire::span_only::SpanOnly;
 pub use crate::fields::wire::wire_or_sso::WireOrSso;
 pub use crate::unknown_fields::{DiscardUnknowns, RejectUnknowns, UnknownFields, UnknownStore};
 pub use ::unmanaged::DefaultIn;

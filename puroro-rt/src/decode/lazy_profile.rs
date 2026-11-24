@@ -1,91 +1,46 @@
-//! Manifest for a lazy message's island buffer and singular LEN read policy.
+//! Manifest for a lazy message's island buffer and singular LEN slot layout.
 //!
-//! [`Owned`] keeps a [`Bytes`](bytes::Bytes) island and promotes string / bytes
-//! on get ([`WireOrSso`](crate::fields::wire::wire_or_sso::WireOrSso) cache).
-//! [`Borrowed`] stores `&[u8]` and peeks without promoting. Returned string /
-//! bytes views are tied to the `&self` borrow of the message (`&'msg str`);
-//! for [`Borrowed`], that shortens the input-buffer lifetime when the message
-//! borrow is shorter. Slot layout is still `WireOrSso` for both in this phase;
-//! a span-only store for no-cache profiles is a follow-up.
+//! [`Owned`] keeps a [`Bytes`](bytes::Bytes) island and caches string / bytes
+//! in [`WireOrSso`](crate::WireOrSso). [`Borrowed`] stores `&[u8]` and uses
+//! [`SpanOnly`](crate::SpanOnly) (span into the island, no Inline / Heap /
+//! Failed). Returned string / bytes views are tied to the `&self` borrow
+//! (`&'msg str`).
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::Bytes;
 use ::core::marker::PhantomData;
-use ::puroro::DecodeError;
-use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
 use super::wire_buf::WireBuf;
-use crate::fields::wire::{WireOrSsoKind, WireOrSsoSlot};
+use crate::fields::wire::lazy_len::{LazyBytesLen, LazyStringLen};
+use crate::fields::wire::span_only::SpanOnly;
+use crate::fields::wire::wire_or_sso::WireOrSso;
 
-/// Island buffer plus singular string / bytes get policy for a lazy message.
+/// Island buffer plus singular string / bytes slot layout for a lazy message.
 pub trait LazyProfile: Clone {
     /// Contiguous wire handle stored on [`super::LazyScan`].
     type Buf: WireBuf;
 
-    /// Read a present `WireOrSso` string slot.
+    /// Singular `string` (`utf8_validation=VERIFY`) slot layout.
     ///
-    /// The returned `&'msg str` is tied to the message / wire borrow. For
-    /// [`Borrowed`], the input buffer must outlive `'msg` (true while the
-    /// message still holds that buffer).
-    fn get_str<'msg, A: Allocator + Clone>(
-        slot: &'msg WireOrSsoSlot<UnmanagedString<A>>,
-        arm: WireOrSsoKind,
-        wire: &'msg Self::Buf,
-        alloc: A,
-        set_arm: impl FnOnce(WireOrSsoKind),
-    ) -> Result<&'msg str, DecodeError>
-    where
-        Self: 'msg;
+    /// `KIND` is the first of two kind bits for [`WireOrSso`]; [`SpanOnly`]
+    /// ignores it (Phase B keeps bit allocations for now).
+    type StringLen<A: Allocator + Clone, const KIND: usize>: LazyStringLen<A>;
 
-    /// Read a present `WireOrSso` bytes slot.
-    fn get_bytes<'msg, A: Allocator + Clone>(
-        slot: &'msg WireOrSsoSlot<UnmanagedVec<u8, A>>,
-        arm: WireOrSsoKind,
-        wire: &'msg Self::Buf,
-        alloc: A,
-        set_arm: impl FnOnce(WireOrSsoKind),
-    ) -> Result<&'msg [u8], DecodeError>
-    where
-        Self: 'msg;
+    /// Singular `bytes` / `utf8_validation=NONE` string slot layout.
+    type BytesLen<A: Allocator + Clone, const KIND: usize>: LazyBytesLen<A>;
 }
 
-/// Owned island (`Bytes`) with UTF-8 / bytes promote on get.
+/// Owned island (`Bytes`) with UTF-8 / bytes promote on get (`WireOrSso`).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Owned;
 
 impl LazyProfile for Owned {
     type Buf = Bytes;
-
-    #[inline]
-    fn get_str<'msg, A: Allocator + Clone>(
-        slot: &'msg WireOrSsoSlot<UnmanagedString<A>>,
-        arm: WireOrSsoKind,
-        wire: &'msg Bytes,
-        alloc: A,
-        set_arm: impl FnOnce(WireOrSsoKind),
-    ) -> Result<&'msg str, DecodeError>
-    where
-        Self: 'msg,
-    {
-        slot.get_str(arm, wire.as_bytes(), alloc, set_arm)
-    }
-
-    #[inline]
-    fn get_bytes<'msg, A: Allocator + Clone>(
-        slot: &'msg WireOrSsoSlot<UnmanagedVec<u8, A>>,
-        arm: WireOrSsoKind,
-        wire: &'msg Bytes,
-        alloc: A,
-        set_arm: impl FnOnce(WireOrSsoKind),
-    ) -> Result<&'msg [u8], DecodeError>
-    where
-        Self: 'msg,
-    {
-        slot.get_bytes(arm, wire.as_bytes(), alloc, set_arm)
-    }
+    type StringLen<A: Allocator + Clone, const KIND: usize> = WireOrSso<KIND>;
+    type BytesLen<A: Allocator + Clone, const KIND: usize> = WireOrSso<KIND>;
 }
 
-/// Borrowed island (`&[u8]`) with peek-on-get (no promote).
+/// Borrowed island (`&[u8]`) with span-only slots (no promote cache).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Borrowed<'buf> {
     _buf: PhantomData<&'buf [u8]>,
@@ -93,33 +48,6 @@ pub struct Borrowed<'buf> {
 
 impl<'buf> LazyProfile for Borrowed<'buf> {
     type Buf = &'buf [u8];
-
-    #[inline]
-    fn get_str<'msg, A: Allocator + Clone>(
-        slot: &'msg WireOrSsoSlot<UnmanagedString<A>>,
-        arm: WireOrSsoKind,
-        wire: &'msg &'buf [u8],
-        _alloc: A,
-        _set_arm: impl FnOnce(WireOrSsoKind),
-    ) -> Result<&'msg str, DecodeError>
-    where
-        Self: 'msg,
-    {
-        // `'buf: 'msg` from `Self: 'msg`; shorten the peek to the message borrow.
-        slot.peek_str(arm, wire)
-    }
-
-    #[inline]
-    fn get_bytes<'msg, A: Allocator + Clone>(
-        slot: &'msg WireOrSsoSlot<UnmanagedVec<u8, A>>,
-        arm: WireOrSsoKind,
-        wire: &'msg &'buf [u8],
-        _alloc: A,
-        _set_arm: impl FnOnce(WireOrSsoKind),
-    ) -> Result<&'msg [u8], DecodeError>
-    where
-        Self: 'msg,
-    {
-        slot.peek_bytes(arm, wire)
-    }
+    type StringLen<A: Allocator + Clone, const KIND: usize> = SpanOnly;
+    type BytesLen<A: Allocator + Clone, const KIND: usize> = SpanOnly;
 }

@@ -192,7 +192,9 @@ Live plugin emits both messages for every message (`Name` / `NameLazy`, each a n
 | [`wire/singular_type.rs`](puroro-rt/src/fields/wire/singular_type.rs) | `SingularType` marker + `PayloadAccess` (`Slot` / `Mut` / `Written` for inline) |
 | [`shared/value_layout.rs`](puroro-rt/src/fields/shared/value_layout.rs) | `ValueLayout` (`Slot` / `Mut`), `Inline`, `Boxed`, `BitPacked`, `InlineOrHeap` |
 | [`wire/repeated_element.rs`](puroro-rt/src/fields/wire/repeated_element.rs) | `RepeatedElement` / `RepeatedElementMerge` (`Element` for repeated buffers) |
-| [`wire/wire_or_sso.rs`](puroro-rt/src/fields/wire/wire_or_sso.rs) | `WireOrSso` / `WireOrSsoKind` — lazy singular string / bytes span vs SSO |
+| [`wire/wire_or_sso.rs`](puroro-rt/src/fields/wire/wire_or_sso.rs) | `WireOrSso` / `WireOrSsoKind` — owned lazy singular string / bytes span vs SSO |
+| [`wire/span_only.rs`](puroro-rt/src/fields/wire/span_only.rs) | `SpanOnly` — borrowed / no-cache lazy LEN slot (`WireSpan` only) |
+| [`wire/lazy_len.rs`](puroro-rt/src/fields/wire/lazy_len.rs) | `LazyLenStore` / `LazyStringGet` / `LazyBytesGet` — ingest + get policies |
 | [`wire/proto_ref_ops.rs`](puroro-rt/src/fields/wire/proto_ref_ops.rs) | `PartialEq` / `Debug` for `EncodeType::View` without `A: 'static` |
 | [`wire/proto_message.rs`](puroro-rt/src/fields/wire/proto_message.rs) | `ProtoMessage` (slot = `M` or `UnmanagedBox<M>`, `View = &M`) |
 | [`wire/numerical.rs`](puroro-rt/src/fields/wire/numerical.rs) | `Numerical<C>`, `NumericalType` codecs, `ProtoInt32` / … / fixed / `ProtoEnum` + enum kind traits |
@@ -444,7 +446,7 @@ Adding a singular wire type = one new codec + `Numerical` / `LenScalar` alias (b
 
 Full singular signature: `SingularField<T, P, FIELD, A, L = Inline, D = ProtoDefault>`.
 
-The rows above are the **eager** layouts. On `NameLazy`, companion [`Layout`](protoc-gen-puroro/src/emit/layout.rs) associated types swap LEN / repeated / map slots: singular string / bytes use `WireOrSso<KIND>` (2-bit kind on the common bits) instead of `InlineOrHeap<SSO_BIT>`; repeated LEN uses `RepeatedSpans`; maps use `MapSpans`. Numericals / enums / bools keep the eager catalog slots. Pinned children (`(puroro.child_parse) = LAZY`) are a concrete type on both messages (sample `assignee` is `ProtoMessage<AddressLazy<A>>`).
+The rows above are the **eager** layouts. On `NameLazy`, companion [`Layout`](protoc-gen-puroro/src/emit/layout.rs) associated types swap LEN / repeated / map slots: singular string / bytes use `P::StringLen` / `P::BytesLen` (`Owned` → `WireOrSso<KIND>` with 2-bit kind on the common bits; `Borrowed` → `SpanOnly`, which ignores `KIND`) instead of `InlineOrHeap<SSO_BIT>`; repeated LEN uses `RepeatedSpans`; maps use `MapSpans`. Numericals / enums / bools keep the eager catalog slots. Pinned children (`(puroro.child_parse) = LAZY`) are a concrete type on both messages (sample `assignee` is `ProtoMessage<AddressLazy<A>>`).
 
 ---
 

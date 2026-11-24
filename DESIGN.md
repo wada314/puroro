@@ -1316,7 +1316,7 @@ A future design would need:
 
 ### Zero-copy is a `LazyProfile` parameter, not a second message type
 
-Giving every field a lifetime would force that lifetime onto every generated type. Instead, the lazy alias takes `P: LazyProfile = Owned`: `TaskLazy<A>` stays lifetime-free (owned island), and zero-copy is `TaskLazy<A, Borrowed<'buf>>` via `parse_in` / `parse` ([lazy-profile](.cursor/plans/lazy-profile.md)). Singular / oneof string and bytes getters return `&str` / `&[u8]` tied to `&self`; Borrowed peeks without promoting. Repeated string / bytes and maps still materialise. Map message values materialise as `NameLazy<A>` (`Bytes`), not `NameLazy<A, B>`, so span materialise can use `Message` / `WireAppend`. The plugin and sample both emit `B` and the borrowed getters. The archived `Address` view spike is history only ([`archive/address-view-spike`](archive/address-view-spike/)).
+Giving every field a lifetime would force that lifetime onto every generated type. Instead, the lazy alias takes `P: LazyProfile = Owned`: `TaskLazy<A>` stays lifetime-free (owned island), and zero-copy is `TaskLazy<A, Borrowed<'buf>>` via `parse_in` / `parse` ([lazy-profile](.cursor/plans/lazy-profile.md)). Singular / oneof string and bytes getters return `&str` / `&[u8]` tied to `&self`; `Owned` promotes through `WireOrSso`, `Borrowed` peeks through `SpanOnly`. Repeated string / bytes and maps still materialise. Map message values materialise as `NameLazy<A>` (`Bytes`), not `NameLazy<A, B>`, so span materialise can use `Message` / `WireAppend`. The plugin and sample both emit the profile and the borrowed getters. The archived `Address` view spike is history only ([`archive/address-view-spike`](archive/address-view-spike/)).
 
 ### No builder / immutable-object pattern
 
@@ -1427,7 +1427,7 @@ pub struct TaskLazy<A: Allocator + Clone = Global, P: LazyProfile = Owned> {
 |---|---|---|
 | Singular numerical / enum / bool | Catalog `merge_scanned` from `ScannedValue` (last wins) | Already materialised |
 | Repeated numerical, packed or expanded | Expanded: `merge_scanned` from `ScannedValue`; packed LEN: `len_span` + `merge_packed_buf` | `&[T]` |
-| Singular / oneof string / bytes | Store a span (`WireOrSso`) | Owned (`Bytes`): semantic decode / promote. `InvalidUtf8` is sticky. Borrowed (`&[u8]`): peek without promote; UTF-8 on every get. `has_*` is presence only |
+| Singular / oneof string / bytes | Store a span (`Owned` → `WireOrSso`, `Borrowed` → `SpanOnly`) | Owned (`Bytes`): semantic decode / promote. `InvalidUtf8` is sticky. Borrowed (`&[u8]`): span-only peek; UTF-8 on every get. `has_*` is presence only |
 | Nested message | Merge each LEN into the child | `Option<&Child>` |
 | Repeated message | One child per occurrence | `&[Child]` |
 | Map, repeated string, repeated bytes | Store spans | First get materialises the map or the element list |

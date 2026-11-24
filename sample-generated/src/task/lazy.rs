@@ -2,14 +2,14 @@
 //!
 //! Numerical getters bind through [`Record::field`](puroro_rt::Record::field).
 //! String and bytes getters read spans with [`HasField::field`](puroro_rt::HasField::field)
-//! via [`LazyProfile`](::puroro_rt::decode::LazyProfile) (`Owned` promotes;
-//! `Borrowed` peeks). `into_eager` replays `_wire` through
+//! via the profile's LEN layout (`Owned` / `WireOrSso` promotes;
+//! `Borrowed` / `SpanOnly` peeks). `into_eager` replays `_wire` through
 //! [`Record::decode_eager`](puroro_rt::Record::decode_eager).
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::core::ops::Deref;
 use ::puroro::{DecodeError, HasDefault, MapRef, Optional};
-use ::puroro_rt::decode::{Borrowed, LazyMessage, LazyProfile};
+use ::puroro_rt::decode::{Borrowed, LazyMessage, LazyProfile, WireBuf};
 use ::puroro_rt::{DefaultIn, HasField, Lazy, OneofGroup, Record};
 
 use super::notification::NotificationStorage;
@@ -68,7 +68,10 @@ impl<A: Allocator + Clone, P: LazyProfile> TaskLazy<A, P> {
     {
         LazyMessage::ensure_scanned(self)?;
         <TaskFields<A, Lazy<A, P>> as HasField<{ FIELD_TITLE }>>::field(&self.record.fields)
-            .profile_str::<_, P>(&self.record.common, self.record.common.lazy.scan.wire_buf())
+            .profile_str(
+                &self.record.common,
+                self.record.common.lazy.scan.wire_buf().as_bytes(),
+            )
     }
 
     pub fn owner_id(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
@@ -77,7 +80,10 @@ impl<A: Allocator + Clone, P: LazyProfile> TaskLazy<A, P> {
     {
         LazyMessage::ensure_scanned(self)?;
         <TaskFields<A, Lazy<A, P>> as HasField<{ FIELD_OWNER_ID }>>::field(&self.record.fields)
-            .profile_str::<_, P>(&self.record.common, self.record.common.lazy.scan.wire_buf())
+            .profile_str(
+                &self.record.common,
+                self.record.common.lazy.scan.wire_buf().as_bytes(),
+            )
     }
 
     pub fn payload(&self) -> Result<Optional<&[u8], impl HasDefault<&[u8]>>, DecodeError>
@@ -86,7 +92,10 @@ impl<A: Allocator + Clone, P: LazyProfile> TaskLazy<A, P> {
     {
         LazyMessage::ensure_scanned(self)?;
         <TaskFields<A, Lazy<A, P>> as HasField<{ FIELD_PAYLOAD }>>::field(&self.record.fields)
-            .profile_bytes::<_, P>(&self.record.common, self.record.common.lazy.scan.wire_buf())
+            .profile_bytes(
+                &self.record.common,
+                self.record.common.lazy.scan.wire_buf().as_bytes(),
+            )
     }
 
     pub fn email_address(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
@@ -95,7 +104,10 @@ impl<A: Allocator + Clone, P: LazyProfile> TaskLazy<A, P> {
     {
         LazyMessage::ensure_scanned(self)?;
         <TaskFields<A, Lazy<A, P>> as HasField<{ FIELD_EMAIL_ADDRESS }>>::field(&self.record.fields)
-            .profile_str::<_, _, _, P>(&self.record.common, self.record.common.lazy.scan.wire_buf())
+            .profile_str(
+                &self.record.common,
+                self.record.common.lazy.scan.wire_buf().as_bytes(),
+            )
     }
 
     pub fn phone_number(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
@@ -104,7 +116,10 @@ impl<A: Allocator + Clone, P: LazyProfile> TaskLazy<A, P> {
     {
         LazyMessage::ensure_scanned(self)?;
         <TaskFields<A, Lazy<A, P>> as HasField<{ FIELD_PHONE_NUMBER }>>::field(&self.record.fields)
-            .profile_str::<_, _, _, P>(&self.record.common, self.record.common.lazy.scan.wire_buf())
+            .profile_str(
+                &self.record.common,
+                self.record.common.lazy.scan.wire_buf().as_bytes(),
+            )
     }
 
     pub fn score(&self) -> Result<i32, DecodeError>
