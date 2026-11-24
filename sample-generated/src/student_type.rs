@@ -73,7 +73,7 @@ pub struct Student<A: Allocator + Clone = Global> {
     pub(crate) record: Record<StudentFields<A>, A, Eager, UnknownFields<A>>,
 }
 
-::puroro_rt::forward_record!(eager Student);
+::puroro_rt::forward_record!(eager Student, "example.Student");
 
 impl<A: Allocator + Clone> RecordFields<A, Eager> for StudentFields<A> {
     type Bits = Bits;
@@ -82,6 +82,7 @@ impl<A: Allocator + Clone> RecordFields<A, Eager> for StudentFields<A> {
 
     const EAGER_NAME: &'static str = "Student";
     const LAZY_NAME: &'static str = "Student";
+    const FULL_NAME: &'static str = "example.Student";
 
     fn empty_bits() -> Self::Bits {
         BitArray::ZERO

@@ -136,6 +136,7 @@ protoc --plugin=protoc-gen-puroro=$PWD/target/debug/protoc-gen-puroro --puroro_o
 - Extensions (`extend` / proto2 extension fields).
 - Services and RPC.
 - Well-known types such as `google.protobuf.Any`, `Timestamp`, and `Duration`, unless you compile those `.proto` files yourself.
+- Full runtime reflection / `DynamicMessage`. Light identity (`Message::FULL_NAME`) is always on; encoded `FileDescriptorSet` bytes are an opt-in `descriptors` feature on generated crates (see `DESIGN.md` §3.1).
 - A builder type separate from the message. Mutation is `let mut` plus `_mut` / `clear_*`.
 - Treating `(puroro.unknown_fields) = REJECT` as spec-compliant behavior. The default preserve store is the spec behavior. `DISCARD` accepts the message and drops the bytes.
 

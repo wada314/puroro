@@ -178,6 +178,8 @@ The user-facing trait is slimmer than the generated catalog traits. Wire-body si
 ```rust
 pub trait Message: Sized {
     type Alloc: Allocator; // Clone is required on new_in / merge_from, not on the associated type
+    /// Absolute protobuf type name without a leading `.` (`example.Task`).
+    const FULL_NAME: &'static str;
     fn new_in(alloc: Self::Alloc) -> Self
     where
         Self::Alloc: Clone;
@@ -211,6 +213,43 @@ pub trait Message: Sized {
 **Name conflicts.** If a proto field is named `validate`, `unknown_fields`, `encode`, `encode_to_vec`, etc., the inherent field getter wins; use `Message::validate(&msg)` (UFCS). `has_*()` on a lazy alias is inherent and collides the same way. Lazy `encoded_len()` / `encode()` / `encode_to_vec()` / `push()` / `finish()` are [`LazyMessage`](puroro-rt/src/decode/lazy_scan.rs) methods, not inherent methods and not `Message` items. `LazyMessage::encode` and `LazyMessage::encode_to_vec` return `Result` and require a finished scan. With both traits in scope, call those two by UFCS. `decode` is `Message::decode`.
 
 **Allocator.** `Alloc` is the message's single allocator type. Nested message fields construct children with `Message::new_in` under the bound `M: Message<Alloc = A>` (same `A` as the parent). An inherent `new()` for `Global` may still be emitted on the concrete type. `decode` requires `Self: Default` (typically `A: Default`); otherwise use `new_in(alloc)` then `merge_from`.
+
+### 3.1 Message identity and descriptors
+
+Two layers. Light identity is always on; encoded descriptor bytes are opt-in on the **generated** crate (not on `puroro`).
+
+#### Always on — `Message::FULL_NAME`
+
+Every generated message (eager and lazy) sets [`Message::FULL_NAME`](src/message.rs) to the absolute protobuf type name **without** a leading `.` (`example.Task`, nested `example.Task.Inner`, or `Empty` when the file has no `package`). That matches `type.googleapis.com/…` URLs. The catalog stores the same string as [`RecordFields::FULL_NAME`](puroro-rt/src/message_record.rs); `forward_record!(eager Task, "example.Task")` forwards it onto the user type.
+
+This is not a reflection API: there is no field table, no dynamic get/set, and no `DynamicMessage`. Look up a message inside an embedded set by this name when needed.
+
+#### Opt-in — generated-crate Cargo feature `descriptors`
+
+```toml
+[features]
+default = []
+descriptors = []
+```
+
+When enabled, the generated crate root exposes:
+
+```rust
+pub mod descriptors {
+    /// Encoded `google.protobuf.FileDescriptorSet` for this crate.
+    pub const FILE_DESCRIPTOR_SET: &'static [u8] = /* … */;
+}
+```
+
+One crate-wide byte slice — not a copy per message, not a newtype, and no per-message `FILE_NAME` trait. Ordinary encode/decode builds leave the feature off so schema bytes stay out of the binary. The root module name `descriptors` is reserved like `puroro` ([Allowed and disallowed names](#allowed-and-disallowed-names)), so `package descriptors` cannot collide when the feature is enabled.
+
+Inside that set, each `FileDescriptorProto.name` is a path relative to the proto source-tree root with `/` separators (e.g. `foo/bar/baz.proto`). It is **not** a host OS path; protoc canonicalizes Windows `\` to `/` before the plugin sees the request.
+
+**Plugin status.** The generator already emits `FULL_NAME`, the generated `Cargo.toml` `descriptors` feature, and a cfg-gated `descriptors` module. The set bytes are still an **empty stub**: `FILE_DESCRIPTOR_SET` is `&[]`. Enabling the feature compiles the module in, but that slice is **not** a usable set for gRPC server reflection (empty does not mean “no files in the schema”). A follow-up should preserve raw `CodeGeneratorRequest.proto_file` LEN bodies (the IR is a lossy subset) and wrap them as a `FileDescriptorSet` in that constant — prefer a Rust byte literal (or `ResponseFile` content as `Vec<u8>`) over assuming UTF-8 `string` content.
+
+**Sample.** [`sample-generated`](sample-generated/) uses the same feature flag and sketches `descriptors::FILE_DESCRIPTOR_SET`.
+
+**Out of scope here.** Runtime field reflection, `DynamicMessage`, and a parsed `MessageDescriptor` object graph. Those stay under [Other future work](#other-future-work).
 
 ---
 
@@ -286,7 +325,7 @@ From inside the nested `_root` submodule, `super::super::_root` always reaches t
 
 **Reserved `_`-prefixed names** introduced by the generator (`_root`, `_common`, …) are exempt from proto-derived naming and must not be treated as public API. Which proto names the generator accepts is [Allowed and disallowed names](#allowed-and-disallowed-names).
 
-**`puroro` is a keyword at the generated crate root.** Layout emits `pub use ::puroro;` there, so application code imports traits as `<crate>::puroro::Message` (and `StringMut`, `Optional`, `DecodeError`, …) without a direct `puroro` dependency. The name `puroro` in that position is not a proto module. The rejection rule is in [Allowed and disallowed names](#allowed-and-disallowed-names).
+**`puroro` and `descriptors` are keywords at the generated crate root.** Layout emits `pub use ::puroro;` there, so application code imports traits as `<crate>::puroro::Message` (and `StringMut`, `Optional`, `DecodeError`, …) without a direct `puroro` dependency. The name `puroro` in that position is not a proto module. Layout also reserves `descriptors` for the opt-in `FileDescriptorSet` embedding ([§3.1](#31-message-identity-and-descriptors)). The rejection rules are in [Allowed and disallowed names](#allowed-and-disallowed-names).
 
 Several generated crates each re-export `puroro`. When Cargo unifies those crates onto one `puroro` version, `<crate_a>::puroro::Message` and `<crate_b>::puroro::Message` are the same trait: import it from one crate and it applies to messages from the others. Importing the name `Message` from two of those paths into the same module is a name collision. Incompatible versions (for example `0.15` and `0.16` in the generated manifests) are different crates, and the trait from one does not apply to the other crate's messages.
 
@@ -349,25 +388,30 @@ Enum values strip that UPPER_SNAKE prefix, not the enum's raw spelling. `enum Xm
 
 **Enum value constants** strip a redundant `ENUM_NAME_` prefix when the remainder is still a simple identifier (`STATUS_UNSPECIFIED` on `Status` becomes `Status::UNSPECIFIED`). If the remainder would not be an identifier (`EDITION_2023` → `2023`), the full value name is kept. The constant is not raw-escaped, so a value whose constant name is a Rust keyword is outside the supported set. A value whose constant name is `_Unknown` is rejected, because the native-enum representation uses that variant for unknown numbers. A non-native enum keeps values as associated constants and does not add `_Unknown`.
 
-**`puroro` at the crate root is reserved.** Layout emits `pub use ::puroro;` as the first item of the generated crate, so `<crate>::puroro` is the runtime crate. Codegen rejects the request when the root module would contain a child module `puroro` or a type item named `puroro`. That covers:
+**`puroro` and `descriptors` at the crate root are reserved.** Layout emits `pub use ::puroro;` as the first item of the generated crate, so `<crate>::puroro` is the runtime crate. It also emits a cfg-gated `mod descriptors` for the opt-in `FileDescriptorSet` embedding ([§3.1](#31-message-identity-and-descriptors)). Codegen rejects the request when the root module would contain a child module or type item named `puroro` or `descriptors`. That covers:
 
 | Schema | Rust name at the crate root | Result |
 |---|---|---|
 | `package puroro` | `mod puroro` | rejected |
 | `package puroro.shop` | `mod puroro` | rejected |
+| `package descriptors` | `mod descriptors` | rejected |
+| `package descriptors.v1` | `mod descriptors` | rejected |
 | no package, `message puroro` | type `puroro` and companion `mod puroro` | rejected |
 | no package, `message Puroro` | companion `mod puroro` (the struct is `Puroro`) | rejected |
+| no package, `message Descriptors` | companion `mod descriptors` | rejected |
 | no package, `enum puroro` | type `puroro` | rejected |
 | no package, `enum Puroro` | type `Puroro` | allowed; enums have no companion module |
+| no package, `enum Descriptors` | type `Descriptors` | allowed; enums have no companion module |
 | `package shop.puroro` | `shop::puroro` | allowed |
+| `package shop.descriptors` | `shop::descriptors` | allowed |
 | `package shop`, `message Puroro` | `shop::Puroro`, companion `shop::puroro` | allowed |
-| a field, oneof, or enum value named `puroro` | a method or constant, not a root module | allowed |
+| a field, oneof, or enum value named `puroro` / `descriptors` | a method or constant, not a root module | allowed |
 
 **Generator-owned names are not proto names.** Every emitted module contains a private `mod _root` used as the absolute-path alias (`self::_root`). Every message struct has a field `_common`. These names are not public API. The plugin does not currently reject a proto package, message, or field that spells `_root` or `_common`; such a schema can fail later, when the generated Rust is compiled. Do not use them. Do not document a proto-derived item as if it were `_root` or `_common`.
 
 **`crate_name` is a Cargo package name, not a proto name.** `--puroro_opt=crate_name=` must be lowercase ASCII letters, digits, `-`, or `_`, and must start with a letter. The default is `generated`. This string is the directory and the `[package] name`; it is not a Rust module inside `lib.rs`.
 
-**Left to merge or to `rustc`.** Companion modules that collide with a package segment are merged. Two messages that generate the same item name in one module are not renamed; `rustc` reports the duplicate. A keyword in an `Ident::new` position is outside the supported set, and that failure is not the reserved-`puroro` error.
+**Left to merge or to `rustc`.** Companion modules that collide with a package segment are merged. Two messages that generate the same item name in one module are not renamed; `rustc` reports the duplicate. A keyword in an `Ident::new` position is outside the supported set, and that failure is not the reserved-root-name error.
 
 ### Public signatures must not surface `puroro-rt`
 
@@ -1491,6 +1535,7 @@ Generic code that only reads fields is meant to use `task::MessageFallible` with
 - **Unknown-field reject-on-decode.** Shipped as `(puroro.unknown_fields) = REJECT` ([§4.9](#49-unknown-fields)). This failure is outside the protobuf spec. File-level / package default is not wired, same as Discard.
 - **Service / RPC definitions.** Out of scope for the runtime library.
 - **Well-known types.** `google.protobuf.Timestamp`, `Duration`, `Any`, etc.
-- **Reflection / descriptors.** Runtime introspection of message schema.
+- **Descriptor set embedding.** [`Message::FULL_NAME`](#31-message-identity-and-descriptors) and the `descriptors` feature surface are sketched; embedding real `FileDescriptorSet` bytes from the plugin request is still open.
+- **Reflection / `DynamicMessage`.** Runtime field introspection and schema object graphs (beyond the opt-in byte embedding above).
 - **Extensions.** See §6.5.
 - **Repeated / map string and bytes SSO.** Singular string / bytes SSO and singular message inline-or-box are shipped. Repeated and map payloads stay on the heap — see [IMPLEMENTATION.md §17.2](IMPLEMENTATION.md#172-string--bytes-inline-optimisation).

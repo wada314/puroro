@@ -9,13 +9,18 @@
 //! This crate is the public API shared by library users and generated
 //! message code:
 //!
-//! - [`Message`] — encode / decode / merge / validate / unknown fields
+//! - [`Message`] — encode / decode / merge / validate / unknown fields /
+//!   [`Message::FULL_NAME`]
 //! - [`Optional`] / [`HasDefault`] — explicit-presence singular accessors
 //! - [`StringMut`] / [`BytesMut`] — singular `string` / `bytes` mutators
 //! - [`MapRef`] / [`MapMut`], [`RepeatedContainerMut`] / [`RepeatedStringMut`] /
 //!   [`RepeatedBytesMut`] — map and repeated mutators
 //! - [`OneofView`] / [`OneofViewMut`] — oneof group views
 //! - [`DecodeError`], [`UnknownField`], [`WireType`]
+//!
+//! Generated crates may opt into a `descriptors` feature that embeds a
+//! `FileDescriptorSet` byte slice (`DESIGN.md` §3.1); that surface lives on
+//! the generated crate, not here.
 //!
 //! Generated messages expose proto fields as **inherent methods** on the concrete
 //! type (`title()`, `title_mut()`, `clear_title()`, …). Explicit-presence getters

@@ -27,7 +27,7 @@ pub enum ModuleLayout {
 
 /// Render a forest according to `layout`.
 pub fn render(forest: &ModuleForest, layout: &ModuleLayout) -> Result<Vec<ResponseFile>> {
-    reject_reserved_puroro(forest.root())?;
+    reject_reserved_root_names(forest.root())?;
     match layout {
         ModuleLayout::SingleFile { path } => Ok(vec![render_single_file(forest, path)]),
     }
@@ -54,6 +54,7 @@ fn render_node_items(node: &ModuleNode, is_forest_root: bool) -> Vec<Item> {
     let mut items = Vec::new();
     if is_forest_root {
         items.push(puroro_reexport());
+        items.push(descriptors_module_stub());
         items.extend(node.items().iter().cloned());
         items.push(root_alias_item(true));
         items.extend(node.children().iter().map(render_child_mod));
@@ -87,29 +88,62 @@ fn puroro_reexport() -> Item {
     }
 }
 
-/// `puroro` at the forest root is the runtime re-export, not a proto module.
-fn reject_reserved_puroro(root: &ModuleNode) -> Result<()> {
-    if root.get_child("puroro").is_some() || root.items().iter().any(item_binds_puroro) {
-        return Err(Error::Codegen(
-            "`puroro` is reserved at the generated crate root; the runtime crate is re-exported as that module"
-                .to_owned(),
-        ));
+/// Opt-in `FileDescriptorSet` embedding (`descriptors` feature).
+///
+/// Bytes are an empty stub until the plugin preserves raw
+/// `CodeGeneratorRequest.proto_file` payloads (see DESIGN.md §3.1).
+fn descriptors_module_stub() -> Item {
+    parse_quote! {
+        /// Encoded `google.protobuf.FileDescriptorSet` for this crate (opt-in).
+        ///
+        /// Enable this crate's `descriptors` feature to compile this module in.
+        ///
+        /// # Interim empty stub
+        ///
+        /// `FILE_DESCRIPTOR_SET` is currently `&[]`. That is intentional until the
+        /// plugin embeds `CodeGeneratorRequest.proto_file` blobs — **not** a valid
+        /// set for gRPC server reflection or similar consumers. Do not treat an
+        /// empty slice as “no files in the schema”.
+        #[cfg(feature = "descriptors")]
+        pub mod descriptors {
+            /// Crate-wide encoded `FileDescriptorSet`.
+            ///
+            /// Interim: always empty (`&[]`). Real embedding is a follow-up; see
+            /// the module docs. Empty does **not** mean the schema has no files.
+            pub const FILE_DESCRIPTOR_SET: &'static [u8] = &[];
+        }
+    }
+}
+
+/// Root names reserved for layout-owned modules (`puroro`, `descriptors`).
+const RESERVED_ROOT_NAMES: &[&str] = &["puroro", "descriptors"];
+
+/// `puroro` is the runtime re-export; `descriptors` holds the opt-in FDS bytes.
+fn reject_reserved_root_names(root: &ModuleNode) -> Result<()> {
+    for name in RESERVED_ROOT_NAMES {
+        if root.get_child(name).is_some()
+            || root.items().iter().any(|item| item_binds_name(item, name))
+        {
+            return Err(Error::Codegen(format!(
+                "`{name}` is reserved at the generated crate root"
+            )));
+        }
     }
     Ok(())
 }
 
-fn item_binds_puroro(item: &Item) -> bool {
+fn item_binds_name(item: &Item, name: &str) -> bool {
     match item {
-        Item::Struct(item) => item.ident == "puroro",
-        Item::Enum(item) => item.ident == "puroro",
-        Item::Type(item) => item.ident == "puroro",
-        Item::Union(item) => item.ident == "puroro",
-        Item::Trait(item) => item.ident == "puroro",
-        Item::TraitAlias(item) => item.ident == "puroro",
-        Item::Fn(item) => item.sig.ident == "puroro",
-        Item::Const(item) => item.ident == "puroro",
-        Item::Static(item) => item.ident == "puroro",
-        Item::Mod(item) => item.ident == "puroro",
+        Item::Struct(item) => item.ident == name,
+        Item::Enum(item) => item.ident == name,
+        Item::Type(item) => item.ident == name,
+        Item::Union(item) => item.ident == name,
+        Item::Trait(item) => item.ident == name,
+        Item::TraitAlias(item) => item.ident == name,
+        Item::Fn(item) => item.sig.ident == name,
+        Item::Const(item) => item.ident == name,
+        Item::Static(item) => item.ident == name,
+        Item::Mod(item) => item.ident == name,
         _ => false,
     }
 }
@@ -169,6 +203,8 @@ mod tests {
         assert!(file.content.contains("pub struct Empty"));
         assert!(file.content.contains("allow"));
         assert!(file.content.contains("pub use ::puroro"));
+        assert!(file.content.contains("mod descriptors"));
+        assert!(file.content.contains("FILE_DESCRIPTOR_SET"));
         assert!(file.content.contains("mod _root"));
         assert!(file.content.contains("use super::*;"));
     }
@@ -188,9 +224,37 @@ mod tests {
     }
 
     #[test]
+    fn root_module_named_descriptors_is_rejected() {
+        let mut forest = ModuleForest::new();
+        forest.ensure_package("descriptors");
+        let err = render(
+            &forest,
+            &ModuleLayout::SingleFile {
+                path: "lib.rs".into(),
+            },
+        )
+        .unwrap_err();
+        assert!(err.to_string().contains("reserved"));
+        assert!(err.to_string().contains("descriptors"));
+    }
+
+    #[test]
     fn nested_module_named_puroro_is_allowed() {
         let mut forest = ModuleForest::new();
         forest.ensure_package("shop.puroro");
+        render(
+            &forest,
+            &ModuleLayout::SingleFile {
+                path: "lib.rs".into(),
+            },
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn nested_module_named_descriptors_is_allowed() {
+        let mut forest = ModuleForest::new();
+        forest.ensure_package("shop.descriptors");
         render(
             &forest,
             &ModuleLayout::SingleFile {

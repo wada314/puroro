@@ -48,7 +48,7 @@ pub struct Marker<A: Allocator + Clone = Global> {
     pub(crate) record: Record<MarkerFields<A>, A, Eager, DiscardUnknowns>,
 }
 
-::puroro_rt::forward_record!(eager Marker);
+::puroro_rt::forward_record!(eager Marker, "example.Marker");
 
 impl<A: Allocator + Clone> RecordFields<A, Eager> for MarkerFields<A> {
     type Bits = Bits;
@@ -57,6 +57,7 @@ impl<A: Allocator + Clone> RecordFields<A, Eager> for MarkerFields<A> {
 
     const EAGER_NAME: &'static str = "Marker";
     const LAZY_NAME: &'static str = "Marker";
+    const FULL_NAME: &'static str = "example.Marker";
 
     fn empty_bits() -> Self::Bits {
         BitArray::ZERO

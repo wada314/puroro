@@ -110,7 +110,14 @@ fn prepare_message(message: &Message<'_>, storage: &MessageStoragePlan) -> Resul
     let module_name = type_name_to_module_ident(message.name());
     let type_name = ident::escape_ident(message.name());
     let field_plan = plan_fields(message, storage)?;
-    let rendered = message::render_items(&field_plan, &type_name, message.name(), &module_name)?;
+    let full_name = message.fqn().without_leading_dot();
+    let rendered = message::render_items(
+        &field_plan,
+        &type_name,
+        message.name(),
+        &module_name,
+        full_name,
+    )?;
 
     let nested_enums = message
         .nested_enums()

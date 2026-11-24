@@ -8,6 +8,11 @@ description = "Hand-written sample of puroro protoc plugin output (Task / Addres
 [lints]
 workspace = true
 
+[features]
+default = []
+# Opt-in encoded `FileDescriptorSet` as `descriptors::FILE_DESCRIPTOR_SET`.
+descriptors = []
+
 [dependencies]
 allocator-api2 = "0.2"
 bitvec = "1"

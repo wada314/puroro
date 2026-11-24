@@ -26,11 +26,14 @@ pub(super) struct RenderedMessageItems {
 }
 
 /// Render the message struct (parent) and companion (`FIELD_*`, defaults, oneofs).
+///
+/// `full_name` is the protobuf type name without a leading `.` (`example.Task`).
 pub(super) fn render_items(
     field_plan: &MessageFieldPlan<'_>,
     name: &Ident,
     name_str: &str,
     companion: &Ident,
+    full_name: &str,
 ) -> Result<RenderedMessageItems> {
     let fields = field_plan
         .members()
@@ -101,6 +104,7 @@ pub(super) fn render_items(
 
                 const EAGER_NAME: &'static str = #name_str;
                 const LAZY_NAME: &'static str = #lazy_name_str;
+                const FULL_NAME: &'static str = #full_name;
 
                 fn empty_bits() -> Self::Bits {
                     <#layout as #companion::Layout<A>>::empty_bits()
@@ -304,8 +308,8 @@ pub(super) fn render_items(
             >,
         }
 
-        ::puroro_rt::forward_record!(eager #name);
-        ::puroro_rt::forward_record!(lazy #lazy_alias);
+        ::puroro_rt::forward_record!(eager #name, #full_name);
+        ::puroro_rt::forward_record!(lazy #lazy_alias, #full_name);
 
         #record_fields_impl
 

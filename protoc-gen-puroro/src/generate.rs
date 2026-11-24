@@ -17,14 +17,42 @@ use crate::resolved::{Arena, resolve_with};
 /// Package name written into the generated `Cargo.toml` when `crate_name` is unset.
 const DEFAULT_CRATE_NAME: &str = "generated";
 
+/// One crate listed under `[dependencies]` in the generated `Cargo.toml`.
+struct GeneratedDependency {
+    name: &'static str,
+    version: &'static str,
+}
+
+impl GeneratedDependency {
+    /// One `[dependencies]` line, including the trailing newline.
+    fn toml_line(&self) -> String {
+        format!("{} = \"{}\"\n", self.name, self.version)
+    }
+}
+
 /// Crates that generated `lib.rs` names directly, with the package version from
 /// the `Cargo.lock` that compiled this plugin (`build.rs`).
-const GENERATED_DEPENDENCIES: &[(&str, &str)] = &[
-    ("allocator-api2", env!("PURORO_GEN_DEP_ALLOCATOR_API2")),
-    ("bitvec", env!("PURORO_GEN_DEP_BITVEC")),
-    ("bytes", env!("PURORO_GEN_DEP_BYTES")),
-    ("puroro", env!("PURORO_GEN_DEP_PURORO")),
-    ("puroro-rt", env!("PURORO_GEN_DEP_PURORO_RT")),
+const GENERATED_DEPENDENCIES: &[GeneratedDependency] = &[
+    GeneratedDependency {
+        name: "allocator-api2",
+        version: env!("PURORO_GEN_DEP_ALLOCATOR_API2"),
+    },
+    GeneratedDependency {
+        name: "bitvec",
+        version: env!("PURORO_GEN_DEP_BITVEC"),
+    },
+    GeneratedDependency {
+        name: "bytes",
+        version: env!("PURORO_GEN_DEP_BYTES"),
+    },
+    GeneratedDependency {
+        name: "puroro",
+        version: env!("PURORO_GEN_DEP_PURORO"),
+    },
+    GeneratedDependency {
+        name: "puroro-rt",
+        version: env!("PURORO_GEN_DEP_PURORO_RT"),
+    },
 ];
 
 /// Generate-time knobs parsed from [`CodegenRequest`] `parameter`.
@@ -84,11 +112,8 @@ fn parse_crate_name(value: &str) -> Result<String> {
 /// from [`GENERATED_DEPENDENCIES`].
 fn cargo_manifest(crate_name: &str) -> ResponseFile {
     let mut dependencies = String::new();
-    for (name, version) in GENERATED_DEPENDENCIES {
-        dependencies.push_str(name);
-        dependencies.push_str(" = \"");
-        dependencies.push_str(version);
-        dependencies.push_str("\"\n");
+    for dep in GENERATED_DEPENDENCIES {
+        dependencies.push_str(&dep.toml_line());
     }
     ResponseFile {
         name: "Cargo.toml".to_owned(),
@@ -106,6 +131,12 @@ publish = false
 
 [lib]
 path = \"lib.rs\"
+
+[features]
+default = []
+# Embed encoded `FileDescriptorSet` bytes as `descriptors::FILE_DESCRIPTOR_SET`.
+# `Message::FULL_NAME` is always available without this.
+descriptors = []
 
 [dependencies]
 {dependencies}"
@@ -284,9 +315,15 @@ mod tests {
             .find(|file| file.name == "Cargo.toml")
             .expect("Cargo.toml");
         assert!(manifest.content.contains("name = \"library-proto\""));
-        for (name, version) in GENERATED_DEPENDENCIES {
-            let line = format!("{name} = \"{version}\"");
-            assert!(manifest.content.contains(&line), "missing {line}");
+        assert!(
+            manifest.content.contains("descriptors = []"),
+            "missing descriptors feature: {}",
+            manifest.content
+        );
+        for dep in GENERATED_DEPENDENCIES {
+            let line = dep.toml_line();
+            let line = line.trim_end();
+            assert!(manifest.content.contains(line), "missing {line}");
         }
         let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("..");
         assert_eq!(
@@ -345,9 +382,23 @@ mod tests {
     }
 
     #[test]
+    fn package_descriptors_is_reserved_at_the_crate_root() {
+        let err = generate(&empty_request_with_package("Empty", "descriptors")).unwrap_err();
+        assert!(err.to_string().contains("reserved"));
+        assert!(err.to_string().contains("descriptors"));
+    }
+
+    #[test]
     fn file_level_message_puroro_is_reserved_at_the_crate_root() {
         let err = generate(&empty_request("Puroro")).unwrap_err();
         assert!(err.to_string().contains("reserved"));
+    }
+
+    #[test]
+    fn file_level_message_descriptors_is_reserved_at_the_crate_root() {
+        let err = generate(&empty_request("Descriptors")).unwrap_err();
+        assert!(err.to_string().contains("reserved"));
+        assert!(err.to_string().contains("descriptors"));
     }
 
     #[test]
@@ -503,7 +554,7 @@ mod tests {
             "discard must bake DiscardUnknowns: {content}"
         );
         assert!(
-            content.contains("::puroro_rt::forward_record!(eager Marker)"),
+            content.contains("::puroro_rt::forward_record!(eager Marker, \"Marker\")"),
             "discard still uses the Record shell, which calls skip_field_and_save_in: {content}"
         );
     }

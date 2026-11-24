@@ -46,6 +46,15 @@ pub mod school;
 pub mod student;
 pub mod task;
 
+/// Opt-in schema embeddings (`descriptors` feature). See `DESIGN.md` §3.1.
+#[cfg(feature = "descriptors")]
+pub mod descriptors {
+    pub use crate::descriptors_sample::*;
+}
+
+#[cfg(feature = "descriptors")]
+mod descriptors_sample;
+
 mod address_type;
 mod marker_type;
 mod point_type;
