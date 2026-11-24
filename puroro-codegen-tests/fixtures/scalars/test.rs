@@ -95,6 +95,32 @@ fn clear_omits_on_encode() {
     assert!(msg.encode_to_vec().is_empty());
 }
 
+/// proto3 IMPLICIT: writing the type default leaves the field absent on the wire.
+#[test]
+fn implicit_type_default_omits_on_encode() {
+    let mut msg = Scalars::new();
+    *msg.score_mut() = 0;
+    *msg.done_mut() = false;
+    *msg.ratio_mut() = 0.0;
+    *msg.big_score_mut() = 0;
+    *msg.count_mut() = 0;
+    *msg.big_count_mut() = 0;
+    *msg.zigzag32_mut() = 0;
+    *msg.zigzag64_mut() = 0;
+    *msg.fixed_id_mut() = 0;
+    assert!(
+        msg.encode_to_vec().is_empty(),
+        "IMPLICIT defaults must not appear on the wire"
+    );
+
+    // EXPLICIT optional: set-to-zero is present (contrast with IMPLICIT).
+    *msg.postal_code_mut() = 0;
+    assert!(
+        !msg.encode_to_vec().is_empty(),
+        "EXPLICIT set-zero must encode"
+    );
+}
+
 #[test]
 fn unknown_field_preserved_with_knowns() {
     let mut msg = Scalars::new();

@@ -1,12 +1,19 @@
 //! Behavioural tests for the `empty` fixture (field-less message).
 
-use crate::empty::Empty;
+use allocator_api2::alloc::Global;
+use crate::empty::{Empty, EmptyLazy};
 use puroro::Message;
 
 #[test]
 fn default_encodes_to_empty() {
     let msg: Empty = Empty::new();
     assert!(msg.encode_to_vec().is_empty());
+}
+
+#[test]
+fn full_name_is_the_protobuf_type_name() {
+    assert_eq!(Empty::<Global>::FULL_NAME, "Empty");
+    assert_eq!(EmptyLazy::<Global>::FULL_NAME, "Empty");
 }
 
 #[test]
