@@ -28,7 +28,8 @@ pub(super) struct RenderedMessageItems {
 /// Render the message struct (parent) and companion (`FIELD_*`, defaults, oneofs).
 ///
 /// `full_name` is the protobuf type name without a leading `.` (`example.Task`).
-/// `file_name` is `FileDescriptorProto.name` for `puroro::descriptors::DescribedMessage`.
+/// `file_name` is `FileDescriptorProto.name` (`/`-separated logical path; see
+/// `DESIGN.md` §3.1) for `puroro::descriptors::DescribedMessage`.
 pub(super) fn render_items(
     field_plan: &MessageFieldPlan<'_>,
     name: &Ident,

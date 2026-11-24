@@ -33,5 +33,9 @@ impl FileDescriptorSetBytes {
 /// file's name.
 pub trait DescribedMessage: crate::Message {
     /// `FileDescriptorProto.name` of the file that declared this message.
+    ///
+    /// This is a protobuf logical path relative to the source-tree root
+    /// (e.g. `foo/bar/baz.proto`), not a host OS path. Separators are always
+    /// `/`; protoc normalizes Windows `\` to `/` before it reaches the plugin.
     const FILE_NAME: &'static str;
 }

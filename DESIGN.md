@@ -246,6 +246,8 @@ pub mod descriptors {
 
 Embedding unit is **one crate-wide `FileDescriptorSet`**, not a copy per message. Each message only records `FILE_NAME` so a consumer can find its `FileDescriptorProto` inside the set (needed for gRPC server reflection and similar). Nested messages use the outer file's name.
 
+`FILE_NAME` is **not** a host OS path. It is `FileDescriptorProto.name`: a path relative to the proto source-tree root with `/` separators (e.g. `foo/bar/baz.proto`). protoc canonicalizes inputs so Windows `\` becomes `/` before the plugin sees the request; do not re-interpret the string with `std::path::Path` as if it were platform-native.
+
 **Plugin status.** The generator already emits `FULL_NAME`, the generated `Cargo.toml` `descriptors` feature, per-message `DescribedMessage` impls, and a cfg-gated `descriptors` module. The set bytes are still an **empty stub**. A follow-up should preserve raw `CodeGeneratorRequest.proto_file` LEN bodies (the IR is a lossy subset) and wrap them as a `FileDescriptorSet` in that constant — prefer a Rust byte literal (or `ResponseFile` content as `Vec<u8>`) over assuming UTF-8 `string` content.
 
 **Sample.** [`sample-generated`](sample-generated/) enables the same feature flag and sketches `descriptors::FILE_DESCRIPTOR_SET` plus `DescribedMessage` for `Task` / `Address` / ….
