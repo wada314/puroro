@@ -100,11 +100,7 @@ pub(crate) struct PreparedFile {
     messages: Vec<PreparedMessage>,
 }
 
-fn prepare_message(
-    message: &Message<'_>,
-    storage: &MessageStoragePlan,
-    file_name: &str,
-) -> Result<PreparedMessage> {
+fn prepare_message(message: &Message<'_>, storage: &MessageStoragePlan) -> Result<PreparedMessage> {
     if !ident::is_simple_ident(message.name()) {
         return Err(Error::Codegen(format!(
             "cannot use message name `{}` as a Rust identifier",
@@ -121,7 +117,6 @@ fn prepare_message(
         message.name(),
         &module_name,
         full_name,
-        file_name,
     )?;
 
     let nested_enums = message
@@ -131,7 +126,7 @@ fn prepare_message(
     let nested = message
         .nested_messages()
         .filter(|m| !m.is_map_entry())
-        .map(|m| prepare_message(m, storage, file_name))
+        .map(|m| prepare_message(m, storage))
         .collect::<Result<Vec<_>>>()?;
 
     Ok(PreparedMessage {
@@ -151,13 +146,12 @@ fn prepare_enum(enumeration: &Enum<'_>) -> Result<PreparedEnum> {
 }
 
 pub(crate) fn prepare_file(file: &File<'_>, storage: &MessageStoragePlan) -> Result<PreparedFile> {
-    let file_name = file.name();
     Ok(PreparedFile {
         package: file.package().to_owned(),
         enums: file.enums().map(prepare_enum).collect::<Result<Vec<_>>>()?,
         messages: file
             .messages()
-            .map(|m| prepare_message(m, storage, file_name))
+            .map(|m| prepare_message(m, storage))
             .collect::<Result<Vec<_>>>()?,
     })
 }

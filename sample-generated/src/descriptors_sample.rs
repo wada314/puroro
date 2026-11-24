@@ -1,58 +1,21 @@
 //! Sample of the opt-in `descriptors` feature surface.
 //!
 //! Production plugin output puts `FILE_DESCRIPTOR_SET` in a crate-root
-//! `descriptors` module and implements [`DescribedMessage`] next to each
-//! message type. This hand-written crate mirrors that shape.
-
-use ::puroro::descriptors::{DescribedMessage, FileDescriptorSetBytes};
-use ::puroro_rt::decode::LazyProfile;
-
-use crate::{Address, AddressLazy, Marker, Point, PointLazy, School, Student, Task, TaskLazy};
+//! `descriptors` module. This hand-written crate mirrors that shape.
 
 /// Crate-wide descriptor set.
 ///
 /// Empty stub: the sample is not produced by `protoc`, so there is no real
 /// `FileDescriptorSet` to embed. Generated crates will replace this with bytes
 /// preserved from `CodeGeneratorRequest.proto_file`.
-pub const FILE_DESCRIPTOR_SET: FileDescriptorSetBytes = FileDescriptorSetBytes::new(&[]);
-
-macro_rules! impl_described_message {
-    ($ty:ident, $file:expr) => {
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> DescribedMessage
-            for $ty<A>
-        {
-            const FILE_NAME: &'static str = $file;
-        }
-    };
-}
-
-macro_rules! impl_described_message_lazy {
-    ($ty:ident, $file:expr) => {
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone, P: LazyProfile>
-            DescribedMessage for $ty<A, P>
-        where
-            P::Buf: ::puroro_rt::decode::WireAppend,
-        {
-            const FILE_NAME: &'static str = $file;
-        }
-    };
-}
-
-// DESIGN.md reference schema lives in a fictional `example.proto`.
-impl_described_message!(Task, "example.proto");
-impl_described_message_lazy!(TaskLazy, "example.proto");
-impl_described_message!(Address, "example.proto");
-impl_described_message_lazy!(AddressLazy, "example.proto");
-impl_described_message!(Point, "example.proto");
-impl_described_message_lazy!(PointLazy, "example.proto");
-impl_described_message!(School, "example.proto");
-impl_described_message!(Student, "example.proto");
-impl_described_message!(Marker, "example.proto");
+pub const FILE_DESCRIPTOR_SET: &[u8] = &[];
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use ::puroro::Message;
+
+    use crate::{Task, TaskLazy};
 
     #[test]
     fn full_name_is_always_available() {
@@ -67,11 +30,7 @@ mod tests {
     }
 
     #[test]
-    fn described_message_names_source_file() {
-        assert_eq!(
-            <Task<::allocator_api2::alloc::Global> as DescribedMessage>::FILE_NAME,
-            "example.proto"
-        );
-        assert!(FILE_DESCRIPTOR_SET.as_bytes().is_empty());
+    fn file_descriptor_set_is_empty_stub() {
+        assert!(FILE_DESCRIPTOR_SET.is_empty());
     }
 }

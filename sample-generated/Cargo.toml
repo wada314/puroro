@@ -10,14 +10,14 @@ workspace = true
 
 [features]
 default = []
-# Mirrors generated crates: opt-in FileDescriptorSet helpers on `puroro`.
-descriptors = ["puroro/descriptors"]
+# Opt-in encoded `FileDescriptorSet` as `descriptors::FILE_DESCRIPTOR_SET`.
+descriptors = []
 
 [dependencies]
 allocator-api2 = "0.2"
 bitvec = "1"
 bytes = "1"
-puroro = { path = "..", default-features = false }
+puroro = { path = ".." }
 puroro-rt = { path = "../puroro-rt" }
 
 [dev-dependencies]

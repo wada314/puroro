@@ -21,22 +21,12 @@ const DEFAULT_CRATE_NAME: &str = "generated";
 struct GeneratedDependency {
     name: &'static str,
     version: &'static str,
-    /// When `false`, emit a table with `default-features = false` (needed so the
-    /// generated crate can opt into `puroro/descriptors` via its own feature).
-    default_features: bool,
 }
 
 impl GeneratedDependency {
     /// One `[dependencies]` line, including the trailing newline.
     fn toml_line(&self) -> String {
-        if self.default_features {
-            format!("{} = \"{}\"\n", self.name, self.version)
-        } else {
-            format!(
-                "{} = {{ version = \"{}\", default-features = false }}\n",
-                self.name, self.version
-            )
-        }
+        format!("{} = \"{}\"\n", self.name, self.version)
     }
 }
 
@@ -46,27 +36,22 @@ const GENERATED_DEPENDENCIES: &[GeneratedDependency] = &[
     GeneratedDependency {
         name: "allocator-api2",
         version: env!("PURORO_GEN_DEP_ALLOCATOR_API2"),
-        default_features: true,
     },
     GeneratedDependency {
         name: "bitvec",
         version: env!("PURORO_GEN_DEP_BITVEC"),
-        default_features: true,
     },
     GeneratedDependency {
         name: "bytes",
         version: env!("PURORO_GEN_DEP_BYTES"),
-        default_features: true,
     },
     GeneratedDependency {
         name: "puroro",
         version: env!("PURORO_GEN_DEP_PURORO"),
-        default_features: false,
     },
     GeneratedDependency {
         name: "puroro-rt",
         version: env!("PURORO_GEN_DEP_PURORO_RT"),
-        default_features: true,
     },
 ];
 
@@ -149,9 +134,9 @@ path = \"lib.rs\"
 
 [features]
 default = []
-# Embed `FileDescriptorSet` helpers (`puroro::descriptors`) and per-message
-# `DescribedMessage`. `Message::FULL_NAME` is always available without this.
-descriptors = [\"puroro/descriptors\"]
+# Embed encoded `FileDescriptorSet` bytes as `descriptors::FILE_DESCRIPTOR_SET`.
+# `Message::FULL_NAME` is always available without this.
+descriptors = []
 
 [dependencies]
 {dependencies}"
@@ -331,9 +316,7 @@ mod tests {
             .expect("Cargo.toml");
         assert!(manifest.content.contains("name = \"library-proto\""));
         assert!(
-            manifest
-                .content
-                .contains("descriptors = [\"puroro/descriptors\"]"),
+            manifest.content.contains("descriptors = []"),
             "missing descriptors feature: {}",
             manifest.content
         );

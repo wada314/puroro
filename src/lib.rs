@@ -17,8 +17,10 @@
 //!   [`RepeatedBytesMut`] — map and repeated mutators
 //! - [`OneofView`] / [`OneofViewMut`] — oneof group views
 //! - [`DecodeError`], [`UnknownField`], [`WireType`]
-//! - `descriptors` feature — `FileDescriptorSetBytes` / `DescribedMessage`
-//!   for opt-in schema embeddings (`DESIGN.md` §3.1)
+//!
+//! Generated crates may opt into a `descriptors` feature that embeds a
+//! `FileDescriptorSet` byte slice (`DESIGN.md` §3.1); that surface lives on
+//! the generated crate, not here.
 //!
 //! Generated messages expose proto fields as **inherent methods** on the concrete
 //! type (`title()`, `title_mut()`, `clear_title()`, …). Explicit-presence getters
@@ -44,8 +46,6 @@
 //! ```
 
 mod bytes_mut;
-#[cfg(feature = "descriptors")]
-pub mod descriptors;
 pub mod error;
 pub mod map;
 pub mod message;

@@ -101,8 +101,7 @@ fn descriptors_module_stub() -> Item {
         #[cfg(feature = "descriptors")]
         pub mod descriptors {
             /// Crate-wide descriptor set (empty stub until embedding lands).
-            pub const FILE_DESCRIPTOR_SET: ::puroro::descriptors::FileDescriptorSetBytes =
-                ::puroro::descriptors::FileDescriptorSetBytes::new(&[]);
+            pub const FILE_DESCRIPTOR_SET: &'static [u8] = &[];
         }
     }
 }

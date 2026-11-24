@@ -28,15 +28,12 @@ pub(super) struct RenderedMessageItems {
 /// Render the message struct (parent) and companion (`FIELD_*`, defaults, oneofs).
 ///
 /// `full_name` is the protobuf type name without a leading `.` (`example.Task`).
-/// `file_name` is `FileDescriptorProto.name` (`/`-separated logical path; see
-/// `DESIGN.md` §3.1) for `puroro::descriptors::DescribedMessage`.
 pub(super) fn render_items(
     field_plan: &MessageFieldPlan<'_>,
     name: &Ident,
     name_str: &str,
     companion: &Ident,
     full_name: &str,
-    file_name: &str,
 ) -> Result<RenderedMessageItems> {
     let fields = field_plan
         .members()
@@ -313,24 +310,6 @@ pub(super) fn render_items(
 
         ::puroro_rt::forward_record!(eager #name, #full_name);
         ::puroro_rt::forward_record!(lazy #lazy_alias, #full_name);
-
-        #[cfg(feature = "descriptors")]
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone>
-            ::puroro::descriptors::DescribedMessage for #name<A>
-        {
-            const FILE_NAME: &'static str = #file_name;
-        }
-
-        #[cfg(feature = "descriptors")]
-        impl<
-            A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            P: ::puroro_rt::decode::LazyProfile,
-        > ::puroro::descriptors::DescribedMessage for #lazy_alias<A, P>
-        where
-            P::Buf: ::puroro_rt::decode::WireAppend,
-        {
-            const FILE_NAME: &'static str = #file_name;
-        }
 
         #record_fields_impl
 
