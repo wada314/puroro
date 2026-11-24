@@ -1,4 +1,4 @@
-//! Maps: all legal keys × scalar / string / bytes / enum / message values.
+//! Maps: legal keys × scalar / string / bytes / enum / message values.
 
 use crate::map_basic::{Holder, Kind, Peer};
 use ::puroro::{MapMut, MapRef, Message, StringMut};
@@ -186,4 +186,27 @@ fn string_to_string_entry_mut_round_trip() {
 
     let decoded: Holder = Holder::decode(&msg.encode_to_vec()[..]).expect("decode");
     assert_eq!(decoded.aliases().get("k"), Some("v"));
+}
+
+#[test]
+fn remaining_integral_and_fixed_key_types_round_trip() {
+    let mut msg = Holder::new();
+    *msg.u32_keys_mut().entry_mut(1) = 11;
+    *msg.u64_keys_mut().entry_mut(2) = 22;
+    *msg.s32_keys_mut().entry_mut(-3) = 33;
+    *msg.s64_keys_mut().entry_mut(-4) = 44;
+    *msg.f32_keys_mut().entry_mut(5) = 55;
+    *msg.f64_keys_mut().entry_mut(6) = 66;
+    *msg.sf32_keys_mut().entry_mut(-7) = 77;
+    *msg.sf64_keys_mut().entry_mut(-8) = 88;
+
+    let decoded: Holder = Holder::decode(&msg.encode_to_vec()[..]).expect("decode");
+    assert_eq!(decoded.u32_keys().get(1).copied(), Some(11));
+    assert_eq!(decoded.u64_keys().get(2).copied(), Some(22));
+    assert_eq!(decoded.s32_keys().get(-3).copied(), Some(33));
+    assert_eq!(decoded.s64_keys().get(-4).copied(), Some(44));
+    assert_eq!(decoded.f32_keys().get(5).copied(), Some(55));
+    assert_eq!(decoded.f64_keys().get(6).copied(), Some(66));
+    assert_eq!(decoded.sf32_keys().get(-7).copied(), Some(77));
+    assert_eq!(decoded.sf64_keys().get(-8).copied(), Some(88));
 }

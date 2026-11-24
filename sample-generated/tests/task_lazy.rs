@@ -206,9 +206,9 @@ fn incremental_chunks_join_one_record() {
 }
 
 #[test]
-fn skips_len_records() {
+fn unknown_len_is_preserved_while_known_fields_apply() {
     let mut bytes = Vec::new();
-    // Field 99 is not a known `Task` field — still skipped (oneof is too).
+    // Field 99 is not a known `Task` field — preserve store keeps the LEN.
     encode_len_bytes(99, b"ignored", &mut bytes);
     encode_varint_field(
         field_number_const::<FIELD_SCORE>(),
@@ -218,6 +218,10 @@ fn skips_len_records() {
 
     let lazy = TaskLazy::<Global>::decode(&bytes[..]).unwrap();
     assert_eq!(lazy.score().unwrap(), 7);
+    let unknowns: Vec<_> = lazy.unknown_fields().collect();
+    assert_eq!(unknowns.len(), 1);
+    assert_eq!(unknowns[0].number(), 99);
+    assert_eq!(*unknowns[0].payload(), UnknownPayload::Bytes(b"ignored"));
 }
 
 #[test]
@@ -1225,6 +1229,18 @@ fn leaf_child_is_accepted_at_the_eager_limit() {
     let mut bytes = Vec::new();
     encode_message_field(FIELD_ASSIGNEE, &addr.encode_to_vec(), &mut bytes);
 
+    // Eager reject: `depth >= RECURSION_LIMIT` before reading tags.
+    {
+        let mut eager = Task::new();
+        let mut cursor = bytes.as_slice();
+        let mut scoped = ScopedBuf::new(&mut cursor);
+        assert_eq!(
+            MessageMerge::merge_from_with_depth(&mut eager, &mut scoped, RECURSION_LIMIT, None),
+            Err(DecodeError::RecursionLimitExceeded)
+        );
+    }
+
+    // Lazy ingest does not apply that stack cap (IMPLEMENTATION.md).
     let mut lazy = TaskLazy::new();
     {
         let mut cursor = bytes.as_slice();
@@ -1243,6 +1259,17 @@ fn merge_from_ignores_the_eager_recursion_limit() {
         Varint::from_int32(9),
         &mut bytes,
     );
+
+    {
+        let mut eager = Task::new();
+        let mut cursor = bytes.as_slice();
+        let mut scoped = ScopedBuf::new(&mut cursor);
+        assert_eq!(
+            MessageMerge::merge_from_with_depth(&mut eager, &mut scoped, RECURSION_LIMIT, None),
+            Err(DecodeError::RecursionLimitExceeded)
+        );
+    }
+
     let mut lazy = TaskLazy::new();
     {
         let mut cursor = bytes.as_slice();
