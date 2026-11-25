@@ -5,13 +5,14 @@
 //! `BitPacked`), real oneof groups, and maps (legal keys × Copy scalar /
 //! bool values).
 
+use super::docs;
 use super::field_emit::{
     EagerGetter, FieldEmit, MapEmit, RepeatedAccessorStyle, RepeatedEmit, ScalarEmit,
 };
 use super::ident::to_pascal_case;
 use super::layout::{self, LayoutAssoc, LayoutAssocKind};
 use super::oneof::{self, OneofEmit};
-use crate::descriptor::UnknownFieldsPolicy;
+use crate::descriptor::{Comments, UnknownFieldsPolicy};
 use crate::error::Result;
 use crate::field_kind::{MessageFieldPlan, bit_array_byte_len};
 use crate::module_tree::nested_root_alias;
@@ -36,6 +37,7 @@ pub(super) fn render_items(
     name_str: &str,
     companion: &Ident,
     full_name: &str,
+    comments: &Comments,
     emit_lazy: bool,
 ) -> Result<RenderedMessageItems> {
     let fields = field_plan
@@ -285,12 +287,28 @@ pub(super) fn render_items(
         .chain(oneof_modules)
         .collect();
 
+    let message_doc = docs::doc_attr(comments);
     let lazy_alias_items = if emit_lazy {
         let apply_arms = super::lazy::render_apply_arms(&fields, companion);
+        // Keep the experimental note; append proto docs when present.
+        let lazy_doc = match comments.doc_text() {
+            Some(_) => {
+                let proto = docs::doc_attr(comments);
+                quote! {
+                    #proto
+                    ///
+                    /// Experimental lazy alias. Emitted only with `--puroro_opt=lazy=true`.
+                    /// Design and behaviour may change; see DESIGN.md §8.
+                }
+            }
+            None => quote! {
+                /// Experimental lazy alias. Emitted only with `--puroro_opt=lazy=true`.
+                ///
+                /// Design and behaviour may change; see DESIGN.md §8.
+            },
+        };
         quote! {
-            /// Experimental lazy alias. Emitted only with `--puroro_opt=lazy=true`.
-            ///
-            /// Design and behaviour may change; see DESIGN.md §8.
+            #lazy_doc
             pub struct #lazy_alias<
                 A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone = ::allocator_api2::alloc::Global,
                 P: ::puroro_rt::decode::LazyProfile = ::puroro_rt::decode::Owned,
@@ -363,6 +381,7 @@ pub(super) fn render_items(
 
         #(#has_slot_impls)*
 
+        #message_doc
         pub struct #name<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone = ::allocator_api2::alloc::Global,
         > {
@@ -923,7 +942,9 @@ fn render_map_accessors(field: &MapEmit, companion: &Ident) -> (TokenStream, Tok
     let get = eager_field(companion, &field.field_const);
     let get_mut = eager_field_mut(companion, &field.field_const);
     let clear = eager_field_mut(companion, &field.field_const);
+    let doc = &field.doc;
     let getter = quote! {
+        #doc
         pub fn #name(&self) -> impl ::puroro::MapRef<#key_view, #value_view> + '_ {
             #get
         }
@@ -953,7 +974,9 @@ fn render_repeated_accessors(
     let get = eager_field(companion, &field.field_const);
     let get_mut = eager_field_mut(companion, &field.field_const);
     let clear = eager_field_mut(companion, &field.field_const);
+    let doc = &field.doc;
     let getter = quote! {
+        #doc
         pub fn #name(&self) -> &[#elem] {
             #get.as_slice()
         }
@@ -997,9 +1020,11 @@ fn render_singular_accessors(field: &ScalarEmit, companion: &Ident) -> (TokenStr
     let get = eager_field(companion, &field.field_const);
     let get_mut = eager_field_mut(companion, &field.field_const);
     let clear = eager_field_mut(companion, &field.field_const);
+    let doc = &field.doc;
 
     if matches!(field.getter_shape.eager(), EagerGetter::Message) {
         let getter = quote! {
+            #doc
             pub fn #name(&self) -> ::core::option::Option<&#mut_target> {
                 #get.get()
             }
@@ -1037,6 +1062,7 @@ fn render_singular_accessors(field: &ScalarEmit, companion: &Ident) -> (TokenStr
 
     let getter = if matches!(field.getter_shape.eager(), EagerGetter::Optional) {
         quote! {
+            #doc
             pub fn #name<'a>(&'a self) -> ::puroro::Optional<#optional_ty, impl ::puroro::HasDefault<#optional_ty>>
             where
                 A: 'a,
@@ -1046,6 +1072,7 @@ fn render_singular_accessors(field: &ScalarEmit, companion: &Ident) -> (TokenStr
         }
     } else {
         quote! {
+            #doc
             pub fn #name(&self) -> #implicit_ty {
                 #get.value()
             }

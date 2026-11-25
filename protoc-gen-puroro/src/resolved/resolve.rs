@@ -50,6 +50,7 @@ impl OneofRemap {
                 remap[i] = Some(i32::try_from(oneofs.len()).expect("oneof count fits i32"));
                 oneofs.push(Oneof {
                     name: oneof.name.clone(),
+                    comments: oneof.comments.clone(),
                 });
             }
         }
@@ -202,6 +203,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             map_entry: desc.map_entry,
             unknown_fields: desc.unknown_fields,
             child_parse: desc.child_parse,
+            comments: desc.comments.clone(),
         });
         self.messages_by_fqn.insert(fqn.clone(), message);
         self.pending.push(PendingFields {
@@ -247,6 +249,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             .map(|v| EnumValue {
                 name: v.name.clone(),
                 number: v.number,
+                comments: v.comments.clone(),
             })
             .collect();
 
@@ -257,6 +260,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             openness: EnumType::resolve(file, &desc.features, self.proto2_utf8),
             enum_repr: desc.enum_repr,
             values,
+            comments: desc.comments.clone(),
         });
         self.enums_by_fqn.insert(fqn, enum_ty);
         Ok(enum_ty)
@@ -318,6 +322,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             child_parse: field.child_parse,
             legacy_required: features.field_presence == FieldPresence::LegacyRequired,
             group_wire,
+            comments: field.comments.clone(),
         })
     }
 

@@ -19,7 +19,7 @@ pub use resolve::{resolve, resolve_with};
 
 use crate::descriptor::features::{EnumType, RepeatedFieldEncoding, Utf8Validation};
 use crate::descriptor::{
-    BytesLayout, ChildParse, EnumRepr, MessageLayout, ProtoFqn, StringLayout, Syntax,
+    BytesLayout, ChildParse, Comments, EnumRepr, MessageLayout, ProtoFqn, StringLayout, Syntax,
     UnknownFieldsPolicy,
 };
 use ::std::fmt;
@@ -84,6 +84,8 @@ pub struct Message<'a> {
     unknown_fields: UnknownFieldsPolicy,
     /// `(puroro.child_parse)` on this message. Default for its fields.
     child_parse: ChildParse,
+    /// Proto source comments for this message.
+    comments: Comments,
 }
 
 /// A field with a resolved [`TypeRef`].
@@ -115,6 +117,8 @@ pub struct Field<'a> {
     /// Storage still uses [`TypeRef::Message`]; emit picks `ProtoGroup` when
     /// this is set.
     group_wire: bool,
+    /// Proto source comments for this field.
+    comments: Comments,
 }
 
 /// Resolved type of a field.
@@ -143,6 +147,8 @@ pub enum TypeRef<'a> {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Oneof {
     name: String,
+    /// Proto source comments for this oneof.
+    comments: Comments,
 }
 
 /// An enum type.
@@ -156,6 +162,8 @@ pub struct Enum<'a> {
     /// `(puroro.enum_repr)` — newtype (default) vs native Rust `enum`.
     enum_repr: EnumRepr,
     values: Vec<EnumValue>,
+    /// Proto source comments for this enum.
+    comments: Comments,
 }
 
 /// An enum value.
@@ -163,6 +171,8 @@ pub struct Enum<'a> {
 pub struct EnumValue {
     name: String,
     number: i32,
+    /// Proto source comments for this enumerator.
+    comments: Comments,
 }
 
 impl<'a> FileSet<'a> {
@@ -248,6 +258,11 @@ impl<'a> Message<'a> {
     pub fn child_parse(&self) -> ChildParse {
         self.child_parse
     }
+
+    /// Proto source comments for this message declaration.
+    pub fn comments(&self) -> &Comments {
+        &self.comments
+    }
 }
 
 impl<'a> Field<'a> {
@@ -310,11 +325,21 @@ impl<'a> Field<'a> {
     pub fn is_group_wire(&self) -> bool {
         self.group_wire
     }
+
+    /// Proto source comments for this field declaration.
+    pub fn comments(&self) -> &Comments {
+        &self.comments
+    }
 }
 
 impl Oneof {
     pub fn name(&self) -> &str {
         &self.name
+    }
+
+    /// Proto source comments for this oneof declaration.
+    pub fn comments(&self) -> &Comments {
+        &self.comments
     }
 }
 
@@ -343,6 +368,11 @@ impl<'a> Enum<'a> {
     pub fn values(&self) -> impl Iterator<Item = &EnumValue> + '_ {
         self.values.iter()
     }
+
+    /// Proto source comments for this enum declaration.
+    pub fn comments(&self) -> &Comments {
+        &self.comments
+    }
 }
 
 impl EnumValue {
@@ -352,6 +382,11 @@ impl EnumValue {
 
     pub fn number(&self) -> i32 {
         self.number
+    }
+
+    /// Proto source comments for this enumerator.
+    pub fn comments(&self) -> &Comments {
+        &self.comments
     }
 }
 

@@ -1,0 +1,19 @@
+edition = "2023";
+
+package docs;
+
+option features.field_presence = IMPLICIT;
+
+// Lifecycle of a tracked item.
+enum Status {
+  // Not started yet.
+  STATUS_UNSPECIFIED = 0;
+  STATUS_DONE = 1;
+}
+
+// A documented work item.
+message Task {
+  // Human-readable title.
+  string title = 1;
+  Status status = 2;
+}

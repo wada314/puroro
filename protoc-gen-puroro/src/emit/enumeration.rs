@@ -1,5 +1,6 @@
 //! Emit a protobuf enum as a newtype-over-`i32`, or a native Rust `enum`.
 
+use super::docs;
 use super::ident::{escape_ident, is_simple_ident};
 use crate::case::to_upper_snake;
 use crate::descriptor::features::EnumType;
@@ -67,6 +68,7 @@ fn render_newtype_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
         .expect("validate_enum requires at least one value");
 
     let name = escape_ident(e.name());
+    let enum_doc = docs::doc_attr(e.comments());
     let default_const = variant_const_ident(e.name(), first.name())?;
     let default_self = quote! { Self::#default_const };
     let default_path = quote! { #name::#default_const };
@@ -75,7 +77,9 @@ fn render_newtype_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
         .map(|v| {
             let ident = variant_const_ident(e.name(), v.name())?;
             let number = v.number();
+            let doc = docs::doc_attr(v.comments());
             Ok(quote! {
+                #doc
                 pub const #ident: Self = Self(#number);
             })
         })
@@ -133,6 +137,7 @@ fn render_newtype_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
     };
 
     super::parse::parse_items(quote! {
+        #enum_doc
         #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
         #[repr(transparent)]
         pub struct #name(i32);
@@ -175,9 +180,11 @@ fn render_rust_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
         .expect("validate_enum requires at least one value");
 
     let name = escape_ident(e.name());
+    let enum_doc = docs::doc_attr(e.comments());
     let unknown_ident = Ident::new("_Unknown", Span::call_site());
     let mut variant_idents = Vec::new();
     let mut variant_numbers = Vec::new();
+    let mut variant_docs = Vec::new();
     for v in e.values() {
         let ident = variant_const_ident(e.name(), v.name())?;
         if ident == unknown_ident {
@@ -190,6 +197,7 @@ fn render_rust_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
         }
         variant_idents.push(ident);
         variant_numbers.push(v.number());
+        variant_docs.push(docs::doc_attr(v.comments()));
     }
     let default_ident = variant_const_ident(e.name(), first.name())?;
     let default_self = quote! { Self::#default_ident };
@@ -197,11 +205,11 @@ fn render_rust_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
 
     let variants = match e.openness() {
         EnumType::Open => quote! {
-            #(#variant_idents,)*
+            #(#variant_docs #variant_idents,)*
             #unknown_ident(i32),
         },
         EnumType::Closed => quote! {
-            #(#variant_idents,)*
+            #(#variant_docs #variant_idents,)*
         },
     };
 
@@ -295,6 +303,7 @@ fn render_rust_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
     };
 
     super::parse::parse_items(quote! {
+        #enum_doc
         #derives
         #[allow(non_camel_case_types)]
         pub enum #name {

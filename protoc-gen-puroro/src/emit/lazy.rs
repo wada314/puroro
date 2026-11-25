@@ -97,8 +97,14 @@ fn scan_guard() -> TokenStream {
     quote! { ::puroro_rt::decode::LazyMessage::ensure_scanned(self)?; }
 }
 
-fn optional_method(name: &Ident, optional_ty: &Type, body: TokenStream) -> TokenStream {
+fn optional_method(
+    name: &Ident,
+    optional_ty: &Type,
+    doc: &TokenStream,
+    body: TokenStream,
+) -> TokenStream {
     quote! {
+        #doc
         pub fn #name<'a>(
             &'a self,
         ) -> ::core::result::Result<
@@ -113,9 +119,15 @@ fn optional_method(name: &Ident, optional_ty: &Type, body: TokenStream) -> Token
     }
 }
 
-fn message_method(name: &Ident, view: &TokenStream, expr: TokenStream) -> TokenStream {
+fn message_method(
+    name: &Ident,
+    view: &TokenStream,
+    doc: &TokenStream,
+    expr: TokenStream,
+) -> TokenStream {
     let ensured = scan_guard();
     quote! {
+        #doc
         pub fn #name(
             &self,
         ) -> ::core::result::Result<::core::option::Option<&#view>, ::puroro::DecodeError> {
@@ -156,7 +168,12 @@ fn singular_generic_getters(
     if matches!(field.getter_shape, GetterShape::Message) {
         let view = lazy_child_view(field.layout.as_ref(), &field.mut_target, companion);
         let get = super::message::bound_record_field(companion, &field.field_const, false);
-        out.push(message_method(&field.name, &view, quote! { #get.get() }));
+        out.push(message_method(
+            &field.name,
+            &view,
+            &field.doc,
+            quote! { #get.get() },
+        ));
         return out;
     }
     let read = super::message::bound_record_field(companion, &field.field_const, false);
@@ -164,6 +181,7 @@ fn singular_generic_getters(
         out.push(optional_method(
             &field.name,
             &field.optional_ty,
+            &field.doc,
             quote! {
                 #ensured
                 ::core::result::Result::Ok(#read.optional())
@@ -172,7 +190,9 @@ fn singular_generic_getters(
     } else {
         let name = &field.name;
         let implicit_ty = &field.implicit_ty;
+        let doc = &field.doc;
         out.push(quote! {
+            #doc
             pub fn #name(&self) -> ::core::result::Result<#implicit_ty, ::puroro::DecodeError> {
                 #ensured
                 ::core::result::Result::Ok(#read.value())
@@ -218,6 +238,7 @@ fn singular_len_getter(
     Some(optional_method(
         &field.name,
         &field.optional_ty,
+        &field.doc,
         quote! {
             #ensured
             #read
@@ -227,6 +248,7 @@ fn singular_len_getter(
 
 fn repeated_getter(field: &RepeatedEmit, fields_name: &Ident, companion: &Ident) -> TokenStream {
     let name = &field.name;
+    let doc = &field.doc;
     let elem = lazy_child_view(field.layout.as_ref(), &field.slice_elem_ty, companion);
     let ensured = scan_guard();
     let read = if is_repeated_spans(field.layout.as_ref()) {
@@ -244,6 +266,7 @@ fn repeated_getter(field: &RepeatedEmit, fields_name: &Ident, companion: &Ident)
         quote! { #get.as_slice() }
     };
     quote! {
+        #doc
         pub fn #name(
             &self,
         ) -> ::core::result::Result<&[#elem], ::puroro::DecodeError> {
@@ -255,6 +278,7 @@ fn repeated_getter(field: &RepeatedEmit, fields_name: &Ident, companion: &Ident)
 
 fn map_getter(field: &MapEmit, fields_name: &Ident, companion: &Ident) -> TokenStream {
     let name = &field.name;
+    let doc = &field.doc;
     let key = &field.key_view;
     let child = field
         .layouts
@@ -269,6 +293,7 @@ fn map_getter(field: &MapEmit, fields_name: &Ident, companion: &Ident) -> TokenS
         LazyLayout::ParamP,
     );
     quote! {
+        #doc
         pub fn #name(
             &self,
         ) -> ::core::result::Result<
@@ -287,10 +312,12 @@ fn oneof_generic_getters(
     companion: &Ident,
 ) -> Vec<TokenStream> {
     let name = &field.name;
+    let doc = &field.doc;
     let case_name = &field.case_name;
     let storage = &field.storage_name;
     let ensured = scan_guard();
     let mut out = vec![quote! {
+        #doc
         pub fn #name(
             &self,
         ) -> ::core::result::Result<
@@ -308,15 +335,17 @@ fn oneof_generic_getters(
             continue;
         }
         let vname = &variant.name;
+        let vdoc = &variant.doc;
         let field_const = &variant.field_const;
         let body = if matches!(variant.getter_shape, GetterShape::Message) {
             let view = lazy_child_view(variant.layout.as_ref(), &variant.mut_target, companion);
             let read = super::message::bound_record_field(companion, field_const, false);
-            message_method(vname, &view, quote! { #read.get() })
+            message_method(vname, &view, vdoc, quote! { #read.get() })
         } else {
             let optional_ty = &variant.optional_ty;
             let read = super::message::bound_record_field(companion, field_const, false);
             quote! {
+                #vdoc
                 pub fn #vname(
                     &self,
                 ) -> ::core::result::Result<
@@ -372,6 +401,7 @@ fn oneof_len_getters(
             Some(optional_method(
                 vname,
                 &variant.optional_ty,
+                &variant.doc,
                 quote! {
                     #ensured
                     #read

@@ -6,14 +6,15 @@
 use crate::descriptor::features::FeatureSet;
 use crate::descriptor::{
     BYTES_LAYOUT_OPTION_NUMBER, BytesLayout, CHILD_PARSE_OPTION_NUMBER, ChildParse, CodegenMeta,
-    CodegenRequest, ENUM_REPR_OPTION_NUMBER, Edition, EnumDesc, EnumRepr, EnumValueDesc, FieldDesc,
-    FieldLabel, FieldType, MESSAGE_LAYOUT_OPTION_NUMBER, MessageDesc, MessageLayout, OneofDesc,
-    ProtoFile, ProtoFqn, STRING_LAYOUT_OPTION_NUMBER, StringLayout, Syntax,
+    CodegenRequest, Comments, ENUM_REPR_OPTION_NUMBER, Edition, EnumDesc, EnumRepr, EnumValueDesc,
+    FieldDesc, FieldLabel, FieldType, MESSAGE_LAYOUT_OPTION_NUMBER, MessageDesc, MessageLayout,
+    OneofDesc, ProtoFile, ProtoFqn, STRING_LAYOUT_OPTION_NUMBER, StringLayout, Syntax,
     UNKNOWN_FIELDS_OPTION_NUMBER, UnknownFieldsPolicy,
 };
 use crate::error::{Error, Result};
 use ::protobuf_core::{
-    AsRefExtProtobuf, Field, FieldNumber, FieldValue, ProtobufError, WriteExtProtobuf,
+    AsRefExtProtobuf, Field, FieldNumber, FieldValue, ProtobufError, ReadExtVarint,
+    WriteExtProtobuf,
 };
 use ::std::convert::TryFrom;
 
@@ -161,6 +162,7 @@ fn decode_file_descriptor(bytes: &[u8]) -> Result<ProtoFile> {
         let mut dependency = Vec::new();
         let mut messages = Vec::new();
         let mut enums = Vec::new();
+        let mut source_locations = Vec::new();
 
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
@@ -177,6 +179,8 @@ fn decode_file_descriptor(bytes: &[u8]) -> Result<ProtoFile> {
                 5 => enums.push(decode_enum(expect_len(&field)?)?),
                 // optional FileOptions options = 8;
                 8 => features = decode_options_features("FileOptions", 50, expect_len(&field)?)?,
+                // optional SourceCodeInfo source_code_info = 9;
+                9 => source_locations = decode_source_code_info(expect_len(&field)?)?,
                 // optional string syntax = 12;
                 12 => syntax_raw = Some(expect_string(&field)?),
                 // optional Edition edition = 14;
@@ -187,7 +191,7 @@ fn decode_file_descriptor(bytes: &[u8]) -> Result<ProtoFile> {
 
         let syntax = resolve_syntax(syntax_raw.as_deref(), edition_raw)?;
 
-        Ok(ProtoFile {
+        let mut file = ProtoFile {
             name,
             package,
             syntax,
@@ -195,7 +199,9 @@ fn decode_file_descriptor(bytes: &[u8]) -> Result<ProtoFile> {
             dependency,
             messages,
             enums,
-        })
+        };
+        attach_source_comments(&mut file, &source_locations);
+        Ok(file)
     })
 }
 
@@ -267,6 +273,7 @@ fn decode_descriptor(bytes: &[u8]) -> Result<MessageDesc> {
             unknown_fields,
             child_parse,
             features,
+            comments: Comments::default(),
         })
     })
 }
@@ -377,6 +384,7 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
             message_layout,
             child_parse,
             features,
+            comments: Comments::default(),
         })
     })
 }
@@ -498,7 +506,10 @@ fn decode_oneof(bytes: &[u8]) -> Result<OneofDesc> {
                 name = expect_string(&field)?;
             }
         }
-        Ok(OneofDesc { name })
+        Ok(OneofDesc {
+            name,
+            comments: Comments::default(),
+        })
     })
 }
 
@@ -529,6 +540,7 @@ fn decode_enum(bytes: &[u8]) -> Result<EnumDesc> {
             values,
             features,
             enum_repr,
+            comments: Comments::default(),
         })
     })
 }
@@ -576,8 +588,171 @@ fn decode_enum_value(bytes: &[u8]) -> Result<EnumValueDesc> {
                 _ => {}
             }
         }
-        Ok(EnumValueDesc { name, number })
+        Ok(EnumValueDesc {
+            name,
+            number,
+            comments: Comments::default(),
+        })
     })
+}
+
+/// One `SourceCodeInfo.Location` with comments we care about for rustdoc.
+struct SourceLocation {
+    path: Vec<i32>,
+    comments: Comments,
+}
+
+fn decode_source_code_info(bytes: &[u8]) -> Result<Vec<SourceLocation>> {
+    with_decoding_context("SourceCodeInfo", || {
+        let mut locations = Vec::new();
+        for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
+            let field = field?;
+            // repeated Location location = 1;
+            if field.field_number.as_u32() == 1
+                && let Some(loc) = decode_source_location(expect_len(&field)?)?
+            {
+                locations.push(loc);
+            }
+        }
+        Ok(locations)
+    })
+}
+
+fn decode_source_location(bytes: &[u8]) -> Result<Option<SourceLocation>> {
+    with_decoding_context("SourceCodeInfo.Location", || {
+        let mut path = Vec::new();
+        let mut leading = None;
+        let mut trailing = None;
+        for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
+            let field = field?;
+            match field.field_number.as_u32() {
+                // repeated int32 path = 1 [packed = true];
+                1 => path.extend(expect_int32s(&field)?),
+                // repeated int32 span = 2 [packed = true]; (ignored)
+                // optional string leading_comments = 3;
+                3 => leading = Some(expect_string(&field)?),
+                // optional string trailing_comments = 4;
+                4 => trailing = Some(expect_string(&field)?),
+                // repeated string leading_detached_comments = 6; (ignored)
+                _ => {}
+            }
+        }
+        let comments = Comments { leading, trailing };
+        if comments.is_empty() {
+            Ok(None)
+        } else {
+            Ok(Some(SourceLocation { path, comments }))
+        }
+    })
+}
+
+/// Packed or unpacked `repeated int32`.
+fn expect_int32s(field: &Field<&[u8]>) -> Result<Vec<i32>> {
+    match &field.value {
+        FieldValue::Len(bytes) => {
+            let mut out = Vec::new();
+            let mut slice: &[u8] = bytes;
+            while !slice.is_empty() {
+                let varint = slice.read_varint()?;
+                out.push(varint.try_to_int32()?);
+            }
+            Ok(out)
+        }
+        FieldValue::Varint(v) => Ok(vec![v.try_to_int32()?]),
+        _ => Err(Error::unexpected_field(field.field_number.as_u32())),
+    }
+}
+
+/// Attach `SourceCodeInfo` comments onto declaration descriptors by path.
+///
+/// Only whole-declaration paths are used (message / field / enum / value /
+/// oneof). Deeper paths (name, type, number, …) are ignored.
+fn attach_source_comments(file: &mut ProtoFile, locations: &[SourceLocation]) {
+    for loc in locations {
+        match loc.path.as_slice() {
+            // FileDescriptorProto.message_type = 4
+            [4, mi] => {
+                if let Some(message) = index_mut(&mut file.messages, *mi) {
+                    message.comments.merge(loc.comments.clone());
+                }
+            }
+            [4, mi, rest @ ..] => {
+                if let Some(message) = index_mut(&mut file.messages, *mi) {
+                    attach_message_comments(message, rest, &loc.comments);
+                }
+            }
+            // FileDescriptorProto.enum_type = 5
+            [5, ei] => {
+                if let Some(enumeration) = index_mut(&mut file.enums, *ei) {
+                    enumeration.comments.merge(loc.comments.clone());
+                }
+            }
+            [5, ei, rest @ ..] => {
+                if let Some(enumeration) = index_mut(&mut file.enums, *ei) {
+                    attach_enum_comments(enumeration, rest, &loc.comments);
+                }
+            }
+            _ => {}
+        }
+    }
+}
+
+fn attach_message_comments(message: &mut MessageDesc, path: &[i32], comments: &Comments) {
+    match path {
+        [] => message.comments.merge(comments.clone()),
+        // DescriptorProto.field = 2
+        [2, fi] => {
+            if let Some(field) = index_mut(&mut message.fields, *fi) {
+                field.comments.merge(comments.clone());
+            }
+        }
+        // DescriptorProto.nested_type = 3
+        [3, ni] => {
+            if let Some(nested) = index_mut(&mut message.nested_messages, *ni) {
+                nested.comments.merge(comments.clone());
+            }
+        }
+        [3, ni, rest @ ..] => {
+            if let Some(nested) = index_mut(&mut message.nested_messages, *ni) {
+                attach_message_comments(nested, rest, comments);
+            }
+        }
+        // DescriptorProto.enum_type = 4
+        [4, ei] => {
+            if let Some(enumeration) = index_mut(&mut message.nested_enums, *ei) {
+                enumeration.comments.merge(comments.clone());
+            }
+        }
+        [4, ei, rest @ ..] => {
+            if let Some(enumeration) = index_mut(&mut message.nested_enums, *ei) {
+                attach_enum_comments(enumeration, rest, comments);
+            }
+        }
+        // DescriptorProto.oneof_decl = 8
+        [8, oi] => {
+            if let Some(oneof) = index_mut(&mut message.oneofs, *oi) {
+                oneof.comments.merge(comments.clone());
+            }
+        }
+        _ => {}
+    }
+}
+
+fn attach_enum_comments(enumeration: &mut EnumDesc, path: &[i32], comments: &Comments) {
+    match path {
+        [] => enumeration.comments.merge(comments.clone()),
+        // EnumDescriptorProto.value = 2
+        [2, vi] => {
+            if let Some(value) = index_mut(&mut enumeration.values, *vi) {
+                value.comments.merge(comments.clone());
+            }
+        }
+        _ => {}
+    }
+}
+
+fn index_mut<T>(items: &mut [T], index: i32) -> Option<&mut T> {
+    usize::try_from(index).ok().and_then(|i| items.get_mut(i))
 }
 
 fn with_decoding_context<T>(message: &'static str, f: impl FnOnce() -> Result<T>) -> Result<T> {
@@ -681,6 +856,77 @@ mod tests {
         let mut out = Vec::new();
         write_int32_field(&mut out, field_number, value).unwrap();
         out
+    }
+
+    fn encode_packed_int32s(values: &[i32]) -> Vec<u8> {
+        use ::protobuf_core::WriteExtVarint;
+        let mut bytes = Vec::new();
+        for value in values {
+            let varint = ::protobuf_core::Varint::from_int32(*value);
+            bytes.write_varint(&varint).unwrap();
+        }
+        bytes
+    }
+
+    fn encode_source_location(path: &[i32], leading: &str) -> Vec<u8> {
+        let mut loc = Vec::new();
+        // repeated int32 path = 1 [packed = true];
+        write_len_field(&mut loc, 1, &encode_packed_int32s(path)).unwrap();
+        // optional string leading_comments = 3;
+        loc.extend(encode_string_field(3, leading));
+        loc
+    }
+
+    #[test]
+    fn source_code_info_attaches_comments_by_path() {
+        // FieldDescriptorProto { name=title, number=1, label=OPTIONAL, type=STRING }
+        let mut field = Vec::new();
+        field.extend(encode_string_field(1, "title"));
+        field.extend(encode_varint_field(3, 1));
+        field.extend(encode_varint_field(4, FieldLabel::Optional as i32));
+        field.extend(encode_varint_field(5, FieldType::String as i32));
+
+        // DescriptorProto { name=Task, field=... }
+        let mut message = Vec::new();
+        message.extend(encode_string_field(1, "Task"));
+        message.extend(encode_message_field(2, &field));
+
+        let mut source_info = Vec::new();
+        // FileDescriptorProto.message_type[0]
+        source_info.extend(encode_message_field(
+            1,
+            &encode_source_location(&[4, 0], "A task message.\n"),
+        ));
+        // FileDescriptorProto.message_type[0].field[0]
+        source_info.extend(encode_message_field(
+            1,
+            &encode_source_location(&[4, 0, 2, 0], "Title text.\n"),
+        ));
+
+        let mut file = Vec::new();
+        file.extend(encode_string_field(1, "task.proto"));
+        file.extend(encode_string_field(12, "proto3"));
+        file.extend(encode_message_field(4, &message));
+        file.extend(encode_message_field(9, &source_info));
+
+        let mut request = Vec::new();
+        request.extend(encode_string_field(1, "task.proto"));
+        request.extend(encode_message_field(15, &file));
+
+        let decoded = decode_request(&request).unwrap();
+        let msg = &decoded.proto_files[0].messages[0];
+        assert_eq!(
+            msg.comments.doc_text().map(str::trim),
+            Some("A task message."),
+            "{:?}",
+            msg.comments
+        );
+        assert_eq!(
+            msg.fields[0].comments.doc_text().map(str::trim),
+            Some("Title text."),
+            "{:?}",
+            msg.fields[0].comments
+        );
     }
 
     #[test]

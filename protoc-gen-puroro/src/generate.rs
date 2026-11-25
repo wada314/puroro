@@ -287,9 +287,9 @@ mod tests {
     use crate::descriptor::features::Utf8Validation;
     use crate::descriptor::test_helpers as desc;
     use crate::descriptor::{
-        BytesLayout, CodegenRequest, Edition, EnumDesc, EnumRepr, FeatureSet, FieldDesc,
-        FieldLabel, FieldType, MessageDesc, MessageLayout, ProtoFile, ProtoFqn, StringLayout,
-        Syntax, UnknownFieldsPolicy,
+        BytesLayout, CodegenRequest, Comments, Edition, EnumDesc, EnumRepr, EnumValueDesc,
+        FeatureSet, FieldDesc, FieldLabel, FieldType, MessageDesc, MessageLayout, ProtoFile,
+        ProtoFqn, StringLayout, Syntax, UnknownFieldsPolicy,
     };
     use crate::plugin_io::{decode_request, encode_file_descriptor_set};
     use ::protobuf_core::{AsRefExtProtobuf, Field, FieldNumber, FieldValue, WriteExtProtobuf};
@@ -455,6 +455,59 @@ mod tests {
         assert!(content.contains("@generated"));
         assert!(content.contains("- `empty.proto`"));
         assert!(content.contains("pub use ::puroro"));
+    }
+
+    #[test]
+    fn proto_comments_become_rustdoc_on_types_and_getters() {
+        let mut request = empty_request("Task");
+        request.proto_files[0].messages[0].comments = Comments {
+            leading: Some("A tracked work item.\n".into()),
+            trailing: None,
+        };
+        request.proto_files[0].messages[0].fields = vec![FieldDesc {
+            proto3_optional: true,
+            comments: Comments {
+                leading: Some("Human-readable title.\n".into()),
+                trailing: None,
+            },
+            ..desc::field("title", 1, FieldType::String)
+        }];
+        request.proto_files[0].enums.push(EnumDesc {
+            comments: Comments {
+                leading: Some("Lifecycle state.\n".into()),
+                trailing: None,
+            },
+            ..desc::enumeration(
+                "Status",
+                vec![
+                    EnumValueDesc {
+                        comments: Comments {
+                            leading: Some("Not started.\n".into()),
+                            trailing: None,
+                        },
+                        ..desc::enum_value("STATUS_UNSPECIFIED", 0)
+                    },
+                    desc::enum_value("STATUS_DONE", 1),
+                ],
+            )
+        });
+        let content = generate_lib(&request);
+        assert!(
+            content.contains("A tracked work item."),
+            "message docs missing: {content}"
+        );
+        assert!(
+            content.contains("Human-readable title."),
+            "field docs missing: {content}"
+        );
+        assert!(
+            content.contains("Lifecycle state."),
+            "enum docs missing: {content}"
+        );
+        assert!(
+            content.contains("Not started."),
+            "enum value docs missing: {content}"
+        );
     }
 
     #[test]
