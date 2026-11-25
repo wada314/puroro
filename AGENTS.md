@@ -13,7 +13,7 @@ Draft pull requests #101 and #102 are leftover environment-setup changes from Au
 | `puroro` (workspace root) | Stable user API (`Message`, `Optional`, errors); optional Cargo feature `tonic` for `PuroroCodec` |
 | `puroro-rt` | Generated-code field catalog and wire helpers |
 | `protoc-gen-puroro` | `protoc` plugin (`--puroro_out`) |
-| `puroro-types` | Generated `google.protobuf` descriptors + WKTs (`descriptors` / `wkt` features); leaf crate, not depended on by `puroro` / `puroro-rt`. Vendored `.proto` pin in `puroro-types/proto/UPSTREAM`; refresh with `puroro-types/scripts/vendor-google-protos.sh` |
+| `puroro-types` | Generated `google.protobuf` descriptors + WKTs (`descriptors` / `wkt` features); leaf crate, not depended on by `puroro` / `puroro-rt`. Vendored `.proto` pin in `puroro-types/proto/UPSTREAM`; refresh with `puroro-types/scripts/vendor-google-protos.sh`. Rustdoc is on GitHub Pages (`.github/workflows/update-doc.yml`), not docs.rs |
 | `sample-generated` | Hand-written reference (`Task` / `Address`) on the plugin's `*Fields` + `Record` shell |
 | `puroro-codegen-tests` | Live plugin fixtures (`fixtures/<case>/`) |
 | `protobuf-core` | Git submodule — wire primitives |
@@ -37,6 +37,7 @@ cargo test
 cargo test -p puroro-sample-generated
 cargo test -p puroro-codegen-tests   # needs `protoc` ≥ 32.1 (or `PROTOC=`); plugin via bindeps
 cargo test -p puroro-types           # needs `protoc`; plugin via bindeps; features `descriptors`/`wkt`
+cargo doc --no-deps -p puroro-types --all-features  # GitHub Pages publishes this on master
 cargo bench -p puroro-benches -- --test
 cargo fmt --all
 cargo clippy --all-targets --workspace \

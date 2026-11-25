@@ -1,0 +1,49 @@
+# Publish rustdoc for `puroro-types` only to GitHub Pages.
+# Other crates stay on docs.rs; this crate needs `protoc` + nightly bindeps,
+# which docs.rs does not support well (same pattern as protoc-plugin-by-closure).
+name: Update Doc
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches:
+      - master
+      - test-update-doc
+    paths-ignore:
+      - 'target/doc/**'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prefer HTTPS for git submodules
+        run: |
+          git config --global url."https://github.com/".insteadOf git@github.com:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@nightly
+      - name: Install protoc
+        run: |
+          # Match the Rust workflow: build.rs runs protoc-gen-puroro.
+          PROTOC_VER=32.1
+          PROTOC_ZIP=protoc-${PROTOC_VER}-linux-x86_64.zip
+          curl -fsSL -o "$PROTOC_ZIP" \
+            "https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VER}/$PROTOC_ZIP"
+          sudo unzip -o "$PROTOC_ZIP" -d /usr/local bin/protoc
+          sudo unzip -o "$PROTOC_ZIP" -d /usr/local 'include/*'
+          rm -f "$PROTOC_ZIP"
+          protoc --version
+      - name: Build docs
+        # Only `puroro-types` — not the rest of the workspace.
+        run: cargo doc --locked --no-deps -p puroro-types --all-features
+      - name: Upload docs
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target/doc

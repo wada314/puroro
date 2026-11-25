@@ -6,6 +6,7 @@ edition = "2024"
 license = "Apache-2.0"
 description = "Generated google.protobuf descriptor and well-known message types for puroro"
 repository = "https://github.com/wada314/puroro"
+documentation = "https://wada314.github.io/puroro/puroro_types/index.html"
 readme = "README.md"
 publish = false
 
@@ -30,3 +31,10 @@ puroro-rt = { path = "../puroro-rt", version = "0.1.0" }
 # Requires nightly Cargo `-Z bindeps` (enabled via `.cargo/config.toml`).
 [build-dependencies]
 protoc-gen-puroro = { path = "../protoc-gen-puroro", artifact = "bin" }
+
+# Hint only: docs.rs still cannot build this crate (protoc + bindeps). API docs
+# are published to GitHub Pages via `.github/workflows/update-doc.yml`.
+[package.metadata.docs.rs]
+cargo-args = ["-Zbindeps"]
+all-features = true
+

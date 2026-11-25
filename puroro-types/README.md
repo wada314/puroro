@@ -6,6 +6,14 @@ and common well-known types (WKTs).
 **This is not an official Google product.** For production Rust protobuf code,
 prefer [`google-protobuf`](https://crates.io/crates/google-protobuf).
 
+## Documentation
+
+`build.rs` needs `protoc` and Cargo nightly `-Z bindeps`, so docs.rs cannot
+build this crate reliably. API docs are published to
+[GitHub Pages](https://wada314.github.io/puroro/puroro_types/index.html)
+(`.github/workflows/update-doc.yml` on `master`). Other workspace crates keep
+using docs.rs.
+
 ## Features
 
 | Feature | Default | Contents |
