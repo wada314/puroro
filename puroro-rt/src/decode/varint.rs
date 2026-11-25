@@ -410,6 +410,7 @@ fn try_decode_varint_hot<const N: usize>(
 /// [`super::decode_varint`].
 ///
 /// `Ok(None)` means `chunk` ended before a terminator (and before 10 bytes).
+#[cfg(feature = "lazy")]
 #[inline]
 pub(crate) fn try_decode_varint_slice(chunk: &[u8]) -> Result<Option<(u64, usize)>, DecodeError> {
     try_decode_varint_hot::<4>(chunk)

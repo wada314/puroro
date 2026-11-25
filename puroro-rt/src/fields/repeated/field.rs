@@ -10,29 +10,42 @@ use ::core::marker::PhantomData;
 use ::core::mem::ManuallyDrop;
 
 use ::allocator_api2::alloc::Allocator;
+#[cfg(feature = "lazy")]
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::BufMut;
 use ::puroro::{DecodeBuf, DecodeError, WireType};
 use ::unmanaged::CloneIn;
 use ::unmanaged::DeallocateIn;
+#[cfg(feature = "lazy")]
 use ::unmanaged::UnmanagedString;
 use ::unmanaged::UnmanagedVec;
 use ::unmanaged::vec::VecGuard;
 
+#[cfg(feature = "lazy")]
 use crate::decode::{LazyMessage, LazyProfile, ScannedRecord, ScannedValue, WireSpan};
 use crate::encode::field_number_const;
+#[cfg(feature = "lazy")]
+use crate::fields::shared::DefaultIn;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
-use crate::fields::shared::{DefaultIn, FieldDeallocate, MessageCommon, MessageCommonAlloc};
+use crate::fields::shared::{FieldDeallocate, MessageCommon, MessageCommonAlloc};
+#[cfg(feature = "lazy")]
 use crate::fields::span_list::SpanList;
+#[cfg(feature = "lazy")]
 use crate::fields::wire::len::{ProtoBytes, ProtoString, ProtoStringUnchecked};
+#[cfg(feature = "lazy")]
 use crate::fields::wire::numerical::{Numerical, NumericalType};
+#[cfg(feature = "lazy")]
 use crate::fields::wire::proto_group::ProtoGroup;
+#[cfg(feature = "lazy")]
 use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedVecMut,
 };
+#[cfg(feature = "lazy")]
 use crate::fields::wire::wire_payload::CopyWirePayload;
-use crate::message_encode::{EncodeCtx, MessageEncode};
+use crate::message_encode::EncodeCtx;
+#[cfg(feature = "lazy")]
+use crate::message_encode::MessageEncode;
 
 use super::container::RepeatedElementsMut;
 use super::encoding::RepeatedEncoding;
@@ -65,6 +78,7 @@ where
 pub struct RepeatedReady;
 
 /// Lazy repeated LEN: element-LEN offsets during the parent scan; vec on first get.
+#[cfg(feature = "lazy")]
 pub struct RepeatedSpans;
 
 impl<T, E, const FIELD: u32, A> RepeatedLayout<T, E, FIELD, A> for RepeatedReady
@@ -93,6 +107,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<T, E, const FIELD: u32, A> RepeatedLayout<T, E, FIELD, A> for RepeatedSpans
 where
     T: RepeatedElement,
@@ -118,11 +133,13 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 /// Decode a scanned LEN **body** (length prefix already consumed).
 pub trait DecodeLenBody<A: Allocator>: RepeatedElement {
     fn decode_len_body(bytes: &[u8], alloc: A) -> Result<Self::Element<A>, DecodeError>;
 }
 
+#[cfg(feature = "lazy")]
 impl<A: Allocator + Clone> DecodeLenBody<A> for ProtoString {
     fn decode_len_body(bytes: &[u8], alloc: A) -> Result<UnmanagedString<A>, DecodeError> {
         let mut vec = AllocVec::with_capacity_in(bytes.len(), alloc.clone());
@@ -138,6 +155,7 @@ impl<A: Allocator + Clone> DecodeLenBody<A> for ProtoString {
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<A: Allocator + Clone> DecodeLenBody<A> for ProtoBytes {
     fn decode_len_body(bytes: &[u8], alloc: A) -> Result<UnmanagedVec<u8, A>, DecodeError> {
         let mut vec = AllocVec::with_capacity_in(bytes.len(), alloc);
@@ -146,6 +164,7 @@ impl<A: Allocator + Clone> DecodeLenBody<A> for ProtoBytes {
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<A: Allocator + Clone> DecodeLenBody<A> for ProtoStringUnchecked {
     fn decode_len_body(bytes: &[u8], alloc: A) -> Result<UnmanagedVec<u8, A>, DecodeError> {
         ProtoBytes::decode_len_body(bytes, alloc)
@@ -371,6 +390,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<'f, 'c, C, E, const FIELD: u32, A, Cx> RepeatedFieldMut<'f, 'c, Numerical<C>, E, FIELD, A, Cx>
 where
     C: NumericalType,
@@ -456,6 +476,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<T, E, const FIELD: u32, A> RepeatedField<T, E, FIELD, A, RepeatedSpans>
 where
     T: RepeatedElement,
@@ -502,6 +523,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 fn append_span<T, E, const FIELD: u32, A>(
     field: &mut RepeatedField<T, E, FIELD, A>,
     span: WireSpan,
@@ -519,6 +541,7 @@ where
     Ok(())
 }
 
+#[cfg(feature = "lazy")]
 impl<M, E, const FIELD: u32, A> RepeatedField<ProtoMessage<M>, E, FIELD, A>
 where
     M: MessageEncode + DefaultIn<A>,
@@ -548,6 +571,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<M, E, const FIELD: u32, A> RepeatedField<ProtoGroup<M>, E, FIELD, A>
 where
     M: MessageEncode + DefaultIn<A>,
@@ -651,6 +675,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<T, E, const FIELD: u32, A, Cx> FieldCloneIn<Cx>
     for RepeatedField<T, E, FIELD, A, RepeatedSpans>
 where
@@ -672,7 +697,7 @@ where
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "lazy"))]
 mod tests {
     use super::super::Expanded;
     use super::{RepeatedField, RepeatedSpans};

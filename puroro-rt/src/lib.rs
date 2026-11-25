@@ -27,43 +27,54 @@ pub use ::protobuf_core::{Field, FieldNumber, Varint};
 pub use ::unmanaged::{CloneIn, DeallocateIn, DefaultIn};
 pub use defaults::ProtoDefault;
 pub use encode::field_number_const;
-pub use fields::map::{MapField, MapFieldMut, MapFieldRef, MapLayout, MapReady, MapSpans};
+#[cfg(feature = "lazy")]
+pub use fields::map::MapSpans;
+pub use fields::map::{MapField, MapFieldMut, MapFieldRef, MapLayout, MapReady};
 pub use fields::oneof::{
     OneofDeallocate, OneofEncodable, OneofGroup, OneofSlot, OneofSlotMut, OneofSlotRef,
     OneofVariantRef, OneofView, OneofViewMut,
 };
 pub use fields::oneof_variant::OneofVariant;
 pub use fields::repeated::container::RepeatedElementsMut;
+#[cfg(feature = "lazy")]
+pub use fields::repeated::{DecodeLenBody, RepeatedSpans};
 pub use fields::repeated::{
-    DecodeLenBody, Expanded, Packed, RepeatedField, RepeatedFieldMut, RepeatedFieldRef,
-    RepeatedLayout, RepeatedReady, RepeatedSpans,
+    Expanded, Packed, RepeatedField, RepeatedFieldMut, RepeatedFieldRef, RepeatedLayout,
+    RepeatedReady,
 };
 pub use fields::shared::field_presence::{Explicit, Implicit, LegacyRequired, Message, Oneof};
 pub use fields::shared::{
     AddressableSlot, BitPacked, BitStorage, Boxed, CloneBound, CloneFieldsVisitor, DeallocateBound,
     DebugStructVisitor, DiscardUnknowns, Eager, EncodeRawVisitor, EncodedLenVisitor, FieldCloneIn,
     FieldDeallocVisitor, FieldDeallocate, FieldEncode, FieldEqVisitor, FieldPairVisitor,
-    FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Inline, InlineOrHeap, InteriorBitArray,
-    Lazy, LazyMessageCommon, MessageBinding, MessageBindingMut, MessageCommon, MessageCommonAlloc,
-    MessageCommonBits, MessageCommonSharedBits, RejectUnknowns, SSO_HEAP, SSO_INLINE, SpanOnly,
-    UnknownFields, UnknownStore, ValueLayout, WireOrSso,
+    FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Inline, InlineOrHeap, MessageBinding,
+    MessageBindingMut, MessageCommon, MessageCommonAlloc, MessageCommonBits, RejectUnknowns,
+    SSO_HEAP, SSO_INLINE, UnknownFields, UnknownStore, ValueLayout,
+};
+#[cfg(feature = "lazy")]
+pub use fields::shared::{
+    InteriorBitArray, Lazy, LazyMessageCommon, MessageCommonSharedBits, SpanOnly, WireOrSso,
 };
 pub use fields::singular::{
     SingularField, SingularFieldAccess, SingularFieldMut, SingularFieldRef,
 };
 pub use fields::slot_index::{BindField, BindFieldMut, HasField, OneofFieldMut, OneofFieldRef};
 pub use fields::wire::{
-    BytesSlotNew, Closed, ClosedEnum, INLINE_CAP, LazyBytesGet, LazyBytesLen, LazyBytesSlot,
-    LazyLenStore, LazyStringGet, LazyStringLen, LazyStringSlot, Open, OpenEnum, PayloadAccess,
-    ProtoBool, ProtoBytes, ProtoDouble, ProtoEnum, ProtoEnumStorage, ProtoFixed32, ProtoFixed64,
-    ProtoFloat, ProtoGroup, ProtoInt32, ProtoInt64, ProtoMessage, ProtoSFixed32, ProtoSFixed64,
-    ProtoSInt32, ProtoSInt64, ProtoString, ProtoStringUnchecked, ProtoUInt32, ProtoUInt64,
-    SingularType, SsoBytes, SsoBytesMut, SsoString, SsoStringMut, StringSlotNew, WireOrSsoKind,
-    WireOrSsoSlot,
+    BytesSlotNew, Closed, ClosedEnum, INLINE_CAP, Open, OpenEnum, PayloadAccess, ProtoBool,
+    ProtoBytes, ProtoDouble, ProtoEnum, ProtoEnumStorage, ProtoFixed32, ProtoFixed64, ProtoFloat,
+    ProtoGroup, ProtoInt32, ProtoInt64, ProtoMessage, ProtoSFixed32, ProtoSFixed64, ProtoSInt32,
+    ProtoSInt64, ProtoString, ProtoStringUnchecked, ProtoUInt32, ProtoUInt64, SingularType,
+    SsoBytes, SsoBytesMut, SsoString, SsoStringMut, StringSlotNew,
+};
+#[cfg(feature = "lazy")]
+pub use fields::wire::{
+    LazyBytesGet, LazyBytesLen, LazyBytesSlot, LazyLenStore, LazyStringGet, LazyStringLen,
+    LazyStringSlot, WireOrSsoKind, WireOrSsoSlot,
 };
 pub use message_encode::{EncodeCtx, MessageEncode, encode_message, encode_message_to_vec};
 pub use message_merge::{MessageMerge, merge_message};
+#[cfg(feature = "lazy")]
+pub use message_record::LazyRecordApply;
 pub use message_record::{
-    CloneRecordFields, ConstructRecordFields, EagerRecordFields, LazyRecordApply, Record,
-    RecordFields,
+    CloneRecordFields, ConstructRecordFields, EagerRecordFields, Record, RecordFields,
 };

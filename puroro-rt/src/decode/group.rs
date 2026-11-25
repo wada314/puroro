@@ -152,6 +152,7 @@ pub(crate) fn copy_group<B: Buf>(
 /// The start tag is already consumed and is not copied. `emit` must copy the
 /// bytes before it returns. The slice is borrowed from `buf`'s current chunk.
 /// `Err` from `emit` stops the walk at the byte already consumed.
+#[cfg(feature = "lazy")]
 pub(crate) fn copy_group_body<B: Buf>(
     field_number: FieldNumber,
     buf: &mut B,
