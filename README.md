@@ -75,7 +75,6 @@ bookstore/                          directory from --puroro_out
       puroro                        re-export of the puroro crate
       mod demo                      package demo
         Shelf                       message Shelf
-        ShelfLazy                   lazy alias of Shelf
 
 from another crate:       bookstore::demo::Shelf
                           bookstore::puroro::Message
@@ -87,6 +86,10 @@ shelf.proto is the input file. It is not a Rust module.
 The `[dependencies]` in that `Cargo.toml` are the crates `lib.rs` calls. The plugin writes the version on each line. The root module `puroro` is that runtime crate, re-exported for application code. A schema that would place a module or type named `puroro` at that root is rejected. `package shop.puroro` is a different module (`shop::puroro`). Which other proto names are accepted is [DESIGN.md](DESIGN.md#allowed-and-disallowed-names).
 
 `title` above is an editions string, so it is `&str`. Proto3 rejects `[default = …]`.
+
+### Experimental lazy aliases
+
+By default the plugin emits only the eager message (`Shelf`). Pass `--puroro_opt=lazy=true` (alone or comma-combined with `crate_name=…`) to also emit experimental `ShelfLazy` and to enable `puroro-rt`'s `lazy` feature in the generated `Cargo.toml`. Lazy design is not settled; API and behaviour may change. `(puroro.child_parse) = LAZY` also requires that opt-in. Details: [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing).
 
 ## proto2
 
@@ -119,7 +122,7 @@ let decoded = Shelf::decode(&bytes[..]).unwrap();
 assert_eq!(decoded.title().get(), "Shore");
 ```
 
-`Shelf::new()` and `Shelf::decode` use the `Global` allocator. `StringMut` has to be in scope for `set`. Eager messages do not generate `has_title()`. `ShelfLazy` in the diagram has `Result` getters and no mutators. From this application that type is `bookstore::demo::ShelfLazy`. The full accessor table is [DESIGN.md §4](https://github.com/wada314/puroro/blob/master/DESIGN.md#4-generated-code-specification).
+`Shelf::new()` and `Shelf::decode` use the `Global` allocator. `StringMut` has to be in scope for `set`. Eager messages do not generate `has_title()`. The full accessor table is [DESIGN.md §4](https://github.com/wada314/puroro/blob/master/DESIGN.md#4-generated-code-specification).
 
 ## Build the plugin from a checkout
 

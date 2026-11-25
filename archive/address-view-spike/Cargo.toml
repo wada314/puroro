@@ -11,7 +11,7 @@ description = "Archived zero-copy AddressView spike. Not generator output."
 allocator-api2 = "0.2"
 bytes = "1"
 puroro = { path = "../.." }
-puroro-rt = { path = "../../puroro-rt" }
+puroro-rt = { path = "../../puroro-rt", features = ["lazy"] }
 puroro-sample-generated = { path = "../../sample-generated" }
 
 [dev-dependencies]

@@ -143,8 +143,11 @@ fn run_protoc(
 ) {
     let mut cmd = Command::new(protoc);
     cmd.arg(format!("--plugin=protoc-gen-puroro={}", plugin.display()))
-        .arg(format!("--puroro_out={}", case_out.display()))
-        .arg(format!("-I{}", case.dir.display()));
+        .arg(format!("--puroro_out={}", case_out.display()));
+    if let Some(opt) = &case.puroro_opt {
+        cmd.arg(format!("--puroro_opt={opt}"));
+    }
+    cmd.arg(format!("-I{}", case.dir.display()));
     for dir in extra_includes {
         cmd.arg(format!("-I{}", dir.display()));
     }
@@ -208,6 +211,8 @@ struct FixtureCase {
     /// All `.proto` files in the fixture, sorted by file name.
     proto_paths: Vec<PathBuf>,
     test_path: PathBuf,
+    /// Optional `--puroro_opt=…` from a `puroro_opt` file in the fixture dir.
+    puroro_opt: Option<String>,
 }
 
 fn list_fixture_cases(fixtures_src: &Path) -> Vec<FixtureCase> {
@@ -244,15 +249,39 @@ fn list_fixture_cases(fixtures_src: &Path) -> Vec<FixtureCase> {
         if !test_path.is_file() {
             panic!("fixture `{}` is missing required `test.rs`", dir.display());
         }
+        let puroro_opt = read_puroro_opt(&dir);
 
         cases.push(FixtureCase {
             module,
             dir,
             proto_paths,
             test_path,
+            puroro_opt,
         });
     }
     cases
+}
+
+/// Optional plugin parameter file (`lazy=true`, `crate_name=…`, …).
+///
+/// One line, comma-separated keys as for `--puroro_opt`. Blank / `#` lines are
+/// ignored; the first non-empty content line is used.
+fn read_puroro_opt(case_dir: &Path) -> Option<String> {
+    let path = case_dir.join("puroro_opt");
+    if !path.is_file() {
+        return None;
+    }
+    let text = fs::read_to_string(&path).unwrap_or_else(|e| {
+        panic!("failed to read `{}`: {e}", path.display())
+    });
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        return Some(line.to_owned());
+    }
+    None
 }
 
 fn list_protos(case_dir: &Path) -> Vec<PathBuf> {

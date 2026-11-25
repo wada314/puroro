@@ -11,6 +11,13 @@ readme = "README.md"
 [lints]
 workspace = true
 
+[features]
+default = []
+# Experimental lazy message aliases (`NameLazy`, island scan, WireOrSso, …).
+# Opt in from the plugin with `--puroro_opt=lazy=true` (generated Cargo.toml
+# enables this feature). API and behaviour may change.
+lazy = []
+
 [dependencies]
 allocator-api2 = "0.2"
 bitvec = "1"

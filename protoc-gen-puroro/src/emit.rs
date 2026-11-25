@@ -100,7 +100,11 @@ pub(crate) struct PreparedFile {
     messages: Vec<PreparedMessage>,
 }
 
-fn prepare_message(message: &Message<'_>, storage: &MessageStoragePlan) -> Result<PreparedMessage> {
+fn prepare_message(
+    message: &Message<'_>,
+    storage: &MessageStoragePlan,
+    emit_lazy: bool,
+) -> Result<PreparedMessage> {
     if !ident::is_simple_ident(message.name()) {
         return Err(Error::Codegen(format!(
             "cannot use message name `{}` as a Rust identifier",
@@ -117,6 +121,7 @@ fn prepare_message(message: &Message<'_>, storage: &MessageStoragePlan) -> Resul
         message.name(),
         &module_name,
         full_name,
+        emit_lazy,
     )?;
 
     let nested_enums = message
@@ -126,7 +131,7 @@ fn prepare_message(message: &Message<'_>, storage: &MessageStoragePlan) -> Resul
     let nested = message
         .nested_messages()
         .filter(|m| !m.is_map_entry())
-        .map(|m| prepare_message(m, storage))
+        .map(|m| prepare_message(m, storage, emit_lazy))
         .collect::<Result<Vec<_>>>()?;
 
     Ok(PreparedMessage {
@@ -145,13 +150,17 @@ fn prepare_enum(enumeration: &Enum<'_>) -> Result<PreparedEnum> {
     })
 }
 
-pub(crate) fn prepare_file(file: &File<'_>, storage: &MessageStoragePlan) -> Result<PreparedFile> {
+pub(crate) fn prepare_file(
+    file: &File<'_>,
+    storage: &MessageStoragePlan,
+    emit_lazy: bool,
+) -> Result<PreparedFile> {
     Ok(PreparedFile {
         package: file.package().to_owned(),
         enums: file.enums().map(prepare_enum).collect::<Result<Vec<_>>>()?,
         messages: file
             .messages()
-            .map(|m| prepare_message(m, storage))
+            .map(|m| prepare_message(m, storage, emit_lazy))
             .collect::<Result<Vec<_>>>()?,
     })
 }

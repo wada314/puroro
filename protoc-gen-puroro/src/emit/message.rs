@@ -28,12 +28,15 @@ pub(super) struct RenderedMessageItems {
 /// Render the message struct (parent) and companion (`FIELD_*`, defaults, oneofs).
 ///
 /// `full_name` is the protobuf type name without a leading `.` (`example.Task`).
+/// When `emit_lazy` is false, only the eager alias is emitted (default plugin
+/// mode). Pass `--puroro_opt=lazy=true` to also emit `NameLazy`.
 pub(super) fn render_items(
     field_plan: &MessageFieldPlan<'_>,
     name: &Ident,
     name_str: &str,
     companion: &Ident,
     full_name: &str,
+    emit_lazy: bool,
 ) -> Result<RenderedMessageItems> {
     let fields = field_plan
         .members()
@@ -89,7 +92,6 @@ pub(super) fn render_items(
         .collect::<Vec<_>>();
     let merge_arms = render_merge_arms(&fields, companion);
     let validate_body = render_validate(&fields, companion);
-    let apply_arms = super::lazy::render_apply_arms(&fields, companion);
     let layout = quote! { L };
     let validate_method = record_validate_method(validate_body.as_ref(), &layout);
     let record_fields_impl = quote! {
@@ -138,21 +140,25 @@ pub(super) fn render_items(
             }
         }
     };
-    let construct_lazy = quote! {
-        impl<
-            A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            P: ::puroro_rt::decode::LazyProfile,
-        > ::puroro_rt::ConstructRecordFields<A, ::puroro_rt::Lazy<A, P>>
-            for #fields_name<A, ::puroro_rt::Lazy<A, P>>
-        {
-            #[allow(unused_variables)]
-            fn new(alloc: A) -> Self {
-                Self {
-                    #(#new_in_fields)*
-                    _layout: ::core::marker::PhantomData,
+    let construct_lazy = if emit_lazy {
+        quote! {
+            impl<
+                A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
+                P: ::puroro_rt::decode::LazyProfile,
+            > ::puroro_rt::ConstructRecordFields<A, ::puroro_rt::Lazy<A, P>>
+                for #fields_name<A, ::puroro_rt::Lazy<A, P>>
+            {
+                #[allow(unused_variables)]
+                fn new(alloc: A) -> Self {
+                    Self {
+                        #(#new_in_fields)*
+                        _layout: ::core::marker::PhantomData,
+                    }
                 }
             }
         }
+    } else {
+        quote! {}
     };
     let construct_record_impls = [construct_eager, construct_lazy];
     let clone_eager = quote! {
@@ -171,34 +177,38 @@ pub(super) fn render_items(
             }
         }
     };
-    let clone_lazy = quote! {
-        impl<
-            A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            P: ::puroro_rt::decode::LazyProfile,
-        > ::puroro_rt::CloneRecordFields<A, ::puroro_rt::Lazy<A, P>>
-            for #fields_name<A, ::puroro_rt::Lazy<A, P>>
-        {
-            #[allow(unused_variables)]
-            fn clone_fields(
-                &self,
-                dst: &mut Self,
-                src_common: &::puroro_rt::MessageCommon<
-                    Self::Bits,
-                    A,
-                    Self::Unknown,
-                    ::puroro_rt::Lazy<A, P>,
-                >,
-                dst_common: &::puroro_rt::MessageCommon<
-                    Self::Bits,
-                    A,
-                    Self::Unknown,
-                    ::puroro_rt::Lazy<A, P>,
-                >,
-                alloc: A,
-            ) {
-                #(#clone_stmts)*
+    let clone_lazy = if emit_lazy {
+        quote! {
+            impl<
+                A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
+                P: ::puroro_rt::decode::LazyProfile,
+            > ::puroro_rt::CloneRecordFields<A, ::puroro_rt::Lazy<A, P>>
+                for #fields_name<A, ::puroro_rt::Lazy<A, P>>
+            {
+                #[allow(unused_variables)]
+                fn clone_fields(
+                    &self,
+                    dst: &mut Self,
+                    src_common: &::puroro_rt::MessageCommon<
+                        Self::Bits,
+                        A,
+                        Self::Unknown,
+                        ::puroro_rt::Lazy<A, P>,
+                    >,
+                    dst_common: &::puroro_rt::MessageCommon<
+                        Self::Bits,
+                        A,
+                        Self::Unknown,
+                        ::puroro_rt::Lazy<A, P>,
+                    >,
+                    alloc: A,
+                ) {
+                    #(#clone_stmts)*
+                }
             }
         }
+    } else {
+        quote! {}
     };
     let clone_record_impls = [clone_eager, clone_lazy];
     let eager_record_impl = quote! {
@@ -256,10 +266,16 @@ pub(super) fn render_items(
         &bits_ty,
         &lazy_bits_ty,
         field_plan.unknown_fields(),
+        emit_lazy,
     )?;
     let layout_assocs = collect_layout_assocs(&fields);
-    let layout_items =
-        layout::render_module(&layout_assocs, bits_ty.clone(), lazy_bits_ty, lazy_interior)?;
+    let layout_items = layout::render_module(
+        &layout_assocs,
+        bits_ty.clone(),
+        lazy_bits_ty,
+        lazy_interior,
+        emit_lazy,
+    )?;
 
     let companion_items = bit_consts
         .into_iter()
@@ -268,6 +284,69 @@ pub(super) fn render_items(
         .chain(layout_items)
         .chain(oneof_modules)
         .collect();
+
+    let lazy_alias_items = if emit_lazy {
+        let apply_arms = super::lazy::render_apply_arms(&fields, companion);
+        quote! {
+            /// Experimental lazy alias. Emitted only with `--puroro_opt=lazy=true`.
+            ///
+            /// Design and behaviour may change; see DESIGN.md §8.
+            pub struct #lazy_alias<
+                A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone = ::allocator_api2::alloc::Global,
+                P: ::puroro_rt::decode::LazyProfile = ::puroro_rt::decode::Owned,
+            > {
+                #[allow(clippy::type_complexity)]
+                record: ::puroro_rt::Record<
+                    #fields_name<A, ::puroro_rt::Lazy<A, P>>,
+                    A,
+                    ::puroro_rt::Lazy<A, P>,
+                    #unknown_ty,
+                >,
+            }
+
+            ::puroro_rt::forward_record!(lazy #lazy_alias, #fields_name);
+
+            impl<
+                A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
+                P: ::puroro_rt::decode::LazyProfile,
+            > ::puroro_rt::LazyRecordApply<A, P> for #fields_name<A, ::puroro_rt::Lazy<A, P>>
+            {
+                #[allow(unused_variables)]
+                fn apply_record(
+                    &mut self,
+                    common: &mut ::puroro_rt::MessageCommon<
+                        Self::Bits,
+                        A,
+                        Self::Unknown,
+                        ::puroro_rt::Lazy<A, P>,
+                    >,
+                    rec: &::puroro_rt::decode::ScannedRecord,
+                    origin: usize,
+                    depth: usize,
+                ) -> ::core::result::Result<(), ::puroro::DecodeError> {
+                    match rec.field_number.as_u32() {
+                        #(#apply_arms)*
+                        _ => common.note_unrecognized_record(rec, origin),
+                    }
+                }
+            }
+        }
+    } else {
+        quote! {}
+    };
+
+    let into_lazy_method = if emit_lazy {
+        quote! {
+            /// Encodes `self` and rebuilds it as the experimental lazy alias.
+            pub fn into_lazy(self) -> #lazy_alias<A> {
+                #lazy_alias {
+                    record: ::puroro_rt::Record::encode_lazy(self.record),
+                }
+            }
+        }
+    } else {
+        quote! {}
+    };
 
     let mut type_items = super::parse::parse_items(quote! {
         // @generated message body from protoc-gen-puroro.
@@ -295,21 +374,9 @@ pub(super) fn render_items(
             >,
         }
 
-        pub struct #lazy_alias<
-            A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone = ::allocator_api2::alloc::Global,
-            P: ::puroro_rt::decode::LazyProfile = ::puroro_rt::decode::Owned,
-        > {
-            #[allow(clippy::type_complexity)]
-            record: ::puroro_rt::Record<
-                #fields_name<A, ::puroro_rt::Lazy<A, P>>,
-                A,
-                ::puroro_rt::Lazy<A, P>,
-                #unknown_ty,
-            >,
-        }
+        #lazy_alias_items
 
         ::puroro_rt::forward_record!(eager #name, #fields_name);
-        ::puroro_rt::forward_record!(lazy #lazy_alias, #fields_name);
 
         #record_fields_impl
 
@@ -319,51 +386,23 @@ pub(super) fn render_items(
 
         #eager_record_impl
 
-        impl<
-            A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-            P: ::puroro_rt::decode::LazyProfile,
-        > ::puroro_rt::LazyRecordApply<A, P> for #fields_name<A, ::puroro_rt::Lazy<A, P>>
-        {
-            #[allow(unused_variables)]
-            fn apply_record(
-                &mut self,
-                common: &mut ::puroro_rt::MessageCommon<
-                    Self::Bits,
-                    A,
-                    Self::Unknown,
-                    ::puroro_rt::Lazy<A, P>,
-                >,
-                rec: &::puroro_rt::decode::ScannedRecord,
-                origin: usize,
-                depth: usize,
-            ) -> ::core::result::Result<(), ::puroro::DecodeError> {
-                match rec.field_number.as_u32() {
-                    #(#apply_arms)*
-                    _ => common.note_unrecognized_record(rec, origin),
-                }
-            }
-        }
-
         impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> #name<A> {
             #(#getters)*
 
             #(#mutators)*
 
-            /// Encodes `self` and rebuilds it as the lazy alias.
-            pub fn into_lazy(self) -> #lazy_alias<A> {
-                #lazy_alias {
-                    record: ::puroro_rt::Record::encode_lazy(self.record),
-                }
-            }
+            #into_lazy_method
         }
     })?;
-    type_items.extend(super::lazy::render_items(
-        &fields,
-        name,
-        &fields_name,
-        &lazy_alias,
-        companion,
-    )?);
+    if emit_lazy {
+        type_items.extend(super::lazy::render_items(
+            &fields,
+            name,
+            &fields_name,
+            &lazy_alias,
+            companion,
+        )?);
+    }
 
     Ok(RenderedMessageItems {
         type_items,
@@ -804,6 +843,7 @@ fn render_oneof_modules(
     bits_ty: &TokenStream,
     lazy_bits_ty: &TokenStream,
     unknown_fields: UnknownFieldsPolicy,
+    emit_lazy: bool,
 ) -> Result<Vec<Item>> {
     let mut out = Vec::new();
     for field in fields {
@@ -813,6 +853,7 @@ fn render_oneof_modules(
                 bits_ty,
                 lazy_bits_ty,
                 unknown_fields,
+                emit_lazy,
             )?);
         }
     }

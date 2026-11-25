@@ -20,6 +20,8 @@ Draft pull requests #101 and #102 are leftover environment-setup changes from Au
 
 Library users of generated messages depend on the generated crate. The plugin re-exports the runtime as `<crate>::puroro`. Do not surface `puroro-rt` types in public generated signatures. The root module names `puroro` and `descriptors` are reserved. Accepted and rejected proto names: [`DESIGN.md`](DESIGN.md#allowed-and-disallowed-names).
 
+Lazy decode is **experimental and opt-in**. The plugin emits `NameLazy` only with `--puroro_opt=lazy=true` (also enables `puroro-rt`'s `lazy` feature). `(puroro.child_parse) = LAZY` requires that opt-in. `sample-generated` keeps hand-written lazy aliases with `puroro-rt/lazy` enabled. Do not treat lazy as stable public API.
+
 Lazy `RecordScanner` emits `ScannedRecord` / `ScannedValue`. LEN is a span into `_wire`, not a `protobuf_core::Field` / owned payload. Do not copy complete LEN bodies into the scan record. Numerical apply uses catalog `merge_scanned` (`CopyWirePayload::from_scanned`). Do not re-encode a scanned numeric into a wire body and merge that. Packed LEN uses the scanned `payload_len` (`merge_packed_buf`); do not re-read the length prefix. Do not re-land island-first leftover-as-offset / `push_bytes` ingest: it did not move typical decode and duplicated leftover state.
 
 ## Setup

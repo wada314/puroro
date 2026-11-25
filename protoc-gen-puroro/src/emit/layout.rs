@@ -81,6 +81,7 @@ pub(super) fn render_module(
     eager_bits: TokenStream,
     lazy_bits: TokenStream,
     lazy_interior: bool,
+    emit_lazy: bool,
 ) -> Result<Vec<Item>> {
     let root_alias = nested_root_alias();
     let assoc_defs: Vec<TokenStream> = assocs.iter().map(assoc_def).collect();
@@ -92,11 +93,37 @@ pub(super) fn render_module(
         quote! { ::bitvec::array::BitArray::ZERO }
     };
 
+    let layout_doc = if emit_lazy {
+        "Catalog slots that differ between the eager and lazy aliases."
+    } else {
+        "Catalog slots for the eager message (lazy aliases need `--puroro_opt=lazy=true`)."
+    };
+
+    let lazy_impl = if emit_lazy {
+        quote! {
+            impl<
+                A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
+                P: ::puroro_rt::decode::LazyProfile,
+            > Layout<A> for ::puroro_rt::Lazy<A, P>
+            {
+                type Bits = #lazy_bits;
+                #(#lazy_tys)*
+
+                #[inline]
+                fn empty_bits() -> Self::Bits {
+                    #lazy_empty
+                }
+            }
+        }
+    } else {
+        quote! {}
+    };
+
     parse::parse_items(quote! {
         pub mod layout {
             #root_alias
 
-            /// Catalog slots that differ between the eager and lazy aliases.
+            #[doc = #layout_doc]
             ///
             /// Numericals, enums, and bools stay on the struct. This trait names
             /// string / bytes slots, repeated LEN storage, maps, and nested
@@ -121,19 +148,7 @@ pub(super) fn render_module(
                 }
             }
 
-            impl<
-                A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone,
-                P: ::puroro_rt::decode::LazyProfile,
-            > Layout<A> for ::puroro_rt::Lazy<A, P>
-            {
-                type Bits = #lazy_bits;
-                #(#lazy_tys)*
-
-                #[inline]
-                fn empty_bits() -> Self::Bits {
-                    #lazy_empty
-                }
-            }
+            #lazy_impl
         }
 
         pub use layout::Layout;

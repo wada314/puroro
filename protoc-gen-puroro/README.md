@@ -14,6 +14,16 @@ protoc --puroro_out=out -I . shelf.proto
 
 `protoc` runs `protoc-gen-puroro` from `PATH` when it sees `--puroro_out`. The crate name in that `Cargo.toml`, the `name` value under `[package]`, is the string `generated` unless you pass `crate_name`. The diagram in the [puroro README](https://github.com/wada314/puroro/blob/master/README.md#generate-a-crate) shows protobuf `package demo` / `message Shelf` as `generated::demo::Shelf`.
 
+### Options (`--puroro_opt`)
+
+Comma-separated `key=value` pairs (a bare `lazy` also works):
+
+| Option | Default | Meaning |
+|---|---|---|
+| `crate_name` | `generated` | `[package] name` in the generated `Cargo.toml` |
+| `proto2_utf8` | `none` | proto2 string views: `none` → `&[u8]`, `verify` → `&str` |
+| `lazy` | off | Experimental: emit `NameLazy` and enable `puroro-rt/lazy` |
+
 ## Build the plugin from a checkout
 
 This is for people changing puroro. Other users stop at `cargo install`.

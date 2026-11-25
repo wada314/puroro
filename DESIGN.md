@@ -260,7 +260,7 @@ This section is the normative reference for what the code generator emits. All f
 This section is the **normative** shape of what `protoc-gen-puroro` emits. The shell is two newtypes around [`puroro_rt::Record`](puroro-rt/src/message_record.rs). The lazy alias uses the same field names with `Result` getters and no mutators ([§8](#tasklaya--lazy-parse-timing)). Hand-written [`sample-generated/`](sample-generated/) uses that same shell. Remaining sample-vs-production differences — flat modules, short-name `use`s, no `@generated` header, `task::MessageFallible`, eager-only `School` / `Student` / `Marker`, and `pub(crate) record` so a sibling `lazy` module can call `self.record.field` — are documented in [IMPLEMENTATION.md §9](IMPLEMENTATION.md#9-struct-layout). For each message type the generator must emit:
 
 1. **The primary struct** — `Task<A>`, a newtype around `puroro_rt::Record<TaskFields<A, Eager>, …>` (§4.0–4.10). Slots are **`puroro_rt::fields` catalog types** on `TaskFields` (see [IMPLEMENTATION.md §2](IMPLEMENTATION.md#2-architecture-overview)). Field accessors are **inherent methods** on `Task`.
-2. **The lazy message** — `TaskLazy<A>`, same field names, `Result<_, DecodeError>` getters, no `_mut` ([§8](#tasklaya--lazy-parse-timing)). The plugin emits `TaskFields<A, L>` for the slots and the `Task<A>` / `TaskLazy<A>` newtypes. `TaskFields` is `pub(crate)`. [`sample-generated/`](sample-generated/) uses the same newtypes. `School`, `Student`, and `Marker` stay eager-only.
+2. **The lazy message (opt-in)** — `TaskLazy<A>`, same field names, `Result<_, DecodeError>` getters, no `_mut` ([§8](#tasklaya--lazy-parse-timing)). Emitted only with `--puroro_opt=lazy=true`. The plugin emits `TaskFields<A, L>` for the slots and the `Task<A>` newtype (plus `TaskLazy<A>` when opted in). `TaskFields` is `pub(crate)`. [`sample-generated/`](sample-generated/) always includes the lazy newtypes. `School`, `Student`, and `Marker` stay eager-only in the sample.
 3. **(Future) Per-message traits** — `foo::Message` / `foo::MessageFallible` (in that message's companion module) ([§8](#8-future-work)). The plugin does not emit those traits. The handwritten sample implements `task::MessageFallible` on eager `Task` only. A borrowing view is not part of this sample; the measured `Address` spike is [`archive/address-view-spike`](archive/address-view-spike/).
 
 Generated Rust is not hand-edited. Navigational comments in generated output are **not required**; semantics and usage are documented on the library API (`puroro` / `puroro-rt` rustdoc) and in this document / [IMPLEMENTATION.md](IMPLEMENTATION.md). Production modules still carry an `@generated` file header ([IMPLEMENTATION.md §9](IMPLEMENTATION.md#generated-headers)). The shell reference is the plugin's `Record` newtypes ([IMPLEMENTATION.md §9](IMPLEMENTATION.md#9-struct-layout)). [`sample-generated/`](sample-generated/) is the hand-written copy of that shell.
@@ -445,7 +445,7 @@ If a new public API would need a `puroro-rt` name, **add or reexport a stable st
 
 ### 4.0 Inherent accessors (current)
 
-The normative generated API is the concrete message struct's inherent `impl` block. Sample messages ([`Task`](sample-generated/src/task_type.rs) / [`School`](sample-generated/src/school_type.rs) / [`Student`](sample-generated/src/student_type.rs) / [`Point`](sample-generated/src/point_type.rs) / [`Address`](sample-generated/src/address_type.rs)) are owned-only (`Drop` / `Message`); an inlined child is a full `M`, not a view over a shared parent common. Each message is also a lazy alias (`TaskLazy`, …) with fallible getters and no mutators ([§8](#tasklaya--lazy-parse-timing)). Per-message traits (`foo::Message` / `foo::MessageFallible`, in the companion) stay [§8](#8-future-work). Callers of today's generated plugin output use `Name` or `NameLazy` (or [`Message`](#message) for codec / infrastructure).
+The normative generated API is the concrete message struct's inherent `impl` block. Sample messages ([`Task`](sample-generated/src/task_type.rs) / [`School`](sample-generated/src/school_type.rs) / [`Student`](sample-generated/src/student_type.rs) / [`Point`](sample-generated/src/point_type.rs) / [`Address`](sample-generated/src/address_type.rs)) are owned-only (`Drop` / `Message`); an inlined child is a full `M`, not a view over a shared parent common. With `--puroro_opt=lazy=true`, each message also gets an experimental lazy alias (`TaskLazy`, …) with fallible getters and no mutators ([§8](#tasklaya--lazy-parse-timing)); the sample always includes those aliases. Per-message traits (`foo::Message` / `foo::MessageFallible`, in the companion) stay [§8](#8-future-work). Callers of today's generated plugin output use `Name` (or `NameLazy` when opted in, or [`Message`](#message) for codec / infrastructure).
 
 **Read / write shape (eager `Task<A>`):**
 
@@ -802,7 +802,7 @@ pub fn clear_assignee(&mut self);
 
 #### Child parse timing
 
-Every proto message emits both an eager type (`Task`) and a lazy type (`TaskLazy`). Which one a caller holds is a Rust type choice. `(puroro.child_parse)` does not make that choice. It chooses the **nested** message's layout. The signatures above are the default: an eager parent stores an eager child, and a lazy parent stores a lazy child.
+With `--puroro_opt=lazy=true`, every proto message emits both an eager type (`Task`) and a lazy type (`TaskLazy`). Which one a caller holds is a Rust type choice. `(puroro.child_parse)` does not make that choice. It chooses the **nested** message's layout (and requires the same lazy opt-in when set to `LAZY`). The signatures above are the default under that opt-in: an eager parent stores an eager child, and a lazy parent stores a lazy child.
 
 Resolution, for a singular message, a repeated message, a map value, or a oneof message variant:
 
@@ -1394,7 +1394,7 @@ Repeated field accessors return a reference to a contiguous sequence rather than
 
 ### Inherent accessors as the current public contract
 
-The generator emits two aliases and their inherent accessors ([§4.0](#40-inherent-accessors-current)): eager `Name` and lazy `NameLazy`. Per-message traits (`foo::Message` / `foo::MessageFallible`, in the companion) are reserved for [§8](#8-future-work) so that eager, lazy, and view layouts can share one generic read API later. Plugin-generated generic code still uses [`Message`](#message) for codec / infrastructure, or is monomorphised over the concrete alias for field access.
+The generator always emits the eager alias and its inherent accessors ([§4.0](#40-inherent-accessors-current)). Lazy `NameLazy` is opt-in (`--puroro_opt=lazy=true`). Per-message traits (`foo::Message` / `foo::MessageFallible`, in the companion) are reserved for [§8](#8-future-work) so that eager, lazy, and view layouts can share one generic read API later. Plugin-generated generic code still uses [`Message`](#message) for codec / infrastructure, or is monomorphised over the concrete alias for field access.
 
 ### `Default` bound on `Message::decode`
 
@@ -1441,11 +1441,13 @@ These traits are **not** yet emitted by `protoc-gen-puroro`. The hand-written [`
 
 ### Specialized message implementations
 
-Every message has an eager alias and a lazy alias. Zero-copy is the same lazy type with `P = Borrowed<'buf>` ([`LazyProfile`](.cursor/plans/lazy-profile.md)), not a separate `TaskView`. The archived `Address` spike lives in [`archive/address-view-spike`](archive/address-view-spike/). A shared `task::MessageFallible` impl for the eager and lazy aliases is not emitted yet ([Per-message traits](#per-message-traits-not-yet-generated)).
+**Experimental / opt-in.** The plugin emits only the eager alias by default. Pass `--puroro_opt=lazy=true` to emit `NameLazy` and to enable `puroro-rt`'s `lazy` Cargo feature in the generated manifest. `(puroro.child_parse) = LAZY` / `(puroro.message_child_parse) = LAZY` require that same opt-in. The hand-written [`sample-generated`](sample-generated/) crate keeps the lazy aliases as the reference shape. Design and behaviour may still change; do not treat lazy as part of the stable public surface yet.
+
+Every message *can* have an eager alias and a lazy alias. Zero-copy is the same lazy type with `P = Borrowed<'buf>` ([`LazyProfile`](.cursor/plans/lazy-profile.md)), not a separate `TaskView`. The archived `Address` spike lives in [`archive/address-view-spike`](archive/address-view-spike/). A shared `task::MessageFallible` impl for the eager and lazy aliases is not emitted yet ([Per-message traits](#per-message-traits-not-yet-generated)).
 
 #### `TaskLazy<A>` — lazy parse timing
 
-Shipped, on the sample and in the plugin. Both emit the same field struct and library shell with a `LazyProfile` parameter:
+Opt-in on the plugin (`--puroro_opt=lazy=true`); always present in the hand-written sample. Both use the same field struct and library shell with a `LazyProfile` parameter:
 
 ```rust
 pub struct TaskFields<A: Allocator + Clone = Global, L: task::Layout<A> = Eager> { /* slots */ }
