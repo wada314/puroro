@@ -21,6 +21,15 @@ using docs.rs.
 | `descriptors` | yes | `FileDescriptorSet`, `FileDescriptorProto`, `DescriptorProto`, … |
 | `wkt` | yes | `Any`, `Duration`, `Empty`, `FieldMask`, `Struct` / `Value`, `Timestamp`, wrappers |
 
+With `wkt`, hand-written helpers on `Timestamp` / `Duration` convert to and from
+`std::time::{SystemTime, Duration}` and expose `normalize()` /
+`normalized()`. No-alloc-arg constructors (`from_seconds_nanos()`,
+`from_system_time()`, `try_from_std()`, and the matching `From` / `TryFrom`)
+are on the `Global` alias, same pattern as `Timestamp::new()`. Pass a custom
+allocator with the `*_in` variants. Errors are `TimestampError` /
+`DurationError` at the crate root. These are not plugin output; the generator
+stays free of WKT special cases.
+
 Disable what you do not need to shrink the dependency graph of generated code
 pulled into your binary (`default-features = false`, then enable one feature).
 
