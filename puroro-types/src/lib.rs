@@ -3,6 +3,11 @@
 //! Enable Cargo features `descriptors` and/or `wkt` (both are on by default).
 //! See the crate README for the feature table and dependency notes.
 //!
+//! With `wkt`, hand-written helpers live on
+//! [`Timestamp`](crate::google::protobuf::Timestamp) /
+//! [`Duration`](crate::google::protobuf::Duration) (see the `timestamp` /
+//! `duration` modules). They are not emitted by the plugin.
+//!
 //! **Not an official Google product.** Prefer
 //! [`google-protobuf`](https://crates.io/crates/google-protobuf) for production.
 
@@ -10,6 +15,16 @@
 #![allow(clippy::match_single_binding)]
 
 include!(concat!(env!("OUT_DIR"), "/generated_lib.rs"));
+
+#[cfg(feature = "wkt")]
+mod duration;
+#[cfg(feature = "wkt")]
+mod timestamp;
+
+#[cfg(feature = "wkt")]
+pub use duration::DurationError;
+#[cfg(feature = "wkt")]
+pub use timestamp::TimestampError;
 
 #[cfg(test)]
 mod tests {
