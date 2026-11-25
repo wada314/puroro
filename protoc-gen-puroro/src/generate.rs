@@ -12,7 +12,7 @@ use crate::field_kind::plan_message_storage;
 use crate::module_tree::ModuleForest;
 use crate::module_tree::layout::{ModuleLayout, render};
 use crate::plugin_io::{CodeGeneratorResponse, ResponseFile, encode_file_descriptor_set};
-use crate::resolved::{Arena, resolve_with};
+use crate::resolved::{Arena, File, resolve_with};
 
 /// Package name written into the generated `Cargo.toml` when `crate_name` is unset.
 const DEFAULT_CRATE_NAME: &str = "generated";
@@ -240,7 +240,7 @@ pub fn generate(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
 }
 
 /// `(puroro.child_parse) = LAZY` needs `--puroro_opt=lazy=true`.
-fn reject_lazy_child_parse(file: &crate::resolved::File<'_>) -> Result<()> {
+fn reject_lazy_child_parse(file: &File<'_>) -> Result<()> {
     use crate::descriptor::ChildParse;
     use crate::resolved::Message;
 

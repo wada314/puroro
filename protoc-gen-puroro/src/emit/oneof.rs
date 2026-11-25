@@ -87,8 +87,7 @@ pub(super) fn render_module_and_exports(
     let case_name = &oneof.case_name;
     let storage_name = &oneof.storage_name;
 
-    let module_body =
-        render_module_body(oneof, bits_ty, lazy_bits_ty, unknown_fields, emit_lazy)?;
+    let module_body = render_module_body(oneof, bits_ty, lazy_bits_ty, unknown_fields, emit_lazy)?;
     super::parse::parse_items(quote! {
         mod #mod_name {
             #module_body

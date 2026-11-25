@@ -271,9 +271,8 @@ fn read_puroro_opt(case_dir: &Path) -> Option<String> {
     if !path.is_file() {
         return None;
     }
-    let text = fs::read_to_string(&path).unwrap_or_else(|e| {
-        panic!("failed to read `{}`: {e}", path.display())
-    });
+    let text = fs::read_to_string(&path)
+        .unwrap_or_else(|e| panic!("failed to read `{}`: {e}", path.display()));
     for line in text.lines() {
         let line = line.trim();
         if line.is_empty() || line.starts_with('#') {
