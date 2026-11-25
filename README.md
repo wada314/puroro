@@ -134,7 +134,7 @@ protoc --plugin=protoc-gen-puroro=$PWD/target/debug/protoc-gen-puroro --puroro_o
 ## Out of scope
 
 - Extensions (`extend` / proto2 extension fields).
-- Services and RPC.
+- Services and RPC. A thin `tonic` codec adapter lives in the optional `puroro-tonic` crate; it does not generate service stubs.
 - Well-known types such as `google.protobuf.Any`, `Timestamp`, and `Duration`, unless you compile those `.proto` files yourself.
 - Full runtime reflection / `DynamicMessage`. Light identity (`Message::FULL_NAME`) is always on; encoded `FileDescriptorSet` bytes are an opt-in `descriptors` feature on generated crates (see `DESIGN.md` §3.1).
 - A builder type separate from the message. Mutation is `let mut` plus `_mut` / `clear_*`.
