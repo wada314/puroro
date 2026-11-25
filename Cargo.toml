@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "puroro-rt", "puroro-benches", "protobuf-core", "protoc-gen-puroro", "puroro-codegen-tests", "puroro-tonic", "sample-generated", "unmanaged", "archive/address-view-spike"]
+members = [".", "puroro-rt", "puroro-benches", "protobuf-core", "protoc-gen-puroro", "puroro-codegen-tests", "sample-generated", "unmanaged", "archive/address-view-spike"]
 resolver = "2"
 
 [workspace.lints.clippy]
@@ -29,8 +29,17 @@ workspace = true
 [lib]
 bench = false
 
+[features]
+default = []
+# Optional tonic `Codec` for `Message` types (`puroro::tonic`).
+tonic = ["dep:tonic"]
+
 [dependencies]
 allocator-api2 = "0.2"
 bytes = "1"
 protobuf-core = { path = "protobuf-core", version = "0.6.0" }
+tonic = { version = "0.14", default-features = false, optional = true }
 unmanaged = { path = "unmanaged", version = "0.1.0" }
+
+[package.metadata.docs.rs]
+features = ["tonic"]

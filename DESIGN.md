@@ -1533,7 +1533,7 @@ Generic code that only reads fields is meant to use `task::MessageFallible` with
 
 - **Unknown-field preservation opt-out.** `(puroro.unknown_fields) = DISCARD` bakes [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs) on the eager alias. File-level / package default is not wired. The lazy alias's `unknown_fields()` iterator is empty for discard, and lazy encode omits those tags on this message only. A parent still copies a child LEN blob, unknowns included. A preserve lazy alias yields its own tags from `_wire`. The rest of the eager / lazy split, including this one, is listed under [eager / lazy semantic gaps](#eager-and-lazy-semantic-gaps).
 - **Unknown-field reject-on-decode.** Shipped as `(puroro.unknown_fields) = REJECT` ([§4.9](#49-unknown-fields)). This failure is outside the protobuf spec. File-level / package default is not wired, same as Discard.
-- **Service / RPC definitions.** Out of scope for the runtime library. Message bytes can ride tonic via the optional [`puroro-tonic`](puroro-tonic/) `Codec`; stub / service codegen is still separate.
+- **Service / RPC definitions.** Out of scope for the runtime library. Message bytes can ride tonic via the optional Cargo feature `tonic` (`puroro::tonic::PuroroCodec`); stub / service codegen is still separate.
 - **Well-known types.** `google.protobuf.Timestamp`, `Duration`, `Any`, etc.
 - **Descriptor set embedding.** [`Message::FULL_NAME`](#31-message-identity-and-descriptors) and the generated-crate `descriptors::FILE_DESCRIPTOR_SET` embedding (raw `proto_file` LEN bodies) are shipped. Parsed descriptor object graphs are not.
 - **Reflection / `DynamicMessage`.** Runtime field introspection and schema object graphs (beyond the opt-in byte embedding above).

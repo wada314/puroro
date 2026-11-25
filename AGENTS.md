@@ -10,10 +10,9 @@ Draft pull requests #101 and #102 are leftover environment-setup changes from Au
 
 | Crate | Role |
 |---|---|
-| `puroro` (workspace root) | Stable user API (`Message`, `Optional`, errors) |
+| `puroro` (workspace root) | Stable user API (`Message`, `Optional`, errors); optional Cargo feature `tonic` for `PuroroCodec` |
 | `puroro-rt` | Generated-code field catalog and wire helpers |
 | `protoc-gen-puroro` | `protoc` plugin (`--puroro_out`) |
-| `puroro-tonic` | Optional `tonic::codec::Codec` for puroro messages (no HTTP/2 / service codegen) |
 | `sample-generated` | Hand-written reference (`Task` / `Address`) on the plugin's `*Fields` + `Record` shell |
 | `puroro-codegen-tests` | Live plugin fixtures (`fixtures/<case>/`) |
 | `protobuf-core` | Git submodule — wire primitives |
@@ -41,7 +40,10 @@ cargo fmt --all
 cargo clippy --all-targets --workspace \
   --exclude puroro-codegen-tests --exclude puroro-benches --exclude address-view-spike
 RUSTDOCFLAGS='-D warnings' cargo doc --no-deps \
- -p puroro -p puroro-rt -p protoc-gen-puroro -p puroro-sample-generated -p puroro-tonic
+  -p puroro -p puroro-rt -p protoc-gen-puroro -p puroro-sample-generated
+# Optional tonic Codec surface:
+cargo test -p puroro --features tonic
+RUSTDOCFLAGS='-D warnings' cargo doc --no-deps -p puroro --features tonic
 ```
 
 `cargo test` also runs rustdoc examples (doctests). CI (`.github/workflows/rust.yml`) runs fmt, clippy (`-D warnings`, excluding generated/archive/bench crates), tests, codegen fixtures, and `cargo doc` with `RUSTDOCFLAGS=-D warnings` for the first-party packages above. Bench smoke stays in `.github/workflows/benches.yml`.

@@ -45,6 +45,8 @@ jobs:
           -- -D warnings
       - name: Test (includes doctests)
         run: cargo test --locked --workspace --exclude puroro-codegen-tests --exclude puroro-benches
+      - name: Test tonic feature
+        run: cargo test --locked -p puroro --features tonic
       - name: Codegen fixture tests
         run: cargo test --locked -p puroro-codegen-tests
       - name: Docs
@@ -53,4 +55,5 @@ jobs:
           RUSTDOCFLAGS: -D warnings
         run: >
           cargo doc --locked --no-deps
-          -p puroro -p puroro-rt -p protoc-gen-puroro -p puroro-sample-generated -p puroro-tonic
+          -p puroro -p puroro-rt -p protoc-gen-puroro -p puroro-sample-generated
+          && cargo doc --locked --no-deps -p puroro --features tonic

@@ -581,6 +581,7 @@ dependencies = [
  "allocator-api2",
  "bytes",
  "protobuf-core",
+ "tonic",
  "unmanaged",
 ]
 
@@ -635,18 +636,9 @@ dependencies = [
  "allocator-api2",
  "bitvec",
  "bytes",
- "puroro",
- "puroro-rt",
-]
-
-[[package]]
-name = "puroro-tonic"
-version = "0.1.0"
-dependencies = [
- "bytes",
  "http-body",
  "puroro",
- "puroro-sample-generated",
+ "puroro-rt",
  "tokio",
  "tonic",
 ]
