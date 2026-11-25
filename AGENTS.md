@@ -13,7 +13,7 @@ Draft pull requests #101 and #102 are leftover environment-setup changes from Au
 | `puroro` (workspace root) | Stable user API (`Message`, `Optional`, errors); optional Cargo feature `tonic` for `PuroroCodec` |
 | `puroro-rt` | Generated-code field catalog and wire helpers |
 | `protoc-gen-puroro` | `protoc` plugin (`--puroro_out`) |
-| `puroro-types` | Generated `google.protobuf` descriptors + WKTs (`descriptors` / `wkt` features); leaf crate, not depended on by `puroro` / `puroro-rt` |
+| `puroro-types` | Generated `google.protobuf` descriptors + WKTs (`descriptors` / `wkt` features); leaf crate, not depended on by `puroro` / `puroro-rt`. Vendored `.proto` pin in `puroro-types/proto/UPSTREAM`; refresh with `puroro-types/scripts/vendor-google-protos.sh` |
 | `sample-generated` | Hand-written reference (`Task` / `Address`) on the plugin's `*Fields` + `Record` shell |
 | `puroro-codegen-tests` | Live plugin fixtures (`fixtures/<case>/`) |
 | `protobuf-core` | Git submodule — wire primitives |

@@ -21,9 +21,20 @@ pulled into your binary (`default-features = false`, then enable one feature).
 Types live under `google::protobuf::…`, matching the protobuf package. The
 crate re-exports the runtime as `puroro` (same as other plugin output).
 
-Sources under `proto/google/protobuf/` are vendored from the Protocol Buffers
-distribution (BSD-style license; see each file header). `build.rs` regenerates
-Rust via `protoc-gen-puroro` (needs `protoc` on `PATH`, or `PROTOC=`).
+Sources under `proto/google/protobuf/` are vendored from
+[protocolbuffers/protobuf](https://github.com/protocolbuffers/protobuf)
+(BSD-style license; see `proto/LICENSE` and each file header). The pin lives in
+[`proto/UPSTREAM`](proto/UPSTREAM) (currently **v24.4** /
+`7789b3ac85248ad75631a1919071fa268e466210`). Refresh with:
+
+```sh
+./puroro-types/scripts/vendor-google-protos.sh          # same tag as UPSTREAM
+./puroro-types/scripts/vendor-google-protos.sh v32.1    # bump the pin
+```
+
+Do not edit the `.proto` files by hand. After a bump, run `cargo test -p puroro-types`
+(needs `protoc` on `PATH`, or `PROTOC=`). `build.rs` regenerates Rust via
+`protoc-gen-puroro`.
 
 ## Dependency note
 

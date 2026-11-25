@@ -1,0 +1,25 @@
+# Pinned Protocol Buffers sources for puroro-types/proto/.
+#
+# Refresh with:
+#   ./puroro-types/scripts/vendor-google-protos.sh
+# Or pin another release tag:
+#   ./puroro-types/scripts/vendor-google-protos.sh v32.1
+#
+# Do not edit the .proto files by hand; re-run the script so this pin stays accurate.
+
+repo=https://github.com/protocolbuffers/protobuf
+tag=v24.4
+commit=7789b3ac85248ad75631a1919071fa268e466210
+# Paths are relative to the upstream repo root.
+src_root=src/google/protobuf
+license=LICENSE
+
+files=
+  any.proto
+  descriptor.proto
+  duration.proto
+  empty.proto
+  field_mask.proto
+  struct.proto
+  timestamp.proto
+  wrappers.proto
