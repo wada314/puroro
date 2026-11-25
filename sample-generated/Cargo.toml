@@ -21,3 +21,9 @@ puroro = { path = ".." }
 puroro-rt = { path = "../puroro-rt" }
 
 [dev-dependencies]
+http-body = "1"
+# Enables `puroro`'s `tonic` feature for `tests/tonic_codec.rs` (unified with
+# the path dependency above when running this package's tests).
+puroro = { path = "..", features = ["tonic"] }
+tokio = { version = "1", features = ["macros", "rt"] }
+tonic = { version = "0.14", default-features = false }
