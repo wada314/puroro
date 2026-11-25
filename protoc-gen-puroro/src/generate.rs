@@ -95,18 +95,19 @@ fn parse_generate_options(parameter: Option<&str>) -> Result<GenerateOptions> {
         } else if key == "crate_name" {
             options.crate_name = parse_crate_name(value)?;
         } else if key == "lazy" {
-            options.lazy = parse_lazy_flag(value)?;
+            options.lazy = parse_bool_flag(key, value)?;
         }
     }
     Ok(options)
 }
 
-fn parse_lazy_flag(value: &str) -> Result<bool> {
+/// Parse a `--puroro_opt` boolean value (`true`/`false`, plus common aliases).
+fn parse_bool_flag(key: &str, value: &str) -> Result<bool> {
     match value {
         "true" | "TRUE" | "1" | "yes" | "YES" => Ok(true),
         "false" | "FALSE" | "0" | "no" | "NO" => Ok(false),
         other => Err(Error::Codegen(format!(
-            "unknown `lazy` value `{other}` (expected `true` or `false`)"
+            "unknown `{key}` value `{other}` (expected `true` or `false`)"
         ))),
     }
 }
