@@ -21,7 +21,7 @@ use crate::field_kind::{
 use crate::resolved::Message as ResolvedMessage;
 use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
-use ::syn::{Item, Lifetime, Type, parse_quote};
+use ::syn::{Attribute, Item, Lifetime, Type, parse_quote};
 
 pub(super) enum FieldEmit {
     Singular(Box<ScalarEmit>),
@@ -36,8 +36,8 @@ pub(super) struct ScalarEmit {
     pub(super) name: Ident,
     /// Raw proto name — `"title"` (for `title_mut`, visit keys).
     pub(super) name_str: String,
-    /// Proto comments as `#[doc = …]` (empty when absent).
-    pub(super) doc: TokenStream,
+    /// Proto comments as `#[doc = …]` (`None` when absent).
+    pub(super) doc: Option<Attribute>,
     /// Companion const ident — `FIELD_TITLE`.
     pub(super) field_const: Ident,
     /// Proto field number — `1`.
@@ -84,8 +84,8 @@ pub(super) struct RepeatedEmit {
     pub(super) name: Ident,
     /// Raw proto name — `"tag_ids"`.
     pub(super) name_str: String,
-    /// Proto comments as `#[doc = …]` (empty when absent).
-    pub(super) doc: TokenStream,
+    /// Proto comments as `#[doc = …]` (`None` when absent).
+    pub(super) doc: Option<Attribute>,
     /// Companion const ident — `FIELD_TAG_IDS`.
     pub(super) field_const: Ident,
     /// Proto field number — `6`.
@@ -109,8 +109,8 @@ pub(super) struct MapEmit {
     pub(super) name: Ident,
     /// Raw proto name — `"attrs"`.
     pub(super) name_str: String,
-    /// Proto comments as `#[doc = …]` (empty when absent).
-    pub(super) doc: TokenStream,
+    /// Proto comments as `#[doc = …]` (`None` when absent).
+    pub(super) doc: Option<Attribute>,
     /// Companion const ident — `FIELD_ATTRS`.
     pub(super) field_const: Ident,
     /// Proto field number — `10`.

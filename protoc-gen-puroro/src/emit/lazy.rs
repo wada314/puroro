@@ -7,7 +7,7 @@ use super::oneof::OneofEmit;
 use crate::error::Result;
 use ::proc_macro2::{Ident, TokenStream};
 use ::quote::quote;
-use ::syn::{Item, Type};
+use ::syn::{Attribute, Item, Type};
 
 /// Lazy getters on the generated lazy newtype. Shell traits live in `puroro-rt`.
 ///
@@ -100,7 +100,7 @@ fn scan_guard() -> TokenStream {
 fn optional_method(
     name: &Ident,
     optional_ty: &Type,
-    doc: &TokenStream,
+    doc: &Option<Attribute>,
     body: TokenStream,
 ) -> TokenStream {
     quote! {
@@ -122,7 +122,7 @@ fn optional_method(
 fn message_method(
     name: &Ident,
     view: &TokenStream,
-    doc: &TokenStream,
+    doc: &Option<Attribute>,
     expr: TokenStream,
 ) -> TokenStream {
     let ensured = scan_guard();

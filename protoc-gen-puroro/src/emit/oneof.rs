@@ -8,7 +8,7 @@ use crate::error::Result;
 use crate::module_tree::nested_root_alias;
 use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
-use ::syn::{Item, Type, parse_quote};
+use ::syn::{Attribute, Item, Type, parse_quote};
 
 /// Owned facts for one generated oneof group.
 pub(super) struct OneofEmit {
@@ -16,8 +16,8 @@ pub(super) struct OneofEmit {
     pub name: Ident,
     /// Raw proto oneof name — `"kind"` (visit key, `kind_mut`).
     pub name_str: String,
-    /// Proto comments as `#[doc = …]` (empty when absent).
-    pub doc: TokenStream,
+    /// Proto comments as `#[doc = …]` (`None` when absent).
+    pub doc: Option<Attribute>,
     /// Companion submodule — `kind` (`mod kind { … }`).
     pub mod_name: Ident,
     /// Shared / mut shape enum — `Kind`.
@@ -36,8 +36,8 @@ pub(super) struct OneofVariantEmit {
     pub name: Ident,
     /// Raw proto field name — `"email"`.
     pub name_str: String,
-    /// Proto comments as `#[doc = …]` (empty when absent).
-    pub doc: TokenStream,
+    /// Proto comments as `#[doc = …]` (`None` when absent).
+    pub doc: Option<Attribute>,
     /// Enum variant ident — `Email` (`Kind::Email`, `KindCase::Email`).
     pub variant_name: Ident,
     /// Shape type parameter — `T0`, `T1`.

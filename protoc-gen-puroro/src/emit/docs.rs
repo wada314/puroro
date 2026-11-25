@@ -1,18 +1,14 @@
 //! Proto comments → rustdoc attributes.
 
 use crate::descriptor::Comments;
-use ::proc_macro2::TokenStream;
-use ::quote::quote;
+use ::syn::{Attribute, parse_quote};
 
-/// `#[doc = "…"]` from proto comments, or empty tokens when absent.
-pub(super) fn doc_attr(comments: &Comments) -> TokenStream {
-    match comments.doc_text() {
-        Some(text) => {
-            let cleaned = format_proto_doc(text);
-            quote! { #[doc = #cleaned] }
-        }
-        None => quote! {},
-    }
+/// `#[doc = "…"]` from proto comments, or `None` when absent.
+pub(super) fn doc_attr(comments: &Comments) -> Option<Attribute> {
+    comments.doc_text().map(|text| {
+        let cleaned = format_proto_doc(text);
+        parse_quote! { #[doc = #cleaned] }
+    })
 }
 
 /// Normalize SourceCodeInfo comment text for a single `#[doc = …]` string.
@@ -37,8 +33,7 @@ mod tests {
 
     #[test]
     fn empty_comments_emit_nothing() {
-        let tokens = doc_attr(&Comments::default());
-        assert!(tokens.is_empty());
+        assert!(doc_attr(&Comments::default()).is_none());
     }
 
     #[test]
@@ -47,8 +42,8 @@ mod tests {
             leading: Some("Hello task.\n".into()),
             trailing: None,
         };
-        let tokens = doc_attr(&comments);
-        let s = tokens.to_string();
+        let attr = doc_attr(&comments).expect("doc attr");
+        let s = ::quote::quote! { #attr }.to_string();
         assert!(s.contains("doc"), "{s}");
         assert!(s.contains("Hello task."), "{s}");
     }
