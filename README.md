@@ -133,12 +133,17 @@ mkdir -p bookstore
 protoc --plugin=protoc-gen-puroro=$PWD/target/debug/protoc-gen-puroro --puroro_out=bookstore --puroro_opt=crate_name=bookstore -I . shelf.proto
 ```
 
-## Out of scope
+## Future work
 
-- Extensions (`extend` / proto2 extension fields).
-- Service / RPC stub codegen. Message bytes can use the optional Cargo feature `tonic` (`puroro::tonic::PuroroCodec`); it does not generate service stubs.
+Open items (not permanent refusals). The full list is [DESIGN.md §8](https://github.com/wada314/puroro/blob/master/DESIGN.md#8-future-work).
+
+- Service / RPC stub codegen. Message bytes already use the optional Cargo feature `tonic` (`puroro::tonic::PuroroCodec`); stubs are not generated yet.
 - Convenience helpers on well-known types (for example `Timestamp` ↔ time) and richer packing for `Any`. The message types themselves are in [`puroro-types`](puroro-types/).
-- Full runtime reflection / `DynamicMessage`. Light identity (`Message::FULL_NAME`) is always on; encoded `FileDescriptorSet` bytes are an opt-in `descriptors` feature on generated crates (see `DESIGN.md` §3.1). Parsed schema object graphs would sit above `puroro-types`, not in this crate.
+- Full runtime reflection / `DynamicMessage` and parsed descriptor object graphs. Light identity (`Message::FULL_NAME`) is always on; encoded `FileDescriptorSet` bytes are an opt-in `descriptors` feature on generated crates (see `DESIGN.md` §3.1). A reflect layer would sit above `puroro-types`, not in this crate.
+- Extensions (`extend` / proto2 extension fields). Deferred; see [DESIGN.md §6.5](https://github.com/wada314/puroro/blob/master/DESIGN.md#65-extensions-not-yet-implemented).
+
+## Not goals
+
 - A builder type separate from the message. Mutation is `let mut` plus `_mut` / `clear_*`.
 - Treating `(puroro.unknown_fields) = REJECT` as spec-compliant behavior. The default preserve store is the spec behavior. `DISCARD` accepts the message and drops the bytes.
 
