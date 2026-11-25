@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+// Message names that snake_case to Rust keywords (`Struct` → `struct`,
+// `Match` → `match`). Module paths must use raw idents (`r#struct::…`).
+message Struct {
+  message Match {
+    optional int32 value = 1;
+  }
+  Match nest = 1;
+  // Field keyword coverage lives in `keyword_field`; one here keeps the
+  // type-module path and a keyword field on the same generated type.
+  optional string type = 2;
+}
+
+message Type {
+  optional int32 for = 1;
+}
+
+message Holder {
+  Struct payload = 1;
+  Type wrapper = 2;
+}

@@ -15,6 +15,7 @@ pub(crate) use layout::nested_root_alias;
 
 use crate::case::to_snake_case;
 use crate::descriptor::ProtoFqn;
+use crate::rust_ident::escape_ident;
 use ::proc_macro2::Ident;
 use ::syn::{Attribute, Item};
 
@@ -199,7 +200,9 @@ impl ModuleNode {
 /// This is a minimal converter for ASCII protobuf identifiers (`Task` → `task`,
 /// `FooBar` → `foo_bar`). It is not a full unicode ident mapper.
 pub fn type_name_to_module_ident(type_name: &str) -> Ident {
-    Ident::new(&to_snake_case(type_name), ::proc_macro2::Span::call_site())
+    // Snake_case can land on a Rust keyword (`Struct` → `struct`, `Match` →
+    // `match`, …); escape those as raw idents so companion module paths compile.
+    escape_ident(&to_snake_case(type_name))
 }
 
 #[cfg(test)]
@@ -279,5 +282,9 @@ mod tests {
     fn type_name_to_module_uses_snake_case() {
         assert_eq!(type_name_to_module_ident("Task").to_string(), "task");
         assert_eq!(type_name_to_module_ident("FooBar").to_string(), "foo_bar");
+        // `Struct` → `struct` (keyword) → raw ident for the companion module.
+        assert_eq!(type_name_to_module_ident("Struct").to_string(), "r#struct");
+        assert_eq!(type_name_to_module_ident("Match").to_string(), "r#match");
+        assert_eq!(type_name_to_module_ident("Type").to_string(), "r#type");
     }
 }

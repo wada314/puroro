@@ -14,6 +14,7 @@ pub mod generate;
 pub mod module_tree;
 pub mod plugin_io;
 pub mod resolved;
+pub mod rust_ident;
 
 pub use crate::descriptor::{CodegenMeta, CodegenRequest, ProtoFqn};
 pub use crate::error::{Error, Result};

@@ -40,15 +40,18 @@ jobs:
         run: >
           cargo clippy --locked --all-targets --workspace
           --exclude puroro-codegen-tests
+          --exclude puroro-types
           --exclude puroro-benches
           --exclude address-view-spike
           -- -D warnings
       - name: Test (includes doctests)
-        run: cargo test --locked --workspace --exclude puroro-codegen-tests --exclude puroro-benches
+        run: cargo test --locked --workspace --exclude puroro-codegen-tests --exclude puroro-types --exclude puroro-benches
       - name: Test tonic feature
         run: cargo test --locked -p puroro --features tonic
       - name: Codegen fixture tests
         run: cargo test --locked -p puroro-codegen-tests
+      - name: puroro-types (descriptors + WKTs)
+        run: cargo test --locked -p puroro-types
       - name: Docs
         # Doctest samples are covered by `cargo test` above.
         env:
