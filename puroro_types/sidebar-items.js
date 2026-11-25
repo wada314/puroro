@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["descriptors","google"]};
+window.SIDEBAR_ITEMS = {"enum":["DurationError","TimestampError"],"mod":["descriptors","google"]};
