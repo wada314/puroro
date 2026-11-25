@@ -290,22 +290,20 @@ pub(super) fn render_items(
     let message_doc = docs::doc_attr(comments);
     let lazy_alias_items = if emit_lazy {
         let apply_arms = super::lazy::render_apply_arms(&fields, companion);
-        // Keep the experimental note; append proto docs when present.
-        let lazy_doc = match comments.doc_text() {
-            Some(_) => {
-                let proto = docs::doc_attr(comments);
-                quote! {
-                    #proto
-                    ///
-                    /// Experimental lazy alias. Emitted only with `--puroro_opt=lazy=true`.
-                    /// Design and behaviour may change; see DESIGN.md §8.
-                }
-            }
-            None => quote! {
+        // Keep the experimental note; reuse `#message_doc` when proto comments exist.
+        let lazy_doc = if message_doc.is_empty() {
+            quote! {
                 /// Experimental lazy alias. Emitted only with `--puroro_opt=lazy=true`.
                 ///
                 /// Design and behaviour may change; see DESIGN.md §8.
-            },
+            }
+        } else {
+            quote! {
+                #message_doc
+                ///
+                /// Experimental lazy alias. Emitted only with `--puroro_opt=lazy=true`.
+                /// Design and behaviour may change; see DESIGN.md §8.
+            }
         };
         quote! {
             #lazy_doc
