@@ -7,7 +7,7 @@
 //! [1]: https://github.com/protocolbuffers/protobuf/blob/v3.3.2/src/google/protobuf/util/time_util.cc#L79-L100
 
 use crate::google::protobuf::Duration as ProtoDuration;
-use ::allocator_api2::alloc::{Allocator, Global};
+use ::allocator_api2::alloc::Allocator;
 use ::core::fmt;
 use ::std::time::Duration as StdDuration;
 
@@ -129,22 +129,23 @@ impl<A: Allocator + ::core::clone::Clone> ProtoDuration<A> {
     }
 }
 
-impl ProtoDuration {
+impl<A: Allocator + ::core::clone::Clone + Default> ProtoDuration<A> {
     /// Like [`from_seconds_nanos_in()`](Self::from_seconds_nanos_in) with
-    /// [`Global`].
+    /// [`A::default()`](Default::default).
     #[inline]
     pub fn from_seconds_nanos(seconds: i64, nanos: i32) -> Self {
-        Self::from_seconds_nanos_in(Global, seconds, nanos)
+        Self::from_seconds_nanos_in(A::default(), seconds, nanos)
     }
 
-    /// Builds from [`StdDuration`] using [`Global`].
+    /// Like [`try_from_std_in()`](Self::try_from_std_in) with
+    /// [`A::default()`](Default::default).
     #[inline]
     pub fn try_from_std(duration: StdDuration) -> Result<Self, DurationError> {
-        Self::try_from_std_in(Global, duration)
+        Self::try_from_std_in(A::default(), duration)
     }
 }
 
-impl TryFrom<StdDuration> for ProtoDuration {
+impl<A: Allocator + ::core::clone::Clone + Default> TryFrom<StdDuration> for ProtoDuration<A> {
     type Error = DurationError;
 
     fn try_from(duration: StdDuration) -> Result<Self, Self::Error> {
@@ -175,7 +176,7 @@ mod tests {
     #[test]
     fn std_round_trip() {
         let std = StdDuration::new(42, 123_456_789);
-        let d = ProtoDuration::try_from(std).unwrap();
+        let d: ProtoDuration = ProtoDuration::try_from(std).unwrap();
         assert_eq!(d.seconds(), 42);
         assert_eq!(d.nanos(), 123_456_789);
         assert_eq!(StdDuration::try_from(&d).unwrap(), std);
@@ -183,7 +184,7 @@ mod tests {
 
     #[test]
     fn negative_rejected_for_std() {
-        let d = ProtoDuration::from_seconds_nanos(-1, -500);
+        let d: ProtoDuration = ProtoDuration::from_seconds_nanos(-1, -500);
         match d.try_to_std() {
             Err(DurationError::NegativeDuration(mag)) => {
                 assert_eq!(mag, StdDuration::new(1, 500));
@@ -194,14 +195,29 @@ mod tests {
 
     #[test]
     fn normalize_aligns_sign() {
-        let mut d = ProtoDuration::from_seconds_nanos(1, -1);
+        let mut d: ProtoDuration = ProtoDuration::from_seconds_nanos(1, -1);
         d.normalize();
         assert_eq!(d.seconds(), 0);
         assert_eq!(d.nanos(), 999_999_999);
 
-        let mut d = ProtoDuration::from_seconds_nanos(-1, 1);
+        let mut d: ProtoDuration = ProtoDuration::from_seconds_nanos(-1, 1);
         d.normalize();
         assert_eq!(d.seconds(), 0);
         assert_eq!(d.nanos(), -999_999_999);
+    }
+
+    #[test]
+    fn default_alloc_constructors() {
+        use ::allocator_api2::alloc::Global;
+
+        let std = StdDuration::new(7, 8);
+        let via_method = ProtoDuration::<Global>::try_from_std(std).unwrap();
+        let via_try: ProtoDuration<Global> = std.try_into().unwrap();
+        assert_eq!(via_method.seconds(), 7);
+        assert_eq!(via_try.nanos(), 8);
+        assert_eq!(
+            ProtoDuration::<Global>::from_seconds_nanos(-2, -3).seconds(),
+            -2
+        );
     }
 }

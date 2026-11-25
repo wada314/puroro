@@ -7,7 +7,7 @@
 //! [1]: https://github.com/protocolbuffers/protobuf/blob/v3.3.2/src/google/protobuf/util/time_util.cc#L59-L77
 
 use crate::google::protobuf::Timestamp;
-use ::allocator_api2::alloc::{Allocator, Global};
+use ::allocator_api2::alloc::Allocator;
 use ::core::fmt;
 use ::std::time::{Duration as StdDuration, SystemTime, UNIX_EPOCH};
 
@@ -142,18 +142,25 @@ impl<A: Allocator + ::core::clone::Clone> Timestamp<A> {
     }
 }
 
-impl Timestamp {
+impl<A: Allocator + ::core::clone::Clone + Default> Timestamp<A> {
     /// Like [`from_seconds_nanos_in()`](Self::from_seconds_nanos_in) with
-    /// [`Global`].
+    /// [`A::default()`](Default::default).
     #[inline]
     pub fn from_seconds_nanos(seconds: i64, nanos: i32) -> Self {
-        Self::from_seconds_nanos_in(Global, seconds, nanos)
+        Self::from_seconds_nanos_in(A::default(), seconds, nanos)
+    }
+
+    /// Like [`from_system_time_in()`](Self::from_system_time_in) with
+    /// [`A::default()`](Default::default).
+    #[inline]
+    pub fn from_system_time(system_time: SystemTime) -> Self {
+        Self::from_system_time_in(A::default(), system_time)
     }
 }
 
-impl From<SystemTime> for Timestamp {
+impl<A: Allocator + ::core::clone::Clone + Default> From<SystemTime> for Timestamp<A> {
     fn from(system_time: SystemTime) -> Self {
-        Self::from_system_time_in(Global, system_time)
+        Self::from_system_time(system_time)
     }
 }
 
@@ -180,7 +187,7 @@ mod tests {
     #[test]
     fn system_time_round_trip_after_epoch() {
         let t = UNIX_EPOCH + StdDuration::new(1_700_000_000, 123_456_789);
-        let ts = Timestamp::from(t);
+        let ts: Timestamp = Timestamp::from(t);
         assert_eq!(ts.seconds(), 1_700_000_000);
         assert_eq!(ts.nanos(), 123_456_789);
         assert_eq!(SystemTime::try_from(&ts).unwrap(), t);
@@ -189,7 +196,7 @@ mod tests {
     #[test]
     fn system_time_before_epoch_keeps_non_negative_nanos() {
         let t = UNIX_EPOCH - StdDuration::new(1, 250);
-        let ts = Timestamp::from(t);
+        let ts: Timestamp = Timestamp::from(t);
         assert_eq!(ts.seconds(), -2);
         assert_eq!(ts.nanos(), NANOS_PER_SECOND - 250);
         assert_eq!(SystemTime::try_from(ts).unwrap(), t);
@@ -197,14 +204,26 @@ mod tests {
 
     #[test]
     fn normalize_carries_nanos() {
-        let mut ts = Timestamp::from_seconds_nanos(1, 1_000_000_001);
+        let mut ts: Timestamp = Timestamp::from_seconds_nanos(1, 1_000_000_001);
         ts.normalize();
         assert_eq!(ts.seconds(), 2);
         assert_eq!(ts.nanos(), 1);
 
-        let mut ts = Timestamp::from_seconds_nanos(0, -1);
+        let mut ts: Timestamp = Timestamp::from_seconds_nanos(0, -1);
         ts.normalize();
         assert_eq!(ts.seconds(), -1);
         assert_eq!(ts.nanos(), 999_999_999);
+    }
+
+    #[test]
+    fn default_alloc_constructors() {
+        use ::allocator_api2::alloc::Global;
+
+        let t = UNIX_EPOCH + StdDuration::from_secs(10);
+        let via_method = Timestamp::<Global>::from_system_time(t);
+        let via_from: Timestamp<Global> = t.into();
+        assert_eq!(via_method.seconds(), 10);
+        assert_eq!(via_from.seconds(), 10);
+        assert_eq!(Timestamp::<Global>::from_seconds_nanos(3, 4).nanos(), 4);
     }
 }
