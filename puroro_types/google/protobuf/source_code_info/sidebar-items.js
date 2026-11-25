@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["FIELD_LOCATION"],"mod":["layout","location"],"struct":["Location","LocationLazy"]};
+window.SIDEBAR_ITEMS = {"constant":["FIELD_LOCATION"],"mod":["layout","location"],"struct":["Location"]};

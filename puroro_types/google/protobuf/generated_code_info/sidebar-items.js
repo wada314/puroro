@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["FIELD_ANNOTATION"],"mod":["annotation","layout"],"struct":["Annotation","AnnotationLazy"]};
+window.SIDEBAR_ITEMS = {"constant":["FIELD_ANNOTATION"],"mod":["annotation","layout"],"struct":["Annotation"]};
