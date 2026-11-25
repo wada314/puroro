@@ -864,8 +864,17 @@ mod tests {
         );
         assert_eq!(
             content.matches("fn after_deallocate").count(),
+            1,
+            "eager-only oneof group wipes parent bits once: {content}"
+        );
+
+        let mut lazy_request = request;
+        lazy_request.meta.parameter = Some("lazy=true".into());
+        let lazy_content = generate_lib(&lazy_request);
+        assert_eq!(
+            lazy_content.matches("fn after_deallocate").count(),
             2,
-            "eager and lazy oneof groups both wipe parent bits: {content}"
+            "eager and lazy oneof groups both wipe parent bits: {lazy_content}"
         );
     }
 
