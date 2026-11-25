@@ -12,16 +12,14 @@ use super::len::{
     UncheckedStringCodec,
 };
 use super::singular_type::SingularType;
+use super::slot_new::{BytesSlotNew, StringSlotNew};
 use super::span_only::SpanOnly;
 use super::wire_or_sso::{WireOrSso, WireOrSsoSlot};
 use crate::decode::WireSpan;
 use crate::fields::shared::slot_init::SlotInitMut;
-use crate::fields::shared::value_layout::{Inline, InlineOrHeap, ValueLayout, ValueLayoutClone};
+use crate::fields::shared::value_layout::{ValueLayout, ValueLayoutClone};
 use crate::fields::shared::value_slot::ValueSlot;
 use crate::fields::shared::{MessageBindingMut, MessageCommonAlloc, MessageCommonSharedBits};
-use crate::fields::wire::sso_bytes::SsoBytes;
-use crate::fields::wire::sso_string::SsoString;
-use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
 /// Write a LEN payload span into a lazy singular slot during ingest.
 pub trait LazyLenStore<T: SingularType, A: Allocator>: ValueLayout<T, A> {
@@ -59,30 +57,6 @@ pub trait LazyBytesGet<C: BytesLikeLenCodec, A: Allocator>: ValueLayout<LenScala
         A: Clone;
 }
 
-/// Construct an empty string slot (eager SSO or lazy wire/span).
-pub trait StringSlotNew<A: Allocator>: ValueLayout<ProtoString, A> {
-    fn new_slot(alloc: A) -> Self::Slot;
-}
-
-/// Construct an empty bytes slot (eager SSO or lazy wire/span).
-pub trait BytesSlotNew<A: Allocator>: ValueLayout<ProtoBytes, A> {
-    fn new_slot(alloc: A) -> Self::Slot;
-}
-
-impl<A: Allocator> StringSlotNew<A> for Inline {
-    #[inline]
-    fn new_slot(alloc: A) -> Self::Slot {
-        UnmanagedString::default_in(alloc)
-    }
-}
-
-impl<A: Allocator, const HEAP_BIT: usize> StringSlotNew<A> for InlineOrHeap<HEAP_BIT> {
-    #[inline]
-    fn new_slot(alloc: A) -> Self::Slot {
-        SsoString::default_in(alloc)
-    }
-}
-
 impl<A: Allocator, const KIND: usize> StringSlotNew<A> for WireOrSso<KIND> {
     #[inline]
     fn new_slot(_alloc: A) -> Self::Slot {
@@ -94,20 +68,6 @@ impl<A: Allocator> StringSlotNew<A> for SpanOnly {
     #[inline]
     fn new_slot(_alloc: A) -> Self::Slot {
         WireSpan::default()
-    }
-}
-
-impl<A: Allocator> BytesSlotNew<A> for Inline {
-    #[inline]
-    fn new_slot(alloc: A) -> Self::Slot {
-        UnmanagedVec::default_in(alloc)
-    }
-}
-
-impl<A: Allocator, const HEAP_BIT: usize> BytesSlotNew<A> for InlineOrHeap<HEAP_BIT> {
-    #[inline]
-    fn new_slot(alloc: A) -> Self::Slot {
-        SsoBytes::default_in(alloc)
     }
 }
 

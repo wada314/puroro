@@ -25,33 +25,44 @@ use ::bytes::BufMut;
 use crate::defaults::ProtoDefault;
 use ::puroro::{DecodeBuf, DecodeError, HasDefault, Optional, WireType};
 
+#[cfg(feature = "lazy")]
 use crate::decode::{LazyMessage, LazyProfile, ScannedValue, WireSpan, save_unknown_varint_field};
 use crate::encode::field_number_const;
 use crate::fields::shared::FieldDeallocate;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
+#[cfg(feature = "lazy")]
+use crate::fields::shared::value_layout::{BitPacked, Boxed};
+#[cfg(feature = "lazy")]
+use crate::fields::shared::value_slot::ValueSlotMutAccess;
+#[cfg(feature = "lazy")]
+use crate::fields::shared::{DeallocateBound, MessageCommonSharedBits};
 use crate::fields::shared::{
-    DeallocateBound, DefaultIn, MessageBindingMut, MessageCommonAlloc, MessageCommonBits,
-    MessageCommonSharedBits,
+    DefaultIn, MessageBindingMut, MessageCommonAlloc, MessageCommonBits,
     field_presence::{
         Explicit, FieldPresence, Implicit, LegacyRequired, Message, Oneof, RequiredFieldPresence,
     },
     slot_init::{AlwaysInitialized, SlotInitView},
     value_layout::{
-        BitPacked, Boxed, Inline, ValueLayout, ValueLayoutClone, ValueLayoutGet, ValueLayoutMerge,
-        ValueLayoutMut,
+        Inline, ValueLayout, ValueLayoutClone, ValueLayoutGet, ValueLayoutMerge, ValueLayoutMut,
     },
-    value_slot::{
-        AddressableSlot, ValueSlot, ValueSlotMutAccess, ValueSlotNew, ValueSlotRefAccess,
-    },
+    value_slot::{AddressableSlot, ValueSlot, ValueSlotNew, ValueSlotRefAccess},
 };
 use crate::fields::wire::encode_type::{encode_field, encoded_len_field};
+#[cfg(feature = "lazy")]
 use crate::fields::wire::lazy_len::{LazyBytesGet, LazyLenStore, LazyStringGet};
+#[cfg(feature = "lazy")]
 use crate::fields::wire::len::{BytesLikeLenCodec, LenScalar, ProtoString};
+#[cfg(feature = "lazy")]
 use crate::fields::wire::numerical::{BoolCodec, Numerical, NumericalType, ProtoBool};
+#[cfg(feature = "lazy")]
 use crate::fields::wire::proto_group::ProtoGroup;
+#[cfg(feature = "lazy")]
 use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::proto_ref_ops::{ProtoRefDebug, ProtoRefEq};
-use crate::fields::wire::singular_type::{PayloadAccess, SingularType};
+#[cfg(feature = "lazy")]
+use crate::fields::wire::singular_type::PayloadAccess;
+use crate::fields::wire::singular_type::SingularType;
+#[cfg(feature = "lazy")]
 use crate::fields::wire::wire_payload::{CopyWirePayload, VarintPayload};
 use crate::message_encode::EncodeCtx;
 
@@ -620,6 +631,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<'f, 'c, C, P, const FIELD: u32, A, D, Cx>
     SingularFieldMut<'f, 'c, Numerical<C>, P, FIELD, A, Inline, D, Cx>
 where
@@ -668,6 +680,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<'f, 'c, P, const FIELD: u32, A, const VALUE_BIT: usize, D, Cx>
     SingularFieldMut<'f, 'c, ProtoBool, P, FIELD, A, BitPacked<VALUE_BIT>, D, Cx>
 where
@@ -702,6 +715,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<T, P, const FIELD: u32, A, L, D> SingularField<T, P, FIELD, A, L, D>
 where
     T: SingularType,
@@ -717,6 +731,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<M, P, const FIELD: u32, A, D> SingularField<ProtoMessage<M>, P, FIELD, A, Inline, D>
 where
     M: crate::MessageEncode + crate::DeallocateBound<A>,
@@ -746,6 +761,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<M, P, const FIELD: u32, A, D> SingularField<ProtoMessage<M>, P, FIELD, A, Boxed, D>
 where
     M: crate::MessageEncode + crate::DeallocateIn<A> + DefaultIn<A>,
@@ -774,6 +790,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<M, P, const FIELD: u32, A, D> SingularField<ProtoGroup<M>, P, FIELD, A, Inline, D>
 where
     M: crate::MessageEncode + crate::DeallocateBound<A>,
@@ -802,6 +819,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<M, P, const FIELD: u32, A, D> SingularField<ProtoGroup<M>, P, FIELD, A, Boxed, D>
 where
     M: crate::MessageEncode + crate::DeallocateIn<A> + DefaultIn<A>,
@@ -829,6 +847,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<P, const FIELD: u32, A, L, D> SingularField<ProtoString, P, FIELD, A, L, D>
 where
     P: FieldPresence,
@@ -864,6 +883,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<P, const FIELD: u32, A, L, D, C> SingularField<LenScalar<C>, P, FIELD, A, L, D>
 where
     P: FieldPresence,
@@ -1111,6 +1131,7 @@ mod tests {
         common.deallocate();
     }
 
+    #[cfg(feature = "lazy")]
     #[test]
     fn proto_int32_merge_scanned_skips_wire() {
         use crate::decode::ScannedValue;

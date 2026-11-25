@@ -22,11 +22,11 @@ use crate::fields::shared::{
     value_slot::{AddressableSlot, ValueSlot, ValueSlotNew},
 };
 use crate::fields::singular::field::SingularField;
-use crate::fields::wire::lazy_len::{BytesSlotNew, StringSlotNew};
 use crate::fields::wire::len::{BytesLikeLenCodec, LenScalar, ProtoBytes, ProtoString};
 use crate::fields::wire::numerical::{Numerical, NumericalType};
 use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::singular_type::SingularType;
+use crate::fields::wire::slot_new::{BytesSlotNew, StringSlotNew};
 use crate::message_encode::EncodeCtx;
 use crate::unknown_fields::{UnknownFields, UnknownStore};
 use ::allocator_api2::alloc::Allocator;

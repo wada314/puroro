@@ -35,5 +35,6 @@ pub(crate) mod repeated;
 pub(crate) mod shared;
 pub(crate) mod singular;
 pub(crate) mod slot_index;
+#[cfg(feature = "lazy")]
 pub(crate) mod span_list;
 pub(crate) mod wire;

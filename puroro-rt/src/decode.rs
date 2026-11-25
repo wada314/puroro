@@ -6,19 +6,27 @@
 //! into a validated [`FieldNumber`] plus [`WireType`].
 
 mod group;
+#[cfg(feature = "lazy")]
 mod lazy_profile;
 mod lazy_scan;
+#[cfg(feature = "lazy")]
 mod record;
 mod slice_cursor;
 mod varint;
+#[cfg(feature = "lazy")]
 mod wire_buf;
 
 pub use self::slice_cursor::{SliceCursor, contiguous_remaining};
 
+#[cfg(feature = "lazy")]
 pub(crate) use group::{copy_group_body, measure_group};
 
+#[cfg(feature = "lazy")]
 pub use self::lazy_profile::{Borrowed, LazyProfile, Owned};
-pub use self::lazy_scan::{Eager, Lazy, LazyMessage, LazyScan, MessageScan};
+pub use self::lazy_scan::{Eager, MessageScan};
+#[cfg(feature = "lazy")]
+pub use self::lazy_scan::{Lazy, LazyMessage, LazyScan};
+#[cfg(feature = "lazy")]
 pub use self::record::{
     RecordScanner, ScannedRecord, ScannedValue, WireSpan, for_each_len_field,
     scanned_group_body_span, scanned_len_payload, scanned_len_span, scanned_record_span,
@@ -28,6 +36,7 @@ pub use self::varint::{
     ChunkScanHot4, ChunkScanHot8, ChunkScanHot10, ChunkScanHotAdapt, ChunkScanLikely1,
     ChunkScanMsb, VarintDecoder,
 };
+#[cfg(feature = "lazy")]
 pub use self::wire_buf::{WireAppend, WireBuf};
 
 use ::allocator_api2::alloc::Allocator;

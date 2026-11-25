@@ -21,10 +21,13 @@ use ::puroro::{DecodeBuf, DecodeError, MapMut, MapRef, ScopedBuf, WireType};
 use ::unmanaged::{CloneIn, ToOwnedIn};
 
 use super::MapKey;
-use crate::decode::{self, WireSpan};
+use crate::decode;
+#[cfg(feature = "lazy")]
+use crate::decode::WireSpan;
 use crate::encode::{self, field_number_const};
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{FieldDeallocate, MessageCommon, MessageCommonAlloc};
+#[cfg(feature = "lazy")]
 use crate::fields::span_list::SpanList;
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut,
@@ -56,6 +59,7 @@ pub trait MapLayout<K: MapKey, V: RepeatedElement, const FIELD: u32, A: Allocato
 pub struct MapReady;
 
 /// Lazy map: entry-LEN offsets during the parent scan; `HashMap` on first get.
+#[cfg(feature = "lazy")]
 pub struct MapSpans;
 
 impl<K, V, const FIELD: u32, A> MapLayout<K, V, FIELD, A> for MapReady
@@ -87,6 +91,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<K, V, const FIELD: u32, A> MapLayout<K, V, FIELD, A> for MapSpans
 where
     K: MapKey,
@@ -223,6 +228,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<K, V, const FIELD: u32, A> MapField<K, V, FIELD, A, MapSpans>
 where
     K: MapKey,
@@ -380,6 +386,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<K, V, const FIELD: u32, A, Cx> FieldCloneIn<Cx> for MapField<K, V, FIELD, A, MapSpans>
 where
     K: MapKey,
@@ -638,7 +645,9 @@ where
 mod tests {
     use super::super::entry::encode_map_entry;
     use super::MapField;
-    use crate::decode::{decode_tag, decode_varint};
+    use crate::decode::decode_tag;
+    #[cfg(feature = "lazy")]
+    use crate::decode::decode_varint;
     use crate::encode::{encode_tag, encode_varint, encode_varint_field, field_number_const};
     use crate::fields::shared::field_inspect::FieldEncode;
     use crate::fields::shared::{FieldDeallocate, MessageCommon};
@@ -846,25 +855,26 @@ mod tests {
         field.deallocate(&common);
     }
 
-    fn encode_map_entry_body(common: &mut TestCommon, key: i32, value: i32) -> BytesMut {
-        let mut src = MapField::<ProtoInt32, ProtoInt32, 7, _>::new_in(Global);
-        src.bind_mut(common).insert(key, value);
-        let mut framed = BytesMut::new();
-        src.encode_raw(common, &mut EncodeCtx::new(), &mut framed);
-        src.deallocate(common);
-        // Drop the field tag + length prefix; store_span wants the entry body.
-        let mut rest = framed.as_ref();
-        let _ = decode_tag(&mut rest).unwrap();
-        let len = decode_varint(&mut rest).unwrap() as usize;
-        BytesMut::from(&rest[..len])
-    }
-
-    type TestCommon = MessageCommon<BitArray<[u8; 1], Lsb0>, Global>;
-
+    #[cfg(feature = "lazy")]
     #[test]
     fn map_spans_materialise_last_wins_and_later_store() {
         use super::MapSpans;
         use crate::decode::WireSpan;
+
+        type TestCommon = MessageCommon<BitArray<[u8; 1], Lsb0>, Global>;
+
+        fn encode_map_entry_body(common: &mut TestCommon, key: i32, value: i32) -> BytesMut {
+            let mut src = MapField::<ProtoInt32, ProtoInt32, 7, _>::new_in(Global);
+            src.bind_mut(common).insert(key, value);
+            let mut framed = BytesMut::new();
+            src.encode_raw(common, &mut EncodeCtx::new(), &mut framed);
+            src.deallocate(common);
+            // Drop the field tag + length prefix; store_span wants the entry body.
+            let mut rest = framed.as_ref();
+            let _ = decode_tag(&mut rest).unwrap();
+            let len = decode_varint(&mut rest).unwrap() as usize;
+            BytesMut::from(&rest[..len])
+        }
 
         let mut common = TestCommon::new_in(BitArray::ZERO, Global);
         let mut field = MapField::<ProtoInt32, ProtoInt32, 7, _, MapSpans>::new_in(Global);

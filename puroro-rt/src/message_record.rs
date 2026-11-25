@@ -12,9 +12,11 @@ use ::core::ops::ControlFlow;
 use ::protobuf_core::FieldNumber;
 use ::puroro::{DecodeBuf, DecodeError, Message, RECURSION_LIMIT, WireType};
 
+use crate::decode::{Eager, MessageScan, next_tag, skip_field_and_save_in};
+#[cfg(feature = "lazy")]
 use crate::decode::{
-    Eager, Lazy, LazyMessage, LazyProfile, LazyScan, MessageScan, Owned, ScannedRecord, WireAppend,
-    copy_group_body, measure_group, next_tag, skip_field_and_save_in,
+    Lazy, LazyMessage, LazyProfile, LazyScan, Owned, ScannedRecord, WireAppend, copy_group_body,
+    measure_group,
 };
 use crate::fields::shared::{
     BitStorage, CloneBound, DeallocateBound, DebugStructVisitor, EncodeRawVisitor,
@@ -142,6 +144,7 @@ where
     ) -> Result<bool, DecodeError>;
 }
 
+#[cfg(feature = "lazy")]
 /// Lazy ingest of one scanned record.
 ///
 /// Separate from [`RecordFields`] because the body names `Lazy::scan`, which
@@ -242,6 +245,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<F, A, U> Record<F, A, Eager, U>
 where
     A: Allocator + Clone,
@@ -264,6 +268,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<F, A, U, P> Record<F, A, Lazy<A, P>, U>
 where
     A: Allocator + Clone,
@@ -420,6 +425,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<F, A, U, P> PartialEq for Record<F, A, Lazy<A, P>, U>
 where
     A: Allocator + Clone,
@@ -452,6 +458,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<F, A, U, P> Debug for Record<F, A, Lazy<A, P>, U>
 where
     A: Allocator + Clone,
@@ -496,6 +503,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<F, A, U, W> MessageEncode for Record<F, A, Lazy<A, W>, U>
 where
     A: Allocator + Clone,
@@ -526,6 +534,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<F, A, U, W> Record<F, A, Lazy<A, W>, U>
 where
     A: Allocator + Clone,
@@ -585,6 +594,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<F, A, U, W> MessageMerge for Record<F, A, Lazy<A, W>, U>
 where
     A: Allocator + Clone,
@@ -628,6 +638,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<F, A, U, P> LazyMessage<A, P> for Record<F, A, Lazy<A, P>, U>
 where
     A: Allocator + Clone,
@@ -732,6 +743,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<F, A, U, W> Message for Record<F, A, Lazy<A, W>, U>
 where
     A: Allocator + Clone,
@@ -816,6 +828,7 @@ macro_rules! forward_record {
         $crate::forward_record!(@shared $name, $fields);
     };
     (lazy $name:ident, $fields:ident) => {
+        // Requires puroro-rt `--features lazy` (Lazy / LazyProfile / WireAppend).
         $crate::forward_record!(@shared_lazy $name, $fields);
         $crate::forward_record!(@lazy $name);
     };

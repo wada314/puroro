@@ -20,8 +20,12 @@ pub(crate) mod slot_init;
 pub(crate) mod value_layout;
 pub(crate) mod value_slot;
 
-pub use crate::decode::{Eager, Lazy, LazyProfile, WireBuf};
+pub use crate::decode::Eager;
+#[cfg(feature = "lazy")]
+pub use crate::decode::{Lazy, LazyProfile, WireBuf};
+#[cfg(feature = "lazy")]
 pub use crate::fields::wire::span_only::SpanOnly;
+#[cfg(feature = "lazy")]
 pub use crate::fields::wire::wire_or_sso::WireOrSso;
 pub use crate::unknown_fields::{DiscardUnknowns, RejectUnknowns, UnknownFields, UnknownStore};
 pub use ::unmanaged::DefaultIn;
@@ -36,12 +40,13 @@ pub use value_layout::{BitPacked, Boxed, Inline, InlineOrHeap, SSO_HEAP, SSO_INL
 pub use value_slot::AddressableSlot;
 // MessageBinding / MessageBindingMut are defined in this module.
 
+#[cfg(feature = "lazy")]
 use ::core::cell::UnsafeCell;
 use ::core::mem::ManuallyDrop;
 
-use crate::decode::{
-    MessageScan, ScannedRecord, UnknownFieldsIter, iter_unknown_fields, scanned_record_span,
-};
+use crate::decode::{MessageScan, UnknownFieldsIter, iter_unknown_fields};
+#[cfg(feature = "lazy")]
+use crate::decode::{ScannedRecord, scanned_record_span};
 use ::allocator_api2::alloc::Allocator;
 use ::bitvec::{
     array::BitArray,
@@ -85,10 +90,12 @@ impl<const N: usize> BitStorage for BitArray<[u8; N], Lsb0> {
 ///
 /// Catalog `bit_mut` still requires `&mut self`. Shared writes go through
 /// [`set_shared`](Self::set_shared).
+#[cfg(feature = "lazy")]
 pub struct InteriorBitArray<const N: usize> {
     bits: UnsafeCell<BitArray<[u8; N], Lsb0>>,
 }
 
+#[cfg(feature = "lazy")]
 impl<const N: usize> InteriorBitArray<N> {
     pub fn zero() -> Self {
         Self {
@@ -111,6 +118,7 @@ impl<const N: usize> InteriorBitArray<N> {
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<const N: usize> Clone for InteriorBitArray<N> {
     fn clone(&self) -> Self {
         Self {
@@ -119,12 +127,14 @@ impl<const N: usize> Clone for InteriorBitArray<N> {
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<const N: usize> Default for InteriorBitArray<N> {
     fn default() -> Self {
         Self::zero()
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<const N: usize> BitStorage for InteriorBitArray<N> {
     #[inline]
     fn is_set(&self, bit: usize) -> bool {
@@ -250,6 +260,7 @@ pub struct MessageCommon<B, A: Allocator, U: UnknownStore<A> = UnknownFields<A>,
 }
 
 /// [`MessageCommon`] with a [`Lazy`] ingest slot.
+#[cfg(feature = "lazy")]
 pub type LazyMessageCommon<B, A, U = UnknownFields<A>> = MessageCommon<B, A, U, Lazy<A>>;
 
 impl<B, A: Allocator + Clone, U: UnknownStore<A>, L: MessageScan<A>> MessageCommon<B, A, U, L> {
@@ -366,10 +377,12 @@ pub trait MessageBindingMut<A: Allocator>: MessageBinding<A> {
 }
 
 /// Bit writes through `&self` (lazy LEN promotion).
+#[cfg(feature = "lazy")]
 pub trait MessageCommonSharedBits: MessageCommonBits {
     fn set_bit_shared(&self, bit: usize, value: bool);
 }
 
+#[cfg(feature = "lazy")]
 impl<const N: usize, A: Allocator, U: UnknownStore<A>, S> MessageCommonSharedBits
     for MessageCommon<InteriorBitArray<N>, A, U, S>
 {
@@ -401,6 +414,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<B, A, U, W> MessageCommon<B, A, U, Lazy<A, W>>
 where
     A: Allocator + Clone,

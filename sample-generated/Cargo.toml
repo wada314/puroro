@@ -18,7 +18,7 @@ allocator-api2 = "0.2"
 bitvec = "1"
 bytes = "1"
 puroro = { path = ".." }
-puroro-rt = { path = "../puroro-rt" }
+puroro-rt = { path = "../puroro-rt", features = ["lazy"] }
 
 [dev-dependencies]
 http-body = "1"

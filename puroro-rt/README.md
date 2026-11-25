@@ -10,6 +10,12 @@ puroro = "0.15"
 puroro-rt = "0.1"
 ```
 
+## Features
+
+| Feature | Default | Purpose |
+|---|---|---|
+| `lazy` | off | Experimental lazy message aliases (`NameLazy`, island scan, `WireOrSso`, …). Enable via `--puroro_opt=lazy=true` on the plugin (the generated `Cargo.toml` turns this on). API and behaviour may change. |
+
 ## License
 
 [Apache License 2.0](https://github.com/wada314/puroro/blob/master/LICENSE).

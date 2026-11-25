@@ -8,6 +8,7 @@
 //! on the bound view (`optional`, `value`, `get`, `as_slice`, …).
 
 use ::allocator_api2::alloc::Allocator;
+#[cfg(feature = "lazy")]
 use ::puroro::{DecodeError, HasDefault, Optional};
 
 use super::map::{MapField, MapFieldMut, MapFieldRef, MapKey};
@@ -18,14 +19,19 @@ use super::repeated::{RepeatedField, RepeatedFieldMut, RepeatedFieldRef};
 use super::shared::field_presence::FieldPresence;
 use super::shared::value_slot::ValueSlot;
 use super::shared::{
-    AddressableSlot, BitStorage, MessageBindingMut, MessageCommon, MessageCommonAlloc,
-    MessageCommonSharedBits, UnknownStore, ValueLayout,
+    AddressableSlot, MessageBindingMut, MessageCommon, MessageCommonAlloc, UnknownStore,
+    ValueLayout,
 };
+#[cfg(feature = "lazy")]
+use super::shared::{BitStorage, MessageCommonSharedBits};
 use super::singular::{SingularField, SingularFieldMut, SingularFieldRef};
+#[cfg(feature = "lazy")]
 use super::wire::lazy_len::{LazyBytesGet, LazyStringGet};
+#[cfg(feature = "lazy")]
 use super::wire::len::{BytesLikeLenCodec, LenScalar};
 use super::wire::repeated_element::RepeatedElement;
 use super::wire::singular_type::SingularType;
+#[cfg(feature = "lazy")]
 use crate::ProtoString;
 
 /// Map protobuf field number `N` to the value generated code reads and writes.
@@ -104,6 +110,7 @@ impl<'a, E, const N: u32> OneofFieldRef<'a, E, N> {
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<'a, E, const N: u32, A, Len, D> OneofFieldRef<'a, E, N>
 where
     A: Allocator + Clone,
@@ -133,6 +140,7 @@ where
     }
 }
 
+#[cfg(feature = "lazy")]
 impl<'a, E, const N: u32, C, A, Len, D> OneofFieldRef<'a, E, N>
 where
     C: BytesLikeLenCodec,

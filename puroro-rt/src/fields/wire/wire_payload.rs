@@ -21,7 +21,9 @@ use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES, Varint};
 use ::puroro::{DecodeError, WireType};
 use ::unmanaged::UnmanagedVec;
 
-use crate::decode::{self, ScannedValue};
+use crate::decode;
+#[cfg(feature = "lazy")]
+use crate::decode::ScannedValue;
 
 /// Untagged body for a wire type (`Varint`, `Int32`, `Int64`, or `Len`).
 #[doc(hidden)]
@@ -47,6 +49,7 @@ pub trait CopyWirePayload: WirePayload + Copy + Sized {
 
     /// Uses a value the lazy scanner already decoded. Wrong wire shape is
     /// [`DecodeError::InvalidTag`].
+    #[cfg(feature = "lazy")]
     fn from_scanned(value: &ScannedValue) -> Result<Self, DecodeError>;
 }
 
@@ -85,6 +88,7 @@ impl CopyWirePayload for VarintPayload {
         Ok(Self(Varint::from_uint64(decode::decode_varint(buf)?)))
     }
 
+    #[cfg(feature = "lazy")]
     #[inline]
     fn from_scanned(value: &ScannedValue) -> Result<Self, DecodeError> {
         match *value {
@@ -132,6 +136,7 @@ impl CopyWirePayload for Fixed32Payload {
         Ok(Self(bytes))
     }
 
+    #[cfg(feature = "lazy")]
     #[inline]
     fn from_scanned(value: &ScannedValue) -> Result<Self, DecodeError> {
         match *value {
@@ -179,6 +184,7 @@ impl CopyWirePayload for Fixed64Payload {
         Ok(Self(bytes))
     }
 
+    #[cfg(feature = "lazy")]
     #[inline]
     fn from_scanned(value: &ScannedValue) -> Result<Self, DecodeError> {
         match *value {

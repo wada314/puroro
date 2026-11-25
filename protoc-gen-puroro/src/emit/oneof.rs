@@ -80,13 +80,14 @@ pub(super) fn render_module_and_exports(
     bits_ty: &TokenStream,
     lazy_bits_ty: &TokenStream,
     unknown_fields: UnknownFieldsPolicy,
+    emit_lazy: bool,
 ) -> Result<Vec<Item>> {
     let mod_name = &oneof.mod_name;
     let shape_name = &oneof.shape_name;
     let case_name = &oneof.case_name;
     let storage_name = &oneof.storage_name;
 
-    let module_body = render_module_body(oneof, bits_ty, lazy_bits_ty, unknown_fields)?;
+    let module_body = render_module_body(oneof, bits_ty, lazy_bits_ty, unknown_fields, emit_lazy)?;
     super::parse::parse_items(quote! {
         mod #mod_name {
             #module_body
@@ -102,6 +103,7 @@ fn render_module_body(
     bits_ty: &TokenStream,
     lazy_bits_ty: &TokenStream,
     unknown_fields: UnknownFieldsPolicy,
+    emit_lazy: bool,
 ) -> Result<TokenStream> {
     let shape_name = &oneof.shape_name;
     let case_name = &oneof.case_name;
@@ -372,6 +374,81 @@ fn render_module_body(
     let store = super::unknown_store_ty(unknown_fields);
     let unknown_assoc = quote! { type Unknown = #store; };
 
+    let lazy_oneof_group = if emit_lazy {
+        quote! {
+            impl<A: Allocator + ::core::clone::Clone, P: ::puroro_rt::decode::LazyProfile> OneofGroup
+                for #storage_name<A, ::puroro_rt::Lazy<A, P>>
+            {
+                type Case = #case_name;
+                type Ref<'a>
+                    = #case_name
+                where
+                    A: 'a,
+                    P: 'a;
+                type Mut<'a>
+                    = ()
+                where
+                    A: 'a,
+                    P: 'a;
+                type Bits = #lazy_bits_ty;
+                type Alloc = A;
+                #unknown_assoc
+                type Layout = ::puroro_rt::Lazy<A, P>;
+
+                fn case(storage: &Self) -> Self::Case {
+                    match &storage.value {
+                        #(#case_match_arms)*
+                    }
+                }
+
+                fn to_ref<'a>(
+                    storage: &'a Self,
+                    _common: &'a MessageCommon<Self::Bits, Self::Alloc, Self::Unknown, Self::Layout>,
+                ) -> Self::Ref<'a> {
+                    Self::case(storage)
+                }
+
+                fn to_mut<'a>(
+                    _storage: &'a mut Self,
+                    _common: &'a mut MessageCommon<Self::Bits, Self::Alloc, Self::Unknown, Self::Layout>,
+                ) -> Self::Mut<'a>
+                where
+                    A: ::core::clone::Clone,
+                {
+                }
+
+                fn clone_storage_in(
+                    storage: &Self,
+                    common: &MessageCommon<Self::Bits, Self::Alloc, Self::Unknown, Self::Layout>,
+                    alloc: Self::Alloc,
+                ) -> Self
+                where
+                    A: ::core::clone::Clone,
+                {
+                    let value = match &storage.value {
+                        #(#clone_arms)*
+                    };
+                    Self {
+                        value,
+                        _layout: ::core::marker::PhantomData,
+                    }
+                }
+
+                fn after_deallocate(
+                    common: &mut MessageCommon<Self::Bits, Self::Alloc, Self::Unknown, Self::Layout>,
+                )
+                where
+                    A: ::core::clone::Clone,
+                {
+                    let _ = common;
+                    #(#lazy_clear_bits)*
+                }
+            }
+        }
+    } else {
+        quote! {}
+    };
+
     let root_alias = nested_root_alias();
     Ok(quote! {
         #root_alias
@@ -522,74 +599,7 @@ fn render_module_body(
             }
         }
 
-        impl<A: Allocator + ::core::clone::Clone, P: ::puroro_rt::decode::LazyProfile> OneofGroup
-            for #storage_name<A, ::puroro_rt::Lazy<A, P>>
-        {
-            type Case = #case_name;
-            type Ref<'a>
-                = #case_name
-            where
-                A: 'a,
-                P: 'a;
-            type Mut<'a>
-                = ()
-            where
-                A: 'a,
-                P: 'a;
-            type Bits = #lazy_bits_ty;
-            type Alloc = A;
-            #unknown_assoc
-            type Layout = ::puroro_rt::Lazy<A, P>;
-
-            fn case(storage: &Self) -> Self::Case {
-                match &storage.value {
-                    #(#case_match_arms)*
-                }
-            }
-
-            fn to_ref<'a>(
-                storage: &'a Self,
-                _common: &'a MessageCommon<Self::Bits, Self::Alloc, Self::Unknown, Self::Layout>,
-            ) -> Self::Ref<'a> {
-                Self::case(storage)
-            }
-
-            fn to_mut<'a>(
-                _storage: &'a mut Self,
-                _common: &'a mut MessageCommon<Self::Bits, Self::Alloc, Self::Unknown, Self::Layout>,
-            ) -> Self::Mut<'a>
-            where
-                A: ::core::clone::Clone,
-            {
-            }
-
-            fn clone_storage_in(
-                storage: &Self,
-                common: &MessageCommon<Self::Bits, Self::Alloc, Self::Unknown, Self::Layout>,
-                alloc: Self::Alloc,
-            ) -> Self
-            where
-                A: ::core::clone::Clone,
-            {
-                let value = match &storage.value {
-                    #(#clone_arms)*
-                };
-                Self {
-                    value,
-                    _layout: ::core::marker::PhantomData,
-                }
-            }
-
-            fn after_deallocate(
-                common: &mut MessageCommon<Self::Bits, Self::Alloc, Self::Unknown, Self::Layout>,
-            )
-            where
-                A: ::core::clone::Clone,
-            {
-                let _ = common;
-                #(#lazy_clear_bits)*
-            }
-        }
+        #lazy_oneof_group
     })
 }
 
