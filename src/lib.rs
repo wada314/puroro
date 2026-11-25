@@ -17,6 +17,8 @@
 //!   [`RepeatedBytesMut`] — map and repeated mutators
 //! - [`OneofView`] / [`OneofViewMut`] — oneof group views
 //! - [`DecodeError`], [`UnknownField`], [`WireType`]
+//! - Cargo feature `tonic` — optional `puroro::tonic` module (`tonic::codec::Codec`
+//!   adapter for gRPC runtimes; no service stub codegen)
 //!
 //! Generated crates may opt into a `descriptors` feature that embeds a
 //! `FileDescriptorSet` byte slice (`DESIGN.md` §3.1); that surface lives on
@@ -55,6 +57,8 @@ mod protobuf_error;
 pub mod repeated;
 pub mod scoped_buf;
 mod string_mut;
+#[cfg(feature = "tonic")]
+pub mod tonic;
 pub mod unknown;
 pub mod wire_type;
 
