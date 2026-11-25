@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["BIT_VERIFICATION","FIELD_DECLARATION","FIELD_FEATURES","FIELD_UNINTERPRETED_OPTION","FIELD_VERIFICATION"],"mod":["declaration","layout"],"struct":["Declaration","DeclarationLazy","VerificationState"]};

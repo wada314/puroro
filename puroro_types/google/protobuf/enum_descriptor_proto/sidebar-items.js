@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["BIT_NAME","BIT_NAME_LAZY_KIND","BIT_NAME_SSO","FIELD_NAME","FIELD_OPTIONS","FIELD_RESERVED_NAME","FIELD_RESERVED_RANGE","FIELD_VALUE"],"mod":["enum_reserved_range","layout"],"struct":["EnumReservedRange","EnumReservedRangeLazy"]};

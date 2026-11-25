@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["FIELD_VALUE"],"mod":["layout"]};
