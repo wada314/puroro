@@ -5,6 +5,10 @@ edition = "2024"
 publish = false
 description = "Compile-time generation + runtime tests for protoc-gen-puroro"
 
+[lib]
+# Fixtures `include!` generated sources whose proto comments are not Rust examples.
+doctest = false
+
 [lints]
 workspace = true
 
