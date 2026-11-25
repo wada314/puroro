@@ -12,6 +12,11 @@ enum Status {
 }
 
 // A documented work item.
+//
+// Example:
+// ```
+// Foo foo = 1;
+// ```
 message Task {
   // Human-readable title.
   string title = 1;

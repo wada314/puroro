@@ -33,4 +33,12 @@ fn generated_source_includes_proto_comments() {
         content.contains("Not started yet."),
         "enum value comment missing: {content}"
     );
+    assert!(
+        content.contains("```text"),
+        "bare proto fences must be neutralized for rustdoc: {content}"
+    );
+    assert!(
+        !content.contains("```\nFoo foo"),
+        "bare fence must not remain a Rust doctest opener: {content}"
+    );
 }
