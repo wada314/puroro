@@ -33,12 +33,13 @@ fn generated_source_includes_proto_comments() {
         content.contains("Not started yet."),
         "enum value comment missing: {content}"
     );
+    // Protoc keeps the space after `//`, so fence lines look like ` ``` `.
     assert!(
-        content.contains("```text"),
-        "bare proto fences must be neutralized for rustdoc: {content}"
+        content.contains("```") && content.contains("Foo foo = 1;"),
+        "proto fence example should stay as written: {content}"
     );
     assert!(
-        !content.contains("```\nFoo foo"),
-        "bare fence must not remain a Rust doctest opener: {content}"
+        !content.contains("```text"),
+        "comment text must not be rewritten for doctests: {content}"
     );
 }

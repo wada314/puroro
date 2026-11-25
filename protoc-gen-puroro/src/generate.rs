@@ -166,6 +166,8 @@ publish = false
 
 [lib]
 path = \"lib.rs\"
+# Proto comments often contain non-Rust examples; do not compile them as doctests.
+doctest = false
 
 [features]
 default = []
@@ -377,6 +379,11 @@ mod tests {
             .expect("Cargo.toml");
         assert!(manifest.content.contains("name = \"generated\""));
         assert!(manifest.content.contains("path = \"lib.rs\""));
+        assert!(
+            manifest.content.contains("doctest = false"),
+            "generated crates must disable doctests: {}",
+            manifest.content
+        );
         response
             .files
             .iter()
@@ -397,6 +404,11 @@ mod tests {
             .find(|file| file.name == "Cargo.toml")
             .expect("Cargo.toml");
         assert!(manifest.content.contains("name = \"library-proto\""));
+        assert!(
+            manifest.content.contains("doctest = false"),
+            "missing doctest = false: {}",
+            manifest.content
+        );
         assert!(
             manifest.content.contains("descriptors = []"),
             "missing descriptors feature: {}",

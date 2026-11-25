@@ -10,6 +10,10 @@ documentation = "https://wada314.github.io/puroro/puroro_types/index.html"
 readme = "README.md"
 publish = false
 
+[lib]
+# Generated WKT / descriptor docs carry proto examples that are not Rust.
+doctest = false
+
 [lints]
 workspace = true
 
