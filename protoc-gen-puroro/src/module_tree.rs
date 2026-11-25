@@ -281,5 +281,9 @@ mod tests {
     fn type_name_to_module_uses_snake_case() {
         assert_eq!(type_name_to_module_ident("Task").to_string(), "task");
         assert_eq!(type_name_to_module_ident("FooBar").to_string(), "foo_bar");
+        // `Struct` → `struct` (keyword) → raw ident for the companion module.
+        assert_eq!(type_name_to_module_ident("Struct").to_string(), "r#struct");
+        assert_eq!(type_name_to_module_ident("Match").to_string(), "r#match");
+        assert_eq!(type_name_to_module_ident("Type").to_string(), "r#type");
     }
 }
