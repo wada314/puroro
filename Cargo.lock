@@ -569,6 +569,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "puroro-types"
+version = "0.1.0"
+dependencies = [
+ "allocator-api2",
+ "bitvec",
+ "bytes",
+ "protoc-gen-puroro",
+ "puroro",
+ "puroro-rt",
+]
+
+[[package]]
 name = "quote"
 version = "1.0.46"
 source = "registry+https://github.com/rust-lang/crates.io-index"

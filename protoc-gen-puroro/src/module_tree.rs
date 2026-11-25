@@ -199,7 +199,8 @@ impl ModuleNode {
 /// This is a minimal converter for ASCII protobuf identifiers (`Task` → `task`,
 /// `FooBar` → `foo_bar`). It is not a full unicode ident mapper.
 pub fn type_name_to_module_ident(type_name: &str) -> Ident {
-    Ident::new(&to_snake_case(type_name), ::proc_macro2::Span::call_site())
+    // `Struct` → `struct` (keyword); use a raw ident so layout paths compile.
+    crate::rust_ident::escape_ident(&to_snake_case(type_name))
 }
 
 #[cfg(test)]

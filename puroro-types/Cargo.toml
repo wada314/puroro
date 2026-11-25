@@ -1,0 +1,32 @@
+[package]
+name = "puroro-types"
+version = "0.1.0"
+authors = ["Shohei Wada <pc@wada314.jp>"]
+edition = "2024"
+license = "Apache-2.0"
+description = "Generated google.protobuf descriptor and well-known message types for puroro"
+repository = "https://github.com/wada314/puroro"
+readme = "README.md"
+publish = false
+
+[lints]
+workspace = true
+
+[features]
+default = ["descriptors", "wkt"]
+# `google.protobuf` descriptor messages (`FileDescriptorSet`, …).
+descriptors = []
+# Common well-known types (`Timestamp`, `Duration`, `Any`, …).
+wkt = []
+
+[dependencies]
+allocator-api2 = "0.2"
+bitvec = "1"
+bytes = "1"
+puroro = { path = "..", version = "0.15.0" }
+puroro-rt = { path = "../puroro-rt", version = "0.1.0" }
+
+# Host plugin binary for the build script (`CARGO_BIN_FILE_PROTOC_GEN_PURORO`).
+# Requires nightly Cargo `-Z bindeps` (enabled via `.cargo/config.toml`).
+[build-dependencies]
+protoc-gen-puroro = { path = "../protoc-gen-puroro", artifact = "bin" }
