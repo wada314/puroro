@@ -15,6 +15,7 @@ pub(crate) use layout::nested_root_alias;
 
 use crate::case::to_snake_case;
 use crate::descriptor::ProtoFqn;
+use crate::rust_ident::escape_ident;
 use ::proc_macro2::Ident;
 use ::syn::{Attribute, Item};
 
@@ -200,7 +201,7 @@ impl ModuleNode {
 /// `FooBar` → `foo_bar`). It is not a full unicode ident mapper.
 pub fn type_name_to_module_ident(type_name: &str) -> Ident {
     // `Struct` → `struct` (keyword); use a raw ident so layout paths compile.
-    crate::rust_ident::escape_ident(&to_snake_case(type_name))
+    escape_ident(&to_snake_case(type_name))
 }
 
 #[cfg(test)]
