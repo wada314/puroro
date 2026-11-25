@@ -14,6 +14,8 @@ puroro is an independent experiment. It is pre-1.0 and the API changes. Use `goo
 
 `.proto` files are compiled with the `protoc-gen-puroro` plugin (`protoc --puroro_out=…`). Install that crate's binary and leave it on `PATH`. Application code depends on the generated crate. Traits such as `Message` and `StringMut` are in that crate's `puroro` module. It should not import `puroro-rt`.
 
+Generated `google.protobuf` descriptor messages and common well-known types live in the sibling [`puroro-types`](puroro-types/) crate (optional; `puroro` does not depend on it). Its rustdoc is on [GitHub Pages](https://wada314.github.io/puroro/puroro_types/index.html).
+
 The interface specification is [DESIGN.md](https://github.com/wada314/puroro/blob/master/DESIGN.md). Generator internals are [IMPLEMENTATION.md](https://github.com/wada314/puroro/blob/master/IMPLEMENTATION.md).
 
 ## Status
@@ -134,9 +136,9 @@ protoc --plugin=protoc-gen-puroro=$PWD/target/debug/protoc-gen-puroro --puroro_o
 ## Out of scope
 
 - Extensions (`extend` / proto2 extension fields).
-- Services and RPC. The optional Cargo feature `tonic` exposes `puroro::tonic::PuroroCodec`; it does not generate service stubs.
-- Well-known types such as `google.protobuf.Any`, `Timestamp`, and `Duration`, unless you compile those `.proto` files yourself.
-- Full runtime reflection / `DynamicMessage`. Light identity (`Message::FULL_NAME`) is always on; encoded `FileDescriptorSet` bytes are an opt-in `descriptors` feature on generated crates (see `DESIGN.md` §3.1).
+- Service / RPC stub codegen. Message bytes can use the optional Cargo feature `tonic` (`puroro::tonic::PuroroCodec`); it does not generate service stubs.
+- Convenience helpers on well-known types (for example `Timestamp` ↔ time) and richer packing for `Any`. The message types themselves are in [`puroro-types`](puroro-types/).
+- Full runtime reflection / `DynamicMessage`. Light identity (`Message::FULL_NAME`) is always on; encoded `FileDescriptorSet` bytes are an opt-in `descriptors` feature on generated crates (see `DESIGN.md` §3.1). Parsed schema object graphs would sit above `puroro-types`, not in this crate.
 - A builder type separate from the message. Mutation is `let mut` plus `_mut` / `clear_*`.
 - Treating `(puroro.unknown_fields) = REJECT` as spec-compliant behavior. The default preserve store is the spec behavior. `DISCARD` accepts the message and drops the bytes.
 

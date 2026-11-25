@@ -22,7 +22,9 @@
 //!
 //! Generated crates may opt into a `descriptors` feature that embeds a
 //! `FileDescriptorSet` byte slice (`DESIGN.md` §3.1); that surface lives on
-//! the generated crate, not here.
+//! the generated crate, not here. Typed `google.protobuf` descriptor messages
+//! and well-known types are the sibling **`puroro-types`** crate (this crate
+//! does not depend on it).
 //!
 //! Generated messages expose proto fields as **inherent methods** on the concrete
 //! type (`title()`, `title_mut()`, `clear_title()`, …). Explicit-presence getters
