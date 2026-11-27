@@ -3,7 +3,8 @@
 Plan for generating gRPC client/server stubs from `service` / `rpc` definitions,
 wired to the existing `puroro::tonic::PuroroCodec` bridge.
 
-Status: shipped (v1). Stub-side / per-request custom allocator remains deferred.
+Status: shipped (v1). Deferred follow-ups: stub-side custom allocator, stub/message
+module-name clash guard, in-process tonic round-trip fixture (see Future work).
 
 ## Goal
 
@@ -33,14 +34,31 @@ tonic wiring; `Default` keeps the `Global` path that tonic-build's
   server, or thread an `A` through stub types. Codec-level `with_alloc` ships
   with this work for manual wiring only.
 
+- **Stub vs message companion module-name clash.** tonic-build emits
+  `{snake(Service)}_client` / `{snake(Service)}_server` beside package message
+  types. Message companions use the same snake scheme (`type_name_to_module_ident`),
+  so e.g. `service Greeter` + `message GreeterClient` both want `mod greeter_client`.
+  `package.append_items(...)` has no collision check today; the generated crate
+  then fails at `rustc`. Hellworld does not hit this. Before wider use: add a
+  resolve/emit guard (codegen error naming both entities), or document a naming
+  restriction. Leaving clashes to `rustc` alone is weak UX for a plugin.
+
+- **In-process tonic server+client round-trip fixture.** `grpc_helloworld` under
+  `--features tonic` only forces stub modules to compile (`type_name` on
+  `GreeterClient` / `GreeterServer`). That catches missing emit, not handler
+  signature or `PuroroCodec` wiring regressions. A small in-process unary
+  round-trip (implement `Greeter`, serve, call `SayHello`) would be much stronger;
+  optional for v1 once CI runs the compile-only cfg (it does).
+
 ## Current state
 
 | Piece | Status |
 |---|---|
-| `puroro` feature `tonic` / `PuroroCodec` | Shipped — message byte codec only |
-| `FileDescriptorProto.service` (field 6) in plugin IR | Skipped in `decode_file_descriptor` |
-| Resolve / FieldKind / emit for services | Absent |
-| DESIGN / README future-work bullet | Documents the gap |
+| `puroro` feature `tonic` / `PuroroCodec` | Shipped — `with_alloc`; `Default` → `Global` |
+| `FileDescriptorProto.service` + views | Shipped |
+| Resolve / emit tonic stubs | Shipped (v1); clash guard deferred |
+| `grpc_helloworld` fixture | Compile-only under `--features tonic`; round-trip deferred |
+| DESIGN / README / IMPLEMENTATION | Stub codegen marked shipped (v1) |
 
 Message types already default `A = Global`, so stub signatures can name
 `HelloRequest` without an explicit allocator parameter.
@@ -94,10 +112,11 @@ helloworld::greeter_server::{Greeter, GreeterServer}
 Same placement tonic-prost uses: stub modules sit beside message types in the
 package module. Naming: `to_snake_case(ServiceName) + "_client"/"_server"`.
 
-Collision note: a message companion `greeter` and stub mods `greeter_client` /
-`greeter_server` do not clash. Document that a proto entity must not claim those
-suffix module names (or leave clashes to `rustc`, consistent with today's merge
-rules).
+Collision note: `service Greeter` does not clash with companion `greeter` (the
+struct lives in the package module). The real risk is a message whose snake
+name equals a stub module — e.g. `message GreeterClient` → `greeter_client`
+alongside tonic's `{service}_client`. No generate-time guard yet; see Future
+work.
 
 ### Message types in stubs
 
