@@ -6,7 +6,7 @@
 //! [`crate::resolved::FileSet`] via [`crate::resolved::resolve`].
 //!
 //! Wire decoding stays in [`crate::plugin_io`] via [`crate::plugin_io::views`]
-//! (`FileDescriptorProto::name()`, …). This module is the owned codegen IR;
+//! (`FileDescriptorProto.name`, …). This module is the owned codegen IR;
 //! it is not `puroro-types` generated descriptor messages (that crate is a
 //! plugin output, not a plugin input).
 

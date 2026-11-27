@@ -1,9 +1,8 @@
 //! Parsed wire views over `descriptor.proto` / `plugin.proto` message bytes.
 //!
-//! [`parse()`](CodeGeneratorRequest::parse) walks each message body once, stores
-//! the fields this plugin needs, then getters return those values. Nested LEN
-//! messages are parsed recursively. This is not `puroro-types` generated code
-//! (bootstrap cycle).
+//! [`parse()`](CodeGeneratorRequest::parse) walks each message body once and
+//! fills public fields. Nested LEN messages are parsed recursively. This is not
+//! `puroro-types` generated code (bootstrap cycle).
 //!
 //! Singular fields are last-wins. Wrong wire types for a requested field are
 //! errors; other fields are ignored.
@@ -67,14 +66,6 @@ fn record_extension_enum(out: &mut Vec<(u32, i32)>, number: u32, value: i32) {
     }
 }
 
-fn extension_enum_get(stored: &[(u32, i32)], field_number: u32) -> Option<i32> {
-    stored
-        .iter()
-        .rev()
-        .find(|(n, _)| *n == field_number)
-        .map(|(_, v)| *v)
-}
-
 /// `google.protobuf.FileDescriptorSet` wire numbers (encode helper).
 #[derive(Debug, Clone, Copy)]
 pub struct FileDescriptorSet;
@@ -87,9 +78,9 @@ impl FileDescriptorSet {
 /// `google.protobuf.compiler.CodeGeneratorRequest` parsed view.
 #[derive(Debug, Clone)]
 pub struct CodeGeneratorRequest<'a> {
-    file_to_generate: Vec<&'a str>,
-    parameter: Option<&'a str>,
-    proto_file: Vec<FileDescriptorProto<'a>>,
+    pub file_to_generate: Vec<&'a str>,
+    pub parameter: Option<&'a str>,
+    pub proto_file: Vec<FileDescriptorProto<'a>>,
 }
 
 impl<'a> CodeGeneratorRequest<'a> {
@@ -120,33 +111,22 @@ impl<'a> CodeGeneratorRequest<'a> {
             })
         })
     }
-
-    pub fn file_to_generate(&self) -> &[&'a str] {
-        &self.file_to_generate
-    }
-
-    pub fn parameter(&self) -> Option<&'a str> {
-        self.parameter
-    }
-
-    pub fn proto_file(&self) -> &[FileDescriptorProto<'a>] {
-        &self.proto_file
-    }
 }
 
 /// `google.protobuf.FileDescriptorProto` parsed view.
 #[derive(Debug, Clone)]
 pub struct FileDescriptorProto<'a> {
-    bytes: &'a [u8],
-    name: Option<&'a str>,
-    package: Option<&'a str>,
-    dependency: Vec<&'a str>,
-    message_type: Vec<DescriptorProto<'a>>,
-    enum_type: Vec<EnumDescriptorProto<'a>>,
-    options: Option<FileOptions>,
-    source_code_info: Option<SourceCodeInfo<'a>>,
-    syntax: Option<&'a str>,
-    edition: Option<i32>,
+    /// Original message body bytes (for `FileDescriptorSet` re-encode).
+    pub bytes: &'a [u8],
+    pub name: Option<&'a str>,
+    pub package: Option<&'a str>,
+    pub dependency: Vec<&'a str>,
+    pub message_type: Vec<DescriptorProto<'a>>,
+    pub enum_type: Vec<EnumDescriptorProto<'a>>,
+    pub options: Option<FileOptions>,
+    pub source_code_info: Option<SourceCodeInfo<'a>>,
+    pub syntax: Option<&'a str>,
+    pub edition: Option<i32>,
 }
 
 impl<'a> FileDescriptorProto<'a> {
@@ -206,57 +186,17 @@ impl<'a> FileDescriptorProto<'a> {
             })
         })
     }
-
-    pub fn as_bytes(&self) -> &'a [u8] {
-        self.bytes
-    }
-
-    pub fn name(&self) -> Option<&'a str> {
-        self.name
-    }
-
-    pub fn package(&self) -> Option<&'a str> {
-        self.package
-    }
-
-    pub fn dependency(&self) -> &[&'a str] {
-        &self.dependency
-    }
-
-    pub fn message_type(&self) -> &[DescriptorProto<'a>] {
-        &self.message_type
-    }
-
-    pub fn enum_type(&self) -> &[EnumDescriptorProto<'a>] {
-        &self.enum_type
-    }
-
-    pub fn options(&self) -> Option<&FileOptions> {
-        self.options.as_ref()
-    }
-
-    pub fn source_code_info(&self) -> Option<&SourceCodeInfo<'a>> {
-        self.source_code_info.as_ref()
-    }
-
-    pub fn syntax(&self) -> Option<&'a str> {
-        self.syntax
-    }
-
-    pub fn edition(&self) -> Option<i32> {
-        self.edition
-    }
 }
 
 /// `google.protobuf.DescriptorProto` parsed view.
 #[derive(Debug, Clone)]
 pub struct DescriptorProto<'a> {
-    name: Option<&'a str>,
-    field: Vec<FieldDescriptorProto<'a>>,
-    nested_type: Vec<DescriptorProto<'a>>,
-    enum_type: Vec<EnumDescriptorProto<'a>>,
-    options: Option<MessageOptions>,
-    oneof_decl: Vec<OneofDescriptorProto<'a>>,
+    pub name: Option<&'a str>,
+    pub field: Vec<FieldDescriptorProto<'a>>,
+    pub nested_type: Vec<DescriptorProto<'a>>,
+    pub enum_type: Vec<EnumDescriptorProto<'a>>,
+    pub options: Option<MessageOptions>,
+    pub oneof_decl: Vec<OneofDescriptorProto<'a>>,
 }
 
 impl<'a> DescriptorProto<'a> {
@@ -299,44 +239,20 @@ impl<'a> DescriptorProto<'a> {
             })
         })
     }
-
-    pub fn name(&self) -> Option<&'a str> {
-        self.name
-    }
-
-    pub fn field(&self) -> &[FieldDescriptorProto<'a>] {
-        &self.field
-    }
-
-    pub fn nested_type(&self) -> &[DescriptorProto<'a>] {
-        &self.nested_type
-    }
-
-    pub fn enum_type(&self) -> &[EnumDescriptorProto<'a>] {
-        &self.enum_type
-    }
-
-    pub fn options(&self) -> Option<&MessageOptions> {
-        self.options.as_ref()
-    }
-
-    pub fn oneof_decl(&self) -> &[OneofDescriptorProto<'a>] {
-        &self.oneof_decl
-    }
 }
 
 /// `google.protobuf.FieldDescriptorProto` parsed view.
 #[derive(Debug, Clone)]
 pub struct FieldDescriptorProto<'a> {
-    name: Option<&'a str>,
-    number: Option<i32>,
-    label: Option<i32>,
-    type_: Option<i32>,
-    type_name: Option<&'a str>,
-    default_value: Option<&'a str>,
-    options: Option<FieldOptions>,
-    oneof_index: Option<i32>,
-    proto3_optional: Option<bool>,
+    pub name: Option<&'a str>,
+    pub number: Option<i32>,
+    pub label: Option<i32>,
+    pub type_: Option<i32>,
+    pub type_name: Option<&'a str>,
+    pub default_value: Option<&'a str>,
+    pub options: Option<FieldOptions>,
+    pub oneof_index: Option<i32>,
+    pub proto3_optional: Option<bool>,
 }
 
 impl<'a> FieldDescriptorProto<'a> {
@@ -389,48 +305,12 @@ impl<'a> FieldDescriptorProto<'a> {
             })
         })
     }
-
-    pub fn name(&self) -> Option<&'a str> {
-        self.name
-    }
-
-    pub fn number(&self) -> Option<i32> {
-        self.number
-    }
-
-    pub fn label(&self) -> Option<i32> {
-        self.label
-    }
-
-    pub fn type_(&self) -> Option<i32> {
-        self.type_
-    }
-
-    pub fn type_name(&self) -> Option<&'a str> {
-        self.type_name
-    }
-
-    pub fn default_value(&self) -> Option<&'a str> {
-        self.default_value
-    }
-
-    pub fn options(&self) -> Option<&FieldOptions> {
-        self.options.as_ref()
-    }
-
-    pub fn oneof_index(&self) -> Option<i32> {
-        self.oneof_index
-    }
-
-    pub fn proto3_optional(&self) -> Option<bool> {
-        self.proto3_optional
-    }
 }
 
 /// `google.protobuf.OneofDescriptorProto` parsed view.
 #[derive(Debug, Clone)]
 pub struct OneofDescriptorProto<'a> {
-    name: Option<&'a str>,
+    pub name: Option<&'a str>,
 }
 
 impl<'a> OneofDescriptorProto<'a> {
@@ -448,18 +328,14 @@ impl<'a> OneofDescriptorProto<'a> {
             Ok(Self { name })
         })
     }
-
-    pub fn name(&self) -> Option<&'a str> {
-        self.name
-    }
 }
 
 /// `google.protobuf.EnumDescriptorProto` parsed view.
 #[derive(Debug, Clone)]
 pub struct EnumDescriptorProto<'a> {
-    name: Option<&'a str>,
-    value: Vec<EnumValueDescriptorProto<'a>>,
-    options: Option<EnumOptions>,
+    pub name: Option<&'a str>,
+    pub value: Vec<EnumValueDescriptorProto<'a>>,
+    pub options: Option<EnumOptions>,
 }
 
 impl<'a> EnumDescriptorProto<'a> {
@@ -490,25 +366,13 @@ impl<'a> EnumDescriptorProto<'a> {
             })
         })
     }
-
-    pub fn name(&self) -> Option<&'a str> {
-        self.name
-    }
-
-    pub fn value(&self) -> &[EnumValueDescriptorProto<'a>] {
-        &self.value
-    }
-
-    pub fn options(&self) -> Option<&EnumOptions> {
-        self.options.as_ref()
-    }
 }
 
 /// `google.protobuf.EnumValueDescriptorProto` parsed view.
 #[derive(Debug, Clone)]
 pub struct EnumValueDescriptorProto<'a> {
-    name: Option<&'a str>,
-    number: Option<i32>,
+    pub name: Option<&'a str>,
+    pub number: Option<i32>,
 }
 
 impl<'a> EnumValueDescriptorProto<'a> {
@@ -530,20 +394,12 @@ impl<'a> EnumValueDescriptorProto<'a> {
             Ok(Self { name, number })
         })
     }
-
-    pub fn name(&self) -> Option<&'a str> {
-        self.name
-    }
-
-    pub fn number(&self) -> Option<i32> {
-        self.number
-    }
 }
 
 /// `google.protobuf.FileOptions` parsed view (subset).
 #[derive(Debug, Clone)]
 pub struct FileOptions {
-    features: Option<FeatureSet>,
+    pub features: Option<FeatureSet>,
 }
 
 impl FileOptions {
@@ -561,18 +417,15 @@ impl FileOptions {
             Ok(Self { features })
         })
     }
-
-    pub fn features(&self) -> Option<&FeatureSet> {
-        self.features.as_ref()
-    }
 }
 
 /// `google.protobuf.MessageOptions` parsed view (subset + custom enum extensions).
 #[derive(Debug, Clone)]
 pub struct MessageOptions {
-    map_entry: Option<bool>,
-    features: Option<FeatureSet>,
-    extension_enums: Vec<(u32, i32)>,
+    pub map_entry: Option<bool>,
+    pub features: Option<FeatureSet>,
+    /// Last-wins varint extensions keyed by field number.
+    pub extension_enums: Vec<(u32, i32)>,
 }
 
 impl MessageOptions {
@@ -604,25 +457,22 @@ impl MessageOptions {
         })
     }
 
-    pub fn map_entry(&self) -> Option<bool> {
-        self.map_entry
-    }
-
-    pub fn features(&self) -> Option<&FeatureSet> {
-        self.features.as_ref()
-    }
-
     pub fn extension_enum(&self, field_number: u32) -> Option<i32> {
-        extension_enum_get(&self.extension_enums, field_number)
+        self.extension_enums
+            .iter()
+            .rev()
+            .find(|(n, _)| *n == field_number)
+            .map(|(_, v)| *v)
     }
 }
 
 /// `google.protobuf.FieldOptions` parsed view (subset + custom enum extensions).
 #[derive(Debug, Clone)]
 pub struct FieldOptions {
-    packed: Option<bool>,
-    features: Option<FeatureSet>,
-    extension_enums: Vec<(u32, i32)>,
+    pub packed: Option<bool>,
+    pub features: Option<FeatureSet>,
+    /// Last-wins varint extensions keyed by field number.
+    pub extension_enums: Vec<(u32, i32)>,
 }
 
 impl FieldOptions {
@@ -654,24 +504,21 @@ impl FieldOptions {
         })
     }
 
-    pub fn packed(&self) -> Option<bool> {
-        self.packed
-    }
-
-    pub fn features(&self) -> Option<&FeatureSet> {
-        self.features.as_ref()
-    }
-
     pub fn extension_enum(&self, field_number: u32) -> Option<i32> {
-        extension_enum_get(&self.extension_enums, field_number)
+        self.extension_enums
+            .iter()
+            .rev()
+            .find(|(n, _)| *n == field_number)
+            .map(|(_, v)| *v)
     }
 }
 
 /// `google.protobuf.EnumOptions` parsed view (subset + custom enum extensions).
 #[derive(Debug, Clone)]
 pub struct EnumOptions {
-    features: Option<FeatureSet>,
-    extension_enums: Vec<(u32, i32)>,
+    pub features: Option<FeatureSet>,
+    /// Last-wins varint extensions keyed by field number.
+    pub extension_enums: Vec<(u32, i32)>,
 }
 
 impl EnumOptions {
@@ -699,26 +546,26 @@ impl EnumOptions {
         })
     }
 
-    pub fn features(&self) -> Option<&FeatureSet> {
-        self.features.as_ref()
-    }
-
     pub fn extension_enum(&self, field_number: u32) -> Option<i32> {
-        extension_enum_get(&self.extension_enums, field_number)
+        self.extension_enums
+            .iter()
+            .rev()
+            .find(|(n, _)| *n == field_number)
+            .map(|(_, v)| *v)
     }
 }
 
 /// `google.protobuf.FeatureSet` parsed view (owned scalars; no borrow).
 #[derive(Debug, Clone, Default)]
 pub struct FeatureSet {
-    field_presence: Option<i32>,
-    enum_type: Option<i32>,
-    repeated_field_encoding: Option<i32>,
-    utf8_validation: Option<i32>,
-    message_encoding: Option<i32>,
-    json_format: Option<i32>,
-    enforce_naming_style: Option<i32>,
-    default_symbol_visibility: Option<i32>,
+    pub field_presence: Option<i32>,
+    pub enum_type: Option<i32>,
+    pub repeated_field_encoding: Option<i32>,
+    pub utf8_validation: Option<i32>,
+    pub message_encoding: Option<i32>,
+    pub json_format: Option<i32>,
+    pub enforce_naming_style: Option<i32>,
+    pub default_symbol_visibility: Option<i32>,
 }
 
 impl FeatureSet {
@@ -758,44 +605,12 @@ impl FeatureSet {
             Ok(out)
         })
     }
-
-    pub fn field_presence(&self) -> Option<i32> {
-        self.field_presence
-    }
-
-    pub fn enum_type(&self) -> Option<i32> {
-        self.enum_type
-    }
-
-    pub fn repeated_field_encoding(&self) -> Option<i32> {
-        self.repeated_field_encoding
-    }
-
-    pub fn utf8_validation(&self) -> Option<i32> {
-        self.utf8_validation
-    }
-
-    pub fn message_encoding(&self) -> Option<i32> {
-        self.message_encoding
-    }
-
-    pub fn json_format(&self) -> Option<i32> {
-        self.json_format
-    }
-
-    pub fn enforce_naming_style(&self) -> Option<i32> {
-        self.enforce_naming_style
-    }
-
-    pub fn default_symbol_visibility(&self) -> Option<i32> {
-        self.default_symbol_visibility
-    }
 }
 
 /// `google.protobuf.SourceCodeInfo` parsed view.
 #[derive(Debug, Clone)]
 pub struct SourceCodeInfo<'a> {
-    location: Vec<SourceCodeInfoLocation<'a>>,
+    pub location: Vec<SourceCodeInfoLocation<'a>>,
 }
 
 impl<'a> SourceCodeInfo<'a> {
@@ -813,18 +628,14 @@ impl<'a> SourceCodeInfo<'a> {
             Ok(Self { location })
         })
     }
-
-    pub fn location(&self) -> &[SourceCodeInfoLocation<'a>] {
-        &self.location
-    }
 }
 
 /// `google.protobuf.SourceCodeInfo.Location` parsed view.
 #[derive(Debug, Clone)]
 pub struct SourceCodeInfoLocation<'a> {
-    path: Vec<i32>,
-    leading_comments: Option<&'a str>,
-    trailing_comments: Option<&'a str>,
+    pub path: Vec<i32>,
+    pub leading_comments: Option<&'a str>,
+    pub trailing_comments: Option<&'a str>,
 }
 
 impl<'a> SourceCodeInfoLocation<'a> {
@@ -852,17 +663,5 @@ impl<'a> SourceCodeInfoLocation<'a> {
                 trailing_comments,
             })
         })
-    }
-
-    pub fn path(&self) -> &[i32] {
-        &self.path
-    }
-
-    pub fn leading_comments(&self) -> Option<&'a str> {
-        self.leading_comments
-    }
-
-    pub fn trailing_comments(&self) -> Option<&'a str> {
-        self.trailing_comments
     }
 }
