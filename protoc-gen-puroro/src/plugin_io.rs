@@ -8,7 +8,7 @@
 //! stays a hand-written subset decoder and does not use `puroro-types`
 //! generated messages (bootstrap cycle).
 
-pub(crate) mod fields;
+pub mod fields;
 
 use self::fields::{
     code_generator_request, code_generator_response, descriptor_proto, enum_descriptor_proto,
