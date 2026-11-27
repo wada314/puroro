@@ -140,7 +140,7 @@ protoc --plugin=protoc-gen-puroro=$PWD/target/debug/protoc-gen-puroro --puroro_o
 
 Open items (not permanent refusals). The full list is [DESIGN.md §8](https://github.com/wada314/puroro/blob/master/DESIGN.md#8-future-work).
 
-- Service / RPC stub codegen (in progress). Message bytes use the optional Cargo feature `tonic` (`puroro::tonic::PuroroCodec`); plugin stub emission is underway. Generated stubs stay on `Global`; per-request custom allocators in stubs are deferred.
+- Service / RPC stub codegen: shipped (v1). Plugin emits cfg-gated tonic client/server stubs (`--puroro_opt` / generated-crate feature `tonic`) on `puroro::tonic::PuroroCodec`. Stubs stay on `Global`; per-request custom allocators in stubs are deferred.
 - Richer packing for `Any` on well-known types. `Timestamp` ↔ `SystemTime` and `Duration` ↔ `std::time::Duration` helpers already live in [`puroro-types`](puroro-types/).
 - Full runtime reflection / `DynamicMessage` and parsed descriptor object graphs. Light identity (`Message::FULL_NAME`) is always on; encoded `FileDescriptorSet` bytes are an opt-in `descriptors` feature on generated crates (see `DESIGN.md` §3.1). A reflect layer would sit above `puroro-types`, not in this crate.
 - Extensions (`extend` / proto2 extension fields). Deferred; see [DESIGN.md §6.5](https://github.com/wada314/puroro/blob/master/DESIGN.md#65-extensions-not-yet-implemented).

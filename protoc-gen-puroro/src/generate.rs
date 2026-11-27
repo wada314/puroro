@@ -120,7 +120,8 @@ fn parse_generate_options(parameter: Option<&str>) -> Result<GenerateOptions> {
 
 impl GenerateOptions {
     fn tonic_emit(&self) -> Option<TonicEmitOptions> {
-        if !self.tonic {
+        // Both sides off means no stub modules — do not inject a tonic dep either.
+        if !self.tonic || (!self.tonic_client && !self.tonic_server) {
             return None;
         }
         Some(TonicEmitOptions {
@@ -1276,9 +1277,8 @@ mod tests {
         );
     }
 
-    #[test]
-    fn tonic_false_skips_service_stubs() {
-        let mut request = desc::request(vec![ProtoFile {
+    fn greeter_service_request() -> CodegenRequest {
+        desc::request(vec![ProtoFile {
             messages: vec![
                 MessageDesc {
                     fields: vec![desc::field("name", 1, FieldType::String)],
@@ -1298,7 +1298,12 @@ mod tests {
                 )],
             )],
             ..desc::proto_file("greeter.proto", "helloworld")
-        }]);
+        }])
+    }
+
+    #[test]
+    fn tonic_false_skips_service_stubs() {
+        let mut request = greeter_service_request();
         request.meta.parameter = Some("tonic=false".into());
         let response = generate(&request).expect("generate with tonic=false");
         let lib = response
@@ -1316,6 +1321,60 @@ mod tests {
         assert!(
             !manifest.content.contains("tonic ="),
             "no tonic dep when stubs suppressed"
+        );
+    }
+
+    #[test]
+    fn tonic_client_and_server_false_skips_tonic_dep() {
+        let mut request = greeter_service_request();
+        request.meta.parameter = Some("tonic_client=false,tonic_server=false".into());
+        let response = generate(&request).expect("generate with both sides off");
+        let lib = response
+            .files
+            .iter()
+            .find(|f| f.name == "lib.rs")
+            .expect("lib.rs");
+        assert!(!lib.content.contains("GreeterClient"));
+        assert!(!lib.content.contains("GreeterServer"));
+        let manifest = response
+            .files
+            .iter()
+            .find(|f| f.name == "Cargo.toml")
+            .expect("Cargo.toml");
+        assert!(
+            !manifest.content.contains("tonic ="),
+            "no tonic dep when neither stub side emits: {}",
+            manifest.content
+        );
+    }
+
+    #[test]
+    fn invalid_service_name_is_codegen_error() {
+        let request = desc::request(vec![ProtoFile {
+            messages: vec![
+                MessageDesc {
+                    fields: vec![desc::field("name", 1, FieldType::String)],
+                    ..desc::message("HelloRequest")
+                },
+                MessageDesc {
+                    fields: vec![desc::field("message", 1, FieldType::String)],
+                    ..desc::message("HelloReply")
+                },
+            ],
+            services: vec![desc::service(
+                "bad-name",
+                vec![desc::method(
+                    "SayHello",
+                    ProtoFqn::parse(".helloworld.HelloRequest"),
+                    ProtoFqn::parse(".helloworld.HelloReply"),
+                )],
+            )],
+            ..desc::proto_file("greeter.proto", "helloworld")
+        }]);
+        let err = generate(&request).expect_err("hyphenated service name");
+        assert!(
+            err.to_string().contains("service name"),
+            "expected service-name error, got: {err}"
         );
     }
 

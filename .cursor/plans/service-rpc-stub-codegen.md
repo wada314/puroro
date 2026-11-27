@@ -3,7 +3,7 @@
 Plan for generating gRPC client/server stubs from `service` / `rpc` definitions,
 wired to the existing `puroro::tonic::PuroroCodec` bridge.
 
-Status: implementation in progress.
+Status: shipped (v1). Stub-side / per-request custom allocator remains deferred.
 
 ## Goal
 

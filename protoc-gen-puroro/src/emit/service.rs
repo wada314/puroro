@@ -4,6 +4,7 @@
 //! Stub modules are sealed tonic style; we inject `mod _root` so request /
 //! response paths can use `self::_root::…` like the rest of the forest.
 
+use super::ident::is_simple_ident;
 use super::type_path::fqn_to_message_root_path;
 use crate::case::to_snake_case;
 use crate::error::{Error, Result};
@@ -39,6 +40,12 @@ struct TonicMethodSpec {
 
 impl TonicServiceSpec {
     fn from_resolved(service: &Service<'_>, package: &str) -> Result<Self> {
+        if !is_simple_ident(service.name()) {
+            return Err(Error::Codegen(format!(
+                "cannot use service name `{}` as a Rust identifier",
+                service.name()
+            )));
+        }
         let methods = service
             .methods()
             .map(|m| TonicMethodSpec::from_resolved(m))
@@ -55,6 +62,12 @@ impl TonicServiceSpec {
 
 impl TonicMethodSpec {
     fn from_resolved(method: &Method<'_>) -> Result<Self> {
+        if !is_simple_ident(method.name()) {
+            return Err(Error::Codegen(format!(
+                "cannot use method name `{}` as a Rust identifier",
+                method.name()
+            )));
+        }
         let request = {
             let path = fqn_to_message_root_path(method.input())?;
             quote! { #path }
