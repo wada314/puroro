@@ -3,11 +3,11 @@
 //! Decodes only the fields needed to build [`crate::descriptor::CodegenRequest`],
 //! and encodes a minimal [`CodeGeneratorResponse`].
 //!
-//! Decode walks wire bytes through [`views`] (`FileDescriptorProto::name()`, …) —
-//! thin wrappers that look up a field number via `protobuf-core`. Field numbers
-//! live as associated constants on those wrappers (and on the encode types
-//! below). The structured IR is [`crate::descriptor`]; this module does not use
-//! `puroro-types` generated messages (bootstrap cycle).
+//! Decode walks wire bytes through [`views`]: each message is [`parse`](views::FileDescriptorProto::parse)d
+//! once into a wrapper that stores field values, then getters return those
+//! values. Field numbers live as associated constants on the wrappers (and on
+//! the encode types below). The structured IR is [`crate::descriptor`]; this
+//! module does not use `puroro-types` generated messages (bootstrap cycle).
 
 pub mod views;
 
@@ -129,19 +129,19 @@ impl CodeGeneratorResponse {
 /// Decode `CodeGeneratorRequest` bytes into descriptor + metadata.
 pub fn decode_request(bytes: &[u8]) -> Result<CodegenRequest> {
     with_decoding_context("CodeGeneratorRequest", || {
-        let request = CodeGeneratorRequestView::new(bytes);
+        let request = CodeGeneratorRequestView::parse(bytes)?;
         let file_to_generate = request
-            .file_to_generate()?
-            .into_iter()
+            .file_to_generate()
+            .iter()
+            .copied()
             .map(str::to_owned)
             .collect();
-        let parameter = request.parameter()?.map(str::to_owned);
+        let parameter = request.parameter().map(str::to_owned);
         let mut proto_files = Vec::new();
         let mut proto_file_raw = Vec::new();
-        for file in request.proto_file()? {
-            let raw = file.as_bytes().to_vec();
+        for file in request.proto_file() {
+            proto_file_raw.push(file.as_bytes().to_vec());
             proto_files.push(decode_file_descriptor(file)?);
-            proto_file_raw.push(raw);
         }
         Ok(CodegenRequest {
             meta: CodegenMeta {
@@ -166,33 +166,38 @@ pub fn encode_file_descriptor_set(proto_file_raw: &[Vec<u8>]) -> Result<Vec<u8>>
     Ok(out)
 }
 
-fn decode_file_descriptor(file: FileDescriptorProto<'_>) -> Result<ProtoFile> {
+fn decode_file_descriptor(file: &FileDescriptorProto<'_>) -> Result<ProtoFile> {
     with_decoding_context("FileDescriptorProto", || {
-        let name = file.name()?.unwrap_or("").to_owned();
-        let package = file.package()?.unwrap_or("").to_owned();
-        let dependency = file.dependency()?.into_iter().map(str::to_owned).collect();
+        let name = file.name().unwrap_or("").to_owned();
+        let package = file.package().unwrap_or("").to_owned();
+        let dependency = file
+            .dependency()
+            .iter()
+            .copied()
+            .map(str::to_owned)
+            .collect();
         let mut messages = Vec::new();
-        for message in file.message_type()? {
+        for message in file.message_type() {
             messages.push(decode_descriptor(message)?);
         }
         let mut enums = Vec::new();
-        for enumeration in file.enum_type()? {
+        for enumeration in file.enum_type() {
             enums.push(decode_enum(enumeration)?);
         }
-        let features = match file.options()? {
-            Some(options) => {
-                with_decoding_context("FileOptions", || match options.features()? {
-                    Some(fs) => decode_feature_set(fs),
-                    None => Ok(FeatureSet::default()),
-                })?
-            }
+        let features = match file.options() {
+            Some(options) => with_decoding_context("FileOptions", || {
+                Ok(match options.features() {
+                    Some(fs) => decode_feature_set(fs)?,
+                    None => FeatureSet::default(),
+                })
+            })?,
             None => FeatureSet::default(),
         };
-        let source_locations = match file.source_code_info()? {
+        let source_locations = match file.source_code_info() {
             Some(info) => decode_source_code_info(info)?,
             None => Vec::new(),
         };
-        let syntax = resolve_syntax(file.syntax()?, file.edition()?)?;
+        let syntax = resolve_syntax(file.syntax(), file.edition())?;
 
         let mut out = ProtoFile {
             name,
@@ -229,26 +234,26 @@ fn resolve_syntax(syntax_raw: Option<&str>, edition_raw: Option<i32>) -> Result<
     }
 }
 
-fn decode_descriptor(message: DescriptorProto<'_>) -> Result<MessageDesc> {
+fn decode_descriptor(message: &DescriptorProto<'_>) -> Result<MessageDesc> {
     with_decoding_context("DescriptorProto", || {
-        let name = message.name()?.unwrap_or("").to_owned();
+        let name = message.name().unwrap_or("").to_owned();
         let mut fields = Vec::new();
-        for field in message.field()? {
+        for field in message.field() {
             fields.push(decode_field(field)?);
         }
         let mut nested_messages = Vec::new();
-        for nested in message.nested_type()? {
+        for nested in message.nested_type() {
             nested_messages.push(decode_descriptor(nested)?);
         }
         let mut nested_enums = Vec::new();
-        for enumeration in message.enum_type()? {
+        for enumeration in message.enum_type() {
             nested_enums.push(decode_enum(enumeration)?);
         }
         let mut oneofs = Vec::new();
-        for oneof in message.oneof_decl()? {
+        for oneof in message.oneof_decl() {
             oneofs.push(decode_oneof(oneof)?);
         }
-        let decoded = match message.options()? {
+        let decoded = match message.options() {
             Some(options) => decode_message_options(options)?,
             None => DecodedMessageOptions::default(),
         };
@@ -277,21 +282,21 @@ struct DecodedMessageOptions {
 }
 
 /// `MessageOptions`: `map_entry`, `features`, and puroro extensions.
-fn decode_message_options(options: views::MessageOptions<'_>) -> Result<DecodedMessageOptions> {
+fn decode_message_options(options: &views::MessageOptions) -> Result<DecodedMessageOptions> {
     with_decoding_context("MessageOptions", || {
         Ok(DecodedMessageOptions {
-            map_entry: options.map_entry()?.unwrap_or(false),
+            map_entry: options.map_entry().unwrap_or(false),
             unknown_fields: enum_from_i32_opt(
-                options.extension_enum(UNKNOWN_FIELDS_OPTION_NUMBER)?,
+                options.extension_enum(UNKNOWN_FIELDS_OPTION_NUMBER),
                 UNKNOWN_FIELDS_OPTION_NUMBER,
             )?
             .unwrap_or_default(),
             child_parse: enum_from_i32_opt(
-                options.extension_enum(CHILD_PARSE_OPTION_NUMBER)?,
+                options.extension_enum(CHILD_PARSE_OPTION_NUMBER),
                 CHILD_PARSE_OPTION_NUMBER,
             )?
             .unwrap_or_default(),
-            features: match options.features()? {
+            features: match options.features() {
                 Some(fs) => decode_feature_set(fs)?,
                 None => FeatureSet::default(),
             },
@@ -299,19 +304,19 @@ fn decode_message_options(options: views::MessageOptions<'_>) -> Result<DecodedM
     })
 }
 
-fn decode_field(field: FieldDescriptorProto<'_>) -> Result<FieldDesc> {
+fn decode_field(field: &FieldDescriptorProto<'_>) -> Result<FieldDesc> {
     with_decoding_context("FieldDescriptorProto", || {
-        let name = field.name()?.unwrap_or("").to_owned();
-        let number = field.number()?.unwrap_or(0);
-        let label = enum_from_i32_opt(field.label()?, FieldDescriptorProto::LABEL)?
+        let name = field.name().unwrap_or("").to_owned();
+        let number = field.number().unwrap_or(0);
+        let label = enum_from_i32_opt(field.label(), FieldDescriptorProto::LABEL)?
             .unwrap_or(FieldLabel::Optional);
-        let type_ = enum_from_i32_opt(field.type_()?, FieldDescriptorProto::TYPE)?
+        let type_ = enum_from_i32_opt(field.type_(), FieldDescriptorProto::TYPE)?
             .unwrap_or(FieldType::Int32);
-        let type_name = field.type_name()?.map(ProtoFqn::parse);
-        let default_value = field.default_value()?.map(str::to_owned);
-        let oneof_index = field.oneof_index()?;
-        let proto3_optional = field.proto3_optional()?.unwrap_or(false);
-        let decoded = match field.options()? {
+        let type_name = field.type_name().map(ProtoFqn::parse);
+        let default_value = field.default_value().map(str::to_owned);
+        let oneof_index = field.oneof_index();
+        let proto3_optional = field.proto3_optional().unwrap_or(false);
+        let decoded = match field.options() {
             Some(options) => decode_field_options(options)?,
             None => DecodedFieldOptions::default(),
         };
@@ -347,87 +352,84 @@ struct DecodedFieldOptions {
 }
 
 /// `FieldOptions`: `packed`, `features`, and puroro layout extensions.
-fn decode_field_options(options: views::FieldOptions<'_>) -> Result<DecodedFieldOptions> {
+fn decode_field_options(options: &views::FieldOptions) -> Result<DecodedFieldOptions> {
     with_decoding_context("FieldOptions", || {
         Ok(DecodedFieldOptions {
-            features: match options.features()? {
+            features: match options.features() {
                 Some(fs) => decode_feature_set(fs)?,
                 None => FeatureSet::default(),
             },
-            packed: options.packed()?,
+            packed: options.packed(),
             string_layout: enum_from_i32_opt(
-                options.extension_enum(STRING_LAYOUT_OPTION_NUMBER)?,
+                options.extension_enum(STRING_LAYOUT_OPTION_NUMBER),
                 STRING_LAYOUT_OPTION_NUMBER,
             )?,
             bytes_layout: enum_from_i32_opt(
-                options.extension_enum(BYTES_LAYOUT_OPTION_NUMBER)?,
+                options.extension_enum(BYTES_LAYOUT_OPTION_NUMBER),
                 BYTES_LAYOUT_OPTION_NUMBER,
             )?,
             message_layout: enum_from_i32_opt(
-                options.extension_enum(MESSAGE_LAYOUT_OPTION_NUMBER)?,
+                options.extension_enum(MESSAGE_LAYOUT_OPTION_NUMBER),
                 MESSAGE_LAYOUT_OPTION_NUMBER,
             )?,
             child_parse: enum_from_i32_opt(
-                options.extension_enum(CHILD_PARSE_OPTION_NUMBER)?,
+                options.extension_enum(CHILD_PARSE_OPTION_NUMBER),
                 CHILD_PARSE_OPTION_NUMBER,
             )?,
         })
     })
 }
 
-fn decode_feature_set(features: views::FeatureSet<'_>) -> Result<FeatureSet> {
+fn decode_feature_set(features: &views::FeatureSet) -> Result<FeatureSet> {
     with_decoding_context("FeatureSet", || {
         Ok(FeatureSet {
             field_presence: enum_from_i32_opt(
-                features.field_presence()?,
+                features.field_presence(),
                 views::FeatureSet::FIELD_PRESENCE,
             )?,
-            enum_type: enum_from_i32_opt(features.enum_type()?, views::FeatureSet::ENUM_TYPE)?,
+            enum_type: enum_from_i32_opt(features.enum_type(), views::FeatureSet::ENUM_TYPE)?,
             repeated_field_encoding: enum_from_i32_opt(
-                features.repeated_field_encoding()?,
+                features.repeated_field_encoding(),
                 views::FeatureSet::REPEATED_FIELD_ENCODING,
             )?,
             utf8_validation: enum_from_i32_opt(
-                features.utf8_validation()?,
+                features.utf8_validation(),
                 views::FeatureSet::UTF8_VALIDATION,
             )?,
             message_encoding: enum_from_i32_opt(
-                features.message_encoding()?,
+                features.message_encoding(),
                 views::FeatureSet::MESSAGE_ENCODING,
             )?,
-            json_format: enum_from_i32_opt(
-                features.json_format()?,
-                views::FeatureSet::JSON_FORMAT,
-            )?,
+            json_format: enum_from_i32_opt(features.json_format(), views::FeatureSet::JSON_FORMAT)?,
             enforce_naming_style: enum_from_i32_opt(
-                features.enforce_naming_style()?,
+                features.enforce_naming_style(),
                 views::FeatureSet::ENFORCE_NAMING_STYLE,
             )?,
             default_symbol_visibility: enum_from_i32_opt(
-                features.default_symbol_visibility()?,
+                features.default_symbol_visibility(),
                 views::FeatureSet::DEFAULT_SYMBOL_VISIBILITY,
             )?,
         })
     })
 }
 
-fn decode_oneof(oneof: OneofDescriptorProto<'_>) -> Result<OneofDesc> {
+fn decode_oneof(oneof: &OneofDescriptorProto<'_>) -> Result<OneofDesc> {
     with_decoding_context("OneofDescriptorProto", || {
         Ok(OneofDesc {
-            name: oneof.name()?.unwrap_or("").to_owned(),
+            name: oneof.name().unwrap_or("").to_owned(),
             comments: Comments::default(),
         })
     })
 }
 
-fn decode_enum(enumeration: EnumDescriptorProto<'_>) -> Result<EnumDesc> {
+fn decode_enum(enumeration: &EnumDescriptorProto<'_>) -> Result<EnumDesc> {
     with_decoding_context("EnumDescriptorProto", || {
-        let name = enumeration.name()?.unwrap_or("").to_owned();
+        let name = enumeration.name().unwrap_or("").to_owned();
         let mut values = Vec::new();
-        for value in enumeration.value()? {
+        for value in enumeration.value() {
             values.push(decode_enum_value(value)?);
         }
-        let decoded = match enumeration.options()? {
+        let decoded = match enumeration.options() {
             Some(options) => decode_enum_options(options)?,
             None => DecodedEnumOptions::default(),
         };
@@ -448,15 +450,15 @@ struct DecodedEnumOptions {
 }
 
 /// `EnumOptions`: `features` and `(puroro.enum_repr)`.
-fn decode_enum_options(options: views::EnumOptions<'_>) -> Result<DecodedEnumOptions> {
+fn decode_enum_options(options: &views::EnumOptions) -> Result<DecodedEnumOptions> {
     with_decoding_context("EnumOptions", || {
         Ok(DecodedEnumOptions {
-            features: match options.features()? {
+            features: match options.features() {
                 Some(fs) => decode_feature_set(fs)?,
                 None => FeatureSet::default(),
             },
             enum_repr: enum_from_i32_opt(
-                options.extension_enum(ENUM_REPR_OPTION_NUMBER)?,
+                options.extension_enum(ENUM_REPR_OPTION_NUMBER),
                 ENUM_REPR_OPTION_NUMBER,
             )?
             .unwrap_or_default(),
@@ -464,11 +466,11 @@ fn decode_enum_options(options: views::EnumOptions<'_>) -> Result<DecodedEnumOpt
     })
 }
 
-fn decode_enum_value(value: EnumValueDescriptorProto<'_>) -> Result<EnumValueDesc> {
+fn decode_enum_value(value: &EnumValueDescriptorProto<'_>) -> Result<EnumValueDesc> {
     with_decoding_context("EnumValueDescriptorProto", || {
         Ok(EnumValueDesc {
-            name: value.name()?.unwrap_or("").to_owned(),
-            number: value.number()?.unwrap_or(0),
+            name: value.name().unwrap_or("").to_owned(),
+            number: value.number().unwrap_or(0),
             comments: Comments::default(),
         })
     })
@@ -480,10 +482,10 @@ struct SourceLocation {
     comments: Comments,
 }
 
-fn decode_source_code_info(info: SourceCodeInfo<'_>) -> Result<Vec<SourceLocation>> {
+fn decode_source_code_info(info: &SourceCodeInfo<'_>) -> Result<Vec<SourceLocation>> {
     with_decoding_context("SourceCodeInfo", || {
         let mut locations = Vec::new();
-        for loc in info.location()? {
+        for loc in info.location() {
             if let Some(decoded) = decode_source_location(loc)? {
                 locations.push(decoded);
             }
@@ -493,18 +495,20 @@ fn decode_source_code_info(info: SourceCodeInfo<'_>) -> Result<Vec<SourceLocatio
 }
 
 fn decode_source_location(
-    loc: views::SourceCodeInfoLocation<'_>,
+    loc: &views::SourceCodeInfoLocation<'_>,
 ) -> Result<Option<SourceLocation>> {
     with_decoding_context("SourceCodeInfo.Location", || {
-        let path = loc.path()?;
         let comments = Comments {
-            leading: loc.leading_comments()?.map(str::to_owned),
-            trailing: loc.trailing_comments()?.map(str::to_owned),
+            leading: loc.leading_comments().map(str::to_owned),
+            trailing: loc.trailing_comments().map(str::to_owned),
         };
         if comments.is_empty() {
             Ok(None)
         } else {
-            Ok(Some(SourceLocation { path, comments }))
+            Ok(Some(SourceLocation {
+                path: loc.path().to_vec(),
+                comments,
+            }))
         }
     })
 }

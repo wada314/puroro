@@ -1,127 +1,78 @@
-//! Thin wire views over `descriptor.proto` / `plugin.proto` message bytes.
+//! Parsed wire views over `descriptor.proto` / `plugin.proto` message bytes.
 //!
-//! Each type wraps a message LEN body (`&[u8]`) and exposes named getters that
-//! look up a field number via [`protobuf_core::AsRefExtProtobuf`]. Field numbers
-//! are `pub(crate)` associated constants on the same type (for example
-//! `FileDescriptorProto::NAME`). This is not `puroro-types` generated code
-//! (bootstrap cycle); it is a hand-written subset of the official field layout.
+//! [`parse()`](CodeGeneratorRequest::parse) walks each message body once, stores
+//! the fields this plugin needs, then getters return those values. Nested LEN
+//! messages are parsed recursively. This is not `puroro-types` generated code
+//! (bootstrap cycle).
 //!
-//! Singular getters are last-wins. Wrong wire types for a requested field are
+//! Singular fields are last-wins. Wrong wire types for a requested field are
 //! errors; other fields are ignored.
 
 use crate::error::{Error, Result};
 use ::protobuf_core::{AsRefExtProtobuf, Field, FieldValue, ReadExtVarint};
 use ::std::str;
 
-/// Shared helpers for last-wins / repeated field lookups on a message body.
-mod raw {
-    use super::*;
+fn while_decoding<T>(message: &'static str, f: impl FnOnce() -> Result<T>) -> Result<T> {
+    f().map_err(|e| e.while_decoding(message))
+}
 
-    pub(super) fn last_len(bytes: &[u8], number: u32) -> Result<Option<&[u8]>> {
-        let mut found = None;
-        for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
-            let field = field?;
-            if field.field_number.as_u32() == number {
-                found = Some(expect_len(&field)?);
+fn expect_len<'a>(field: &Field<&'a [u8]>) -> Result<&'a [u8]> {
+    match &field.value {
+        FieldValue::Len(bytes) => Ok(*bytes),
+        _ => Err(Error::unexpected_field(field.field_number.as_u32())),
+    }
+}
+
+fn expect_str<'a>(field: &Field<&'a [u8]>) -> Result<&'a str> {
+    Ok(str::from_utf8(expect_len(field)?)?)
+}
+
+fn expect_i32(field: &Field<&[u8]>) -> Result<i32> {
+    match &field.value {
+        FieldValue::Varint(v) => Ok(v.try_to_int32()?),
+        _ => Err(Error::unexpected_field(field.field_number.as_u32())),
+    }
+}
+
+fn expect_bool(field: &Field<&[u8]>) -> Result<bool> {
+    match &field.value {
+        FieldValue::Varint(v) => Ok(v.to_bool()),
+        _ => Err(Error::unexpected_field(field.field_number.as_u32())),
+    }
+}
+
+fn extend_i32s(out: &mut Vec<i32>, field: &Field<&[u8]>) -> Result<()> {
+    match &field.value {
+        FieldValue::Len(payload) => {
+            let mut slice: &[u8] = payload;
+            while !slice.is_empty() {
+                let varint = slice.read_varint()?;
+                out.push(varint.try_to_int32()?);
             }
+            Ok(())
         }
-        Ok(found)
+        FieldValue::Varint(v) => {
+            out.push(v.try_to_int32()?);
+            Ok(())
+        }
+        _ => Err(Error::unexpected_field(field.field_number.as_u32())),
     }
+}
 
-    pub(super) fn last_string(bytes: &[u8], number: u32) -> Result<Option<&str>> {
-        match last_len(bytes, number)? {
-            None => Ok(None),
-            Some(payload) => Ok(Some(str::from_utf8(payload)?)),
-        }
+fn record_extension_enum(out: &mut Vec<(u32, i32)>, number: u32, value: i32) {
+    if let Some((_, slot)) = out.iter_mut().rev().find(|(n, _)| *n == number) {
+        *slot = value;
+    } else {
+        out.push((number, value));
     }
+}
 
-    pub(super) fn last_i32(bytes: &[u8], number: u32) -> Result<Option<i32>> {
-        let mut found = None;
-        for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
-            let field = field?;
-            if field.field_number.as_u32() == number {
-                found = Some(expect_i32(&field)?);
-            }
-        }
-        Ok(found)
-    }
-
-    pub(super) fn last_bool(bytes: &[u8], number: u32) -> Result<Option<bool>> {
-        let mut found = None;
-        for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
-            let field = field?;
-            if field.field_number.as_u32() == number {
-                found = Some(expect_bool(&field)?);
-            }
-        }
-        Ok(found)
-    }
-
-    pub(super) fn repeated_strings(bytes: &[u8], number: u32) -> Result<Vec<&str>> {
-        let mut out = Vec::new();
-        for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
-            let field = field?;
-            if field.field_number.as_u32() == number {
-                out.push(str::from_utf8(expect_len(&field)?)?);
-            }
-        }
-        Ok(out)
-    }
-
-    pub(super) fn repeated_lens(bytes: &[u8], number: u32) -> Result<Vec<&[u8]>> {
-        let mut out = Vec::new();
-        for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
-            let field = field?;
-            if field.field_number.as_u32() == number {
-                out.push(expect_len(&field)?);
-            }
-        }
-        Ok(out)
-    }
-
-    /// Packed or unpacked `repeated int32`.
-    pub(super) fn repeated_i32s(bytes: &[u8], number: u32) -> Result<Vec<i32>> {
-        let mut out = Vec::new();
-        for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
-            let field = field?;
-            if field.field_number.as_u32() != number {
-                continue;
-            }
-            match &field.value {
-                FieldValue::Len(payload) => {
-                    let mut slice: &[u8] = payload;
-                    while !slice.is_empty() {
-                        let varint = slice.read_varint()?;
-                        out.push(varint.try_to_int32()?);
-                    }
-                }
-                FieldValue::Varint(v) => out.push(v.try_to_int32()?),
-                _ => return Err(Error::unexpected_field(field.field_number.as_u32())),
-            }
-        }
-        Ok(out)
-    }
-
-    fn expect_len<'a>(field: &Field<&'a [u8]>) -> Result<&'a [u8]> {
-        match &field.value {
-            FieldValue::Len(bytes) => Ok(*bytes),
-            _ => Err(Error::unexpected_field(field.field_number.as_u32())),
-        }
-    }
-
-    fn expect_i32(field: &Field<&[u8]>) -> Result<i32> {
-        match &field.value {
-            FieldValue::Varint(v) => Ok(v.try_to_int32()?),
-            _ => Err(Error::unexpected_field(field.field_number.as_u32())),
-        }
-    }
-
-    fn expect_bool(field: &Field<&[u8]>) -> Result<bool> {
-        match &field.value {
-            FieldValue::Varint(v) => Ok(v.to_bool()),
-            _ => Err(Error::unexpected_field(field.field_number.as_u32())),
-        }
-    }
+fn extension_enum_get(stored: &[(u32, i32)], field_number: u32) -> Option<i32> {
+    stored
+        .iter()
+        .rev()
+        .find(|(n, _)| *n == field_number)
+        .map(|(_, v)| *v)
 }
 
 /// `google.protobuf.FileDescriptorSet` wire numbers (encode helper).
@@ -133,10 +84,12 @@ impl FileDescriptorSet {
     pub(crate) const FILE: u32 = 1;
 }
 
-/// `google.protobuf.compiler.CodeGeneratorRequest` wire view.
-#[derive(Debug, Clone, Copy)]
+/// `google.protobuf.compiler.CodeGeneratorRequest` parsed view.
+#[derive(Debug, Clone)]
 pub struct CodeGeneratorRequest<'a> {
-    bytes: &'a [u8],
+    file_to_generate: Vec<&'a str>,
+    parameter: Option<&'a str>,
+    proto_file: Vec<FileDescriptorProto<'a>>,
 }
 
 impl<'a> CodeGeneratorRequest<'a> {
@@ -144,35 +97,56 @@ impl<'a> CodeGeneratorRequest<'a> {
     pub(crate) const PARAMETER: u32 = 2;
     pub(crate) const PROTO_FILE: u32 = 15;
 
-    pub fn new(bytes: &'a [u8]) -> Self {
-        Self { bytes }
+    pub fn parse(bytes: &'a [u8]) -> Result<Self> {
+        while_decoding("CodeGeneratorRequest", || {
+            let mut file_to_generate = Vec::new();
+            let mut parameter = None;
+            let mut proto_file = Vec::new();
+            for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
+                let field = field?;
+                match field.field_number.as_u32() {
+                    Self::FILE_TO_GENERATE => file_to_generate.push(expect_str(&field)?),
+                    Self::PARAMETER => parameter = Some(expect_str(&field)?),
+                    Self::PROTO_FILE => {
+                        proto_file.push(FileDescriptorProto::parse(expect_len(&field)?)?)
+                    }
+                    _ => {}
+                }
+            }
+            Ok(Self {
+                file_to_generate,
+                parameter,
+                proto_file,
+            })
+        })
     }
 
-    pub fn as_bytes(self) -> &'a [u8] {
-        self.bytes
+    pub fn file_to_generate(&self) -> &[&'a str] {
+        &self.file_to_generate
     }
 
-    /// `repeated string file_to_generate = 1;`
-    pub fn file_to_generate(self) -> Result<Vec<&'a str>> {
-        raw::repeated_strings(self.bytes, Self::FILE_TO_GENERATE)
+    pub fn parameter(&self) -> Option<&'a str> {
+        self.parameter
     }
 
-    /// `optional string parameter = 2;`
-    pub fn parameter(self) -> Result<Option<&'a str>> {
-        raw::last_string(self.bytes, Self::PARAMETER)
-    }
-
-    /// `repeated FileDescriptorProto proto_file = 15;`
-    pub fn proto_file(self) -> Result<Vec<FileDescriptorProto<'a>>> {
-        raw::repeated_lens(self.bytes, Self::PROTO_FILE)
-            .map(|bodies| bodies.into_iter().map(FileDescriptorProto::new).collect())
+    pub fn proto_file(&self) -> &[FileDescriptorProto<'a>] {
+        &self.proto_file
     }
 }
 
-/// `google.protobuf.FileDescriptorProto` wire view.
-#[derive(Debug, Clone, Copy)]
+/// `google.protobuf.FileDescriptorProto` parsed view.
+#[derive(Debug, Clone)]
 pub struct FileDescriptorProto<'a> {
     bytes: &'a [u8],
+    name: Option<&'a str>,
+    package: Option<&'a str>,
+    dependency: Vec<&'a str>,
+    message_type: Vec<DescriptorProto<'a>>,
+    enum_type: Vec<EnumDescriptorProto<'a>>,
+    options: Option<FileOptions>,
+    source_code_info: Option<SourceCodeInfo<'a>>,
+    syntax: Option<&'a str>,
+    edition: Option<i32>,
 }
 
 impl<'a> FileDescriptorProto<'a> {
@@ -186,66 +160,103 @@ impl<'a> FileDescriptorProto<'a> {
     pub(crate) const SYNTAX: u32 = 12;
     pub(crate) const EDITION: u32 = 14;
 
-    pub fn new(bytes: &'a [u8]) -> Self {
-        Self { bytes }
+    pub fn parse(bytes: &'a [u8]) -> Result<Self> {
+        while_decoding("FileDescriptorProto", || {
+            let mut name = None;
+            let mut package = None;
+            let mut dependency = Vec::new();
+            let mut message_type = Vec::new();
+            let mut enum_type = Vec::new();
+            let mut options = None;
+            let mut source_code_info = None;
+            let mut syntax = None;
+            let mut edition = None;
+            for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
+                let field = field?;
+                match field.field_number.as_u32() {
+                    Self::NAME => name = Some(expect_str(&field)?),
+                    Self::PACKAGE => package = Some(expect_str(&field)?),
+                    Self::DEPENDENCY => dependency.push(expect_str(&field)?),
+                    Self::MESSAGE_TYPE => {
+                        message_type.push(DescriptorProto::parse(expect_len(&field)?)?)
+                    }
+                    Self::ENUM_TYPE => {
+                        enum_type.push(EnumDescriptorProto::parse(expect_len(&field)?)?)
+                    }
+                    Self::OPTIONS => options = Some(FileOptions::parse(expect_len(&field)?)?),
+                    Self::SOURCE_CODE_INFO => {
+                        source_code_info = Some(SourceCodeInfo::parse(expect_len(&field)?)?)
+                    }
+                    Self::SYNTAX => syntax = Some(expect_str(&field)?),
+                    Self::EDITION => edition = Some(expect_i32(&field)?),
+                    _ => {}
+                }
+            }
+            Ok(Self {
+                bytes,
+                name,
+                package,
+                dependency,
+                message_type,
+                enum_type,
+                options,
+                source_code_info,
+                syntax,
+                edition,
+            })
+        })
     }
 
-    pub fn as_bytes(self) -> &'a [u8] {
+    pub fn as_bytes(&self) -> &'a [u8] {
         self.bytes
     }
 
-    /// `optional string name = 1;`
-    pub fn name(self) -> Result<Option<&'a str>> {
-        raw::last_string(self.bytes, Self::NAME)
+    pub fn name(&self) -> Option<&'a str> {
+        self.name
     }
 
-    /// `optional string package = 2;`
-    pub fn package(self) -> Result<Option<&'a str>> {
-        raw::last_string(self.bytes, Self::PACKAGE)
+    pub fn package(&self) -> Option<&'a str> {
+        self.package
     }
 
-    /// `repeated string dependency = 3;`
-    pub fn dependency(self) -> Result<Vec<&'a str>> {
-        raw::repeated_strings(self.bytes, Self::DEPENDENCY)
+    pub fn dependency(&self) -> &[&'a str] {
+        &self.dependency
     }
 
-    /// `repeated DescriptorProto message_type = 4;`
-    pub fn message_type(self) -> Result<Vec<DescriptorProto<'a>>> {
-        raw::repeated_lens(self.bytes, Self::MESSAGE_TYPE)
-            .map(|bodies| bodies.into_iter().map(DescriptorProto::new).collect())
+    pub fn message_type(&self) -> &[DescriptorProto<'a>] {
+        &self.message_type
     }
 
-    /// `repeated EnumDescriptorProto enum_type = 5;`
-    pub fn enum_type(self) -> Result<Vec<EnumDescriptorProto<'a>>> {
-        raw::repeated_lens(self.bytes, Self::ENUM_TYPE)
-            .map(|bodies| bodies.into_iter().map(EnumDescriptorProto::new).collect())
+    pub fn enum_type(&self) -> &[EnumDescriptorProto<'a>] {
+        &self.enum_type
     }
 
-    /// `optional FileOptions options = 8;`
-    pub fn options(self) -> Result<Option<FileOptions<'a>>> {
-        Ok(raw::last_len(self.bytes, Self::OPTIONS)?.map(FileOptions::new))
+    pub fn options(&self) -> Option<&FileOptions> {
+        self.options.as_ref()
     }
 
-    /// `optional SourceCodeInfo source_code_info = 9;`
-    pub fn source_code_info(self) -> Result<Option<SourceCodeInfo<'a>>> {
-        Ok(raw::last_len(self.bytes, Self::SOURCE_CODE_INFO)?.map(SourceCodeInfo::new))
+    pub fn source_code_info(&self) -> Option<&SourceCodeInfo<'a>> {
+        self.source_code_info.as_ref()
     }
 
-    /// `optional string syntax = 12;`
-    pub fn syntax(self) -> Result<Option<&'a str>> {
-        raw::last_string(self.bytes, Self::SYNTAX)
+    pub fn syntax(&self) -> Option<&'a str> {
+        self.syntax
     }
 
-    /// `optional Edition edition = 14;`
-    pub fn edition(self) -> Result<Option<i32>> {
-        raw::last_i32(self.bytes, Self::EDITION)
+    pub fn edition(&self) -> Option<i32> {
+        self.edition
     }
 }
 
-/// `google.protobuf.DescriptorProto` wire view.
-#[derive(Debug, Clone, Copy)]
+/// `google.protobuf.DescriptorProto` parsed view.
+#[derive(Debug, Clone)]
 pub struct DescriptorProto<'a> {
-    bytes: &'a [u8],
+    name: Option<&'a str>,
+    field: Vec<FieldDescriptorProto<'a>>,
+    nested_type: Vec<DescriptorProto<'a>>,
+    enum_type: Vec<EnumDescriptorProto<'a>>,
+    options: Option<MessageOptions>,
+    oneof_decl: Vec<OneofDescriptorProto<'a>>,
 }
 
 impl<'a> DescriptorProto<'a> {
@@ -256,47 +267,76 @@ impl<'a> DescriptorProto<'a> {
     pub(crate) const OPTIONS: u32 = 7;
     pub(crate) const ONEOF_DECL: u32 = 8;
 
-    pub fn new(bytes: &'a [u8]) -> Self {
-        Self { bytes }
+    pub fn parse(bytes: &'a [u8]) -> Result<Self> {
+        while_decoding("DescriptorProto", || {
+            let mut name = None;
+            let mut field = Vec::new();
+            let mut nested_type = Vec::new();
+            let mut enum_type = Vec::new();
+            let mut options = None;
+            let mut oneof_decl = Vec::new();
+            for f in AsRefExtProtobuf::read_protobuf_fields(bytes) {
+                let f = f?;
+                match f.field_number.as_u32() {
+                    Self::NAME => name = Some(expect_str(&f)?),
+                    Self::FIELD => field.push(FieldDescriptorProto::parse(expect_len(&f)?)?),
+                    Self::NESTED_TYPE => nested_type.push(DescriptorProto::parse(expect_len(&f)?)?),
+                    Self::ENUM_TYPE => enum_type.push(EnumDescriptorProto::parse(expect_len(&f)?)?),
+                    Self::OPTIONS => options = Some(MessageOptions::parse(expect_len(&f)?)?),
+                    Self::ONEOF_DECL => {
+                        oneof_decl.push(OneofDescriptorProto::parse(expect_len(&f)?)?)
+                    }
+                    _ => {}
+                }
+            }
+            Ok(Self {
+                name,
+                field,
+                nested_type,
+                enum_type,
+                options,
+                oneof_decl,
+            })
+        })
     }
 
-    pub fn as_bytes(self) -> &'a [u8] {
-        self.bytes
+    pub fn name(&self) -> Option<&'a str> {
+        self.name
     }
 
-    pub fn name(self) -> Result<Option<&'a str>> {
-        raw::last_string(self.bytes, Self::NAME)
+    pub fn field(&self) -> &[FieldDescriptorProto<'a>] {
+        &self.field
     }
 
-    pub fn field(self) -> Result<Vec<FieldDescriptorProto<'a>>> {
-        raw::repeated_lens(self.bytes, Self::FIELD)
-            .map(|bodies| bodies.into_iter().map(FieldDescriptorProto::new).collect())
+    pub fn nested_type(&self) -> &[DescriptorProto<'a>] {
+        &self.nested_type
     }
 
-    pub fn nested_type(self) -> Result<Vec<DescriptorProto<'a>>> {
-        raw::repeated_lens(self.bytes, Self::NESTED_TYPE)
-            .map(|bodies| bodies.into_iter().map(DescriptorProto::new).collect())
+    pub fn enum_type(&self) -> &[EnumDescriptorProto<'a>] {
+        &self.enum_type
     }
 
-    pub fn enum_type(self) -> Result<Vec<EnumDescriptorProto<'a>>> {
-        raw::repeated_lens(self.bytes, Self::ENUM_TYPE)
-            .map(|bodies| bodies.into_iter().map(EnumDescriptorProto::new).collect())
+    pub fn options(&self) -> Option<&MessageOptions> {
+        self.options.as_ref()
     }
 
-    pub fn options(self) -> Result<Option<MessageOptions<'a>>> {
-        Ok(raw::last_len(self.bytes, Self::OPTIONS)?.map(MessageOptions::new))
-    }
-
-    pub fn oneof_decl(self) -> Result<Vec<OneofDescriptorProto<'a>>> {
-        raw::repeated_lens(self.bytes, Self::ONEOF_DECL)
-            .map(|bodies| bodies.into_iter().map(OneofDescriptorProto::new).collect())
+    pub fn oneof_decl(&self) -> &[OneofDescriptorProto<'a>] {
+        &self.oneof_decl
     }
 }
 
-/// `google.protobuf.FieldDescriptorProto` wire view.
-#[derive(Debug, Clone, Copy)]
+/// `google.protobuf.FieldDescriptorProto` parsed view.
+#[derive(Debug, Clone)]
 pub struct FieldDescriptorProto<'a> {
-    bytes: &'a [u8],
+    name: Option<&'a str>,
+    number: Option<i32>,
+    label: Option<i32>,
+    type_: Option<i32>,
+    type_name: Option<&'a str>,
+    default_value: Option<&'a str>,
+    options: Option<FieldOptions>,
+    oneof_index: Option<i32>,
+    proto3_optional: Option<bool>,
 }
 
 impl<'a> FieldDescriptorProto<'a> {
@@ -310,69 +350,116 @@ impl<'a> FieldDescriptorProto<'a> {
     pub(crate) const ONEOF_INDEX: u32 = 9;
     pub(crate) const PROTO3_OPTIONAL: u32 = 17;
 
-    pub fn new(bytes: &'a [u8]) -> Self {
-        Self { bytes }
+    pub fn parse(bytes: &'a [u8]) -> Result<Self> {
+        while_decoding("FieldDescriptorProto", || {
+            let mut name = None;
+            let mut number = None;
+            let mut label = None;
+            let mut type_ = None;
+            let mut type_name = None;
+            let mut default_value = None;
+            let mut options = None;
+            let mut oneof_index = None;
+            let mut proto3_optional = None;
+            for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
+                let field = field?;
+                match field.field_number.as_u32() {
+                    Self::NAME => name = Some(expect_str(&field)?),
+                    Self::NUMBER => number = Some(expect_i32(&field)?),
+                    Self::LABEL => label = Some(expect_i32(&field)?),
+                    Self::TYPE => type_ = Some(expect_i32(&field)?),
+                    Self::TYPE_NAME => type_name = Some(expect_str(&field)?),
+                    Self::DEFAULT_VALUE => default_value = Some(expect_str(&field)?),
+                    Self::OPTIONS => options = Some(FieldOptions::parse(expect_len(&field)?)?),
+                    Self::ONEOF_INDEX => oneof_index = Some(expect_i32(&field)?),
+                    Self::PROTO3_OPTIONAL => proto3_optional = Some(expect_bool(&field)?),
+                    _ => {}
+                }
+            }
+            Ok(Self {
+                name,
+                number,
+                label,
+                type_,
+                type_name,
+                default_value,
+                options,
+                oneof_index,
+                proto3_optional,
+            })
+        })
     }
 
-    pub fn name(self) -> Result<Option<&'a str>> {
-        raw::last_string(self.bytes, Self::NAME)
+    pub fn name(&self) -> Option<&'a str> {
+        self.name
     }
 
-    pub fn number(self) -> Result<Option<i32>> {
-        raw::last_i32(self.bytes, Self::NUMBER)
+    pub fn number(&self) -> Option<i32> {
+        self.number
     }
 
-    pub fn label(self) -> Result<Option<i32>> {
-        raw::last_i32(self.bytes, Self::LABEL)
+    pub fn label(&self) -> Option<i32> {
+        self.label
     }
 
-    pub fn type_(self) -> Result<Option<i32>> {
-        raw::last_i32(self.bytes, Self::TYPE)
+    pub fn type_(&self) -> Option<i32> {
+        self.type_
     }
 
-    pub fn type_name(self) -> Result<Option<&'a str>> {
-        raw::last_string(self.bytes, Self::TYPE_NAME)
+    pub fn type_name(&self) -> Option<&'a str> {
+        self.type_name
     }
 
-    pub fn default_value(self) -> Result<Option<&'a str>> {
-        raw::last_string(self.bytes, Self::DEFAULT_VALUE)
+    pub fn default_value(&self) -> Option<&'a str> {
+        self.default_value
     }
 
-    pub fn options(self) -> Result<Option<FieldOptions<'a>>> {
-        Ok(raw::last_len(self.bytes, Self::OPTIONS)?.map(FieldOptions::new))
+    pub fn options(&self) -> Option<&FieldOptions> {
+        self.options.as_ref()
     }
 
-    pub fn oneof_index(self) -> Result<Option<i32>> {
-        raw::last_i32(self.bytes, Self::ONEOF_INDEX)
+    pub fn oneof_index(&self) -> Option<i32> {
+        self.oneof_index
     }
 
-    pub fn proto3_optional(self) -> Result<Option<bool>> {
-        raw::last_bool(self.bytes, Self::PROTO3_OPTIONAL)
+    pub fn proto3_optional(&self) -> Option<bool> {
+        self.proto3_optional
     }
 }
 
-/// `google.protobuf.OneofDescriptorProto` wire view.
-#[derive(Debug, Clone, Copy)]
+/// `google.protobuf.OneofDescriptorProto` parsed view.
+#[derive(Debug, Clone)]
 pub struct OneofDescriptorProto<'a> {
-    bytes: &'a [u8],
+    name: Option<&'a str>,
 }
 
 impl<'a> OneofDescriptorProto<'a> {
     pub(crate) const NAME: u32 = 1;
 
-    pub fn new(bytes: &'a [u8]) -> Self {
-        Self { bytes }
+    pub fn parse(bytes: &'a [u8]) -> Result<Self> {
+        while_decoding("OneofDescriptorProto", || {
+            let mut name = None;
+            for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
+                let field = field?;
+                if field.field_number.as_u32() == Self::NAME {
+                    name = Some(expect_str(&field)?);
+                }
+            }
+            Ok(Self { name })
+        })
     }
 
-    pub fn name(self) -> Result<Option<&'a str>> {
-        raw::last_string(self.bytes, Self::NAME)
+    pub fn name(&self) -> Option<&'a str> {
+        self.name
     }
 }
 
-/// `google.protobuf.EnumDescriptorProto` wire view.
-#[derive(Debug, Clone, Copy)]
+/// `google.protobuf.EnumDescriptorProto` parsed view.
+#[derive(Debug, Clone)]
 pub struct EnumDescriptorProto<'a> {
-    bytes: &'a [u8],
+    name: Option<&'a str>,
+    value: Vec<EnumValueDescriptorProto<'a>>,
+    options: Option<EnumOptions>,
 }
 
 impl<'a> EnumDescriptorProto<'a> {
@@ -380,155 +467,261 @@ impl<'a> EnumDescriptorProto<'a> {
     pub(crate) const VALUE: u32 = 2;
     pub(crate) const OPTIONS: u32 = 3;
 
-    pub fn new(bytes: &'a [u8]) -> Self {
-        Self { bytes }
-    }
-
-    pub fn name(self) -> Result<Option<&'a str>> {
-        raw::last_string(self.bytes, Self::NAME)
-    }
-
-    pub fn value(self) -> Result<Vec<EnumValueDescriptorProto<'a>>> {
-        raw::repeated_lens(self.bytes, Self::VALUE).map(|bodies| {
-            bodies
-                .into_iter()
-                .map(EnumValueDescriptorProto::new)
-                .collect()
+    pub fn parse(bytes: &'a [u8]) -> Result<Self> {
+        while_decoding("EnumDescriptorProto", || {
+            let mut name = None;
+            let mut value = Vec::new();
+            let mut options = None;
+            for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
+                let field = field?;
+                match field.field_number.as_u32() {
+                    Self::NAME => name = Some(expect_str(&field)?),
+                    Self::VALUE => {
+                        value.push(EnumValueDescriptorProto::parse(expect_len(&field)?)?)
+                    }
+                    Self::OPTIONS => options = Some(EnumOptions::parse(expect_len(&field)?)?),
+                    _ => {}
+                }
+            }
+            Ok(Self {
+                name,
+                value,
+                options,
+            })
         })
     }
 
-    pub fn options(self) -> Result<Option<EnumOptions<'a>>> {
-        Ok(raw::last_len(self.bytes, Self::OPTIONS)?.map(EnumOptions::new))
+    pub fn name(&self) -> Option<&'a str> {
+        self.name
+    }
+
+    pub fn value(&self) -> &[EnumValueDescriptorProto<'a>] {
+        &self.value
+    }
+
+    pub fn options(&self) -> Option<&EnumOptions> {
+        self.options.as_ref()
     }
 }
 
-/// `google.protobuf.EnumValueDescriptorProto` wire view.
-#[derive(Debug, Clone, Copy)]
+/// `google.protobuf.EnumValueDescriptorProto` parsed view.
+#[derive(Debug, Clone)]
 pub struct EnumValueDescriptorProto<'a> {
-    bytes: &'a [u8],
+    name: Option<&'a str>,
+    number: Option<i32>,
 }
 
 impl<'a> EnumValueDescriptorProto<'a> {
     pub(crate) const NAME: u32 = 1;
     pub(crate) const NUMBER: u32 = 2;
 
-    pub fn new(bytes: &'a [u8]) -> Self {
-        Self { bytes }
+    pub fn parse(bytes: &'a [u8]) -> Result<Self> {
+        while_decoding("EnumValueDescriptorProto", || {
+            let mut name = None;
+            let mut number = None;
+            for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
+                let field = field?;
+                match field.field_number.as_u32() {
+                    Self::NAME => name = Some(expect_str(&field)?),
+                    Self::NUMBER => number = Some(expect_i32(&field)?),
+                    _ => {}
+                }
+            }
+            Ok(Self { name, number })
+        })
     }
 
-    pub fn name(self) -> Result<Option<&'a str>> {
-        raw::last_string(self.bytes, Self::NAME)
+    pub fn name(&self) -> Option<&'a str> {
+        self.name
     }
 
-    pub fn number(self) -> Result<Option<i32>> {
-        raw::last_i32(self.bytes, Self::NUMBER)
+    pub fn number(&self) -> Option<i32> {
+        self.number
     }
 }
 
-/// `google.protobuf.FileOptions` wire view (subset).
-#[derive(Debug, Clone, Copy)]
-pub struct FileOptions<'a> {
-    bytes: &'a [u8],
+/// `google.protobuf.FileOptions` parsed view (subset).
+#[derive(Debug, Clone)]
+pub struct FileOptions {
+    features: Option<FeatureSet>,
 }
 
-impl<'a> FileOptions<'a> {
+impl FileOptions {
     pub(crate) const FEATURES: u32 = 50;
 
-    pub fn new(bytes: &'a [u8]) -> Self {
-        Self { bytes }
+    pub fn parse(bytes: &[u8]) -> Result<Self> {
+        while_decoding("FileOptions", || {
+            let mut features = None;
+            for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
+                let field = field?;
+                if field.field_number.as_u32() == Self::FEATURES {
+                    features = Some(FeatureSet::parse(expect_len(&field)?)?);
+                }
+            }
+            Ok(Self { features })
+        })
     }
 
-    pub fn features(self) -> Result<Option<FeatureSet<'a>>> {
-        Ok(raw::last_len(self.bytes, Self::FEATURES)?.map(FeatureSet::new))
+    pub fn features(&self) -> Option<&FeatureSet> {
+        self.features.as_ref()
     }
 }
 
-/// `google.protobuf.MessageOptions` wire view (subset + puroro extensions).
-#[derive(Debug, Clone, Copy)]
-pub struct MessageOptions<'a> {
-    bytes: &'a [u8],
+/// `google.protobuf.MessageOptions` parsed view (subset + custom enum extensions).
+#[derive(Debug, Clone)]
+pub struct MessageOptions {
+    map_entry: Option<bool>,
+    features: Option<FeatureSet>,
+    extension_enums: Vec<(u32, i32)>,
 }
 
-impl<'a> MessageOptions<'a> {
+impl MessageOptions {
     pub(crate) const MAP_ENTRY: u32 = 7;
     pub(crate) const FEATURES: u32 = 12;
 
-    pub fn new(bytes: &'a [u8]) -> Self {
-        Self { bytes }
+    pub fn parse(bytes: &[u8]) -> Result<Self> {
+        while_decoding("MessageOptions", || {
+            let mut map_entry = None;
+            let mut features = None;
+            let mut extension_enums = Vec::new();
+            for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
+                let field = field?;
+                match field.field_number.as_u32() {
+                    Self::MAP_ENTRY => map_entry = Some(expect_bool(&field)?),
+                    Self::FEATURES => features = Some(FeatureSet::parse(expect_len(&field)?)?),
+                    n => {
+                        if let FieldValue::Varint(_) = &field.value {
+                            record_extension_enum(&mut extension_enums, n, expect_i32(&field)?);
+                        }
+                    }
+                }
+            }
+            Ok(Self {
+                map_entry,
+                features,
+                extension_enums,
+            })
+        })
     }
 
-    pub fn map_entry(self) -> Result<Option<bool>> {
-        raw::last_bool(self.bytes, Self::MAP_ENTRY)
+    pub fn map_entry(&self) -> Option<bool> {
+        self.map_entry
     }
 
-    pub fn features(self) -> Result<Option<FeatureSet<'a>>> {
-        Ok(raw::last_len(self.bytes, Self::FEATURES)?.map(FeatureSet::new))
+    pub fn features(&self) -> Option<&FeatureSet> {
+        self.features.as_ref()
     }
 
-    /// Custom option enum at `field_number` (last-wins).
-    pub fn extension_enum(self, field_number: u32) -> Result<Option<i32>> {
-        raw::last_i32(self.bytes, field_number)
+    pub fn extension_enum(&self, field_number: u32) -> Option<i32> {
+        extension_enum_get(&self.extension_enums, field_number)
     }
 }
 
-/// `google.protobuf.FieldOptions` wire view (subset + puroro extensions).
-#[derive(Debug, Clone, Copy)]
-pub struct FieldOptions<'a> {
-    bytes: &'a [u8],
+/// `google.protobuf.FieldOptions` parsed view (subset + custom enum extensions).
+#[derive(Debug, Clone)]
+pub struct FieldOptions {
+    packed: Option<bool>,
+    features: Option<FeatureSet>,
+    extension_enums: Vec<(u32, i32)>,
 }
 
-impl<'a> FieldOptions<'a> {
+impl FieldOptions {
     pub(crate) const PACKED: u32 = 2;
     pub(crate) const FEATURES: u32 = 21;
 
-    pub fn new(bytes: &'a [u8]) -> Self {
-        Self { bytes }
+    pub fn parse(bytes: &[u8]) -> Result<Self> {
+        while_decoding("FieldOptions", || {
+            let mut packed = None;
+            let mut features = None;
+            let mut extension_enums = Vec::new();
+            for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
+                let field = field?;
+                match field.field_number.as_u32() {
+                    Self::PACKED => packed = Some(expect_bool(&field)?),
+                    Self::FEATURES => features = Some(FeatureSet::parse(expect_len(&field)?)?),
+                    n => {
+                        if let FieldValue::Varint(_) = &field.value {
+                            record_extension_enum(&mut extension_enums, n, expect_i32(&field)?);
+                        }
+                    }
+                }
+            }
+            Ok(Self {
+                packed,
+                features,
+                extension_enums,
+            })
+        })
     }
 
-    pub fn packed(self) -> Result<Option<bool>> {
-        raw::last_bool(self.bytes, Self::PACKED)
+    pub fn packed(&self) -> Option<bool> {
+        self.packed
     }
 
-    pub fn features(self) -> Result<Option<FeatureSet<'a>>> {
-        Ok(raw::last_len(self.bytes, Self::FEATURES)?.map(FeatureSet::new))
+    pub fn features(&self) -> Option<&FeatureSet> {
+        self.features.as_ref()
     }
 
-    /// Custom option enum at `field_number` (last-wins).
-    pub fn extension_enum(self, field_number: u32) -> Result<Option<i32>> {
-        raw::last_i32(self.bytes, field_number)
+    pub fn extension_enum(&self, field_number: u32) -> Option<i32> {
+        extension_enum_get(&self.extension_enums, field_number)
     }
 }
 
-/// `google.protobuf.EnumOptions` wire view (subset + puroro extensions).
-#[derive(Debug, Clone, Copy)]
-pub struct EnumOptions<'a> {
-    bytes: &'a [u8],
+/// `google.protobuf.EnumOptions` parsed view (subset + custom enum extensions).
+#[derive(Debug, Clone)]
+pub struct EnumOptions {
+    features: Option<FeatureSet>,
+    extension_enums: Vec<(u32, i32)>,
 }
 
-impl<'a> EnumOptions<'a> {
+impl EnumOptions {
     pub(crate) const FEATURES: u32 = 7;
 
-    pub fn new(bytes: &'a [u8]) -> Self {
-        Self { bytes }
+    pub fn parse(bytes: &[u8]) -> Result<Self> {
+        while_decoding("EnumOptions", || {
+            let mut features = None;
+            let mut extension_enums = Vec::new();
+            for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
+                let field = field?;
+                match field.field_number.as_u32() {
+                    Self::FEATURES => features = Some(FeatureSet::parse(expect_len(&field)?)?),
+                    n => {
+                        if let FieldValue::Varint(_) = &field.value {
+                            record_extension_enum(&mut extension_enums, n, expect_i32(&field)?);
+                        }
+                    }
+                }
+            }
+            Ok(Self {
+                features,
+                extension_enums,
+            })
+        })
     }
 
-    pub fn features(self) -> Result<Option<FeatureSet<'a>>> {
-        Ok(raw::last_len(self.bytes, Self::FEATURES)?.map(FeatureSet::new))
+    pub fn features(&self) -> Option<&FeatureSet> {
+        self.features.as_ref()
     }
 
-    /// Custom option enum at `field_number` (last-wins).
-    pub fn extension_enum(self, field_number: u32) -> Result<Option<i32>> {
-        raw::last_i32(self.bytes, field_number)
+    pub fn extension_enum(&self, field_number: u32) -> Option<i32> {
+        extension_enum_get(&self.extension_enums, field_number)
     }
 }
 
-/// `google.protobuf.FeatureSet` wire view.
-#[derive(Debug, Clone, Copy)]
-pub struct FeatureSet<'a> {
-    bytes: &'a [u8],
+/// `google.protobuf.FeatureSet` parsed view (owned scalars; no borrow).
+#[derive(Debug, Clone, Default)]
+pub struct FeatureSet {
+    field_presence: Option<i32>,
+    enum_type: Option<i32>,
+    repeated_field_encoding: Option<i32>,
+    utf8_validation: Option<i32>,
+    message_encoding: Option<i32>,
+    json_format: Option<i32>,
+    enforce_naming_style: Option<i32>,
+    default_symbol_visibility: Option<i32>,
 }
 
-impl<'a> FeatureSet<'a> {
+impl FeatureSet {
     pub(crate) const FIELD_PRESENCE: u32 = 1;
     pub(crate) const ENUM_TYPE: u32 = 2;
     pub(crate) const REPEATED_FIELD_ENCODING: u32 = 3;
@@ -538,70 +731,100 @@ impl<'a> FeatureSet<'a> {
     pub(crate) const ENFORCE_NAMING_STYLE: u32 = 7;
     pub(crate) const DEFAULT_SYMBOL_VISIBILITY: u32 = 8;
 
-    pub fn new(bytes: &'a [u8]) -> Self {
-        Self { bytes }
+    pub fn parse(bytes: &[u8]) -> Result<Self> {
+        while_decoding("FeatureSet", || {
+            let mut out = Self::default();
+            for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
+                let field = field?;
+                match field.field_number.as_u32() {
+                    Self::FIELD_PRESENCE => out.field_presence = Some(expect_i32(&field)?),
+                    Self::ENUM_TYPE => out.enum_type = Some(expect_i32(&field)?),
+                    Self::REPEATED_FIELD_ENCODING => {
+                        out.repeated_field_encoding = Some(expect_i32(&field)?)
+                    }
+                    Self::UTF8_VALIDATION => out.utf8_validation = Some(expect_i32(&field)?),
+                    Self::MESSAGE_ENCODING => out.message_encoding = Some(expect_i32(&field)?),
+                    Self::JSON_FORMAT => out.json_format = Some(expect_i32(&field)?),
+                    Self::ENFORCE_NAMING_STYLE => {
+                        out.enforce_naming_style = Some(expect_i32(&field)?)
+                    }
+                    Self::DEFAULT_SYMBOL_VISIBILITY => {
+                        out.default_symbol_visibility = Some(expect_i32(&field)?)
+                    }
+                    // Language-specific FeatureSet extensions (e.g. 1000+) are LEN.
+                    _ => {}
+                }
+            }
+            Ok(out)
+        })
     }
 
-    pub fn field_presence(self) -> Result<Option<i32>> {
-        raw::last_i32(self.bytes, Self::FIELD_PRESENCE)
+    pub fn field_presence(&self) -> Option<i32> {
+        self.field_presence
     }
 
-    pub fn enum_type(self) -> Result<Option<i32>> {
-        raw::last_i32(self.bytes, Self::ENUM_TYPE)
+    pub fn enum_type(&self) -> Option<i32> {
+        self.enum_type
     }
 
-    pub fn repeated_field_encoding(self) -> Result<Option<i32>> {
-        raw::last_i32(self.bytes, Self::REPEATED_FIELD_ENCODING)
+    pub fn repeated_field_encoding(&self) -> Option<i32> {
+        self.repeated_field_encoding
     }
 
-    pub fn utf8_validation(self) -> Result<Option<i32>> {
-        raw::last_i32(self.bytes, Self::UTF8_VALIDATION)
+    pub fn utf8_validation(&self) -> Option<i32> {
+        self.utf8_validation
     }
 
-    pub fn message_encoding(self) -> Result<Option<i32>> {
-        raw::last_i32(self.bytes, Self::MESSAGE_ENCODING)
+    pub fn message_encoding(&self) -> Option<i32> {
+        self.message_encoding
     }
 
-    pub fn json_format(self) -> Result<Option<i32>> {
-        raw::last_i32(self.bytes, Self::JSON_FORMAT)
+    pub fn json_format(&self) -> Option<i32> {
+        self.json_format
     }
 
-    pub fn enforce_naming_style(self) -> Result<Option<i32>> {
-        raw::last_i32(self.bytes, Self::ENFORCE_NAMING_STYLE)
+    pub fn enforce_naming_style(&self) -> Option<i32> {
+        self.enforce_naming_style
     }
 
-    pub fn default_symbol_visibility(self) -> Result<Option<i32>> {
-        raw::last_i32(self.bytes, Self::DEFAULT_SYMBOL_VISIBILITY)
+    pub fn default_symbol_visibility(&self) -> Option<i32> {
+        self.default_symbol_visibility
     }
 }
 
-/// `google.protobuf.SourceCodeInfo` wire view.
-#[derive(Debug, Clone, Copy)]
+/// `google.protobuf.SourceCodeInfo` parsed view.
+#[derive(Debug, Clone)]
 pub struct SourceCodeInfo<'a> {
-    bytes: &'a [u8],
+    location: Vec<SourceCodeInfoLocation<'a>>,
 }
 
 impl<'a> SourceCodeInfo<'a> {
     pub(crate) const LOCATION: u32 = 1;
 
-    pub fn new(bytes: &'a [u8]) -> Self {
-        Self { bytes }
+    pub fn parse(bytes: &'a [u8]) -> Result<Self> {
+        while_decoding("SourceCodeInfo", || {
+            let mut location = Vec::new();
+            for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
+                let field = field?;
+                if field.field_number.as_u32() == Self::LOCATION {
+                    location.push(SourceCodeInfoLocation::parse(expect_len(&field)?)?);
+                }
+            }
+            Ok(Self { location })
+        })
     }
 
-    pub fn location(self) -> Result<Vec<SourceCodeInfoLocation<'a>>> {
-        raw::repeated_lens(self.bytes, Self::LOCATION).map(|bodies| {
-            bodies
-                .into_iter()
-                .map(SourceCodeInfoLocation::new)
-                .collect()
-        })
+    pub fn location(&self) -> &[SourceCodeInfoLocation<'a>] {
+        &self.location
     }
 }
 
-/// `google.protobuf.SourceCodeInfo.Location` wire view.
-#[derive(Debug, Clone, Copy)]
+/// `google.protobuf.SourceCodeInfo.Location` parsed view.
+#[derive(Debug, Clone)]
 pub struct SourceCodeInfoLocation<'a> {
-    bytes: &'a [u8],
+    path: Vec<i32>,
+    leading_comments: Option<&'a str>,
+    trailing_comments: Option<&'a str>,
 }
 
 impl<'a> SourceCodeInfoLocation<'a> {
@@ -609,19 +832,37 @@ impl<'a> SourceCodeInfoLocation<'a> {
     pub(crate) const LEADING_COMMENTS: u32 = 3;
     pub(crate) const TRAILING_COMMENTS: u32 = 4;
 
-    pub fn new(bytes: &'a [u8]) -> Self {
-        Self { bytes }
+    pub fn parse(bytes: &'a [u8]) -> Result<Self> {
+        while_decoding("SourceCodeInfo.Location", || {
+            let mut path = Vec::new();
+            let mut leading_comments = None;
+            let mut trailing_comments = None;
+            for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
+                let field = field?;
+                match field.field_number.as_u32() {
+                    Self::PATH => extend_i32s(&mut path, &field)?,
+                    Self::LEADING_COMMENTS => leading_comments = Some(expect_str(&field)?),
+                    Self::TRAILING_COMMENTS => trailing_comments = Some(expect_str(&field)?),
+                    _ => {}
+                }
+            }
+            Ok(Self {
+                path,
+                leading_comments,
+                trailing_comments,
+            })
+        })
     }
 
-    pub fn path(self) -> Result<Vec<i32>> {
-        raw::repeated_i32s(self.bytes, Self::PATH)
+    pub fn path(&self) -> &[i32] {
+        &self.path
     }
 
-    pub fn leading_comments(self) -> Result<Option<&'a str>> {
-        raw::last_string(self.bytes, Self::LEADING_COMMENTS)
+    pub fn leading_comments(&self) -> Option<&'a str> {
+        self.leading_comments
     }
 
-    pub fn trailing_comments(self) -> Result<Option<&'a str>> {
-        raw::last_string(self.bytes, Self::TRAILING_COMMENTS)
+    pub fn trailing_comments(&self) -> Option<&'a str> {
+        self.trailing_comments
     }
 }
