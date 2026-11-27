@@ -4,6 +4,10 @@
 //! mutates a default-initialized open struct. Nested LEN messages are parsed
 //! recursively. This is not `puroro-types` generated code (bootstrap cycle).
 //!
+//! Field numbers that are also needed outside `parse()` (source-code paths,
+//! encode helpers, error context) stay as associated constants; single-use
+//! numbers are written inline.
+//!
 //! Singular fields are last-wins. Wrong wire types for a requested field are
 //! errors; other fields are ignored.
 
@@ -84,8 +88,9 @@ pub struct CodeGeneratorRequest<'a> {
 }
 
 impl<'a> CodeGeneratorRequest<'a> {
+    /// Also used when synthesizing a request from a `FileDescriptorSet`.
     pub(crate) const FILE_TO_GENERATE: u32 = 1;
-    pub(crate) const PARAMETER: u32 = 2;
+    /// Also used when synthesizing a request from a `FileDescriptorSet`.
     pub(crate) const PROTO_FILE: u32 = 15;
 
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
@@ -95,7 +100,7 @@ impl<'a> CodeGeneratorRequest<'a> {
                 let field = field?;
                 match field.field_number.as_u32() {
                     Self::FILE_TO_GENERATE => out.file_to_generate.push(expect_str(&field)?),
-                    Self::PARAMETER => out.parameter = Some(expect_str(&field)?),
+                    2 => out.parameter = Some(expect_str(&field)?),
                     Self::PROTO_FILE => out
                         .proto_file
                         .push(FileDescriptorProto::parse(expect_len(&field)?)?),
@@ -124,15 +129,10 @@ pub struct FileDescriptorProto<'a> {
 }
 
 impl<'a> FileDescriptorProto<'a> {
-    pub(crate) const NAME: u32 = 1;
-    pub(crate) const PACKAGE: u32 = 2;
-    pub(crate) const DEPENDENCY: u32 = 3;
+    /// Also used as a `SourceCodeInfo` path segment.
     pub(crate) const MESSAGE_TYPE: u32 = 4;
+    /// Also used as a `SourceCodeInfo` path segment.
     pub(crate) const ENUM_TYPE: u32 = 5;
-    pub(crate) const OPTIONS: u32 = 8;
-    pub(crate) const SOURCE_CODE_INFO: u32 = 9;
-    pub(crate) const SYNTAX: u32 = 12;
-    pub(crate) const EDITION: u32 = 14;
 
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("FileDescriptorProto", || {
@@ -143,21 +143,19 @@ impl<'a> FileDescriptorProto<'a> {
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 match field.field_number.as_u32() {
-                    Self::NAME => out.name = Some(expect_str(&field)?),
-                    Self::PACKAGE => out.package = Some(expect_str(&field)?),
-                    Self::DEPENDENCY => out.dependency.push(expect_str(&field)?),
+                    1 => out.name = Some(expect_str(&field)?),
+                    2 => out.package = Some(expect_str(&field)?),
+                    3 => out.dependency.push(expect_str(&field)?),
                     Self::MESSAGE_TYPE => out
                         .message_type
                         .push(DescriptorProto::parse(expect_len(&field)?)?),
                     Self::ENUM_TYPE => out
                         .enum_type
                         .push(EnumDescriptorProto::parse(expect_len(&field)?)?),
-                    Self::OPTIONS => out.options = Some(FileOptions::parse(expect_len(&field)?)?),
-                    Self::SOURCE_CODE_INFO => {
-                        out.source_code_info = Some(SourceCodeInfo::parse(expect_len(&field)?)?)
-                    }
-                    Self::SYNTAX => out.syntax = Some(expect_str(&field)?),
-                    Self::EDITION => out.edition = Some(expect_i32(&field)?),
+                    8 => out.options = Some(FileOptions::parse(expect_len(&field)?)?),
+                    9 => out.source_code_info = Some(SourceCodeInfo::parse(expect_len(&field)?)?),
+                    12 => out.syntax = Some(expect_str(&field)?),
+                    14 => out.edition = Some(expect_i32(&field)?),
                     _ => {}
                 }
             }
@@ -178,11 +176,13 @@ pub struct DescriptorProto<'a> {
 }
 
 impl<'a> DescriptorProto<'a> {
-    pub(crate) const NAME: u32 = 1;
+    /// Also used as a `SourceCodeInfo` path segment.
     pub(crate) const FIELD: u32 = 2;
+    /// Also used as a `SourceCodeInfo` path segment.
     pub(crate) const NESTED_TYPE: u32 = 3;
+    /// Also used as a `SourceCodeInfo` path segment.
     pub(crate) const ENUM_TYPE: u32 = 4;
-    pub(crate) const OPTIONS: u32 = 7;
+    /// Also used as a `SourceCodeInfo` path segment.
     pub(crate) const ONEOF_DECL: u32 = 8;
 
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
@@ -191,7 +191,7 @@ impl<'a> DescriptorProto<'a> {
             for f in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let f = f?;
                 match f.field_number.as_u32() {
-                    Self::NAME => out.name = Some(expect_str(&f)?),
+                    1 => out.name = Some(expect_str(&f)?),
                     Self::FIELD => out
                         .field
                         .push(FieldDescriptorProto::parse(expect_len(&f)?)?),
@@ -201,7 +201,7 @@ impl<'a> DescriptorProto<'a> {
                     Self::ENUM_TYPE => out
                         .enum_type
                         .push(EnumDescriptorProto::parse(expect_len(&f)?)?),
-                    Self::OPTIONS => out.options = Some(MessageOptions::parse(expect_len(&f)?)?),
+                    7 => out.options = Some(MessageOptions::parse(expect_len(&f)?)?),
                     Self::ONEOF_DECL => out
                         .oneof_decl
                         .push(OneofDescriptorProto::parse(expect_len(&f)?)?),
@@ -228,15 +228,10 @@ pub struct FieldDescriptorProto<'a> {
 }
 
 impl<'a> FieldDescriptorProto<'a> {
-    pub(crate) const NAME: u32 = 1;
-    pub(crate) const NUMBER: u32 = 3;
+    /// Also used when mapping a bad enum value to [`Error::UnexpectedField`].
     pub(crate) const LABEL: u32 = 4;
+    /// Also used when mapping a bad enum value to [`Error::UnexpectedField`].
     pub(crate) const TYPE: u32 = 5;
-    pub(crate) const TYPE_NAME: u32 = 6;
-    pub(crate) const DEFAULT_VALUE: u32 = 7;
-    pub(crate) const OPTIONS: u32 = 8;
-    pub(crate) const ONEOF_INDEX: u32 = 9;
-    pub(crate) const PROTO3_OPTIONAL: u32 = 17;
 
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("FieldDescriptorProto", || {
@@ -244,15 +239,15 @@ impl<'a> FieldDescriptorProto<'a> {
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 match field.field_number.as_u32() {
-                    Self::NAME => out.name = Some(expect_str(&field)?),
-                    Self::NUMBER => out.number = Some(expect_i32(&field)?),
+                    1 => out.name = Some(expect_str(&field)?),
+                    3 => out.number = Some(expect_i32(&field)?),
                     Self::LABEL => out.label = Some(expect_i32(&field)?),
                     Self::TYPE => out.type_ = Some(expect_i32(&field)?),
-                    Self::TYPE_NAME => out.type_name = Some(expect_str(&field)?),
-                    Self::DEFAULT_VALUE => out.default_value = Some(expect_str(&field)?),
-                    Self::OPTIONS => out.options = Some(FieldOptions::parse(expect_len(&field)?)?),
-                    Self::ONEOF_INDEX => out.oneof_index = Some(expect_i32(&field)?),
-                    Self::PROTO3_OPTIONAL => out.proto3_optional = Some(expect_bool(&field)?),
+                    6 => out.type_name = Some(expect_str(&field)?),
+                    7 => out.default_value = Some(expect_str(&field)?),
+                    8 => out.options = Some(FieldOptions::parse(expect_len(&field)?)?),
+                    9 => out.oneof_index = Some(expect_i32(&field)?),
+                    17 => out.proto3_optional = Some(expect_bool(&field)?),
                     _ => {}
                 }
             }
@@ -268,14 +263,12 @@ pub struct OneofDescriptorProto<'a> {
 }
 
 impl<'a> OneofDescriptorProto<'a> {
-    pub(crate) const NAME: u32 = 1;
-
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("OneofDescriptorProto", || {
             let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
-                if field.field_number.as_u32() == Self::NAME {
+                if field.field_number.as_u32() == 1 {
                     out.name = Some(expect_str(&field)?);
                 }
             }
@@ -293,9 +286,8 @@ pub struct EnumDescriptorProto<'a> {
 }
 
 impl<'a> EnumDescriptorProto<'a> {
-    pub(crate) const NAME: u32 = 1;
+    /// Also used as a `SourceCodeInfo` path segment.
     pub(crate) const VALUE: u32 = 2;
-    pub(crate) const OPTIONS: u32 = 3;
 
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("EnumDescriptorProto", || {
@@ -303,11 +295,11 @@ impl<'a> EnumDescriptorProto<'a> {
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 match field.field_number.as_u32() {
-                    Self::NAME => out.name = Some(expect_str(&field)?),
+                    1 => out.name = Some(expect_str(&field)?),
                     Self::VALUE => out
                         .value
                         .push(EnumValueDescriptorProto::parse(expect_len(&field)?)?),
-                    Self::OPTIONS => out.options = Some(EnumOptions::parse(expect_len(&field)?)?),
+                    3 => out.options = Some(EnumOptions::parse(expect_len(&field)?)?),
                     _ => {}
                 }
             }
@@ -324,17 +316,14 @@ pub struct EnumValueDescriptorProto<'a> {
 }
 
 impl<'a> EnumValueDescriptorProto<'a> {
-    pub(crate) const NAME: u32 = 1;
-    pub(crate) const NUMBER: u32 = 2;
-
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("EnumValueDescriptorProto", || {
             let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 match field.field_number.as_u32() {
-                    Self::NAME => out.name = Some(expect_str(&field)?),
-                    Self::NUMBER => out.number = Some(expect_i32(&field)?),
+                    1 => out.name = Some(expect_str(&field)?),
+                    2 => out.number = Some(expect_i32(&field)?),
                     _ => {}
                 }
             }
@@ -350,14 +339,12 @@ pub struct FileOptions {
 }
 
 impl FileOptions {
-    pub(crate) const FEATURES: u32 = 50;
-
     pub fn parse(bytes: &[u8]) -> Result<Self> {
         while_decoding("FileOptions", || {
             let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
-                if field.field_number.as_u32() == Self::FEATURES {
+                if field.field_number.as_u32() == 50 {
                     out.features = Some(FeatureSet::parse(expect_len(&field)?)?);
                 }
             }
@@ -376,17 +363,14 @@ pub struct MessageOptions {
 }
 
 impl MessageOptions {
-    pub(crate) const MAP_ENTRY: u32 = 7;
-    pub(crate) const FEATURES: u32 = 12;
-
     pub fn parse(bytes: &[u8]) -> Result<Self> {
         while_decoding("MessageOptions", || {
             let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 match field.field_number.as_u32() {
-                    Self::MAP_ENTRY => out.map_entry = Some(expect_bool(&field)?),
-                    Self::FEATURES => out.features = Some(FeatureSet::parse(expect_len(&field)?)?),
+                    7 => out.map_entry = Some(expect_bool(&field)?),
+                    12 => out.features = Some(FeatureSet::parse(expect_len(&field)?)?),
                     n => {
                         if let FieldValue::Varint(_) = &field.value {
                             record_extension_enum(&mut out.extension_enums, n, expect_i32(&field)?);
@@ -417,17 +401,14 @@ pub struct FieldOptions {
 }
 
 impl FieldOptions {
-    pub(crate) const PACKED: u32 = 2;
-    pub(crate) const FEATURES: u32 = 21;
-
     pub fn parse(bytes: &[u8]) -> Result<Self> {
         while_decoding("FieldOptions", || {
             let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 match field.field_number.as_u32() {
-                    Self::PACKED => out.packed = Some(expect_bool(&field)?),
-                    Self::FEATURES => out.features = Some(FeatureSet::parse(expect_len(&field)?)?),
+                    2 => out.packed = Some(expect_bool(&field)?),
+                    21 => out.features = Some(FeatureSet::parse(expect_len(&field)?)?),
                     n => {
                         if let FieldValue::Varint(_) = &field.value {
                             record_extension_enum(&mut out.extension_enums, n, expect_i32(&field)?);
@@ -457,15 +438,13 @@ pub struct EnumOptions {
 }
 
 impl EnumOptions {
-    pub(crate) const FEATURES: u32 = 7;
-
     pub fn parse(bytes: &[u8]) -> Result<Self> {
         while_decoding("EnumOptions", || {
             let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 match field.field_number.as_u32() {
-                    Self::FEATURES => out.features = Some(FeatureSet::parse(expect_len(&field)?)?),
+                    7 => out.features = Some(FeatureSet::parse(expect_len(&field)?)?),
                     n => {
                         if let FieldValue::Varint(_) = &field.value {
                             record_extension_enum(&mut out.extension_enums, n, expect_i32(&field)?);
@@ -500,13 +479,21 @@ pub struct FeatureSet {
 }
 
 impl FeatureSet {
+    /// Also used when mapping a bad enum value to [`Error::UnexpectedField`].
     pub(crate) const FIELD_PRESENCE: u32 = 1;
+    /// Also used when mapping a bad enum value to [`Error::UnexpectedField`].
     pub(crate) const ENUM_TYPE: u32 = 2;
+    /// Also used when mapping a bad enum value to [`Error::UnexpectedField`].
     pub(crate) const REPEATED_FIELD_ENCODING: u32 = 3;
+    /// Also used when mapping a bad enum value to [`Error::UnexpectedField`].
     pub(crate) const UTF8_VALIDATION: u32 = 4;
+    /// Also used when mapping a bad enum value to [`Error::UnexpectedField`].
     pub(crate) const MESSAGE_ENCODING: u32 = 5;
+    /// Also used when mapping a bad enum value to [`Error::UnexpectedField`].
     pub(crate) const JSON_FORMAT: u32 = 6;
+    /// Also used when mapping a bad enum value to [`Error::UnexpectedField`].
     pub(crate) const ENFORCE_NAMING_STYLE: u32 = 7;
+    /// Also used when mapping a bad enum value to [`Error::UnexpectedField`].
     pub(crate) const DEFAULT_SYMBOL_VISIBILITY: u32 = 8;
 
     pub fn parse(bytes: &[u8]) -> Result<Self> {
@@ -545,14 +532,12 @@ pub struct SourceCodeInfo<'a> {
 }
 
 impl<'a> SourceCodeInfo<'a> {
-    pub(crate) const LOCATION: u32 = 1;
-
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("SourceCodeInfo", || {
             let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
-                if field.field_number.as_u32() == Self::LOCATION {
+                if field.field_number.as_u32() == 1 {
                     out.location
                         .push(SourceCodeInfoLocation::parse(expect_len(&field)?)?);
                 }
@@ -571,19 +556,15 @@ pub struct SourceCodeInfoLocation<'a> {
 }
 
 impl<'a> SourceCodeInfoLocation<'a> {
-    pub(crate) const PATH: u32 = 1;
-    pub(crate) const LEADING_COMMENTS: u32 = 3;
-    pub(crate) const TRAILING_COMMENTS: u32 = 4;
-
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("SourceCodeInfo.Location", || {
             let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 match field.field_number.as_u32() {
-                    Self::PATH => extend_i32s(&mut out.path, &field)?,
-                    Self::LEADING_COMMENTS => out.leading_comments = Some(expect_str(&field)?),
-                    Self::TRAILING_COMMENTS => out.trailing_comments = Some(expect_str(&field)?),
+                    1 => extend_i32s(&mut out.path, &field)?,
+                    3 => out.leading_comments = Some(expect_str(&field)?),
+                    4 => out.trailing_comments = Some(expect_str(&field)?),
                     _ => {}
                 }
             }

@@ -4,10 +4,10 @@
 //! and encodes a minimal [`CodeGeneratorResponse`].
 //!
 //! Decode walks wire bytes through [`views`]: each message is [`parse`](views::FileDescriptorProto::parse)d
-//! once into an open struct with public fields. Field numbers live as associated
-//! constants on those types (and on the encode types below). The structured IR
-//! is [`crate::descriptor`]; this module does not use `puroro-types` generated
-//! messages (bootstrap cycle).
+//! once into an open struct with public fields. Field numbers that are shared
+//! with other call sites stay as associated constants; single-use numbers are
+//! inline. The structured IR is [`crate::descriptor`]; this module does not use
+//! `puroro-types` generated messages (bootstrap cycle).
 
 pub mod views;
 
