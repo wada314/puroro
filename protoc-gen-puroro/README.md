@@ -23,6 +23,9 @@ Comma-separated `key=value` pairs (a bare `lazy` also works):
 | `crate_name` | `generated` | `[package] name` in the generated `Cargo.toml` |
 | `proto2_utf8` | `none` | proto2 string views: `none` → `&[u8]`, `verify` → `&str` |
 | `lazy` | off | Experimental: emit `NameLazy` and enable `puroro-rt/lazy` |
+| `tonic` | on when services exist | Emit cfg-gated tonic client/server stubs; `false` suppresses |
+| `tonic_client` | on | Emit `{service}_client` when `tonic` is on |
+| `tonic_server` | on | Emit `{service}_server` when `tonic` is on |
 
 ## Build the plugin from a checkout
 

@@ -1,7 +1,7 @@
 //! Build a [`FileSet`](super::FileSet) inside a caller-owned [`Arena`](super::Arena).
 
 use super::{
-    Arena, Enum, EnumValue, Field, FieldOccurrence, File, FileSet, Message, Oneof,
+    Arena, Enum, EnumValue, Field, FieldOccurrence, File, FileSet, Message, Method, Oneof, Service,
     SingularPresence, TypeRef,
 };
 use crate::descriptor::features::{
@@ -9,7 +9,8 @@ use crate::descriptor::features::{
     RepeatedFieldEncoding, Utf8Validation,
 };
 use crate::descriptor::{
-    EnumDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, ProtoFile, ProtoFqn, Syntax,
+    EnumDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, MethodDesc, ProtoFile, ProtoFqn,
+    ServiceDesc, Syntax,
 };
 use crate::error::{Error, Result};
 use ::std::collections::HashMap;
@@ -143,6 +144,11 @@ pub fn resolve_with<'a>(
     }
     ctx.link_pending()?;
 
+    // Pass 3: services need the full message FQN map (cross-file inputs/outputs).
+    for (file, proto) in files.iter().zip(proto_files.iter()) {
+        ctx.link_file_services(file, proto)?;
+    }
+
     Ok(FileSet { files })
 }
 
@@ -167,6 +173,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             dependency: proto.dependency.clone(),
             messages,
             enums,
+            services: Vec::new(),
         }))
     }
 
@@ -272,6 +279,70 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             self.link_message_fields(item)?;
         }
         Ok(())
+    }
+
+    fn link_file_services(&self, file: &'a File<'a>, proto: &ProtoFile) -> Result<()> {
+        let mut services = Vec::with_capacity(proto.services.len());
+        for desc in &proto.services {
+            services.push(self.resolve_service(desc)?);
+        }
+        write_shared(&file.services, services);
+        Ok(())
+    }
+
+    fn resolve_service(&self, desc: &ServiceDesc) -> Result<Service<'a>> {
+        let mut methods = Vec::with_capacity(desc.methods.len());
+        for method in &desc.methods {
+            methods.push(self.resolve_method(desc, method)?);
+        }
+        Ok(Service {
+            name: desc.name.clone(),
+            methods,
+            comments: desc.comments.clone(),
+        })
+    }
+
+    fn resolve_method(&self, service: &ServiceDesc, method: &MethodDesc) -> Result<Method<'a>> {
+        let input = self.lookup_message(&method.input_type).ok_or_else(|| {
+            Error::Codegen(format!(
+                "service `{}.{}` input_type `{}` was not found",
+                service.name,
+                method.name,
+                method.input_type.as_str()
+            ))
+        })?;
+        let output = self.lookup_message(&method.output_type).ok_or_else(|| {
+            Error::Codegen(format!(
+                "service `{}.{}` output_type `{}` was not found",
+                service.name,
+                method.name,
+                method.output_type.as_str()
+            ))
+        })?;
+        if input.is_map_entry() {
+            return Err(Error::Codegen(format!(
+                "service `{}.{}` input_type `{}` is a map entry",
+                service.name,
+                method.name,
+                method.input_type.as_str()
+            )));
+        }
+        if output.is_map_entry() {
+            return Err(Error::Codegen(format!(
+                "service `{}.{}` output_type `{}` is a map entry",
+                service.name,
+                method.name,
+                method.output_type.as_str()
+            )));
+        }
+        Ok(Method {
+            name: method.name.clone(),
+            input,
+            output,
+            client_streaming: method.client_streaming,
+            server_streaming: method.server_streaming,
+            comments: method.comments.clone(),
+        })
     }
 
     fn link_message_fields(&self, pending: PendingFields<'a, 'd>) -> Result<()> {

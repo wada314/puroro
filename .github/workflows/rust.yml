@@ -50,6 +50,10 @@ jobs:
         run: cargo test --locked -p puroro --features tonic
       - name: Codegen fixture tests
         run: cargo test --locked -p puroro-codegen-tests
+      - name: Codegen fixture tests (tonic stubs)
+        # Compiles cfg(feature = "tonic") stub modules (e.g. grpc_helloworld).
+        # The default codegen-tests job above does not cover those modules.
+        run: cargo test --locked -p puroro-codegen-tests --features tonic
       - name: puroro-types (descriptors + WKTs)
         run: cargo test --locked -p puroro-types
       - name: Docs

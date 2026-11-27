@@ -9,8 +9,8 @@
 
 use super::{
     CodegenMeta, CodegenRequest, Comments, EnumDesc, EnumRepr, EnumValueDesc, FeatureSet,
-    FieldDesc, FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile, Syntax,
-    UnknownFieldsPolicy,
+    FieldDesc, FieldLabel, FieldType, MessageDesc, MethodDesc, OneofDesc, ProtoFile, ProtoFqn,
+    ServiceDesc, Syntax, UnknownFieldsPolicy,
 };
 
 /// Optional field with empty options (`label = Optional`, no type name / oneof).
@@ -86,7 +86,7 @@ pub(crate) fn map_entry(name: impl Into<String>, key: FieldDesc, value: FieldDes
     }
 }
 
-/// Proto3 file with no messages, enums, or dependencies.
+/// Proto3 file with no messages, enums, services, or dependencies.
 pub(crate) fn proto_file(name: impl Into<String>, package: impl Into<String>) -> ProtoFile {
     ProtoFile {
         name: name.into(),
@@ -96,6 +96,32 @@ pub(crate) fn proto_file(name: impl Into<String>, package: impl Into<String>) ->
         dependency: vec![],
         messages: vec![],
         enums: vec![],
+        services: vec![],
+    }
+}
+
+/// Service with the given methods and empty comments.
+pub(crate) fn service(name: impl Into<String>, methods: Vec<MethodDesc>) -> ServiceDesc {
+    ServiceDesc {
+        name: name.into(),
+        methods,
+        comments: Comments::default(),
+    }
+}
+
+/// Unary RPC (`client_streaming` / `server_streaming` false).
+pub(crate) fn method(
+    name: impl Into<String>,
+    input_type: ProtoFqn,
+    output_type: ProtoFqn,
+) -> MethodDesc {
+    MethodDesc {
+        name: name.into(),
+        input_type,
+        output_type,
+        client_streaming: false,
+        server_streaming: false,
+        comments: Comments::default(),
     }
 }
 

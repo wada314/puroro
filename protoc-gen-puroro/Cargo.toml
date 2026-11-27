@@ -22,6 +22,7 @@ protobuf-core = { path = "../protobuf-core", version = "0.6.0" }
 quote = "1"
 syn = { version = "2", features = ["full", "parsing", "extra-traits"] }
 thiserror = "2"
+tonic-build = "0.14"
 
 # Present so `cargo install` resolves the same crates generated code imports.
 # `build.rs` reads their versions from Cargo.lock. The plugin binary does not
@@ -32,6 +33,8 @@ bitvec = "1"
 bytes = "1"
 puroro = { path = "..", version = "0.15.0" }
 puroro-rt = { path = "../puroro-rt", version = "0.1.0" }
+# Version captured into generated Cargo.toml when services are emitted.
+tonic = { version = "0.14", default-features = false }
 
 [[bin]]
 name = "protoc-gen-puroro"

@@ -63,6 +63,27 @@ pub struct File<'a> {
     dependency: Vec<String>,
     messages: Vec<&'a Message<'a>>,
     enums: Vec<&'a Enum<'a>>,
+    /// File-level services (linked after all message FQNs are registered).
+    services: Vec<Service<'a>>,
+}
+
+/// A gRPC service with resolved request/response message handles.
+#[derive(Debug)]
+pub struct Service<'a> {
+    name: String,
+    methods: Vec<Method<'a>>,
+    comments: Comments,
+}
+
+/// One RPC method on a [`Service`].
+#[derive(Debug)]
+pub struct Method<'a> {
+    name: String,
+    input: &'a Message<'a>,
+    output: &'a Message<'a>,
+    client_streaming: bool,
+    server_streaming: bool,
+    comments: Comments,
 }
 
 /// A message type with resolved field type handles.
@@ -211,6 +232,51 @@ impl<'a> File<'a> {
     /// File-level enums. Nested enums are on the enclosing [`Message`].
     pub fn enums(&self) -> impl Iterator<Item = &'a Enum<'a>> + '_ {
         self.enums.iter().copied()
+    }
+
+    /// File-level services.
+    pub fn services(&self) -> impl Iterator<Item = &Service<'a>> + '_ {
+        self.services.iter()
+    }
+}
+
+impl<'a> Service<'a> {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn methods(&self) -> impl Iterator<Item = &Method<'a>> + '_ {
+        self.methods.iter()
+    }
+
+    pub fn comments(&self) -> &Comments {
+        &self.comments
+    }
+}
+
+impl<'a> Method<'a> {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn input(&self) -> &'a Message<'a> {
+        self.input
+    }
+
+    pub fn output(&self) -> &'a Message<'a> {
+        self.output
+    }
+
+    pub fn client_streaming(&self) -> bool {
+        self.client_streaming
+    }
+
+    pub fn server_streaming(&self) -> bool {
+        self.server_streaming
+    }
+
+    pub fn comments(&self) -> &Comments {
+        &self.comments
     }
 }
 

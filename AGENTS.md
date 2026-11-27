@@ -49,9 +49,11 @@ RUSTDOCFLAGS='-D warnings' cargo doc --no-deps \
 # Optional tonic Codec surface:
 cargo test -p puroro --features tonic
 RUSTDOCFLAGS='-D warnings' cargo doc --no-deps -p puroro --features tonic
+# Generated service stubs (cfg-gated in plugin output):
+cargo test -p puroro-codegen-tests --features tonic
 ```
 
-`cargo test` also runs rustdoc examples (doctests). CI (`.github/workflows/rust.yml`) runs fmt, clippy (`-D warnings`, excluding generated/archive/bench crates), tests, codegen fixtures, and `cargo doc` with `RUSTDOCFLAGS=-D warnings` for the first-party packages above. Bench smoke stays in `.github/workflows/benches.yml`. `puroro-types` is excluded from workspace clippy like other protoc-generated surfaces (its `build.rs` needs `protoc` + bindeps).
+`cargo test` also runs rustdoc examples (doctests). CI (`.github/workflows/rust.yml`) runs fmt, clippy (`-D warnings`, excluding generated/archive/bench crates), tests, codegen fixtures (plain and `--features tonic` for stub modules), and `cargo doc` with `RUSTDOCFLAGS=-D warnings` for the first-party packages above. The plain codegen-tests job does not compile `cfg(feature = "tonic")` stub modules. Bench smoke stays in `.github/workflows/benches.yml`. `puroro-types` is excluded from workspace clippy like other protoc-generated surfaces (its `build.rs` needs `protoc` + bindeps).
 
 Criterion benches are the unpublished `puroro-benches` member (`publish = false`). Sources live in `puroro-benches/benches/`. The `puroro` package sets `autobenches = false` so Cargo does not pick those files up as its own targets. Do not move the targets back onto `puroro`. A `puroro` dev-dependency on `puroro-rt` makes `cargo publish -p puroro` wait for `puroro-rt`, which itself depends on `puroro`.
 

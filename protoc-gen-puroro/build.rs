@@ -21,8 +21,16 @@ extern crate bitvec as _;
 extern crate bytes as _;
 extern crate puroro as _;
 extern crate puroro_rt as _;
+extern crate tonic as _;
 
-const WANTED: &[&str] = &["allocator-api2", "bitvec", "bytes", "puroro", "puroro-rt"];
+const WANTED: &[&str] = &[
+    "allocator-api2",
+    "bitvec",
+    "bytes",
+    "puroro",
+    "puroro-rt",
+    "tonic",
+];
 
 fn main() {
     let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR"));

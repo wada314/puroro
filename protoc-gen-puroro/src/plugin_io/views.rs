@@ -117,6 +117,7 @@ pub struct FileDescriptorProto<'a> {
     pub dependency: Vec<&'a str>,
     pub message_type: Vec<DescriptorProto<'a>>,
     pub enum_type: Vec<EnumDescriptorProto<'a>>,
+    pub service: Vec<ServiceDescriptorProto<'a>>,
     pub options: Option<FileOptions>,
     pub source_code_info: Option<SourceCodeInfo<'a>>,
     pub syntax: Option<&'a str>,
@@ -142,6 +143,9 @@ impl<'a> FileDescriptorProto<'a> {
                     5 => out
                         .enum_type
                         .push(EnumDescriptorProto::parse(expect_len(&field)?)?),
+                    6 => out
+                        .service
+                        .push(ServiceDescriptorProto::parse(expect_len(&field)?)?),
                     8 => out.options = Some(FileOptions::parse(expect_len(&field)?)?),
                     9 => out.source_code_info = Some(SourceCodeInfo::parse(expect_len(&field)?)?),
                     12 => out.syntax = Some(expect_str(&field)?),
@@ -246,6 +250,62 @@ impl<'a> OneofDescriptorProto<'a> {
                 let field = field?;
                 if field.field_number.as_u32() == 1 {
                     out.name = Some(expect_str(&field)?);
+                }
+            }
+            Ok(out)
+        })
+    }
+}
+
+/// `google.protobuf.ServiceDescriptorProto` parsed view.
+#[derive(Debug, Clone, Default)]
+pub struct ServiceDescriptorProto<'a> {
+    pub name: Option<&'a str>,
+    pub method: Vec<MethodDescriptorProto<'a>>,
+}
+
+impl<'a> ServiceDescriptorProto<'a> {
+    pub fn parse(bytes: &'a [u8]) -> Result<Self> {
+        while_decoding("ServiceDescriptorProto", || {
+            let mut out = Self::default();
+            for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
+                let field = field?;
+                match field.field_number.as_u32() {
+                    1 => out.name = Some(expect_str(&field)?),
+                    2 => out
+                        .method
+                        .push(MethodDescriptorProto::parse(expect_len(&field)?)?),
+                    _ => {}
+                }
+            }
+            Ok(out)
+        })
+    }
+}
+
+/// `google.protobuf.MethodDescriptorProto` parsed view.
+#[derive(Debug, Clone, Default)]
+pub struct MethodDescriptorProto<'a> {
+    pub name: Option<&'a str>,
+    pub input_type: Option<&'a str>,
+    pub output_type: Option<&'a str>,
+    pub client_streaming: Option<bool>,
+    pub server_streaming: Option<bool>,
+}
+
+impl<'a> MethodDescriptorProto<'a> {
+    pub fn parse(bytes: &'a [u8]) -> Result<Self> {
+        while_decoding("MethodDescriptorProto", || {
+            let mut out = Self::default();
+            for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
+                let field = field?;
+                match field.field_number.as_u32() {
+                    1 => out.name = Some(expect_str(&field)?),
+                    2 => out.input_type = Some(expect_str(&field)?),
+                    3 => out.output_type = Some(expect_str(&field)?),
+                    5 => out.client_streaming = Some(expect_bool(&field)?),
+                    6 => out.server_streaming = Some(expect_bool(&field)?),
+                    _ => {}
                 }
             }
             Ok(out)
