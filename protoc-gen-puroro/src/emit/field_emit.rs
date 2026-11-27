@@ -5,6 +5,7 @@
 //! [`super::message`].
 
 use super::defaults;
+use super::docs;
 use super::ident::{escape_ident, is_simple_ident, to_pascal_case};
 use super::layout::{LayoutAssoc, LayoutAssocKind, LenAccess, MessageApply, MessageFraming};
 use super::oneof::{OneofEmit, OneofVariantEmit};
@@ -20,7 +21,7 @@ use crate::field_kind::{
 use crate::resolved::Message as ResolvedMessage;
 use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
-use ::syn::{Item, Lifetime, Type, parse_quote};
+use ::syn::{Attribute, Item, Lifetime, Type, parse_quote};
 
 pub(super) enum FieldEmit {
     Singular(Box<ScalarEmit>),
@@ -35,6 +36,8 @@ pub(super) struct ScalarEmit {
     pub(super) name: Ident,
     /// Raw proto name — `"title"` (for `title_mut`, visit keys).
     pub(super) name_str: String,
+    /// Proto comments as `#[doc = …]` (`None` when absent).
+    pub(super) doc: Option<Attribute>,
     /// Companion const ident — `FIELD_TITLE`.
     pub(super) field_const: Ident,
     /// Proto field number — `1`.
@@ -81,6 +84,8 @@ pub(super) struct RepeatedEmit {
     pub(super) name: Ident,
     /// Raw proto name — `"tag_ids"`.
     pub(super) name_str: String,
+    /// Proto comments as `#[doc = …]` (`None` when absent).
+    pub(super) doc: Option<Attribute>,
     /// Companion const ident — `FIELD_TAG_IDS`.
     pub(super) field_const: Ident,
     /// Proto field number — `6`.
@@ -104,6 +109,8 @@ pub(super) struct MapEmit {
     pub(super) name: Ident,
     /// Raw proto name — `"attrs"`.
     pub(super) name_str: String,
+    /// Proto comments as `#[doc = …]` (`None` when absent).
+    pub(super) doc: Option<Attribute>,
     /// Companion const ident — `FIELD_ATTRS`.
     pub(super) field_const: Ident,
     /// Proto field number — `10`.
@@ -372,6 +379,7 @@ fn emit_oneof(o: &PlannedOneof<'_>) -> Result<OneofEmit> {
     Ok(OneofEmit {
         name: escape_ident(o.name()),
         name_str: o.name().to_owned(),
+        doc: docs::doc_attr(o.comments()),
         mod_name: escape_ident(o.name()),
         shape_name: Ident::new(&pascal, Span::call_site()),
         case_name: Ident::new(&format!("{pascal}Case"), Span::call_site()),
@@ -429,6 +437,7 @@ fn emit_oneof_variant(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
     Ok(OneofVariantEmit {
         name: escape_ident(field.name()),
         name_str: field.name().to_owned(),
+        doc: docs::doc_attr(field.field().comments()),
         variant_name: Ident::new(&variant_pascal, Span::call_site()),
         type_param: Ident::new(&format!("T{index}"), Span::call_site()),
         field_alias: Ident::new(&format!("{variant_pascal}Field"), Span::call_site()),
@@ -508,6 +517,7 @@ fn emit_repeated(field: &PlannedField<'_>, companion: &Ident) -> Result<Repeated
     Ok(RepeatedEmit {
         name: escape_ident(name),
         name_str: name.to_owned(),
+        doc: docs::doc_attr(field.field().comments()),
         field_const: Ident::new(field_const, Span::call_site()),
         number: number as u32,
         marker,
@@ -575,6 +585,7 @@ fn emit_map(field: &PlannedField<'_>, companion: &Ident) -> Result<MapEmit> {
     Ok(MapEmit {
         name: escape_ident(name),
         name_str: name.to_owned(),
+        doc: docs::doc_attr(field.field().comments()),
         field_const: Ident::new(field_const, Span::call_site()),
         number: number as u32,
         key_marker,
@@ -640,6 +651,7 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
     Ok(ScalarEmit {
         name: escape_ident(name),
         name_str: name.to_owned(),
+        doc: docs::doc_attr(field.field().comments()),
         field_const: Ident::new(field_const, Span::call_site()),
         number: number as u32,
         marker: plan.marker,

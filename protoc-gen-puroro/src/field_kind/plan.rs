@@ -5,7 +5,7 @@ use super::{
     ResolvedChildParse, WireTypeKind, field_number_const, resolve_child_parse, value_bit_const,
 };
 use crate::default_value::interpret_custom_default;
-use crate::descriptor::{BytesLayout, StringLayout, UnknownFieldsPolicy};
+use crate::descriptor::{BytesLayout, Comments, StringLayout, UnknownFieldsPolicy};
 use crate::error::{Error, Result};
 use crate::resolved::{Field, FieldOccurrence, Message, SingularPresence, TypeRef};
 use ::std::collections::HashMap;
@@ -52,6 +52,8 @@ pub struct PlannedField<'a> {
 #[derive(Debug)]
 pub struct PlannedOneof<'a> {
     name: String,
+    /// Proto source comments for the oneof declaration.
+    comments: Comments,
     variants: Vec<PlannedField<'a>>,
 }
 
@@ -113,6 +115,10 @@ impl<'a> PlannedOneof<'a> {
         &self.name
     }
 
+    pub fn comments(&self) -> &Comments {
+        &self.comments
+    }
+
     pub fn variants(&self) -> &[PlannedField<'a>] {
         &self.variants
     }
@@ -168,8 +174,8 @@ pub fn plan_fields<'a>(
     let lazy_bit_count = kind_at;
 
     // Second pass: struct member order (oneof groups collapse to one slot).
-    let oneof_names: Vec<String> = message.oneofs().map(|o| o.name().to_owned()).collect();
-    let mut emitted_oneofs = vec![false; oneof_names.len()];
+    let oneofs: Vec<_> = message.oneofs().collect();
+    let mut emitted_oneofs = vec![false; oneofs.len()];
     let mut members = Vec::new();
 
     for field in &fields {
@@ -193,12 +199,12 @@ pub fn plan_fields<'a>(
                     field.name()
                 ))
             })?;
-            if idx >= oneof_names.len() {
+            if idx >= oneofs.len() {
                 return Err(Error::internal(format!(
                     "field `{}.{}` oneof_index {idx} out of range ({} oneofs)",
                     message.fqn(),
                     field.name(),
-                    oneof_names.len()
+                    oneofs.len()
                 )));
             }
             if emitted_oneofs[idx] {
@@ -221,7 +227,8 @@ pub fn plan_fields<'a>(
                 }
             }
             members.push(MessageMember::Oneof(PlannedOneof {
-                name: oneof_names[idx].clone(),
+                name: oneofs[idx].name().to_owned(),
+                comments: oneofs[idx].comments().clone(),
                 variants,
             }));
         } else {

@@ -30,6 +30,7 @@ pub(super) fn unknown_store_ty(policy: UnknownFieldsPolicy) -> TokenStream {
 }
 
 mod defaults;
+mod docs;
 mod enumeration;
 mod field_emit;
 mod ident;
@@ -121,6 +122,7 @@ fn prepare_message(
         message.name(),
         &module_name,
         full_name,
+        message.comments(),
         emit_lazy,
     )?;
 

@@ -64,6 +64,63 @@ pub enum Edition {
     Edition2024 = 1001,
 }
 
+/// Comments attached to a declaration via `SourceCodeInfo.Location`.
+///
+/// Protoc strips comment markers (`//`, `/* */`) before delivering these
+/// strings. Prefer [`Self::doc_text()`] for rustdoc emission.
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct Comments {
+    /// Comments immediately before the declaration.
+    pub leading: Option<String>,
+    /// Comments on the same line after the declaration.
+    pub trailing: Option<String>,
+}
+
+impl Comments {
+    /// Whether both leading and trailing are absent or empty.
+    pub fn is_empty(&self) -> bool {
+        self.doc_text().is_none()
+    }
+
+    /// Text for generated rustdoc: leading, else trailing.
+    ///
+    /// Preserves a leading space when protoc left one after stripping `// `
+    /// / `/*`, so prettyplease emits idiomatic `/// text` rather than
+    /// `///text`.
+    pub fn doc_text(&self) -> Option<&str> {
+        for candidate in [&self.leading, &self.trailing] {
+            if let Some(s) = candidate.as_deref()
+                && !s.trim().is_empty()
+            {
+                return Some(s);
+            }
+        }
+        None
+    }
+
+    /// Keep existing text; fill empty slots from `other`.
+    pub fn merge(&mut self, other: Self) {
+        if self
+            .leading
+            .as_deref()
+            .map(str::trim)
+            .filter(|s| !s.is_empty())
+            .is_none()
+        {
+            self.leading = other.leading;
+        }
+        if self
+            .trailing
+            .as_deref()
+            .map(str::trim)
+            .filter(|s| !s.is_empty())
+            .is_none()
+        {
+            self.trailing = other.trailing;
+        }
+    }
+}
+
 /// One `.proto` file (`FileDescriptorProto` subset).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ProtoFile {
@@ -98,6 +155,8 @@ pub struct MessageDesc {
     /// message option reaches the plugin. Naming and visibility are source
     /// retention and usually do not.
     pub features: FeatureSet,
+    /// Proto source comments for this message declaration.
+    pub comments: Comments,
 }
 
 /// A field (`FieldDescriptorProto` subset).
@@ -129,6 +188,8 @@ pub struct FieldDesc {
     pub child_parse: Option<ChildParse>,
     /// Field-level `options.features` (`FeatureSet`), if any fields were set.
     pub features: FeatureSet,
+    /// Proto source comments for this field declaration.
+    pub comments: Comments,
 }
 
 /// Field label (`FieldDescriptorProto.Label`).
@@ -318,6 +379,8 @@ impl EnumRepr {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct OneofDesc {
     pub name: String,
+    /// Proto source comments for this oneof declaration.
+    pub comments: Comments,
 }
 
 /// An enum type (`EnumDescriptorProto` subset).
@@ -329,6 +392,8 @@ pub struct EnumDesc {
     pub features: FeatureSet,
     /// `(puroro.enum_repr)`, if set on the descriptor.
     pub enum_repr: EnumRepr,
+    /// Proto source comments for this enum declaration.
+    pub comments: Comments,
 }
 
 /// An enum value (`EnumValueDescriptorProto` subset).
@@ -336,4 +401,6 @@ pub struct EnumDesc {
 pub struct EnumValueDesc {
     pub name: String,
     pub number: i32,
+    /// Proto source comments for this enumerator.
+    pub comments: Comments,
 }

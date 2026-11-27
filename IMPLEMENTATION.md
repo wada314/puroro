@@ -539,6 +539,8 @@ Normative wording: [DESIGN.md — Path qualification](DESIGN.md#path-qualificati
 
 Navigational comments in generated Rust (section banners, per-field `// proto: …` labels, merge-arm notes, synthesized accessor docs) are **not required**. Semantics live in `puroro` / `puroro-rt` rustdoc and in DESIGN / this document. The hand-written [`sample-generated/`](sample-generated/) may keep informal comments for human review of the reference shape; that is not a codegen contract.
 
+**Proto source comments** (`SourceCodeInfo.Location.leading_comments` / `trailing_comments`) are forwarded onto user-facing generated items as rustdoc (`#[doc = …]`): message / enum types, field getters, oneof group / variant getters, and enum values. Internal catalog items (`*Fields`, `FIELD_*` / `BIT_*`, merge arms) stay undocumented. Detached comments are ignored. Comment text is not rewritten for doctest safety; the generated `Cargo.toml` sets `[lib] doctest = false` because proto examples are not Rust. Host crates that `include!` generated sources (for example `puroro-types`, `puroro-codegen-tests`) need the same `doctest = false` on their own `[lib]`.
+
 **File header** — every **real** plugin module carries a machine marker and the source message:
 
 ```rust

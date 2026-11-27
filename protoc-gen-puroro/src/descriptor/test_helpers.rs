@@ -8,8 +8,9 @@
 //! ```
 
 use super::{
-    CodegenMeta, CodegenRequest, EnumDesc, EnumRepr, EnumValueDesc, FeatureSet, FieldDesc,
-    FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile, Syntax, UnknownFieldsPolicy,
+    CodegenMeta, CodegenRequest, Comments, EnumDesc, EnumRepr, EnumValueDesc, FeatureSet,
+    FieldDesc, FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile, Syntax,
+    UnknownFieldsPolicy,
 };
 
 /// Optional field with empty options (`label = Optional`, no type name / oneof).
@@ -29,6 +30,7 @@ pub(crate) fn field(name: impl Into<String>, number: i32, type_: FieldType) -> F
         message_layout: None,
         child_parse: None,
         features: FeatureSet::default(),
+        comments: Comments::default(),
     }
 }
 
@@ -44,6 +46,7 @@ pub(crate) fn message(name: impl Into<String>) -> MessageDesc {
         unknown_fields: UnknownFieldsPolicy::Unspecified,
         child_parse: super::ChildParse::Unspecified,
         features: FeatureSet::default(),
+        comments: Comments::default(),
     }
 }
 
@@ -54,6 +57,7 @@ pub(crate) fn enumeration(name: impl Into<String>, values: Vec<EnumValueDesc>) -
         values,
         features: FeatureSet::default(),
         enum_repr: EnumRepr::Unspecified,
+        comments: Comments::default(),
     }
 }
 
@@ -61,11 +65,15 @@ pub(crate) fn enum_value(name: impl Into<String>, number: i32) -> EnumValueDesc 
     EnumValueDesc {
         name: name.into(),
         number,
+        comments: Comments::default(),
     }
 }
 
 pub(crate) fn oneof(name: impl Into<String>) -> OneofDesc {
-    OneofDesc { name: name.into() }
+    OneofDesc {
+        name: name.into(),
+        comments: Comments::default(),
+    }
 }
 
 /// Synthetic `map_entry` message with `key` (field 1) and `value` (field 2).

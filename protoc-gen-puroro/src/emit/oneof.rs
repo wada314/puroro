@@ -8,7 +8,7 @@ use crate::error::Result;
 use crate::module_tree::nested_root_alias;
 use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
-use ::syn::{Item, Type, parse_quote};
+use ::syn::{Attribute, Item, Type, parse_quote};
 
 /// Owned facts for one generated oneof group.
 pub(super) struct OneofEmit {
@@ -16,6 +16,8 @@ pub(super) struct OneofEmit {
     pub name: Ident,
     /// Raw proto oneof name — `"kind"` (visit key, `kind_mut`).
     pub name_str: String,
+    /// Proto comments as `#[doc = …]` (`None` when absent).
+    pub doc: Option<Attribute>,
     /// Companion submodule — `kind` (`mod kind { … }`).
     pub mod_name: Ident,
     /// Shared / mut shape enum — `Kind`.
@@ -34,6 +36,8 @@ pub(super) struct OneofVariantEmit {
     pub name: Ident,
     /// Raw proto field name — `"email"`.
     pub name_str: String,
+    /// Proto comments as `#[doc = …]` (`None` when absent).
+    pub doc: Option<Attribute>,
     /// Enum variant ident — `Email` (`Kind::Email`, `KindCase::Email`).
     pub variant_name: Ident,
     /// Shape type parameter — `T0`, `T1`.
@@ -638,8 +642,10 @@ pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> (TokenSt
         let optional_ty = &v.optional_ty;
         let get = super::message::eager_field(companion, field_const);
         let get_mut = super::message::eager_field_mut(companion, field_const);
+        let vdoc = &v.doc;
         if matches!(v.getter_shape.eager(), EagerGetter::Message) {
             variant_getters.push(quote! {
+                #vdoc
                 pub fn #vname(&self) -> ::core::option::Option<&#mut_target> {
                     #get.get()
                 }
@@ -651,6 +657,7 @@ pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> (TokenSt
             });
         } else {
             variant_getters.push(quote! {
+                #vdoc
                 pub fn #vname<'a>(
                     &'a self,
                 ) -> ::puroro::Optional<#optional_ty, impl ::puroro::HasDefault<#optional_ty>>
@@ -669,7 +676,9 @@ pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> (TokenSt
         }
     }
 
+    let doc = &oneof.doc;
     let getters = quote! {
+        #doc
         pub fn #name<'a>(
             &'a self,
         ) -> impl ::puroro::OneofView<
