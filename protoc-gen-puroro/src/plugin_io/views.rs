@@ -9,7 +9,7 @@
 //! errors; other fields are ignored.
 
 use crate::error::{Error, Result};
-use ::protobuf_core::{AsRefExtProtobuf, Field, FieldValue, ReadExtVarint};
+use ::protobuf_core::{AsRefExtProtobuf, Field, FieldNumber, FieldValue, ReadExtVarint};
 use ::std::str;
 
 fn while_decoding<T>(message: &'static str, f: impl FnOnce() -> Result<T>) -> Result<T> {
@@ -59,7 +59,7 @@ fn extend_i32s(out: &mut Vec<i32>, field: &Field<&[u8]>) -> Result<()> {
     }
 }
 
-fn record_extension_enum(out: &mut Vec<(u32, i32)>, number: u32, value: i32) {
+fn record_extension_enum(out: &mut Vec<(FieldNumber, i32)>, number: FieldNumber, value: i32) {
     if let Some((_, slot)) = out.iter_mut().rev().find(|(n, _)| *n == number) {
         *slot = value;
     } else {
@@ -320,7 +320,7 @@ pub struct MessageOptions {
     pub map_entry: Option<bool>,
     pub features: Option<FeatureSet>,
     /// Last-wins varint extensions keyed by field number.
-    pub extension_enums: Vec<(u32, i32)>,
+    pub extension_enums: Vec<(FieldNumber, i32)>,
 }
 
 impl MessageOptions {
@@ -332,9 +332,13 @@ impl MessageOptions {
                 match field.field_number.as_u32() {
                     7 => out.map_entry = Some(expect_bool(&field)?),
                     12 => out.features = Some(FeatureSet::parse(expect_len(&field)?)?),
-                    n => {
+                    _ => {
                         if let FieldValue::Varint(_) = &field.value {
-                            record_extension_enum(&mut out.extension_enums, n, expect_i32(&field)?);
+                            record_extension_enum(
+                                &mut out.extension_enums,
+                                field.field_number,
+                                expect_i32(&field)?,
+                            );
                         }
                     }
                 }
@@ -347,7 +351,7 @@ impl MessageOptions {
         self.extension_enums
             .iter()
             .rev()
-            .find(|(n, _)| *n == field_number)
+            .find(|(n, _)| n.as_u32() == field_number)
             .map(|(_, v)| *v)
     }
 }
@@ -358,7 +362,7 @@ pub struct FieldOptions {
     pub packed: Option<bool>,
     pub features: Option<FeatureSet>,
     /// Last-wins varint extensions keyed by field number.
-    pub extension_enums: Vec<(u32, i32)>,
+    pub extension_enums: Vec<(FieldNumber, i32)>,
 }
 
 impl FieldOptions {
@@ -370,9 +374,13 @@ impl FieldOptions {
                 match field.field_number.as_u32() {
                     2 => out.packed = Some(expect_bool(&field)?),
                     21 => out.features = Some(FeatureSet::parse(expect_len(&field)?)?),
-                    n => {
+                    _ => {
                         if let FieldValue::Varint(_) = &field.value {
-                            record_extension_enum(&mut out.extension_enums, n, expect_i32(&field)?);
+                            record_extension_enum(
+                                &mut out.extension_enums,
+                                field.field_number,
+                                expect_i32(&field)?,
+                            );
                         }
                     }
                 }
@@ -385,7 +393,7 @@ impl FieldOptions {
         self.extension_enums
             .iter()
             .rev()
-            .find(|(n, _)| *n == field_number)
+            .find(|(n, _)| n.as_u32() == field_number)
             .map(|(_, v)| *v)
     }
 }
@@ -395,7 +403,7 @@ impl FieldOptions {
 pub struct EnumOptions {
     pub features: Option<FeatureSet>,
     /// Last-wins varint extensions keyed by field number.
-    pub extension_enums: Vec<(u32, i32)>,
+    pub extension_enums: Vec<(FieldNumber, i32)>,
 }
 
 impl EnumOptions {
@@ -406,9 +414,13 @@ impl EnumOptions {
                 let field = field?;
                 match field.field_number.as_u32() {
                     7 => out.features = Some(FeatureSet::parse(expect_len(&field)?)?),
-                    n => {
+                    _ => {
                         if let FieldValue::Varint(_) = &field.value {
-                            record_extension_enum(&mut out.extension_enums, n, expect_i32(&field)?);
+                            record_extension_enum(
+                                &mut out.extension_enums,
+                                field.field_number,
+                                expect_i32(&field)?,
+                            );
                         }
                     }
                 }
@@ -421,7 +433,7 @@ impl EnumOptions {
         self.extension_enums
             .iter()
             .rev()
-            .find(|(n, _)| *n == field_number)
+            .find(|(n, _)| n.as_u32() == field_number)
             .map(|(_, v)| *v)
     }
 }
