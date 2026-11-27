@@ -12,6 +12,14 @@ doctest = false
 [lints]
 workspace = true
 
+[features]
+default = []
+# Matches generated crates' opt-in `descriptors` cfg (FILE_DESCRIPTOR_SET).
+descriptors = []
+# Compiles generated `{service}_client` / `{service}_server` modules (cfg-gated
+# in plugin output). Also enables `puroro/tonic` for `PuroroCodec`.
+tonic = ["dep:tonic", "puroro/tonic"]
+
 [dependencies]
 allocator-api2 = "0.2"
 bitvec = "1"
@@ -19,6 +27,7 @@ bytes = "1"
 puroro = { path = ".." }
 # Fixtures that set `puroro_opt` to `lazy=true` need the experimental feature.
 puroro-rt = { path = "../puroro-rt", features = ["lazy"] }
+tonic = { version = "0.14", optional = true }
 
 # Host plugin binary for the build script (`CARGO_BIN_FILE_PROTOC_GEN_PURORO`).
 # Requires nightly Cargo `-Z bindeps` (enabled via `.cargo/config.toml`).

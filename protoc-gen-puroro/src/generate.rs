@@ -6,7 +6,7 @@
 
 use crate::descriptor::CodegenRequest;
 use crate::descriptor::features::Utf8Validation;
-use crate::emit::{generated_file_attrs, prepare_file};
+use crate::emit::{TonicEmitOptions, generated_file_attrs, prepare_file};
 use crate::error::{Error, Result};
 use crate::field_kind::plan_message_storage;
 use crate::module_tree::ModuleForest;
@@ -55,6 +55,8 @@ const GENERATED_DEPENDENCIES: &[GeneratedDependency] = &[
     },
 ];
 
+const GENERATED_TONIC_VERSION: &str = env!("PURORO_GEN_DEP_TONIC");
+
 /// Generate-time knobs parsed from [`CodegenRequest`] `parameter`.
 struct GenerateOptions {
     /// proto2 syntax default for `utf8_validation` (spec default is `NONE`).
@@ -65,6 +67,12 @@ struct GenerateOptions {
     ///
     /// Off by default. Pass `--puroro_opt=lazy=true` (or bare `lazy`) to opt in.
     lazy: bool,
+    /// Emit tonic stubs when the file has services (`false` suppresses).
+    tonic: bool,
+    /// Emit `{service}_client` modules when [`Self::tonic`] is on.
+    tonic_client: bool,
+    /// Emit `{service}_server` modules when [`Self::tonic`] is on.
+    tonic_server: bool,
 }
 
 fn parse_generate_options(parameter: Option<&str>) -> Result<GenerateOptions> {
@@ -72,6 +80,9 @@ fn parse_generate_options(parameter: Option<&str>) -> Result<GenerateOptions> {
         proto2_utf8: Utf8Validation::None,
         crate_name: DEFAULT_CRATE_NAME.to_owned(),
         lazy: false,
+        tonic: true,
+        tonic_client: true,
+        tonic_server: true,
     };
     let Some(raw) = parameter else {
         return Ok(options);
@@ -96,9 +107,27 @@ fn parse_generate_options(parameter: Option<&str>) -> Result<GenerateOptions> {
             options.crate_name = parse_crate_name(value)?;
         } else if key == "lazy" {
             options.lazy = parse_bool_flag(key, value)?;
+        } else if key == "tonic" {
+            options.tonic = parse_bool_flag(key, value)?;
+        } else if key == "tonic_client" {
+            options.tonic_client = parse_bool_flag(key, value)?;
+        } else if key == "tonic_server" {
+            options.tonic_server = parse_bool_flag(key, value)?;
         }
     }
     Ok(options)
+}
+
+impl GenerateOptions {
+    fn tonic_emit(&self) -> Option<TonicEmitOptions> {
+        if !self.tonic {
+            return None;
+        }
+        Some(TonicEmitOptions {
+            build_client: self.tonic_client,
+            build_server: self.tonic_server,
+        })
+    }
 }
 
 /// Parse a `--puroro_opt` boolean value (`true`/`false`, plus common aliases).
@@ -132,8 +161,9 @@ fn parse_crate_name(value: &str) -> Result<String> {
 ///
 /// `protoc` overwrites this file on every run. Dependency requirements come
 /// from [`GENERATED_DEPENDENCIES`]. When `lazy` is on, `puroro-rt` enables its
-/// experimental `lazy` feature.
-fn cargo_manifest(crate_name: &str, lazy: bool) -> ResponseFile {
+/// experimental `lazy` feature. When `with_tonic` is on, an optional `tonic`
+/// dependency and feature gate the generated stub modules.
+fn cargo_manifest(crate_name: &str, lazy: bool, with_tonic: bool) -> ResponseFile {
     let mut dependencies = String::new();
     for dep in GENERATED_DEPENDENCIES {
         if dep.name == "puroro-rt" && lazy {
@@ -145,8 +175,21 @@ fn cargo_manifest(crate_name: &str, lazy: bool) -> ResponseFile {
             dependencies.push_str(&dep.toml_line());
         }
     }
+    if with_tonic {
+        dependencies.push_str(&format!(
+            "tonic = {{ version = \"{GENERATED_TONIC_VERSION}\", optional = true }}\n"
+        ));
+    }
     let lazy_comment = if lazy {
         "# Generated with `--puroro_opt=lazy=true` (experimental NameLazy aliases).\n"
+    } else {
+        ""
+    };
+    let tonic_feature = if with_tonic {
+        "\
+# Enable generated `{service}_client` / `{service}_server` modules (needs tonic).
+tonic = [\"dep:tonic\", \"puroro/tonic\"]
+"
     } else {
         ""
     };
@@ -174,7 +217,7 @@ default = []
 # Embed encoded `FileDescriptorSet` (raw CodeGeneratorRequest.proto_file bodies)
 # as `descriptors::FILE_DESCRIPTOR_SET`. `Message::FULL_NAME` needs no feature.
 descriptors = []
-
+{tonic_feature}
 [dependencies]
 {dependencies}"
         ),
@@ -223,8 +266,13 @@ pub fn generate(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
         .append_inner_attrs(generated_file_attrs(&targets)?);
 
     let storage = plan_message_storage(&file_set);
+    let tonic_emit = options.tonic_emit();
+    let mut emitted_services = false;
     for file in &targets {
-        forest.install_file(prepare_file(file, &storage, options.lazy)?);
+        if tonic_emit.is_some() && file.services().next().is_some() {
+            emitted_services = true;
+        }
+        forest.install_file(prepare_file(file, &storage, options.lazy, tonic_emit)?);
     }
 
     let file_descriptor_set = encode_file_descriptor_set(&request.proto_file_raw)?;
@@ -238,7 +286,7 @@ pub fn generate(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
     let file = files
         .pop()
         .ok_or_else(|| Error::internal("layout produced no files"))?;
-    let manifest = cargo_manifest(&options.crate_name, options.lazy);
+    let manifest = cargo_manifest(&options.crate_name, options.lazy, emitted_services);
     Ok(CodeGeneratorResponse::from_files(vec![file, manifest]))
 }
 
@@ -290,8 +338,8 @@ mod tests {
     use crate::descriptor::test_helpers as desc;
     use crate::descriptor::{
         BytesLayout, CodegenRequest, Comments, Edition, EnumDesc, EnumRepr, EnumValueDesc,
-        FeatureSet, FieldDesc, FieldLabel, FieldType, MessageDesc, MessageLayout, ProtoFile,
-        ProtoFqn, StringLayout, Syntax, UnknownFieldsPolicy,
+        FeatureSet, FieldDesc, FieldLabel, FieldType, MessageDesc, MessageLayout, MethodDesc,
+        ProtoFile, ProtoFqn, StringLayout, Syntax, UnknownFieldsPolicy,
     };
     use crate::plugin_io::{decode_request, encode_file_descriptor_set};
     use ::protobuf_core::{AsRefExtProtobuf, Field, FieldNumber, FieldValue, WriteExtProtobuf};
@@ -1151,6 +1199,124 @@ mod tests {
         }];
         let content = generate_lib(&request);
         assert!(!content.contains("ZeroIntDefault"));
+    }
+
+    #[test]
+    fn generate_greeter_service_stubs() {
+        let request = desc::request(vec![ProtoFile {
+            messages: vec![
+                MessageDesc {
+                    fields: vec![desc::field("name", 1, FieldType::String)],
+                    ..desc::message("HelloRequest")
+                },
+                MessageDesc {
+                    fields: vec![desc::field("message", 1, FieldType::String)],
+                    ..desc::message("HelloReply")
+                },
+            ],
+            services: vec![desc::service(
+                "Greeter",
+                vec![
+                    desc::method(
+                        "SayHello",
+                        ProtoFqn::parse(".helloworld.HelloRequest"),
+                        ProtoFqn::parse(".helloworld.HelloReply"),
+                    ),
+                    MethodDesc {
+                        server_streaming: true,
+                        ..desc::method(
+                            "SayHelloStream",
+                            ProtoFqn::parse(".helloworld.HelloRequest"),
+                            ProtoFqn::parse(".helloworld.HelloReply"),
+                        )
+                    },
+                ],
+            )],
+            ..desc::proto_file("greeter.proto", "helloworld")
+        }]);
+        let response = generate(&request).expect("generate greeter");
+        let lib = response
+            .files
+            .iter()
+            .find(|f| f.name == "lib.rs")
+            .expect("lib.rs");
+        assert!(
+            lib.content.contains("GreeterClient"),
+            "missing GreeterClient"
+        );
+        assert!(
+            lib.content.contains("GreeterServer"),
+            "missing GreeterServer"
+        );
+        assert!(
+            lib.content.contains("PuroroCodec"),
+            "missing PuroroCodec path"
+        );
+        assert!(
+            lib.content.contains("cfg(feature = \"tonic\")"),
+            "stubs should be cfg-gated"
+        );
+        assert!(
+            lib.content.contains("say_hello_stream"),
+            "streaming method should be snake_case"
+        );
+        let manifest = response
+            .files
+            .iter()
+            .find(|f| f.name == "Cargo.toml")
+            .expect("Cargo.toml");
+        assert!(
+            manifest.content.contains("tonic ="),
+            "manifest should list tonic: {}",
+            manifest.content
+        );
+        assert!(
+            manifest.content.contains("puroro/tonic"),
+            "manifest should enable puroro/tonic via feature"
+        );
+    }
+
+    #[test]
+    fn tonic_false_skips_service_stubs() {
+        let mut request = desc::request(vec![ProtoFile {
+            messages: vec![
+                MessageDesc {
+                    fields: vec![desc::field("name", 1, FieldType::String)],
+                    ..desc::message("HelloRequest")
+                },
+                MessageDesc {
+                    fields: vec![desc::field("message", 1, FieldType::String)],
+                    ..desc::message("HelloReply")
+                },
+            ],
+            services: vec![desc::service(
+                "Greeter",
+                vec![desc::method(
+                    "SayHello",
+                    ProtoFqn::parse(".helloworld.HelloRequest"),
+                    ProtoFqn::parse(".helloworld.HelloReply"),
+                )],
+            )],
+            ..desc::proto_file("greeter.proto", "helloworld")
+        }]);
+        request.meta.parameter = Some("tonic=false".into());
+        let response = generate(&request).expect("generate with tonic=false");
+        let lib = response
+            .files
+            .iter()
+            .find(|f| f.name == "lib.rs")
+            .expect("lib.rs");
+        assert!(!lib.content.contains("GreeterClient"));
+        assert!(!lib.content.contains("GreeterServer"));
+        let manifest = response
+            .files
+            .iter()
+            .find(|f| f.name == "Cargo.toml")
+            .expect("Cargo.toml");
+        assert!(
+            !manifest.content.contains("tonic ="),
+            "no tonic dep when stubs suppressed"
+        );
     }
 
     const DESCRIPTOR_PROTO: &str = "google/protobuf/descriptor.proto";

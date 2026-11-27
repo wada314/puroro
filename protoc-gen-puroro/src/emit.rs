@@ -39,6 +39,7 @@ mod lazy;
 mod message;
 mod oneof;
 mod parse;
+mod service;
 mod type_path;
 
 /// Crate-level inner attributes (`//!` / `/*!` header and clippy allows).
@@ -99,6 +100,15 @@ pub(crate) struct PreparedFile {
     enums: Vec<PreparedEnum>,
     /// File-level messages — e.g. `[PreparedMessage` for `Foo]`.
     messages: Vec<PreparedMessage>,
+    /// cfg-gated tonic `{service}_client` / `{service}_server` modules.
+    service_items: Vec<Item>,
+}
+
+/// Which tonic stub modules to emit for services in a file.
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct TonicEmitOptions {
+    pub build_client: bool,
+    pub build_server: bool,
 }
 
 fn prepare_message(
@@ -156,7 +166,19 @@ pub(crate) fn prepare_file(
     file: &File<'_>,
     storage: &MessageStoragePlan,
     emit_lazy: bool,
+    tonic: Option<TonicEmitOptions>,
 ) -> Result<PreparedFile> {
+    let mut service_items = Vec::new();
+    if let Some(tonic) = tonic {
+        for service in file.services() {
+            service_items.extend(service::render_service_items(
+                service,
+                file.package(),
+                tonic.build_client,
+                tonic.build_server,
+            )?);
+        }
+    }
     Ok(PreparedFile {
         package: file.package().to_owned(),
         enums: file.enums().map(prepare_enum).collect::<Result<Vec<_>>>()?,
@@ -164,6 +186,7 @@ pub(crate) fn prepare_file(
             .messages()
             .map(|m| prepare_message(m, storage, emit_lazy))
             .collect::<Result<Vec<_>>>()?,
+        service_items,
     })
 }
 
@@ -176,6 +199,7 @@ impl ModuleForest {
         for message in prepared.messages {
             package.install_message(message);
         }
+        package.append_items(prepared.service_items);
     }
 }
 

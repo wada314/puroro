@@ -14,16 +14,16 @@ pub use self::views::{CodeGeneratorResponse, FileDescriptorSet, ResponseFile};
 
 use self::views::{
     CodeGeneratorRequest as CodeGeneratorRequestView, DescriptorProto, EnumDescriptorProto,
-    EnumValueDescriptorProto, FieldDescriptorProto, FileDescriptorProto, OneofDescriptorProto,
-    SourceCodeInfo,
+    EnumValueDescriptorProto, FieldDescriptorProto, FileDescriptorProto, MethodDescriptorProto,
+    OneofDescriptorProto, ServiceDescriptorProto, SourceCodeInfo,
 };
 use crate::descriptor::features::FeatureSet;
 use crate::descriptor::{
     BYTES_LAYOUT_OPTION_NUMBER, BytesLayout, CHILD_PARSE_OPTION_NUMBER, ChildParse, CodegenMeta,
     CodegenRequest, Comments, ENUM_REPR_OPTION_NUMBER, Edition, EnumDesc, EnumRepr, EnumValueDesc,
     FieldDesc, FieldLabel, FieldType, MESSAGE_LAYOUT_OPTION_NUMBER, MessageDesc, MessageLayout,
-    OneofDesc, ProtoFile, ProtoFqn, STRING_LAYOUT_OPTION_NUMBER, StringLayout, Syntax,
-    UNKNOWN_FIELDS_OPTION_NUMBER, UnknownFieldsPolicy,
+    MethodDesc, OneofDesc, ProtoFile, ProtoFqn, STRING_LAYOUT_OPTION_NUMBER, ServiceDesc,
+    StringLayout, Syntax, UNKNOWN_FIELDS_OPTION_NUMBER, UnknownFieldsPolicy,
 };
 use crate::error::{Error, Result};
 use ::std::convert::TryFrom;
@@ -92,6 +92,10 @@ fn decode_file_descriptor(file: &FileDescriptorProto<'_>) -> Result<ProtoFile> {
         for enumeration in &file.enum_type {
             enums.push(decode_enum(enumeration)?);
         }
+        let mut services = Vec::new();
+        for service in &file.service {
+            services.push(decode_service(service)?);
+        }
         let features = match &file.options {
             Some(options) => options.features.unwrap_or_default(),
             None => FeatureSet::default(),
@@ -110,9 +114,46 @@ fn decode_file_descriptor(file: &FileDescriptorProto<'_>) -> Result<ProtoFile> {
             dependency,
             messages,
             enums,
+            services,
         };
         attach_source_comments(&mut out, &source_locations);
         Ok(out)
+    })
+}
+
+fn decode_service(service: &ServiceDescriptorProto<'_>) -> Result<ServiceDesc> {
+    with_decoding_context("ServiceDescriptorProto", || {
+        let name = service.name.unwrap_or("").to_owned();
+        let mut methods = Vec::new();
+        for method in &service.method {
+            methods.push(decode_method(method)?);
+        }
+        Ok(ServiceDesc {
+            name,
+            methods,
+            comments: Comments::default(),
+        })
+    })
+}
+
+fn decode_method(method: &MethodDescriptorProto<'_>) -> Result<MethodDesc> {
+    with_decoding_context("MethodDescriptorProto", || {
+        let name = method.name.unwrap_or("").to_owned();
+        let input_type = method
+            .input_type
+            .map(ProtoFqn::parse)
+            .ok_or_else(|| Error::Codegen("MethodDescriptorProto missing input_type".to_owned()))?;
+        let output_type = method.output_type.map(ProtoFqn::parse).ok_or_else(|| {
+            Error::Codegen("MethodDescriptorProto missing output_type".to_owned())
+        })?;
+        Ok(MethodDesc {
+            name,
+            input_type,
+            output_type,
+            client_streaming: method.client_streaming.unwrap_or(false),
+            server_streaming: method.server_streaming.unwrap_or(false),
+            comments: Comments::default(),
+        })
     })
 }
 
@@ -385,7 +426,7 @@ fn enum_from_i32_opt<T: TryFrom<i32>>(raw: Option<i32>, field_number: u32) -> Re
 /// Attach `SourceCodeInfo` comments onto declaration descriptors by path.
 ///
 /// Only whole-declaration paths are used (message / field / enum / value /
-/// oneof). Deeper paths (name, type, number, …) are ignored.
+/// oneof / service / method). Deeper paths (name, type, number, …) are ignored.
 fn attach_source_comments(file: &mut ProtoFile, locations: &[SourceLocation]) {
     // SourceCodeInfo paths: FileDescriptorProto.message_type = 4, enum_type = 5.
     for loc in locations {
@@ -410,8 +451,32 @@ fn attach_source_comments(file: &mut ProtoFile, locations: &[SourceLocation]) {
                     attach_enum_comments(enumeration, rest, &loc.comments);
                 }
             }
+            // FileDescriptorProto.service = 6
+            [6, si] => {
+                if let Some(service) = index_mut(&mut file.services, *si) {
+                    service.comments.merge(loc.comments.clone());
+                }
+            }
+            [6, si, rest @ ..] => {
+                if let Some(service) = index_mut(&mut file.services, *si) {
+                    attach_service_comments(service, rest, &loc.comments);
+                }
+            }
             _ => {}
         }
+    }
+}
+
+fn attach_service_comments(service: &mut ServiceDesc, path: &[i32], comments: &Comments) {
+    match path {
+        [] => service.comments.merge(comments.clone()),
+        // ServiceDescriptorProto.method = 2
+        [2, mi] => {
+            if let Some(method) = index_mut(&mut service.methods, *mi) {
+                method.comments.merge(comments.clone());
+            }
+        }
+        _ => {}
     }
 }
 

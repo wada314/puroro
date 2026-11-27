@@ -49,6 +49,8 @@ RUSTDOCFLAGS='-D warnings' cargo doc --no-deps \
 # Optional tonic Codec surface:
 cargo test -p puroro --features tonic
 RUSTDOCFLAGS='-D warnings' cargo doc --no-deps -p puroro --features tonic
+# Generated service stubs (cfg-gated in plugin output):
+cargo test -p puroro-codegen-tests --features tonic
 ```
 
 `cargo test` also runs rustdoc examples (doctests). CI (`.github/workflows/rust.yml`) runs fmt, clippy (`-D warnings`, excluding generated/archive/bench crates), tests, codegen fixtures, and `cargo doc` with `RUSTDOCFLAGS=-D warnings` for the first-party packages above. Bench smoke stays in `.github/workflows/benches.yml`. `puroro-types` is excluded from workspace clippy like other protoc-generated surfaces (its `build.rs` needs `protoc` + bindeps).

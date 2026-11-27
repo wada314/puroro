@@ -137,6 +137,31 @@ pub struct ProtoFile {
     pub dependency: Vec<String>,
     pub messages: Vec<MessageDesc>,
     pub enums: Vec<EnumDesc>,
+    /// File-level `service` declarations (`FileDescriptorProto.service`).
+    pub services: Vec<ServiceDesc>,
+}
+
+/// A service (`ServiceDescriptorProto` subset).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ServiceDesc {
+    pub name: String,
+    pub methods: Vec<MethodDesc>,
+    /// Proto source comments for this service declaration.
+    pub comments: Comments,
+}
+
+/// An RPC method (`MethodDescriptorProto` subset).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MethodDesc {
+    pub name: String,
+    /// Absolute type name (leading `.`), e.g. `.helloworld.HelloRequest`.
+    pub input_type: ProtoFqn,
+    /// Absolute type name (leading `.`), e.g. `.helloworld.HelloReply`.
+    pub output_type: ProtoFqn,
+    pub client_streaming: bool,
+    pub server_streaming: bool,
+    /// Proto source comments for this method declaration.
+    pub comments: Comments,
 }
 
 /// A message type (`DescriptorProto` subset).
