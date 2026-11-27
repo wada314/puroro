@@ -293,7 +293,6 @@ mod tests {
         FeatureSet, FieldDesc, FieldLabel, FieldType, MessageDesc, MessageLayout, ProtoFile,
         ProtoFqn, StringLayout, Syntax, UnknownFieldsPolicy,
     };
-    use crate::plugin_io::views::{CodeGeneratorRequest, FileDescriptorSet};
     use crate::plugin_io::{decode_request, encode_file_descriptor_set};
     use ::protobuf_core::{AsRefExtProtobuf, Field, FieldNumber, FieldValue, WriteExtProtobuf};
     use ::std::env;
@@ -1206,9 +1205,9 @@ mod tests {
     ) -> CodegenRequest {
         let mut request = Vec::new();
         for name in file_to_generate {
+            // CodeGeneratorRequest.file_to_generate = 1;
             let field = Field::new(
-                FieldNumber::try_new(CodeGeneratorRequest::FILE_TO_GENERATE)
-                    .expect("file_to_generate field number"),
+                FieldNumber::try_new(1).expect("file_to_generate field number"),
                 FieldValue::Len(name.as_bytes()),
             );
             request
@@ -1217,15 +1216,16 @@ mod tests {
         }
         for field in AsRefExtProtobuf::read_protobuf_fields(&descriptor_set) {
             let field = field.expect("FileDescriptorSet field");
-            if field.field_number.as_u32() != FileDescriptorSet::FILE {
+            // FileDescriptorSet.file = 1;
+            if field.field_number.as_u32() != 1 {
                 continue;
             }
             let FieldValue::Len(bytes) = field.value else {
                 panic!("FileDescriptorSet.file must be length-delimited");
             };
+            // CodeGeneratorRequest.proto_file = 15;
             let wrapped = Field::new(
-                FieldNumber::try_new(CodeGeneratorRequest::PROTO_FILE)
-                    .expect("proto_file field number"),
+                FieldNumber::try_new(15).expect("proto_file field number"),
                 FieldValue::Len(bytes),
             );
             request

@@ -4,17 +4,16 @@
 //! and encodes a minimal [`CodeGeneratorResponse`].
 //!
 //! Decode walks wire bytes through [`views`]: each message is [`parse`](views::FileDescriptorProto::parse)d
-//! once into an open struct with public fields. Field numbers that are shared
-//! with other call sites stay as associated constants; single-use numbers are
-//! inline. The structured IR is [`crate::descriptor`]; this module does not use
-//! `puroro-types` generated messages (bootstrap cycle).
+//! once into an open struct with public fields. Wire field numbers are written
+//! as literals. The structured IR is [`crate::descriptor`]; this module does
+//! not use `puroro-types` generated messages (bootstrap cycle).
 
 pub mod views;
 
 use self::views::{
     CodeGeneratorRequest as CodeGeneratorRequestView, DescriptorProto, EnumDescriptorProto,
-    EnumValueDescriptorProto, FieldDescriptorProto, FileDescriptorProto, FileDescriptorSet,
-    OneofDescriptorProto, SourceCodeInfo,
+    EnumValueDescriptorProto, FieldDescriptorProto, FileDescriptorProto, OneofDescriptorProto,
+    SourceCodeInfo,
 };
 use crate::descriptor::features::FeatureSet;
 use crate::descriptor::{
@@ -48,13 +47,6 @@ pub struct ResponseFile {
     pub content: String,
 }
 
-impl ResponseFile {
-    /// `optional string name = 1;`
-    pub(crate) const NAME: u32 = 1;
-    /// `optional string content = 15;`
-    pub(crate) const CONTENT: u32 = 15;
-}
-
 /// Plugin response before wire encoding.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CodeGeneratorResponse {
@@ -66,17 +58,6 @@ pub struct CodeGeneratorResponse {
 }
 
 impl CodeGeneratorResponse {
-    /// `optional string error = 1;`
-    pub(crate) const ERROR: u32 = 1;
-    /// `optional uint64 supported_features = 2;`
-    pub(crate) const SUPPORTED_FEATURES_FIELD: u32 = 2;
-    /// `optional int32 minimum_edition = 3;`
-    pub(crate) const MINIMUM_EDITION_FIELD: u32 = 3;
-    /// `optional int32 maximum_edition = 4;`
-    pub(crate) const MAXIMUM_EDITION_FIELD: u32 = 4;
-    /// `repeated File file = 15;`
-    pub(crate) const FILE: u32 = 15;
-
     fn advertised(error: Option<String>, files: Vec<ResponseFile>) -> Self {
         Self {
             error,
@@ -100,26 +81,28 @@ impl CodeGeneratorResponse {
         let mut out = Vec::new();
 
         if let Some(error) = &self.error {
-            write_string_field(&mut out, Self::ERROR, error)?;
+            // optional string error = 1;
+            write_string_field(&mut out, 1, error)?;
         }
         if self.supported_features != 0 {
-            write_uint64_field(
-                &mut out,
-                Self::SUPPORTED_FEATURES_FIELD,
-                self.supported_features,
-            )?;
+            // optional uint64 supported_features = 2;
+            write_uint64_field(&mut out, 2, self.supported_features)?;
         }
         if let Some(edition) = self.minimum_edition {
-            write_int32_field(&mut out, Self::MINIMUM_EDITION_FIELD, edition)?;
+            // optional int32 minimum_edition = 3;
+            write_int32_field(&mut out, 3, edition)?;
         }
         if let Some(edition) = self.maximum_edition {
-            write_int32_field(&mut out, Self::MAXIMUM_EDITION_FIELD, edition)?;
+            // optional int32 maximum_edition = 4;
+            write_int32_field(&mut out, 4, edition)?;
         }
         for file in &self.files {
             let mut nested = Vec::new();
-            write_string_field(&mut nested, ResponseFile::NAME, &file.name)?;
-            write_string_field(&mut nested, ResponseFile::CONTENT, &file.content)?;
-            write_len_field(&mut out, Self::FILE, &nested)?;
+            // File.name = 1; File.content = 15;
+            write_string_field(&mut nested, 1, &file.name)?;
+            write_string_field(&mut nested, 15, &file.content)?;
+            // repeated File file = 15;
+            write_len_field(&mut out, 15, &nested)?;
         }
 
         Ok(out)
@@ -161,7 +144,8 @@ pub fn decode_request(bytes: &[u8]) -> Result<CodegenRequest> {
 pub fn encode_file_descriptor_set(proto_file_raw: &[Vec<u8>]) -> Result<Vec<u8>> {
     let mut out = Vec::new();
     for body in proto_file_raw {
-        write_len_field(&mut out, FileDescriptorSet::FILE, body)?;
+        // FileDescriptorSet.file = 1;
+        write_len_field(&mut out, 1, body)?;
     }
     Ok(out)
 }
@@ -303,10 +287,9 @@ fn decode_field(field: &FieldDescriptorProto<'_>) -> Result<FieldDesc> {
     with_decoding_context("FieldDescriptorProto", || {
         let name = field.name.unwrap_or("").to_owned();
         let number = field.number.unwrap_or(0);
-        let label = enum_from_i32_opt(field.label, FieldDescriptorProto::LABEL)?
-            .unwrap_or(FieldLabel::Optional);
-        let type_ =
-            enum_from_i32_opt(field.type_, FieldDescriptorProto::TYPE)?.unwrap_or(FieldType::Int32);
+        // FieldDescriptorProto.label = 4; type = 5;
+        let label = enum_from_i32_opt(field.label, 4)?.unwrap_or(FieldLabel::Optional);
+        let type_ = enum_from_i32_opt(field.type_, 5)?.unwrap_or(FieldType::Int32);
         let type_name = field.type_name.map(ProtoFqn::parse);
         let default_value = field.default_value.map(str::to_owned);
         let oneof_index = field.oneof_index;
@@ -378,32 +361,15 @@ fn decode_field_options(options: &views::FieldOptions) -> Result<DecodedFieldOpt
 fn decode_feature_set(features: &views::FeatureSet) -> Result<FeatureSet> {
     with_decoding_context("FeatureSet", || {
         Ok(FeatureSet {
-            field_presence: enum_from_i32_opt(
-                features.field_presence,
-                views::FeatureSet::FIELD_PRESENCE,
-            )?,
-            enum_type: enum_from_i32_opt(features.enum_type, views::FeatureSet::ENUM_TYPE)?,
-            repeated_field_encoding: enum_from_i32_opt(
-                features.repeated_field_encoding,
-                views::FeatureSet::REPEATED_FIELD_ENCODING,
-            )?,
-            utf8_validation: enum_from_i32_opt(
-                features.utf8_validation,
-                views::FeatureSet::UTF8_VALIDATION,
-            )?,
-            message_encoding: enum_from_i32_opt(
-                features.message_encoding,
-                views::FeatureSet::MESSAGE_ENCODING,
-            )?,
-            json_format: enum_from_i32_opt(features.json_format, views::FeatureSet::JSON_FORMAT)?,
-            enforce_naming_style: enum_from_i32_opt(
-                features.enforce_naming_style,
-                views::FeatureSet::ENFORCE_NAMING_STYLE,
-            )?,
-            default_symbol_visibility: enum_from_i32_opt(
-                features.default_symbol_visibility,
-                views::FeatureSet::DEFAULT_SYMBOL_VISIBILITY,
-            )?,
+            // FeatureSet field numbers 1..=8.
+            field_presence: enum_from_i32_opt(features.field_presence, 1)?,
+            enum_type: enum_from_i32_opt(features.enum_type, 2)?,
+            repeated_field_encoding: enum_from_i32_opt(features.repeated_field_encoding, 3)?,
+            utf8_validation: enum_from_i32_opt(features.utf8_validation, 4)?,
+            message_encoding: enum_from_i32_opt(features.message_encoding, 5)?,
+            json_format: enum_from_i32_opt(features.json_format, 6)?,
+            enforce_naming_style: enum_from_i32_opt(features.enforce_naming_style, 7)?,
+            default_symbol_visibility: enum_from_i32_opt(features.default_symbol_visibility, 8)?,
         })
     })
 }
@@ -522,27 +488,25 @@ fn enum_from_i32_opt<T: TryFrom<i32>>(raw: Option<i32>, field_number: u32) -> Re
 /// Only whole-declaration paths are used (message / field / enum / value /
 /// oneof). Deeper paths (name, type, number, …) are ignored.
 fn attach_source_comments(file: &mut ProtoFile, locations: &[SourceLocation]) {
-    // SourceCodeInfo paths store descriptor field numbers as `int32`.
-    let message_type = FileDescriptorProto::MESSAGE_TYPE as i32;
-    let enum_type = FileDescriptorProto::ENUM_TYPE as i32;
+    // SourceCodeInfo paths: FileDescriptorProto.message_type = 4, enum_type = 5.
     for loc in locations {
         match loc.path.as_slice() {
-            [m, mi] if *m == message_type => {
+            [4, mi] => {
                 if let Some(message) = index_mut(&mut file.messages, *mi) {
                     message.comments.merge(loc.comments.clone());
                 }
             }
-            [m, mi, rest @ ..] if *m == message_type => {
+            [4, mi, rest @ ..] => {
                 if let Some(message) = index_mut(&mut file.messages, *mi) {
                     attach_message_comments(message, rest, &loc.comments);
                 }
             }
-            [e, ei] if *e == enum_type => {
+            [5, ei] => {
                 if let Some(enumeration) = index_mut(&mut file.enums, *ei) {
                     enumeration.comments.merge(loc.comments.clone());
                 }
             }
-            [e, ei, rest @ ..] if *e == enum_type => {
+            [5, ei, rest @ ..] => {
                 if let Some(enumeration) = index_mut(&mut file.enums, *ei) {
                     attach_enum_comments(enumeration, rest, &loc.comments);
                 }
@@ -553,38 +517,35 @@ fn attach_source_comments(file: &mut ProtoFile, locations: &[SourceLocation]) {
 }
 
 fn attach_message_comments(message: &mut MessageDesc, path: &[i32], comments: &Comments) {
-    let field_path = DescriptorProto::FIELD as i32;
-    let nested_type_path = DescriptorProto::NESTED_TYPE as i32;
-    let enum_type_path = DescriptorProto::ENUM_TYPE as i32;
-    let oneof_decl_path = DescriptorProto::ONEOF_DECL as i32;
+    // DescriptorProto.field = 2, nested_type = 3, enum_type = 4, oneof_decl = 8.
     match path {
         [] => message.comments.merge(comments.clone()),
-        [f, fi] if *f == field_path => {
+        [2, fi] => {
             if let Some(desc) = index_mut(&mut message.fields, *fi) {
                 desc.comments.merge(comments.clone());
             }
         }
-        [n, ni] if *n == nested_type_path => {
+        [3, ni] => {
             if let Some(nested) = index_mut(&mut message.nested_messages, *ni) {
                 nested.comments.merge(comments.clone());
             }
         }
-        [n, ni, rest @ ..] if *n == nested_type_path => {
+        [3, ni, rest @ ..] => {
             if let Some(nested) = index_mut(&mut message.nested_messages, *ni) {
                 attach_message_comments(nested, rest, comments);
             }
         }
-        [e, ei] if *e == enum_type_path => {
+        [4, ei] => {
             if let Some(enumeration) = index_mut(&mut message.nested_enums, *ei) {
                 enumeration.comments.merge(comments.clone());
             }
         }
-        [e, ei, rest @ ..] if *e == enum_type_path => {
+        [4, ei, rest @ ..] => {
             if let Some(enumeration) = index_mut(&mut message.nested_enums, *ei) {
                 attach_enum_comments(enumeration, rest, comments);
             }
         }
-        [o, oi] if *o == oneof_decl_path => {
+        [8, oi] => {
             if let Some(oneof) = index_mut(&mut message.oneofs, *oi) {
                 oneof.comments.merge(comments.clone());
             }
@@ -594,10 +555,10 @@ fn attach_message_comments(message: &mut MessageDesc, path: &[i32], comments: &C
 }
 
 fn attach_enum_comments(enumeration: &mut EnumDesc, path: &[i32], comments: &Comments) {
-    let value_path = EnumDescriptorProto::VALUE as i32;
+    // EnumDescriptorProto.value = 2.
     match path {
         [] => enumeration.comments.merge(comments.clone()),
-        [v, vi] if *v == value_path => {
+        [2, vi] => {
             if let Some(desc) = index_mut(&mut enumeration.values, *vi) {
                 desc.comments.merge(comments.clone());
             }
@@ -1167,13 +1128,13 @@ mod tests {
         let mut contents = Vec::new();
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field.unwrap();
-            if field.field_number.as_u32() == CodeGeneratorResponse::FILE {
+            if field.field_number.as_u32() == 15 {
                 let nested = expect_len(&field).unwrap();
                 for inner in AsRefExtProtobuf::read_protobuf_fields(&nested) {
                     let inner = inner.unwrap();
                     match inner.field_number.as_u32() {
-                        ResponseFile::NAME => names.push(expect_string(&inner).unwrap()),
-                        ResponseFile::CONTENT => contents.push(expect_string(&inner).unwrap()),
+                        1 => names.push(expect_string(&inner).unwrap()),
+                        15 => contents.push(expect_string(&inner).unwrap()),
                         _ => {}
                     }
                 }

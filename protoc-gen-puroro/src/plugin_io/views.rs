@@ -2,11 +2,8 @@
 //!
 //! [`parse()`](CodeGeneratorRequest::parse) walks each message body once and
 //! mutates a default-initialized open struct. Nested LEN messages are parsed
-//! recursively. This is not `puroro-types` generated code (bootstrap cycle).
-//!
-//! Field numbers that are also needed outside `parse()` (source-code paths,
-//! encode helpers, error context) stay as associated constants; single-use
-//! numbers are written inline.
+//! recursively. Wire field numbers are written as literals next to the field
+//! they fill. This is not `puroro-types` generated code (bootstrap cycle).
 //!
 //! Singular fields are last-wins. Wrong wire types for a requested field are
 //! errors; other fields are ignored.
@@ -70,15 +67,6 @@ fn record_extension_enum(out: &mut Vec<(u32, i32)>, number: u32, value: i32) {
     }
 }
 
-/// `google.protobuf.FileDescriptorSet` wire numbers (encode helper).
-#[derive(Debug, Clone, Copy)]
-pub struct FileDescriptorSet;
-
-impl FileDescriptorSet {
-    /// `repeated FileDescriptorProto file = 1;`
-    pub(crate) const FILE: u32 = 1;
-}
-
 /// `google.protobuf.compiler.CodeGeneratorRequest` parsed view.
 #[derive(Debug, Clone, Default)]
 pub struct CodeGeneratorRequest<'a> {
@@ -88,20 +76,15 @@ pub struct CodeGeneratorRequest<'a> {
 }
 
 impl<'a> CodeGeneratorRequest<'a> {
-    /// Also used when synthesizing a request from a `FileDescriptorSet`.
-    pub(crate) const FILE_TO_GENERATE: u32 = 1;
-    /// Also used when synthesizing a request from a `FileDescriptorSet`.
-    pub(crate) const PROTO_FILE: u32 = 15;
-
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("CodeGeneratorRequest", || {
             let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 match field.field_number.as_u32() {
-                    Self::FILE_TO_GENERATE => out.file_to_generate.push(expect_str(&field)?),
+                    1 => out.file_to_generate.push(expect_str(&field)?),
                     2 => out.parameter = Some(expect_str(&field)?),
-                    Self::PROTO_FILE => out
+                    15 => out
                         .proto_file
                         .push(FileDescriptorProto::parse(expect_len(&field)?)?),
                     _ => {}
@@ -129,11 +112,6 @@ pub struct FileDescriptorProto<'a> {
 }
 
 impl<'a> FileDescriptorProto<'a> {
-    /// Also used as a `SourceCodeInfo` path segment.
-    pub(crate) const MESSAGE_TYPE: u32 = 4;
-    /// Also used as a `SourceCodeInfo` path segment.
-    pub(crate) const ENUM_TYPE: u32 = 5;
-
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("FileDescriptorProto", || {
             let mut out = Self {
@@ -146,10 +124,10 @@ impl<'a> FileDescriptorProto<'a> {
                     1 => out.name = Some(expect_str(&field)?),
                     2 => out.package = Some(expect_str(&field)?),
                     3 => out.dependency.push(expect_str(&field)?),
-                    Self::MESSAGE_TYPE => out
+                    4 => out
                         .message_type
                         .push(DescriptorProto::parse(expect_len(&field)?)?),
-                    Self::ENUM_TYPE => out
+                    5 => out
                         .enum_type
                         .push(EnumDescriptorProto::parse(expect_len(&field)?)?),
                     8 => out.options = Some(FileOptions::parse(expect_len(&field)?)?),
@@ -176,15 +154,6 @@ pub struct DescriptorProto<'a> {
 }
 
 impl<'a> DescriptorProto<'a> {
-    /// Also used as a `SourceCodeInfo` path segment.
-    pub(crate) const FIELD: u32 = 2;
-    /// Also used as a `SourceCodeInfo` path segment.
-    pub(crate) const NESTED_TYPE: u32 = 3;
-    /// Also used as a `SourceCodeInfo` path segment.
-    pub(crate) const ENUM_TYPE: u32 = 4;
-    /// Also used as a `SourceCodeInfo` path segment.
-    pub(crate) const ONEOF_DECL: u32 = 8;
-
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("DescriptorProto", || {
             let mut out = Self::default();
@@ -192,17 +161,17 @@ impl<'a> DescriptorProto<'a> {
                 let f = f?;
                 match f.field_number.as_u32() {
                     1 => out.name = Some(expect_str(&f)?),
-                    Self::FIELD => out
+                    2 => out
                         .field
                         .push(FieldDescriptorProto::parse(expect_len(&f)?)?),
-                    Self::NESTED_TYPE => out
+                    3 => out
                         .nested_type
                         .push(DescriptorProto::parse(expect_len(&f)?)?),
-                    Self::ENUM_TYPE => out
+                    4 => out
                         .enum_type
                         .push(EnumDescriptorProto::parse(expect_len(&f)?)?),
                     7 => out.options = Some(MessageOptions::parse(expect_len(&f)?)?),
-                    Self::ONEOF_DECL => out
+                    8 => out
                         .oneof_decl
                         .push(OneofDescriptorProto::parse(expect_len(&f)?)?),
                     _ => {}
@@ -228,11 +197,6 @@ pub struct FieldDescriptorProto<'a> {
 }
 
 impl<'a> FieldDescriptorProto<'a> {
-    /// Also used when mapping a bad enum value to [`Error::UnexpectedField`].
-    pub(crate) const LABEL: u32 = 4;
-    /// Also used when mapping a bad enum value to [`Error::UnexpectedField`].
-    pub(crate) const TYPE: u32 = 5;
-
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("FieldDescriptorProto", || {
             let mut out = Self::default();
@@ -241,8 +205,8 @@ impl<'a> FieldDescriptorProto<'a> {
                 match field.field_number.as_u32() {
                     1 => out.name = Some(expect_str(&field)?),
                     3 => out.number = Some(expect_i32(&field)?),
-                    Self::LABEL => out.label = Some(expect_i32(&field)?),
-                    Self::TYPE => out.type_ = Some(expect_i32(&field)?),
+                    4 => out.label = Some(expect_i32(&field)?),
+                    5 => out.type_ = Some(expect_i32(&field)?),
                     6 => out.type_name = Some(expect_str(&field)?),
                     7 => out.default_value = Some(expect_str(&field)?),
                     8 => out.options = Some(FieldOptions::parse(expect_len(&field)?)?),
@@ -286,9 +250,6 @@ pub struct EnumDescriptorProto<'a> {
 }
 
 impl<'a> EnumDescriptorProto<'a> {
-    /// Also used as a `SourceCodeInfo` path segment.
-    pub(crate) const VALUE: u32 = 2;
-
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("EnumDescriptorProto", || {
             let mut out = Self::default();
@@ -296,7 +257,7 @@ impl<'a> EnumDescriptorProto<'a> {
                 let field = field?;
                 match field.field_number.as_u32() {
                     1 => out.name = Some(expect_str(&field)?),
-                    Self::VALUE => out
+                    2 => out
                         .value
                         .push(EnumValueDescriptorProto::parse(expect_len(&field)?)?),
                     3 => out.options = Some(EnumOptions::parse(expect_len(&field)?)?),
@@ -479,43 +440,20 @@ pub struct FeatureSet {
 }
 
 impl FeatureSet {
-    /// Also used when mapping a bad enum value to [`Error::UnexpectedField`].
-    pub(crate) const FIELD_PRESENCE: u32 = 1;
-    /// Also used when mapping a bad enum value to [`Error::UnexpectedField`].
-    pub(crate) const ENUM_TYPE: u32 = 2;
-    /// Also used when mapping a bad enum value to [`Error::UnexpectedField`].
-    pub(crate) const REPEATED_FIELD_ENCODING: u32 = 3;
-    /// Also used when mapping a bad enum value to [`Error::UnexpectedField`].
-    pub(crate) const UTF8_VALIDATION: u32 = 4;
-    /// Also used when mapping a bad enum value to [`Error::UnexpectedField`].
-    pub(crate) const MESSAGE_ENCODING: u32 = 5;
-    /// Also used when mapping a bad enum value to [`Error::UnexpectedField`].
-    pub(crate) const JSON_FORMAT: u32 = 6;
-    /// Also used when mapping a bad enum value to [`Error::UnexpectedField`].
-    pub(crate) const ENFORCE_NAMING_STYLE: u32 = 7;
-    /// Also used when mapping a bad enum value to [`Error::UnexpectedField`].
-    pub(crate) const DEFAULT_SYMBOL_VISIBILITY: u32 = 8;
-
     pub fn parse(bytes: &[u8]) -> Result<Self> {
         while_decoding("FeatureSet", || {
             let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 match field.field_number.as_u32() {
-                    Self::FIELD_PRESENCE => out.field_presence = Some(expect_i32(&field)?),
-                    Self::ENUM_TYPE => out.enum_type = Some(expect_i32(&field)?),
-                    Self::REPEATED_FIELD_ENCODING => {
-                        out.repeated_field_encoding = Some(expect_i32(&field)?)
-                    }
-                    Self::UTF8_VALIDATION => out.utf8_validation = Some(expect_i32(&field)?),
-                    Self::MESSAGE_ENCODING => out.message_encoding = Some(expect_i32(&field)?),
-                    Self::JSON_FORMAT => out.json_format = Some(expect_i32(&field)?),
-                    Self::ENFORCE_NAMING_STYLE => {
-                        out.enforce_naming_style = Some(expect_i32(&field)?)
-                    }
-                    Self::DEFAULT_SYMBOL_VISIBILITY => {
-                        out.default_symbol_visibility = Some(expect_i32(&field)?)
-                    }
+                    1 => out.field_presence = Some(expect_i32(&field)?),
+                    2 => out.enum_type = Some(expect_i32(&field)?),
+                    3 => out.repeated_field_encoding = Some(expect_i32(&field)?),
+                    4 => out.utf8_validation = Some(expect_i32(&field)?),
+                    5 => out.message_encoding = Some(expect_i32(&field)?),
+                    6 => out.json_format = Some(expect_i32(&field)?),
+                    7 => out.enforce_naming_style = Some(expect_i32(&field)?),
+                    8 => out.default_symbol_visibility = Some(expect_i32(&field)?),
                     // Language-specific FeatureSet extensions (e.g. 1000+) are LEN.
                     _ => {}
                 }
