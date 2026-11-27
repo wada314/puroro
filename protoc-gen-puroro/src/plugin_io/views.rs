@@ -11,10 +11,12 @@
 //! Wire field numbers are written as literals next to the field they fill or
 //! emit. This is not `puroro-types` generated code (bootstrap cycle).
 
+use crate::descriptor::features::FeatureSet;
 use crate::error::{Error, Result};
 use ::protobuf_core::{
     AsRefExtProtobuf, Field, FieldNumber, FieldValue, ReadExtVarint, WriteExtProtobuf,
 };
+use ::std::convert::TryFrom;
 use ::std::str;
 
 fn while_decoding<T>(message: &'static str, f: impl FnOnce() -> Result<T>) -> Result<T> {
@@ -37,6 +39,11 @@ fn expect_i32(field: &Field<&[u8]>) -> Result<i32> {
         FieldValue::Varint(v) => Ok(v.try_to_int32()?),
         _ => Err(Error::unexpected_field(field.field_number.as_u32())),
     }
+}
+
+fn expect_enum<T: TryFrom<i32>>(field: &Field<&[u8]>) -> Result<T> {
+    T::try_from(expect_i32(field)?)
+        .map_err(|_| Error::unexpected_field(field.field_number.as_u32()))
 }
 
 fn expect_bool(field: &Field<&[u8]>) -> Result<bool> {
@@ -443,19 +450,10 @@ impl EnumOptions {
     }
 }
 
-/// `google.protobuf.FeatureSet` parsed view (owned scalars; no borrow).
-#[derive(Debug, Clone, Default)]
-pub struct FeatureSet {
-    pub field_presence: Option<i32>,
-    pub enum_type: Option<i32>,
-    pub repeated_field_encoding: Option<i32>,
-    pub utf8_validation: Option<i32>,
-    pub message_encoding: Option<i32>,
-    pub json_format: Option<i32>,
-    pub enforce_naming_style: Option<i32>,
-    pub default_symbol_visibility: Option<i32>,
-}
-
+/// Wire parse for [`FeatureSet`] (`google.protobuf.FeatureSet`).
+///
+/// Members are the same Rust enums as the descriptor IR; unknown or
+/// unspecified (`0`) wire values fail at parse time.
 impl FeatureSet {
     pub fn parse(bytes: &[u8]) -> Result<Self> {
         while_decoding("FeatureSet", || {
@@ -463,14 +461,14 @@ impl FeatureSet {
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 match field.field_number.as_u32() {
-                    1 => out.field_presence = Some(expect_i32(&field)?),
-                    2 => out.enum_type = Some(expect_i32(&field)?),
-                    3 => out.repeated_field_encoding = Some(expect_i32(&field)?),
-                    4 => out.utf8_validation = Some(expect_i32(&field)?),
-                    5 => out.message_encoding = Some(expect_i32(&field)?),
-                    6 => out.json_format = Some(expect_i32(&field)?),
-                    7 => out.enforce_naming_style = Some(expect_i32(&field)?),
-                    8 => out.default_symbol_visibility = Some(expect_i32(&field)?),
+                    1 => out.field_presence = Some(expect_enum(&field)?),
+                    2 => out.enum_type = Some(expect_enum(&field)?),
+                    3 => out.repeated_field_encoding = Some(expect_enum(&field)?),
+                    4 => out.utf8_validation = Some(expect_enum(&field)?),
+                    5 => out.message_encoding = Some(expect_enum(&field)?),
+                    6 => out.json_format = Some(expect_enum(&field)?),
+                    7 => out.enforce_naming_style = Some(expect_enum(&field)?),
+                    8 => out.default_symbol_visibility = Some(expect_enum(&field)?),
                     // Language-specific FeatureSet extensions (e.g. 1000+) are LEN.
                     _ => {}
                 }

@@ -93,12 +93,7 @@ fn decode_file_descriptor(file: &FileDescriptorProto<'_>) -> Result<ProtoFile> {
             enums.push(decode_enum(enumeration)?);
         }
         let features = match &file.options {
-            Some(options) => with_decoding_context("FileOptions", || {
-                Ok(match &options.features {
-                    Some(fs) => decode_feature_set(fs)?,
-                    None => FeatureSet::default(),
-                })
-            })?,
+            Some(options) => options.features.unwrap_or_default(),
             None => FeatureSet::default(),
         };
         let source_locations = match &file.source_code_info {
@@ -204,10 +199,7 @@ fn decode_message_options(options: &views::MessageOptions) -> Result<DecodedMess
                 CHILD_PARSE_OPTION_NUMBER,
             )?
             .unwrap_or_default(),
-            features: match &options.features {
-                Some(fs) => decode_feature_set(fs)?,
-                None => FeatureSet::default(),
-            },
+            features: options.features.unwrap_or_default(),
         })
     })
 }
@@ -262,10 +254,7 @@ struct DecodedFieldOptions {
 fn decode_field_options(options: &views::FieldOptions) -> Result<DecodedFieldOptions> {
     with_decoding_context("FieldOptions", || {
         Ok(DecodedFieldOptions {
-            features: match &options.features {
-                Some(fs) => decode_feature_set(fs)?,
-                None => FeatureSet::default(),
-            },
+            features: options.features.unwrap_or_default(),
             packed: options.packed,
             string_layout: enum_from_i32_opt(
                 options.extension_enum(STRING_LAYOUT_OPTION_NUMBER),
@@ -283,22 +272,6 @@ fn decode_field_options(options: &views::FieldOptions) -> Result<DecodedFieldOpt
                 options.extension_enum(CHILD_PARSE_OPTION_NUMBER),
                 CHILD_PARSE_OPTION_NUMBER,
             )?,
-        })
-    })
-}
-
-fn decode_feature_set(features: &views::FeatureSet) -> Result<FeatureSet> {
-    with_decoding_context("FeatureSet", || {
-        Ok(FeatureSet {
-            // FeatureSet field numbers 1..=8.
-            field_presence: enum_from_i32_opt(features.field_presence, 1)?,
-            enum_type: enum_from_i32_opt(features.enum_type, 2)?,
-            repeated_field_encoding: enum_from_i32_opt(features.repeated_field_encoding, 3)?,
-            utf8_validation: enum_from_i32_opt(features.utf8_validation, 4)?,
-            message_encoding: enum_from_i32_opt(features.message_encoding, 5)?,
-            json_format: enum_from_i32_opt(features.json_format, 6)?,
-            enforce_naming_style: enum_from_i32_opt(features.enforce_naming_style, 7)?,
-            default_symbol_visibility: enum_from_i32_opt(features.default_symbol_visibility, 8)?,
         })
     })
 }
@@ -343,10 +316,7 @@ struct DecodedEnumOptions {
 fn decode_enum_options(options: &views::EnumOptions) -> Result<DecodedEnumOptions> {
     with_decoding_context("EnumOptions", || {
         Ok(DecodedEnumOptions {
-            features: match &options.features {
-                Some(fs) => decode_feature_set(fs)?,
-                None => FeatureSet::default(),
-            },
+            features: options.features.unwrap_or_default(),
             enum_repr: enum_from_i32_opt(
                 options.extension_enum(ENUM_REPR_OPTION_NUMBER),
                 ENUM_REPR_OPTION_NUMBER,
