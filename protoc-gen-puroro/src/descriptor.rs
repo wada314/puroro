@@ -4,6 +4,11 @@
 //! faithful reproduction of every `google.protobuf.*` field. Message/enum type
 //! names are absolute [`ProtoFqn`] values; resolve the full graph into
 //! [`crate::resolved::FileSet`] via [`crate::resolved::resolve`].
+//!
+//! Wire decoding stays in [`crate::plugin_io`] (field numbers in
+//! [`crate::plugin_io::fields`]). This module is the structured IR the rest of
+//! the generator consumes; it is not `puroro-types` generated descriptor
+//! messages (that crate is a plugin output, not a plugin input).
 
 pub mod features;
 mod proto_fqn;

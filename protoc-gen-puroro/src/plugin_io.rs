@@ -2,7 +2,20 @@
 //!
 //! Decodes only the fields needed to build [`crate::descriptor::CodegenRequest`],
 //! and encodes a minimal [`CodeGeneratorResponse`].
+//!
+//! Wire field numbers live in [`fields`] (named after the official descriptor /
+//! plugin messages). The structured IR is [`crate::descriptor`]; this module
+//! stays a hand-written subset decoder and does not use `puroro-types`
+//! generated messages (bootstrap cycle).
 
+pub(crate) mod fields;
+
+use self::fields::{
+    code_generator_request, code_generator_response, descriptor_proto, enum_descriptor_proto,
+    enum_options, enum_value_descriptor_proto, feature_set, field_descriptor_proto, field_options,
+    file_descriptor_proto, file_descriptor_set, file_options, message_options,
+    oneof_descriptor_proto, source_code_info,
+};
 use crate::descriptor::features::FeatureSet;
 use crate::descriptor::{
     BYTES_LAYOUT_OPTION_NUMBER, BytesLayout, CHILD_PARSE_OPTION_NUMBER, ChildParse, CodegenMeta,
@@ -72,29 +85,30 @@ impl CodeGeneratorResponse {
         let mut out = Vec::new();
 
         if let Some(error) = &self.error {
-            // optional string error = 1;
-            write_string_field(&mut out, 1, error)?;
+            write_string_field(&mut out, code_generator_response::ERROR, error)?;
         }
         if self.supported_features != 0 {
-            // optional uint64 supported_features = 2;
-            write_uint64_field(&mut out, 2, self.supported_features)?;
+            write_uint64_field(
+                &mut out,
+                code_generator_response::SUPPORTED_FEATURES,
+                self.supported_features,
+            )?;
         }
         if let Some(edition) = self.minimum_edition {
-            // optional int32 minimum_edition = 3;
-            write_int32_field(&mut out, 3, edition)?;
+            write_int32_field(&mut out, code_generator_response::MINIMUM_EDITION, edition)?;
         }
         if let Some(edition) = self.maximum_edition {
-            // optional int32 maximum_edition = 4;
-            write_int32_field(&mut out, 4, edition)?;
+            write_int32_field(&mut out, code_generator_response::MAXIMUM_EDITION, edition)?;
         }
         for file in &self.files {
             let mut nested = Vec::new();
-            // CodeGeneratorResponse.File.name = 1;
-            write_string_field(&mut nested, 1, &file.name)?;
-            // CodeGeneratorResponse.File.content = 15;
-            write_string_field(&mut nested, 15, &file.content)?;
-            // repeated File file = 15;
-            write_len_field(&mut out, 15, &nested)?;
+            write_string_field(&mut nested, code_generator_response::file::NAME, &file.name)?;
+            write_string_field(
+                &mut nested,
+                code_generator_response::file::CONTENT,
+                &file.content,
+            )?;
+            write_len_field(&mut out, code_generator_response::FILE, &nested)?;
         }
 
         Ok(out)
@@ -112,18 +126,15 @@ pub fn decode_request(bytes: &[u8]) -> Result<CodegenRequest> {
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
             match field.field_number.as_u32() {
-                // repeated string file_to_generate = 1;
-                1 => file_to_generate.push(expect_string(&field)?),
-                // optional string parameter = 2;
-                2 => parameter = Some(expect_string(&field)?),
-                // optional Version compiler_version = 3; (ignored)
-                // repeated FileDescriptorProto proto_file = 15;
-                15 => {
+                code_generator_request::FILE_TO_GENERATE => {
+                    file_to_generate.push(expect_string(&field)?)
+                }
+                code_generator_request::PARAMETER => parameter = Some(expect_string(&field)?),
+                code_generator_request::PROTO_FILE => {
                     let raw = expect_len(&field)?.to_vec();
                     proto_files.push(decode_file_descriptor(&raw)?);
                     proto_file_raw.push(raw);
                 }
-                // repeated FileDescriptorProto source_file_descriptors = 17; (ignored)
                 _ => {}
             }
         }
@@ -146,8 +157,7 @@ pub fn decode_request(bytes: &[u8]) -> Result<CodegenRequest> {
 pub fn encode_file_descriptor_set(proto_file_raw: &[Vec<u8>]) -> Result<Vec<u8>> {
     let mut out = Vec::new();
     for body in proto_file_raw {
-        // repeated FileDescriptorProto file = 1;
-        write_len_field(&mut out, 1, body)?;
+        write_len_field(&mut out, file_descriptor_set::FILE, body)?;
     }
     Ok(out)
 }
@@ -167,24 +177,25 @@ fn decode_file_descriptor(bytes: &[u8]) -> Result<ProtoFile> {
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
             match field.field_number.as_u32() {
-                // optional string name = 1; // file name, relative to root of source tree
-                1 => name = expect_string(&field)?,
-                // optional string package = 2; // e.g. "foo", "foo.bar", etc.
-                2 => package = expect_string(&field)?,
-                // repeated string dependency = 3;
-                3 => dependency.push(expect_string(&field)?),
-                // repeated DescriptorProto message_type = 4;
-                4 => messages.push(decode_descriptor(expect_len(&field)?)?),
-                // repeated EnumDescriptorProto enum_type = 5;
-                5 => enums.push(decode_enum(expect_len(&field)?)?),
-                // optional FileOptions options = 8;
-                8 => features = decode_options_features("FileOptions", 50, expect_len(&field)?)?,
-                // optional SourceCodeInfo source_code_info = 9;
-                9 => source_locations = decode_source_code_info(expect_len(&field)?)?,
-                // optional string syntax = 12;
-                12 => syntax_raw = Some(expect_string(&field)?),
-                // optional Edition edition = 14;
-                14 => edition_raw = Some(expect_int32(&field)?),
+                file_descriptor_proto::NAME => name = expect_string(&field)?,
+                file_descriptor_proto::PACKAGE => package = expect_string(&field)?,
+                file_descriptor_proto::DEPENDENCY => dependency.push(expect_string(&field)?),
+                file_descriptor_proto::MESSAGE_TYPE => {
+                    messages.push(decode_descriptor(expect_len(&field)?)?)
+                }
+                file_descriptor_proto::ENUM_TYPE => enums.push(decode_enum(expect_len(&field)?)?),
+                file_descriptor_proto::OPTIONS => {
+                    features = decode_options_features(
+                        "FileOptions",
+                        file_options::FEATURES,
+                        expect_len(&field)?,
+                    )?
+                }
+                file_descriptor_proto::SOURCE_CODE_INFO => {
+                    source_locations = decode_source_code_info(expect_len(&field)?)?
+                }
+                file_descriptor_proto::SYNTAX => syntax_raw = Some(expect_string(&field)?),
+                file_descriptor_proto::EDITION => edition_raw = Some(expect_int32(&field)?),
                 _ => {}
             }
         }
@@ -241,24 +252,20 @@ fn decode_descriptor(bytes: &[u8]) -> Result<MessageDesc> {
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
             match field.field_number.as_u32() {
-                // optional string name = 1;
-                1 => name = expect_string(&field)?,
-                // repeated FieldDescriptorProto field = 2;
-                2 => fields.push(decode_field(expect_len(&field)?)?),
-                // repeated DescriptorProto nested_type = 3;
-                3 => nested_messages.push(decode_descriptor(expect_len(&field)?)?),
-                // repeated EnumDescriptorProto enum_type = 4;
-                4 => nested_enums.push(decode_enum(expect_len(&field)?)?),
-                // optional MessageOptions options = 7;
-                7 => {
+                descriptor_proto::NAME => name = expect_string(&field)?,
+                descriptor_proto::FIELD => fields.push(decode_field(expect_len(&field)?)?),
+                descriptor_proto::NESTED_TYPE => {
+                    nested_messages.push(decode_descriptor(expect_len(&field)?)?)
+                }
+                descriptor_proto::ENUM_TYPE => nested_enums.push(decode_enum(expect_len(&field)?)?),
+                descriptor_proto::OPTIONS => {
                     let decoded = decode_message_options(expect_len(&field)?)?;
                     map_entry = decoded.map_entry;
                     unknown_fields = decoded.unknown_fields;
                     child_parse = decoded.child_parse;
                     features = decoded.features;
                 }
-                // repeated OneofDescriptorProto oneof_decl = 8;
-                8 => oneofs.push(decode_oneof(expect_len(&field)?)?),
+                descriptor_proto::ONEOF_DECL => oneofs.push(decode_oneof(expect_len(&field)?)?),
                 _ => {}
             }
         }
@@ -296,14 +303,11 @@ fn decode_message_options(bytes: &[u8]) -> Result<DecodedMessageOptions> {
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
             match field.field_number.as_u32() {
-                // optional bool map_entry = 7;
-                7 => map_entry = expect_bool(&field)?,
-                // optional FeatureSet features = 12;
-                12 => features = decode_feature_set(expect_len(&field)?)?,
+                message_options::MAP_ENTRY => map_entry = expect_bool(&field)?,
+                message_options::FEATURES => features = decode_feature_set(expect_len(&field)?)?,
                 UNKNOWN_FIELDS_OPTION_NUMBER => {
                     unknown_fields = expect_enum(&field)?;
                 }
-                // extend MessageOptions { optional ChildParse message_child_parse = 51404; }
                 CHILD_PARSE_OPTION_NUMBER => {
                     child_parse = expect_enum(&field)?;
                 }
@@ -339,20 +343,17 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
             match field.field_number.as_u32() {
-                // optional string name = 1;
-                1 => name = expect_string(&field)?,
-                // optional int32 number = 3;
-                3 => number = expect_int32(&field)?,
-                // optional Label label = 4;
-                4 => label = expect_enum(&field)?,
-                // optional Type type = 5;
-                5 => type_ = expect_enum(&field)?,
-                // optional string type_name = 6;
-                6 => type_name = Some(ProtoFqn::parse(expect_string(&field)?)),
-                // optional string default_value = 7;
-                7 => default_value = Some(expect_string(&field)?),
-                // optional FieldOptions options = 8;
-                8 => {
+                field_descriptor_proto::NAME => name = expect_string(&field)?,
+                field_descriptor_proto::NUMBER => number = expect_int32(&field)?,
+                field_descriptor_proto::LABEL => label = expect_enum(&field)?,
+                field_descriptor_proto::TYPE => type_ = expect_enum(&field)?,
+                field_descriptor_proto::TYPE_NAME => {
+                    type_name = Some(ProtoFqn::parse(expect_string(&field)?))
+                }
+                field_descriptor_proto::DEFAULT_VALUE => {
+                    default_value = Some(expect_string(&field)?)
+                }
+                field_descriptor_proto::OPTIONS => {
                     let decoded = decode_field_options(expect_len(&field)?)?;
                     features = decoded.features;
                     packed = decoded.packed;
@@ -361,10 +362,8 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
                     message_layout = decoded.message_layout;
                     child_parse = decoded.child_parse;
                 }
-                // optional int32 oneof_index = 9;
-                9 => oneof_index = Some(expect_int32(&field)?),
-                // optional bool proto3_optional = 17;
-                17 => proto3_optional = expect_bool(&field)?,
+                field_descriptor_proto::ONEOF_INDEX => oneof_index = Some(expect_int32(&field)?),
+                field_descriptor_proto::PROTO3_OPTIONAL => proto3_optional = expect_bool(&field)?,
                 _ => {}
             }
         }
@@ -432,23 +431,17 @@ fn decode_field_options(bytes: &[u8]) -> Result<DecodedFieldOptions> {
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
             match field.field_number.as_u32() {
-                // optional bool packed = 2;
-                2 => packed = Some(expect_bool(&field)?),
-                // optional FeatureSet features = 21;
-                21 => features = decode_feature_set(expect_len(&field)?)?,
-                // extend FieldOptions { optional StringLayout string_layout = 51400; }
+                field_options::PACKED => packed = Some(expect_bool(&field)?),
+                field_options::FEATURES => features = decode_feature_set(expect_len(&field)?)?,
                 STRING_LAYOUT_OPTION_NUMBER => {
                     string_layout = Some(expect_enum(&field)?);
                 }
-                // extend FieldOptions { optional BytesLayout bytes_layout = 51401; }
                 BYTES_LAYOUT_OPTION_NUMBER => {
                     bytes_layout = Some(expect_enum(&field)?);
                 }
-                // extend FieldOptions { optional MessageLayout message_layout = 51402; }
                 MESSAGE_LAYOUT_OPTION_NUMBER => {
                     message_layout = Some(expect_enum(&field)?);
                 }
-                // extend FieldOptions { optional ChildParse child_parse = 51404; }
                 CHILD_PARSE_OPTION_NUMBER => {
                     child_parse = Some(expect_enum(&field)?);
                 }
@@ -472,22 +465,24 @@ fn decode_feature_set(bytes: &[u8]) -> Result<FeatureSet> {
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
             match field.field_number.as_u32() {
-                // optional FieldPresence field_presence = 1;
-                1 => features.field_presence = Some(expect_enum(&field)?),
-                // optional EnumType enum_type = 2;
-                2 => features.enum_type = Some(expect_enum(&field)?),
-                // optional RepeatedFieldEncoding repeated_field_encoding = 3;
-                3 => features.repeated_field_encoding = Some(expect_enum(&field)?),
-                // optional Utf8Validation utf8_validation = 4;
-                4 => features.utf8_validation = Some(expect_enum(&field)?),
-                // optional MessageEncoding message_encoding = 5;
-                5 => features.message_encoding = Some(expect_enum(&field)?),
-                // optional JsonFormat json_format = 6;
-                6 => features.json_format = Some(expect_enum(&field)?),
-                // optional EnforceNamingStyle enforce_naming_style = 7;
-                7 => features.enforce_naming_style = Some(expect_enum(&field)?),
-                // optional DefaultSymbolVisibility default_symbol_visibility = 8;
-                8 => features.default_symbol_visibility = Some(expect_enum(&field)?),
+                feature_set::FIELD_PRESENCE => features.field_presence = Some(expect_enum(&field)?),
+                feature_set::ENUM_TYPE => features.enum_type = Some(expect_enum(&field)?),
+                feature_set::REPEATED_FIELD_ENCODING => {
+                    features.repeated_field_encoding = Some(expect_enum(&field)?)
+                }
+                feature_set::UTF8_VALIDATION => {
+                    features.utf8_validation = Some(expect_enum(&field)?)
+                }
+                feature_set::MESSAGE_ENCODING => {
+                    features.message_encoding = Some(expect_enum(&field)?)
+                }
+                feature_set::JSON_FORMAT => features.json_format = Some(expect_enum(&field)?),
+                feature_set::ENFORCE_NAMING_STYLE => {
+                    features.enforce_naming_style = Some(expect_enum(&field)?)
+                }
+                feature_set::DEFAULT_SYMBOL_VISIBILITY => {
+                    features.default_symbol_visibility = Some(expect_enum(&field)?)
+                }
                 // Language-specific FeatureSet extensions (e.g. 1000+) are LEN.
                 _ => {}
             }
@@ -501,8 +496,7 @@ fn decode_oneof(bytes: &[u8]) -> Result<OneofDesc> {
         let mut name = String::new();
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
-            // optional string name = 1;
-            if field.field_number.as_u32() == 1 {
+            if field.field_number.as_u32() == oneof_descriptor_proto::NAME {
                 name = expect_string(&field)?;
             }
         }
@@ -522,12 +516,11 @@ fn decode_enum(bytes: &[u8]) -> Result<EnumDesc> {
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
             match field.field_number.as_u32() {
-                // optional string name = 1;
-                1 => name = expect_string(&field)?,
-                // repeated EnumValueDescriptorProto value = 2;
-                2 => values.push(decode_enum_value(expect_len(&field)?)?),
-                // optional EnumOptions options = 3;
-                3 => {
+                enum_descriptor_proto::NAME => name = expect_string(&field)?,
+                enum_descriptor_proto::VALUE => {
+                    values.push(decode_enum_value(expect_len(&field)?)?)
+                }
+                enum_descriptor_proto::OPTIONS => {
                     let decoded = decode_enum_options(expect_len(&field)?)?;
                     features = decoded.features;
                     enum_repr = decoded.enum_repr;
@@ -558,9 +551,7 @@ fn decode_enum_options(bytes: &[u8]) -> Result<DecodedEnumOptions> {
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
             match field.field_number.as_u32() {
-                // optional FeatureSet features = 7;
-                7 => features = decode_feature_set(expect_len(&field)?)?,
-                // extend EnumOptions { optional EnumRepr enum_repr = 51405; }
+                enum_options::FEATURES => features = decode_feature_set(expect_len(&field)?)?,
                 ENUM_REPR_OPTION_NUMBER => {
                     enum_repr = expect_enum(&field)?;
                 }
@@ -581,10 +572,8 @@ fn decode_enum_value(bytes: &[u8]) -> Result<EnumValueDesc> {
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
             match field.field_number.as_u32() {
-                // optional string name = 1;
-                1 => name = expect_string(&field)?,
-                // optional int32 number = 2;
-                2 => number = expect_int32(&field)?,
+                enum_value_descriptor_proto::NAME => name = expect_string(&field)?,
+                enum_value_descriptor_proto::NUMBER => number = expect_int32(&field)?,
                 _ => {}
             }
         }
@@ -607,8 +596,7 @@ fn decode_source_code_info(bytes: &[u8]) -> Result<Vec<SourceLocation>> {
         let mut locations = Vec::new();
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
-            // repeated Location location = 1;
-            if field.field_number.as_u32() == 1
+            if field.field_number.as_u32() == source_code_info::LOCATION
                 && let Some(loc) = decode_source_location(expect_len(&field)?)?
             {
                 locations.push(loc);
@@ -626,14 +614,13 @@ fn decode_source_location(bytes: &[u8]) -> Result<Option<SourceLocation>> {
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
             match field.field_number.as_u32() {
-                // repeated int32 path = 1 [packed = true];
-                1 => path.extend(expect_int32s(&field)?),
-                // repeated int32 span = 2 [packed = true]; (ignored)
-                // optional string leading_comments = 3;
-                3 => leading = Some(expect_string(&field)?),
-                // optional string trailing_comments = 4;
-                4 => trailing = Some(expect_string(&field)?),
-                // repeated string leading_detached_comments = 6; (ignored)
+                source_code_info::location::PATH => path.extend(expect_int32s(&field)?),
+                source_code_info::location::LEADING_COMMENTS => {
+                    leading = Some(expect_string(&field)?)
+                }
+                source_code_info::location::TRAILING_COMMENTS => {
+                    trailing = Some(expect_string(&field)?)
+                }
                 _ => {}
             }
         }
@@ -668,26 +655,27 @@ fn expect_int32s(field: &Field<&[u8]>) -> Result<Vec<i32>> {
 /// Only whole-declaration paths are used (message / field / enum / value /
 /// oneof). Deeper paths (name, type, number, …) are ignored.
 fn attach_source_comments(file: &mut ProtoFile, locations: &[SourceLocation]) {
+    // SourceCodeInfo paths store descriptor field numbers as `int32`.
+    let message_type = file_descriptor_proto::MESSAGE_TYPE as i32;
+    let enum_type = file_descriptor_proto::ENUM_TYPE as i32;
     for loc in locations {
         match loc.path.as_slice() {
-            // FileDescriptorProto.message_type = 4
-            [4, mi] => {
+            [m, mi] if *m == message_type => {
                 if let Some(message) = index_mut(&mut file.messages, *mi) {
                     message.comments.merge(loc.comments.clone());
                 }
             }
-            [4, mi, rest @ ..] => {
+            [m, mi, rest @ ..] if *m == message_type => {
                 if let Some(message) = index_mut(&mut file.messages, *mi) {
                     attach_message_comments(message, rest, &loc.comments);
                 }
             }
-            // FileDescriptorProto.enum_type = 5
-            [5, ei] => {
+            [e, ei] if *e == enum_type => {
                 if let Some(enumeration) = index_mut(&mut file.enums, *ei) {
                     enumeration.comments.merge(loc.comments.clone());
                 }
             }
-            [5, ei, rest @ ..] => {
+            [e, ei, rest @ ..] if *e == enum_type => {
                 if let Some(enumeration) = index_mut(&mut file.enums, *ei) {
                     attach_enum_comments(enumeration, rest, &loc.comments);
                 }
@@ -698,38 +686,38 @@ fn attach_source_comments(file: &mut ProtoFile, locations: &[SourceLocation]) {
 }
 
 fn attach_message_comments(message: &mut MessageDesc, path: &[i32], comments: &Comments) {
+    let field_path = descriptor_proto::FIELD as i32;
+    let nested_type_path = descriptor_proto::NESTED_TYPE as i32;
+    let enum_type_path = descriptor_proto::ENUM_TYPE as i32;
+    let oneof_decl_path = descriptor_proto::ONEOF_DECL as i32;
     match path {
         [] => message.comments.merge(comments.clone()),
-        // DescriptorProto.field = 2
-        [2, fi] => {
-            if let Some(field) = index_mut(&mut message.fields, *fi) {
-                field.comments.merge(comments.clone());
+        [f, fi] if *f == field_path => {
+            if let Some(desc) = index_mut(&mut message.fields, *fi) {
+                desc.comments.merge(comments.clone());
             }
         }
-        // DescriptorProto.nested_type = 3
-        [3, ni] => {
+        [n, ni] if *n == nested_type_path => {
             if let Some(nested) = index_mut(&mut message.nested_messages, *ni) {
                 nested.comments.merge(comments.clone());
             }
         }
-        [3, ni, rest @ ..] => {
+        [n, ni, rest @ ..] if *n == nested_type_path => {
             if let Some(nested) = index_mut(&mut message.nested_messages, *ni) {
                 attach_message_comments(nested, rest, comments);
             }
         }
-        // DescriptorProto.enum_type = 4
-        [4, ei] => {
+        [e, ei] if *e == enum_type_path => {
             if let Some(enumeration) = index_mut(&mut message.nested_enums, *ei) {
                 enumeration.comments.merge(comments.clone());
             }
         }
-        [4, ei, rest @ ..] => {
+        [e, ei, rest @ ..] if *e == enum_type_path => {
             if let Some(enumeration) = index_mut(&mut message.nested_enums, *ei) {
                 attach_enum_comments(enumeration, rest, comments);
             }
         }
-        // DescriptorProto.oneof_decl = 8
-        [8, oi] => {
+        [o, oi] if *o == oneof_decl_path => {
             if let Some(oneof) = index_mut(&mut message.oneofs, *oi) {
                 oneof.comments.merge(comments.clone());
             }
@@ -739,12 +727,12 @@ fn attach_message_comments(message: &mut MessageDesc, path: &[i32], comments: &C
 }
 
 fn attach_enum_comments(enumeration: &mut EnumDesc, path: &[i32], comments: &Comments) {
+    let value_path = enum_descriptor_proto::VALUE as i32;
     match path {
         [] => enumeration.comments.merge(comments.clone()),
-        // EnumDescriptorProto.value = 2
-        [2, vi] => {
-            if let Some(value) = index_mut(&mut enumeration.values, *vi) {
-                value.comments.merge(comments.clone());
+        [v, vi] if *v == value_path => {
+            if let Some(desc) = index_mut(&mut enumeration.values, *vi) {
+                desc.comments.merge(comments.clone());
             }
         }
         _ => {}
@@ -1330,16 +1318,17 @@ mod tests {
         let mut contents = Vec::new();
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field.unwrap();
-            // repeated File file = 15;
-            if field.field_number.as_u32() == 15 {
+            if field.field_number.as_u32() == code_generator_response::FILE {
                 let nested = expect_len(&field).unwrap();
                 for inner in AsRefExtProtobuf::read_protobuf_fields(&nested) {
                     let inner = inner.unwrap();
                     match inner.field_number.as_u32() {
-                        // optional string name = 1;
-                        1 => names.push(expect_string(&inner).unwrap()),
-                        // optional string content = 15;
-                        15 => contents.push(expect_string(&inner).unwrap()),
+                        code_generator_response::file::NAME => {
+                            names.push(expect_string(&inner).unwrap())
+                        }
+                        code_generator_response::file::CONTENT => {
+                            contents.push(expect_string(&inner).unwrap())
+                        }
                         _ => {}
                     }
                 }
