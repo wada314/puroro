@@ -4,18 +4,17 @@
 //! and encodes a minimal [`CodeGeneratorResponse`].
 //!
 //! Decode walks wire bytes through [`views`] (`FileDescriptorProto::name()`, …) —
-//! thin wrappers that look up a field number via `protobuf-core`. Encode still
-//! uses [`fields`] constants. The structured IR is [`crate::descriptor`]; this
-//! module does not use `puroro-types` generated messages (bootstrap cycle).
+//! thin wrappers that look up a field number via `protobuf-core`. Field numbers
+//! live as associated constants on those wrappers (and on the encode types
+//! below). The structured IR is [`crate::descriptor`]; this module does not use
+//! `puroro-types` generated messages (bootstrap cycle).
 
-pub mod fields;
 pub mod views;
 
-use self::fields::{code_generator_response, file_descriptor_set};
 use self::views::{
     CodeGeneratorRequest as CodeGeneratorRequestView, DescriptorProto, EnumDescriptorProto,
-    EnumValueDescriptorProto, FieldDescriptorProto, FileDescriptorProto, OneofDescriptorProto,
-    SourceCodeInfo,
+    EnumValueDescriptorProto, FieldDescriptorProto, FileDescriptorProto, FileDescriptorSet,
+    OneofDescriptorProto, SourceCodeInfo,
 };
 use crate::descriptor::features::FeatureSet;
 use crate::descriptor::{
@@ -49,6 +48,13 @@ pub struct ResponseFile {
     pub content: String,
 }
 
+impl ResponseFile {
+    /// `optional string name = 1;`
+    pub(crate) const NAME: u32 = 1;
+    /// `optional string content = 15;`
+    pub(crate) const CONTENT: u32 = 15;
+}
+
 /// Plugin response before wire encoding.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CodeGeneratorResponse {
@@ -60,6 +66,17 @@ pub struct CodeGeneratorResponse {
 }
 
 impl CodeGeneratorResponse {
+    /// `optional string error = 1;`
+    pub(crate) const ERROR: u32 = 1;
+    /// `optional uint64 supported_features = 2;`
+    pub(crate) const SUPPORTED_FEATURES_FIELD: u32 = 2;
+    /// `optional int32 minimum_edition = 3;`
+    pub(crate) const MINIMUM_EDITION_FIELD: u32 = 3;
+    /// `optional int32 maximum_edition = 4;`
+    pub(crate) const MAXIMUM_EDITION_FIELD: u32 = 4;
+    /// `repeated File file = 15;`
+    pub(crate) const FILE: u32 = 15;
+
     fn advertised(error: Option<String>, files: Vec<ResponseFile>) -> Self {
         Self {
             error,
@@ -83,30 +100,26 @@ impl CodeGeneratorResponse {
         let mut out = Vec::new();
 
         if let Some(error) = &self.error {
-            write_string_field(&mut out, code_generator_response::ERROR, error)?;
+            write_string_field(&mut out, Self::ERROR, error)?;
         }
         if self.supported_features != 0 {
             write_uint64_field(
                 &mut out,
-                code_generator_response::SUPPORTED_FEATURES,
+                Self::SUPPORTED_FEATURES_FIELD,
                 self.supported_features,
             )?;
         }
         if let Some(edition) = self.minimum_edition {
-            write_int32_field(&mut out, code_generator_response::MINIMUM_EDITION, edition)?;
+            write_int32_field(&mut out, Self::MINIMUM_EDITION_FIELD, edition)?;
         }
         if let Some(edition) = self.maximum_edition {
-            write_int32_field(&mut out, code_generator_response::MAXIMUM_EDITION, edition)?;
+            write_int32_field(&mut out, Self::MAXIMUM_EDITION_FIELD, edition)?;
         }
         for file in &self.files {
             let mut nested = Vec::new();
-            write_string_field(&mut nested, code_generator_response::file::NAME, &file.name)?;
-            write_string_field(
-                &mut nested,
-                code_generator_response::file::CONTENT,
-                &file.content,
-            )?;
-            write_len_field(&mut out, code_generator_response::FILE, &nested)?;
+            write_string_field(&mut nested, ResponseFile::NAME, &file.name)?;
+            write_string_field(&mut nested, ResponseFile::CONTENT, &file.content)?;
+            write_len_field(&mut out, Self::FILE, &nested)?;
         }
 
         Ok(out)
@@ -148,7 +161,7 @@ pub fn decode_request(bytes: &[u8]) -> Result<CodegenRequest> {
 pub fn encode_file_descriptor_set(proto_file_raw: &[Vec<u8>]) -> Result<Vec<u8>> {
     let mut out = Vec::new();
     for body in proto_file_raw {
-        write_len_field(&mut out, file_descriptor_set::FILE, body)?;
+        write_len_field(&mut out, FileDescriptorSet::FILE, body)?;
     }
     Ok(out)
 }
@@ -1155,17 +1168,13 @@ mod tests {
         let mut contents = Vec::new();
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field.unwrap();
-            if field.field_number.as_u32() == code_generator_response::FILE {
+            if field.field_number.as_u32() == CodeGeneratorResponse::FILE {
                 let nested = expect_len(&field).unwrap();
                 for inner in AsRefExtProtobuf::read_protobuf_fields(&nested) {
                     let inner = inner.unwrap();
                     match inner.field_number.as_u32() {
-                        code_generator_response::file::NAME => {
-                            names.push(expect_string(&inner).unwrap())
-                        }
-                        code_generator_response::file::CONTENT => {
-                            contents.push(expect_string(&inner).unwrap())
-                        }
+                        ResponseFile::NAME => names.push(expect_string(&inner).unwrap()),
+                        ResponseFile::CONTENT => contents.push(expect_string(&inner).unwrap()),
                         _ => {}
                     }
                 }

@@ -1,9 +1,10 @@
 //! Thin wire views over `descriptor.proto` / `plugin.proto` message bytes.
 //!
 //! Each type wraps a message LEN body (`&[u8]`) and exposes named getters that
-//! look up a field number via [`protobuf_core::AsRefExtProtobuf`]. This is not
-//! `puroro-types` generated code (bootstrap cycle); it is a hand-written subset
-//! of the official field layout for the plugin decoder.
+//! look up a field number via [`protobuf_core::AsRefExtProtobuf`]. Field numbers
+//! are `pub(crate)` associated constants on the same type (for example
+//! `FileDescriptorProto::NAME`). This is not `puroro-types` generated code
+//! (bootstrap cycle); it is a hand-written subset of the official field layout.
 //!
 //! Singular getters are last-wins. Wrong wire types for a requested field are
 //! errors; other fields are ignored.
@@ -123,6 +124,15 @@ mod raw {
     }
 }
 
+/// `google.protobuf.FileDescriptorSet` wire numbers (encode helper).
+#[derive(Debug, Clone, Copy)]
+pub struct FileDescriptorSet;
+
+impl FileDescriptorSet {
+    /// `repeated FileDescriptorProto file = 1;`
+    pub(crate) const FILE: u32 = 1;
+}
+
 /// `google.protobuf.compiler.CodeGeneratorRequest` wire view.
 #[derive(Debug, Clone, Copy)]
 pub struct CodeGeneratorRequest<'a> {
@@ -130,9 +140,9 @@ pub struct CodeGeneratorRequest<'a> {
 }
 
 impl<'a> CodeGeneratorRequest<'a> {
-    pub const FILE_TO_GENERATE: u32 = 1;
-    pub const PARAMETER: u32 = 2;
-    pub const PROTO_FILE: u32 = 15;
+    pub(crate) const FILE_TO_GENERATE: u32 = 1;
+    pub(crate) const PARAMETER: u32 = 2;
+    pub(crate) const PROTO_FILE: u32 = 15;
 
     pub fn new(bytes: &'a [u8]) -> Self {
         Self { bytes }
@@ -166,15 +176,15 @@ pub struct FileDescriptorProto<'a> {
 }
 
 impl<'a> FileDescriptorProto<'a> {
-    pub const NAME: u32 = 1;
-    pub const PACKAGE: u32 = 2;
-    pub const DEPENDENCY: u32 = 3;
-    pub const MESSAGE_TYPE: u32 = 4;
-    pub const ENUM_TYPE: u32 = 5;
-    pub const OPTIONS: u32 = 8;
-    pub const SOURCE_CODE_INFO: u32 = 9;
-    pub const SYNTAX: u32 = 12;
-    pub const EDITION: u32 = 14;
+    pub(crate) const NAME: u32 = 1;
+    pub(crate) const PACKAGE: u32 = 2;
+    pub(crate) const DEPENDENCY: u32 = 3;
+    pub(crate) const MESSAGE_TYPE: u32 = 4;
+    pub(crate) const ENUM_TYPE: u32 = 5;
+    pub(crate) const OPTIONS: u32 = 8;
+    pub(crate) const SOURCE_CODE_INFO: u32 = 9;
+    pub(crate) const SYNTAX: u32 = 12;
+    pub(crate) const EDITION: u32 = 14;
 
     pub fn new(bytes: &'a [u8]) -> Self {
         Self { bytes }
@@ -239,12 +249,12 @@ pub struct DescriptorProto<'a> {
 }
 
 impl<'a> DescriptorProto<'a> {
-    pub const NAME: u32 = 1;
-    pub const FIELD: u32 = 2;
-    pub const NESTED_TYPE: u32 = 3;
-    pub const ENUM_TYPE: u32 = 4;
-    pub const OPTIONS: u32 = 7;
-    pub const ONEOF_DECL: u32 = 8;
+    pub(crate) const NAME: u32 = 1;
+    pub(crate) const FIELD: u32 = 2;
+    pub(crate) const NESTED_TYPE: u32 = 3;
+    pub(crate) const ENUM_TYPE: u32 = 4;
+    pub(crate) const OPTIONS: u32 = 7;
+    pub(crate) const ONEOF_DECL: u32 = 8;
 
     pub fn new(bytes: &'a [u8]) -> Self {
         Self { bytes }
@@ -290,15 +300,15 @@ pub struct FieldDescriptorProto<'a> {
 }
 
 impl<'a> FieldDescriptorProto<'a> {
-    pub const NAME: u32 = 1;
-    pub const NUMBER: u32 = 3;
-    pub const LABEL: u32 = 4;
-    pub const TYPE: u32 = 5;
-    pub const TYPE_NAME: u32 = 6;
-    pub const DEFAULT_VALUE: u32 = 7;
-    pub const OPTIONS: u32 = 8;
-    pub const ONEOF_INDEX: u32 = 9;
-    pub const PROTO3_OPTIONAL: u32 = 17;
+    pub(crate) const NAME: u32 = 1;
+    pub(crate) const NUMBER: u32 = 3;
+    pub(crate) const LABEL: u32 = 4;
+    pub(crate) const TYPE: u32 = 5;
+    pub(crate) const TYPE_NAME: u32 = 6;
+    pub(crate) const DEFAULT_VALUE: u32 = 7;
+    pub(crate) const OPTIONS: u32 = 8;
+    pub(crate) const ONEOF_INDEX: u32 = 9;
+    pub(crate) const PROTO3_OPTIONAL: u32 = 17;
 
     pub fn new(bytes: &'a [u8]) -> Self {
         Self { bytes }
@@ -348,7 +358,7 @@ pub struct OneofDescriptorProto<'a> {
 }
 
 impl<'a> OneofDescriptorProto<'a> {
-    pub const NAME: u32 = 1;
+    pub(crate) const NAME: u32 = 1;
 
     pub fn new(bytes: &'a [u8]) -> Self {
         Self { bytes }
@@ -366,9 +376,9 @@ pub struct EnumDescriptorProto<'a> {
 }
 
 impl<'a> EnumDescriptorProto<'a> {
-    pub const NAME: u32 = 1;
-    pub const VALUE: u32 = 2;
-    pub const OPTIONS: u32 = 3;
+    pub(crate) const NAME: u32 = 1;
+    pub(crate) const VALUE: u32 = 2;
+    pub(crate) const OPTIONS: u32 = 3;
 
     pub fn new(bytes: &'a [u8]) -> Self {
         Self { bytes }
@@ -399,8 +409,8 @@ pub struct EnumValueDescriptorProto<'a> {
 }
 
 impl<'a> EnumValueDescriptorProto<'a> {
-    pub const NAME: u32 = 1;
-    pub const NUMBER: u32 = 2;
+    pub(crate) const NAME: u32 = 1;
+    pub(crate) const NUMBER: u32 = 2;
 
     pub fn new(bytes: &'a [u8]) -> Self {
         Self { bytes }
@@ -422,7 +432,7 @@ pub struct FileOptions<'a> {
 }
 
 impl<'a> FileOptions<'a> {
-    pub const FEATURES: u32 = 50;
+    pub(crate) const FEATURES: u32 = 50;
 
     pub fn new(bytes: &'a [u8]) -> Self {
         Self { bytes }
@@ -440,8 +450,8 @@ pub struct MessageOptions<'a> {
 }
 
 impl<'a> MessageOptions<'a> {
-    pub const MAP_ENTRY: u32 = 7;
-    pub const FEATURES: u32 = 12;
+    pub(crate) const MAP_ENTRY: u32 = 7;
+    pub(crate) const FEATURES: u32 = 12;
 
     pub fn new(bytes: &'a [u8]) -> Self {
         Self { bytes }
@@ -468,8 +478,8 @@ pub struct FieldOptions<'a> {
 }
 
 impl<'a> FieldOptions<'a> {
-    pub const PACKED: u32 = 2;
-    pub const FEATURES: u32 = 21;
+    pub(crate) const PACKED: u32 = 2;
+    pub(crate) const FEATURES: u32 = 21;
 
     pub fn new(bytes: &'a [u8]) -> Self {
         Self { bytes }
@@ -496,7 +506,7 @@ pub struct EnumOptions<'a> {
 }
 
 impl<'a> EnumOptions<'a> {
-    pub const FEATURES: u32 = 7;
+    pub(crate) const FEATURES: u32 = 7;
 
     pub fn new(bytes: &'a [u8]) -> Self {
         Self { bytes }
@@ -519,14 +529,14 @@ pub struct FeatureSet<'a> {
 }
 
 impl<'a> FeatureSet<'a> {
-    pub const FIELD_PRESENCE: u32 = 1;
-    pub const ENUM_TYPE: u32 = 2;
-    pub const REPEATED_FIELD_ENCODING: u32 = 3;
-    pub const UTF8_VALIDATION: u32 = 4;
-    pub const MESSAGE_ENCODING: u32 = 5;
-    pub const JSON_FORMAT: u32 = 6;
-    pub const ENFORCE_NAMING_STYLE: u32 = 7;
-    pub const DEFAULT_SYMBOL_VISIBILITY: u32 = 8;
+    pub(crate) const FIELD_PRESENCE: u32 = 1;
+    pub(crate) const ENUM_TYPE: u32 = 2;
+    pub(crate) const REPEATED_FIELD_ENCODING: u32 = 3;
+    pub(crate) const UTF8_VALIDATION: u32 = 4;
+    pub(crate) const MESSAGE_ENCODING: u32 = 5;
+    pub(crate) const JSON_FORMAT: u32 = 6;
+    pub(crate) const ENFORCE_NAMING_STYLE: u32 = 7;
+    pub(crate) const DEFAULT_SYMBOL_VISIBILITY: u32 = 8;
 
     pub fn new(bytes: &'a [u8]) -> Self {
         Self { bytes }
@@ -572,7 +582,7 @@ pub struct SourceCodeInfo<'a> {
 }
 
 impl<'a> SourceCodeInfo<'a> {
-    pub const LOCATION: u32 = 1;
+    pub(crate) const LOCATION: u32 = 1;
 
     pub fn new(bytes: &'a [u8]) -> Self {
         Self { bytes }
@@ -595,9 +605,9 @@ pub struct SourceCodeInfoLocation<'a> {
 }
 
 impl<'a> SourceCodeInfoLocation<'a> {
-    pub const PATH: u32 = 1;
-    pub const LEADING_COMMENTS: u32 = 3;
-    pub const TRAILING_COMMENTS: u32 = 4;
+    pub(crate) const PATH: u32 = 1;
+    pub(crate) const LEADING_COMMENTS: u32 = 3;
+    pub(crate) const TRAILING_COMMENTS: u32 = 4;
 
     pub fn new(bytes: &'a [u8]) -> Self {
         Self { bytes }
