@@ -3,7 +3,7 @@
 Plan for generating gRPC client/server stubs from `service` / `rpc` definitions,
 wired to the existing `puroro::tonic::PuroroCodec` bridge.
 
-Status: design only. No code yet.
+Status: implementation in progress.
 
 ## Goal
 
@@ -11,15 +11,27 @@ Given a `.proto` with services, `protoc-gen-puroro` emits tonic-compatible
 client and server stubs that encode/decode request and response messages with
 `PuroroCodec`, so users can implement and call gRPC without prost.
 
+Generated stubs use eager messages with the default `Global` allocator.
+`PuroroCodec` / `PuroroDecoder` accept a caller-supplied `U::Alloc` for manual
+tonic wiring; `Default` keeps the `Global` path that tonic-build's
+`Codec::default()` expects.
+
 ## Non-goals (v1)
 
 - HTTP / gRPC-Gateway (`google.api.http`) annotations.
 - A second RPC runtime (e.g. `grpcio`, tower-only without tonic).
 - Lazy message types (`NameLazy`) as RPC request/response types.
-- Custom-allocator decode on the wire path (stubs use `Message::decode` →
-  `Default` → `Global`, same constraint as today's `PuroroCodec`).
+- Generated stubs generic over `A`, or per-request allocator injection into
+  tonic-build's `Codec::default()` call sites (see Future work below).
 - Reflection / gRPC server reflection from generated stubs.
-- Changing the public `PuroroCodec` API (unless a concrete stub gap forces it).
+
+## Future work (deferred from this slice)
+
+- **Stub-side / per-request custom allocator.** Keep generated client/server
+  APIs on `Global`. Later options: leave tonic-build and construct
+  `PuroroCodec::with_alloc(…)`, expose an allocator factory on the generated
+  server, or thread an `A` through stub types. Codec-level `with_alloc` ships
+  with this work for manual wiring only.
 
 ## Current state
 
@@ -203,7 +215,7 @@ the `Method::{client,server}_streaming` flags once `tonic-build` is wired.
 |---|---|
 | `protoc-gen-puroro` | IR, resolve, emit adapter, Cargo.toml writer, opts |
 | Generated crate manifest | optional `tonic` feature + deps when services exist |
-| `puroro` / `PuroroCodec` | Likely unchanged |
+| `puroro` / `PuroroCodec` | Alloc-aware decode (`with_alloc`); `Default` → `Global` |
 | `puroro-rt` | Unchanged |
 | `puroro-codegen-tests` | New fixture |
 | DESIGN / README / IMPLEMENTATION / AGENTS | Spec + status |
@@ -221,14 +233,12 @@ the `Method::{client,server}_streaming` flags once `tonic-build` is wired.
 - **Plugin binary size / deps.** `tonic-build` pulls quote/syn/prost-adjacent
   codegen crates; acceptable for a codegen binary.
 
-## Open questions (decide before Phase 3)
+## Decisions locked for implementation
 
-1. **Auto-emit vs explicit `tonic=true`.** Plan recommends auto-emit +
-   generated-crate feature gate. Explicit opt-in is the conservative alternative
-   if pulling optional `tonic` into every service-bearing manifest is unwanted.
-2. **`build_transport`.** Default on (needs `tonic/transport` in the generated
-   dep). Off reduces deps but drops `connect()`.
-3. **In-process round-trip test in v1** or compile-only fixture first.
+1. **Auto-emit** when services are present; suppress with `tonic=false`.
+   Generated-crate feature `tonic` cfg-gates stub modules.
+2. **`build_transport` on** by default (`connect()` + `tonic/transport`).
+3. **Compile-only fixture first**; in-process round-trip is a follow-up.
 
 ## Success criteria
 

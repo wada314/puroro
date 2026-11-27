@@ -18,7 +18,7 @@
 //! - [`OneofView`] / [`OneofViewMut`] — oneof group views
 //! - [`DecodeError`], [`UnknownField`], [`WireType`]
 //! - Cargo feature `tonic` — optional `puroro::tonic` module (`tonic::codec::Codec`
-//!   adapter for gRPC runtimes; no service stub codegen)
+//!   adapter for gRPC runtimes; service stub codegen lives in `protoc-gen-puroro`)
 //!
 //! Generated crates may opt into a `descriptors` feature that embeds a
 //! `FileDescriptorSet` byte slice (`DESIGN.md` §3.1); that surface lives on
