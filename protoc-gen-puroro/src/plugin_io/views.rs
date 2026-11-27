@@ -1,15 +1,20 @@
-//! Parsed wire views over `descriptor.proto` / `plugin.proto` message bytes.
+//! Wire message structs for `descriptor.proto` / `plugin.proto` subsets.
 //!
-//! [`parse()`](CodeGeneratorRequest::parse) walks each message body once and
-//! mutates a default-initialized open struct. Nested LEN messages are parsed
-//! recursively. Wire field numbers are written as literals next to the field
-//! they fill. This is not `puroro-types` generated code (bootstrap cycle).
+//! Decode: [`parse()`](CodeGeneratorRequest::parse) walks each message body
+//! once and mutates a default-initialized open struct. Nested LEN messages are
+//! parsed recursively. Singular fields are last-wins. Wrong wire types for a
+//! requested field are errors; other fields are ignored.
 //!
-//! Singular fields are last-wins. Wrong wire types for a requested field are
-//! errors; other fields are ignored.
+//! Encode: open structs such as [`CodeGeneratorResponse`] hold owned fields and
+//! write wire bytes from [`encode()`](CodeGeneratorResponse::encode).
+//!
+//! Wire field numbers are written as literals next to the field they fill or
+//! emit. This is not `puroro-types` generated code (bootstrap cycle).
 
 use crate::error::{Error, Result};
-use ::protobuf_core::{AsRefExtProtobuf, Field, FieldNumber, FieldValue, ReadExtVarint};
+use ::protobuf_core::{
+    AsRefExtProtobuf, Field, FieldNumber, FieldValue, ReadExtVarint, WriteExtProtobuf,
+};
 use ::std::str;
 
 fn while_decoding<T>(message: &'static str, f: impl FnOnce() -> Result<T>) -> Result<T> {
@@ -521,4 +526,142 @@ impl<'a> SourceCodeInfoLocation<'a> {
             Ok(out)
         })
     }
+}
+
+/// `google.protobuf.compiler.CodeGeneratorResponse.File` encode view.
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct ResponseFile {
+    pub name: String,
+    pub content: String,
+}
+
+impl ResponseFile {
+    /// Encode this file entry body (`name` / `content` only).
+    pub fn encode(&self) -> Result<Vec<u8>> {
+        let mut out = Vec::new();
+        // optional string name = 1;
+        write_string_field(&mut out, 1, &self.name)?;
+        // optional string content = 15;
+        write_string_field(&mut out, 15, &self.content)?;
+        Ok(out)
+    }
+}
+
+/// `google.protobuf.compiler.CodeGeneratorResponse` encode view.
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct CodeGeneratorResponse {
+    pub error: Option<String>,
+    pub supported_features: u64,
+    pub minimum_edition: Option<i32>,
+    pub maximum_edition: Option<i32>,
+    pub files: Vec<ResponseFile>,
+}
+
+impl CodeGeneratorResponse {
+    fn advertised(error: Option<String>, files: Vec<ResponseFile>) -> Self {
+        Self {
+            error,
+            supported_features: super::SUPPORTED_FEATURES,
+            minimum_edition: Some(super::MINIMUM_EDITION),
+            maximum_edition: Some(super::MAXIMUM_EDITION),
+            files,
+        }
+    }
+
+    pub fn from_files(files: Vec<ResponseFile>) -> Self {
+        Self::advertised(None, files)
+    }
+
+    pub fn from_error(message: impl Into<String>) -> Self {
+        Self::advertised(Some(message.into()), Vec::new())
+    }
+
+    /// Encode this response to `CodeGeneratorResponse` wire bytes.
+    pub fn encode(&self) -> Result<Vec<u8>> {
+        let mut out = Vec::new();
+
+        if let Some(error) = &self.error {
+            // optional string error = 1;
+            write_string_field(&mut out, 1, error)?;
+        }
+        if self.supported_features != 0 {
+            // optional uint64 supported_features = 2;
+            write_uint64_field(&mut out, 2, self.supported_features)?;
+        }
+        if let Some(edition) = self.minimum_edition {
+            // optional int32 minimum_edition = 3;
+            write_int32_field(&mut out, 3, edition)?;
+        }
+        if let Some(edition) = self.maximum_edition {
+            // optional int32 maximum_edition = 4;
+            write_int32_field(&mut out, 4, edition)?;
+        }
+        for file in &self.files {
+            // repeated File file = 15;
+            write_len_field(&mut out, 15, &file.encode()?)?;
+        }
+
+        Ok(out)
+    }
+}
+
+/// `google.protobuf.FileDescriptorSet` encode view over raw file bodies.
+#[derive(Debug, Clone, Default)]
+pub struct FileDescriptorSet<'a> {
+    pub file: Vec<&'a [u8]>,
+}
+
+impl<'a> FileDescriptorSet<'a> {
+    /// Encode as `FileDescriptorSet` wire bytes (`file` = field 1).
+    pub fn encode(&self) -> Result<Vec<u8>> {
+        let mut out = Vec::new();
+        for body in &self.file {
+            // repeated FileDescriptorProto file = 1;
+            write_len_field(&mut out, 1, body)?;
+        }
+        Ok(out)
+    }
+}
+
+trait FieldNumberExt: Sized {
+    fn try_from_u32(value: u32) -> Result<Self>;
+}
+
+impl FieldNumberExt for FieldNumber {
+    fn try_from_u32(value: u32) -> Result<Self> {
+        Self::try_new(value).map_err(|value| {
+            ::protobuf_core::ProtobufError::FieldNumberOutOfRange {
+                value: i64::from(value),
+            }
+            .into()
+        })
+    }
+}
+
+pub(crate) fn write_len_field(out: &mut Vec<u8>, number: u32, value: &[u8]) -> Result<()> {
+    let field = Field::new(FieldNumber::try_from_u32(number)?, FieldValue::Len(value));
+    out.write_protobuf_field(&field)?;
+    Ok(())
+}
+
+pub(crate) fn write_string_field(out: &mut Vec<u8>, number: u32, value: &str) -> Result<()> {
+    write_len_field(out, number, value.as_bytes())
+}
+
+pub(crate) fn write_int32_field(out: &mut Vec<u8>, number: u32, value: i32) -> Result<()> {
+    let field: Field<&[u8]> = Field::new(
+        FieldNumber::try_from_u32(number)?,
+        FieldValue::from_int32(value),
+    );
+    out.write_protobuf_field(&field)?;
+    Ok(())
+}
+
+pub(crate) fn write_uint64_field(out: &mut Vec<u8>, number: u32, value: u64) -> Result<()> {
+    let field: Field<&[u8]> = Field::new(
+        FieldNumber::try_from_u32(number)?,
+        FieldValue::from_uint64(value),
+    );
+    out.write_protobuf_field(&field)?;
+    Ok(())
 }
