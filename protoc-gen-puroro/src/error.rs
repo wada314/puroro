@@ -3,6 +3,7 @@
 use ::protobuf_core::ProtobufError;
 use ::std::io;
 use ::std::result::Result as StdResult;
+use ::std::str::Utf8Error;
 use ::std::string::FromUtf8Error;
 use ::thiserror::Error;
 
@@ -21,9 +22,12 @@ pub enum Error {
         message: Option<&'static str>,
         field_number: u32,
     },
-    /// A length-delimited string was not valid UTF-8.
+    /// A length-delimited string was not valid UTF-8 (owned decode path).
     #[error("invalid UTF-8 in protobuf string: {0}")]
     InvalidUtf8(#[from] FromUtf8Error),
+    /// A length-delimited string was not valid UTF-8 (borrowed view path).
+    #[error("invalid UTF-8 in protobuf string: {0}")]
+    Utf8(#[from] Utf8Error),
     /// Code generation failed because of the input schema or request
     /// (unsupported feature, illegal identifier, missing file, …).
     #[error("codegen error: {0}")]
