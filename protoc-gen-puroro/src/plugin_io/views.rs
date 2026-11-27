@@ -1,8 +1,8 @@
 //! Parsed wire views over `descriptor.proto` / `plugin.proto` message bytes.
 //!
 //! [`parse()`](CodeGeneratorRequest::parse) walks each message body once and
-//! fills public fields. Nested LEN messages are parsed recursively. This is not
-//! `puroro-types` generated code (bootstrap cycle).
+//! mutates a default-initialized open struct. Nested LEN messages are parsed
+//! recursively. This is not `puroro-types` generated code (bootstrap cycle).
 //!
 //! Singular fields are last-wins. Wrong wire types for a requested field are
 //! errors; other fields are ignored.
@@ -76,7 +76,7 @@ impl FileDescriptorSet {
 }
 
 /// `google.protobuf.compiler.CodeGeneratorRequest` parsed view.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct CodeGeneratorRequest<'a> {
     pub file_to_generate: Vec<&'a str>,
     pub parameter: Option<&'a str>,
@@ -90,31 +90,25 @@ impl<'a> CodeGeneratorRequest<'a> {
 
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("CodeGeneratorRequest", || {
-            let mut file_to_generate = Vec::new();
-            let mut parameter = None;
-            let mut proto_file = Vec::new();
+            let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 match field.field_number.as_u32() {
-                    Self::FILE_TO_GENERATE => file_to_generate.push(expect_str(&field)?),
-                    Self::PARAMETER => parameter = Some(expect_str(&field)?),
-                    Self::PROTO_FILE => {
-                        proto_file.push(FileDescriptorProto::parse(expect_len(&field)?)?)
-                    }
+                    Self::FILE_TO_GENERATE => out.file_to_generate.push(expect_str(&field)?),
+                    Self::PARAMETER => out.parameter = Some(expect_str(&field)?),
+                    Self::PROTO_FILE => out
+                        .proto_file
+                        .push(FileDescriptorProto::parse(expect_len(&field)?)?),
                     _ => {}
                 }
             }
-            Ok(Self {
-                file_to_generate,
-                parameter,
-                proto_file,
-            })
+            Ok(out)
         })
     }
 }
 
 /// `google.protobuf.FileDescriptorProto` parsed view.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct FileDescriptorProto<'a> {
     /// Original message body bytes (for `FileDescriptorSet` re-encode).
     pub bytes: &'a [u8],
@@ -142,54 +136,38 @@ impl<'a> FileDescriptorProto<'a> {
 
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("FileDescriptorProto", || {
-            let mut name = None;
-            let mut package = None;
-            let mut dependency = Vec::new();
-            let mut message_type = Vec::new();
-            let mut enum_type = Vec::new();
-            let mut options = None;
-            let mut source_code_info = None;
-            let mut syntax = None;
-            let mut edition = None;
+            let mut out = Self {
+                bytes,
+                ..Self::default()
+            };
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 match field.field_number.as_u32() {
-                    Self::NAME => name = Some(expect_str(&field)?),
-                    Self::PACKAGE => package = Some(expect_str(&field)?),
-                    Self::DEPENDENCY => dependency.push(expect_str(&field)?),
-                    Self::MESSAGE_TYPE => {
-                        message_type.push(DescriptorProto::parse(expect_len(&field)?)?)
-                    }
-                    Self::ENUM_TYPE => {
-                        enum_type.push(EnumDescriptorProto::parse(expect_len(&field)?)?)
-                    }
-                    Self::OPTIONS => options = Some(FileOptions::parse(expect_len(&field)?)?),
+                    Self::NAME => out.name = Some(expect_str(&field)?),
+                    Self::PACKAGE => out.package = Some(expect_str(&field)?),
+                    Self::DEPENDENCY => out.dependency.push(expect_str(&field)?),
+                    Self::MESSAGE_TYPE => out
+                        .message_type
+                        .push(DescriptorProto::parse(expect_len(&field)?)?),
+                    Self::ENUM_TYPE => out
+                        .enum_type
+                        .push(EnumDescriptorProto::parse(expect_len(&field)?)?),
+                    Self::OPTIONS => out.options = Some(FileOptions::parse(expect_len(&field)?)?),
                     Self::SOURCE_CODE_INFO => {
-                        source_code_info = Some(SourceCodeInfo::parse(expect_len(&field)?)?)
+                        out.source_code_info = Some(SourceCodeInfo::parse(expect_len(&field)?)?)
                     }
-                    Self::SYNTAX => syntax = Some(expect_str(&field)?),
-                    Self::EDITION => edition = Some(expect_i32(&field)?),
+                    Self::SYNTAX => out.syntax = Some(expect_str(&field)?),
+                    Self::EDITION => out.edition = Some(expect_i32(&field)?),
                     _ => {}
                 }
             }
-            Ok(Self {
-                bytes,
-                name,
-                package,
-                dependency,
-                message_type,
-                enum_type,
-                options,
-                source_code_info,
-                syntax,
-                edition,
-            })
+            Ok(out)
         })
     }
 }
 
 /// `google.protobuf.DescriptorProto` parsed view.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct DescriptorProto<'a> {
     pub name: Option<&'a str>,
     pub field: Vec<FieldDescriptorProto<'a>>,
@@ -209,40 +187,34 @@ impl<'a> DescriptorProto<'a> {
 
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("DescriptorProto", || {
-            let mut name = None;
-            let mut field = Vec::new();
-            let mut nested_type = Vec::new();
-            let mut enum_type = Vec::new();
-            let mut options = None;
-            let mut oneof_decl = Vec::new();
+            let mut out = Self::default();
             for f in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let f = f?;
                 match f.field_number.as_u32() {
-                    Self::NAME => name = Some(expect_str(&f)?),
-                    Self::FIELD => field.push(FieldDescriptorProto::parse(expect_len(&f)?)?),
-                    Self::NESTED_TYPE => nested_type.push(DescriptorProto::parse(expect_len(&f)?)?),
-                    Self::ENUM_TYPE => enum_type.push(EnumDescriptorProto::parse(expect_len(&f)?)?),
-                    Self::OPTIONS => options = Some(MessageOptions::parse(expect_len(&f)?)?),
-                    Self::ONEOF_DECL => {
-                        oneof_decl.push(OneofDescriptorProto::parse(expect_len(&f)?)?)
-                    }
+                    Self::NAME => out.name = Some(expect_str(&f)?),
+                    Self::FIELD => out
+                        .field
+                        .push(FieldDescriptorProto::parse(expect_len(&f)?)?),
+                    Self::NESTED_TYPE => out
+                        .nested_type
+                        .push(DescriptorProto::parse(expect_len(&f)?)?),
+                    Self::ENUM_TYPE => out
+                        .enum_type
+                        .push(EnumDescriptorProto::parse(expect_len(&f)?)?),
+                    Self::OPTIONS => out.options = Some(MessageOptions::parse(expect_len(&f)?)?),
+                    Self::ONEOF_DECL => out
+                        .oneof_decl
+                        .push(OneofDescriptorProto::parse(expect_len(&f)?)?),
                     _ => {}
                 }
             }
-            Ok(Self {
-                name,
-                field,
-                nested_type,
-                enum_type,
-                options,
-                oneof_decl,
-            })
+            Ok(out)
         })
     }
 }
 
 /// `google.protobuf.FieldDescriptorProto` parsed view.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct FieldDescriptorProto<'a> {
     pub name: Option<&'a str>,
     pub number: Option<i32>,
@@ -268,47 +240,29 @@ impl<'a> FieldDescriptorProto<'a> {
 
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("FieldDescriptorProto", || {
-            let mut name = None;
-            let mut number = None;
-            let mut label = None;
-            let mut type_ = None;
-            let mut type_name = None;
-            let mut default_value = None;
-            let mut options = None;
-            let mut oneof_index = None;
-            let mut proto3_optional = None;
+            let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 match field.field_number.as_u32() {
-                    Self::NAME => name = Some(expect_str(&field)?),
-                    Self::NUMBER => number = Some(expect_i32(&field)?),
-                    Self::LABEL => label = Some(expect_i32(&field)?),
-                    Self::TYPE => type_ = Some(expect_i32(&field)?),
-                    Self::TYPE_NAME => type_name = Some(expect_str(&field)?),
-                    Self::DEFAULT_VALUE => default_value = Some(expect_str(&field)?),
-                    Self::OPTIONS => options = Some(FieldOptions::parse(expect_len(&field)?)?),
-                    Self::ONEOF_INDEX => oneof_index = Some(expect_i32(&field)?),
-                    Self::PROTO3_OPTIONAL => proto3_optional = Some(expect_bool(&field)?),
+                    Self::NAME => out.name = Some(expect_str(&field)?),
+                    Self::NUMBER => out.number = Some(expect_i32(&field)?),
+                    Self::LABEL => out.label = Some(expect_i32(&field)?),
+                    Self::TYPE => out.type_ = Some(expect_i32(&field)?),
+                    Self::TYPE_NAME => out.type_name = Some(expect_str(&field)?),
+                    Self::DEFAULT_VALUE => out.default_value = Some(expect_str(&field)?),
+                    Self::OPTIONS => out.options = Some(FieldOptions::parse(expect_len(&field)?)?),
+                    Self::ONEOF_INDEX => out.oneof_index = Some(expect_i32(&field)?),
+                    Self::PROTO3_OPTIONAL => out.proto3_optional = Some(expect_bool(&field)?),
                     _ => {}
                 }
             }
-            Ok(Self {
-                name,
-                number,
-                label,
-                type_,
-                type_name,
-                default_value,
-                options,
-                oneof_index,
-                proto3_optional,
-            })
+            Ok(out)
         })
     }
 }
 
 /// `google.protobuf.OneofDescriptorProto` parsed view.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct OneofDescriptorProto<'a> {
     pub name: Option<&'a str>,
 }
@@ -318,20 +272,20 @@ impl<'a> OneofDescriptorProto<'a> {
 
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("OneofDescriptorProto", || {
-            let mut name = None;
+            let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 if field.field_number.as_u32() == Self::NAME {
-                    name = Some(expect_str(&field)?);
+                    out.name = Some(expect_str(&field)?);
                 }
             }
-            Ok(Self { name })
+            Ok(out)
         })
     }
 }
 
 /// `google.protobuf.EnumDescriptorProto` parsed view.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct EnumDescriptorProto<'a> {
     pub name: Option<&'a str>,
     pub value: Vec<EnumValueDescriptorProto<'a>>,
@@ -345,31 +299,25 @@ impl<'a> EnumDescriptorProto<'a> {
 
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("EnumDescriptorProto", || {
-            let mut name = None;
-            let mut value = Vec::new();
-            let mut options = None;
+            let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 match field.field_number.as_u32() {
-                    Self::NAME => name = Some(expect_str(&field)?),
-                    Self::VALUE => {
-                        value.push(EnumValueDescriptorProto::parse(expect_len(&field)?)?)
-                    }
-                    Self::OPTIONS => options = Some(EnumOptions::parse(expect_len(&field)?)?),
+                    Self::NAME => out.name = Some(expect_str(&field)?),
+                    Self::VALUE => out
+                        .value
+                        .push(EnumValueDescriptorProto::parse(expect_len(&field)?)?),
+                    Self::OPTIONS => out.options = Some(EnumOptions::parse(expect_len(&field)?)?),
                     _ => {}
                 }
             }
-            Ok(Self {
-                name,
-                value,
-                options,
-            })
+            Ok(out)
         })
     }
 }
 
 /// `google.protobuf.EnumValueDescriptorProto` parsed view.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct EnumValueDescriptorProto<'a> {
     pub name: Option<&'a str>,
     pub number: Option<i32>,
@@ -381,23 +329,22 @@ impl<'a> EnumValueDescriptorProto<'a> {
 
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("EnumValueDescriptorProto", || {
-            let mut name = None;
-            let mut number = None;
+            let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 match field.field_number.as_u32() {
-                    Self::NAME => name = Some(expect_str(&field)?),
-                    Self::NUMBER => number = Some(expect_i32(&field)?),
+                    Self::NAME => out.name = Some(expect_str(&field)?),
+                    Self::NUMBER => out.number = Some(expect_i32(&field)?),
                     _ => {}
                 }
             }
-            Ok(Self { name, number })
+            Ok(out)
         })
     }
 }
 
 /// `google.protobuf.FileOptions` parsed view (subset).
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct FileOptions {
     pub features: Option<FeatureSet>,
 }
@@ -407,20 +354,20 @@ impl FileOptions {
 
     pub fn parse(bytes: &[u8]) -> Result<Self> {
         while_decoding("FileOptions", || {
-            let mut features = None;
+            let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 if field.field_number.as_u32() == Self::FEATURES {
-                    features = Some(FeatureSet::parse(expect_len(&field)?)?);
+                    out.features = Some(FeatureSet::parse(expect_len(&field)?)?);
                 }
             }
-            Ok(Self { features })
+            Ok(out)
         })
     }
 }
 
 /// `google.protobuf.MessageOptions` parsed view (subset + custom enum extensions).
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct MessageOptions {
     pub map_entry: Option<bool>,
     pub features: Option<FeatureSet>,
@@ -434,26 +381,20 @@ impl MessageOptions {
 
     pub fn parse(bytes: &[u8]) -> Result<Self> {
         while_decoding("MessageOptions", || {
-            let mut map_entry = None;
-            let mut features = None;
-            let mut extension_enums = Vec::new();
+            let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 match field.field_number.as_u32() {
-                    Self::MAP_ENTRY => map_entry = Some(expect_bool(&field)?),
-                    Self::FEATURES => features = Some(FeatureSet::parse(expect_len(&field)?)?),
+                    Self::MAP_ENTRY => out.map_entry = Some(expect_bool(&field)?),
+                    Self::FEATURES => out.features = Some(FeatureSet::parse(expect_len(&field)?)?),
                     n => {
                         if let FieldValue::Varint(_) = &field.value {
-                            record_extension_enum(&mut extension_enums, n, expect_i32(&field)?);
+                            record_extension_enum(&mut out.extension_enums, n, expect_i32(&field)?);
                         }
                     }
                 }
             }
-            Ok(Self {
-                map_entry,
-                features,
-                extension_enums,
-            })
+            Ok(out)
         })
     }
 
@@ -467,7 +408,7 @@ impl MessageOptions {
 }
 
 /// `google.protobuf.FieldOptions` parsed view (subset + custom enum extensions).
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct FieldOptions {
     pub packed: Option<bool>,
     pub features: Option<FeatureSet>,
@@ -481,26 +422,20 @@ impl FieldOptions {
 
     pub fn parse(bytes: &[u8]) -> Result<Self> {
         while_decoding("FieldOptions", || {
-            let mut packed = None;
-            let mut features = None;
-            let mut extension_enums = Vec::new();
+            let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 match field.field_number.as_u32() {
-                    Self::PACKED => packed = Some(expect_bool(&field)?),
-                    Self::FEATURES => features = Some(FeatureSet::parse(expect_len(&field)?)?),
+                    Self::PACKED => out.packed = Some(expect_bool(&field)?),
+                    Self::FEATURES => out.features = Some(FeatureSet::parse(expect_len(&field)?)?),
                     n => {
                         if let FieldValue::Varint(_) = &field.value {
-                            record_extension_enum(&mut extension_enums, n, expect_i32(&field)?);
+                            record_extension_enum(&mut out.extension_enums, n, expect_i32(&field)?);
                         }
                     }
                 }
             }
-            Ok(Self {
-                packed,
-                features,
-                extension_enums,
-            })
+            Ok(out)
         })
     }
 
@@ -514,7 +449,7 @@ impl FieldOptions {
 }
 
 /// `google.protobuf.EnumOptions` parsed view (subset + custom enum extensions).
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct EnumOptions {
     pub features: Option<FeatureSet>,
     /// Last-wins varint extensions keyed by field number.
@@ -526,23 +461,19 @@ impl EnumOptions {
 
     pub fn parse(bytes: &[u8]) -> Result<Self> {
         while_decoding("EnumOptions", || {
-            let mut features = None;
-            let mut extension_enums = Vec::new();
+            let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 match field.field_number.as_u32() {
-                    Self::FEATURES => features = Some(FeatureSet::parse(expect_len(&field)?)?),
+                    Self::FEATURES => out.features = Some(FeatureSet::parse(expect_len(&field)?)?),
                     n => {
                         if let FieldValue::Varint(_) = &field.value {
-                            record_extension_enum(&mut extension_enums, n, expect_i32(&field)?);
+                            record_extension_enum(&mut out.extension_enums, n, expect_i32(&field)?);
                         }
                     }
                 }
             }
-            Ok(Self {
-                features,
-                extension_enums,
-            })
+            Ok(out)
         })
     }
 
@@ -608,7 +539,7 @@ impl FeatureSet {
 }
 
 /// `google.protobuf.SourceCodeInfo` parsed view.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct SourceCodeInfo<'a> {
     pub location: Vec<SourceCodeInfoLocation<'a>>,
 }
@@ -618,20 +549,21 @@ impl<'a> SourceCodeInfo<'a> {
 
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("SourceCodeInfo", || {
-            let mut location = Vec::new();
+            let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 if field.field_number.as_u32() == Self::LOCATION {
-                    location.push(SourceCodeInfoLocation::parse(expect_len(&field)?)?);
+                    out.location
+                        .push(SourceCodeInfoLocation::parse(expect_len(&field)?)?);
                 }
             }
-            Ok(Self { location })
+            Ok(out)
         })
     }
 }
 
 /// `google.protobuf.SourceCodeInfo.Location` parsed view.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct SourceCodeInfoLocation<'a> {
     pub path: Vec<i32>,
     pub leading_comments: Option<&'a str>,
@@ -645,23 +577,17 @@ impl<'a> SourceCodeInfoLocation<'a> {
 
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         while_decoding("SourceCodeInfo.Location", || {
-            let mut path = Vec::new();
-            let mut leading_comments = None;
-            let mut trailing_comments = None;
+            let mut out = Self::default();
             for field in AsRefExtProtobuf::read_protobuf_fields(bytes) {
                 let field = field?;
                 match field.field_number.as_u32() {
-                    Self::PATH => extend_i32s(&mut path, &field)?,
-                    Self::LEADING_COMMENTS => leading_comments = Some(expect_str(&field)?),
-                    Self::TRAILING_COMMENTS => trailing_comments = Some(expect_str(&field)?),
+                    Self::PATH => extend_i32s(&mut out.path, &field)?,
+                    Self::LEADING_COMMENTS => out.leading_comments = Some(expect_str(&field)?),
+                    Self::TRAILING_COMMENTS => out.trailing_comments = Some(expect_str(&field)?),
                     _ => {}
                 }
             }
-            Ok(Self {
-                path,
-                leading_comments,
-                trailing_comments,
-            })
+            Ok(out)
         })
     }
 }
