@@ -93,7 +93,40 @@ The `[dependencies]` in that `Cargo.toml` are the crates `lib.rs` calls. The plu
 
 By default the plugin emits only the eager message (`Shelf`). Pass `--puroro_opt=lazy=true` (alone or comma-combined with `crate_name=…`) to also emit experimental `ShelfLazy` and to enable `puroro-rt`'s `lazy` feature in the generated `Cargo.toml`. Lazy design is not settled; API and behaviour may change. `(puroro.child_parse) = LAZY` also requires that opt-in. Details: [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing).
 
-### gRPC stubs (tonic)
+## proto2
+
+A proto2 `string` is `&[u8]` unless you pass `--puroro_opt=proto2_utf8=verify`. Combine it with the crate name as `crate_name=bookstore,proto2_utf8=verify`.
+
+## Use the generated crate from another crate
+
+The application crate depends on the generated crate. The path is the `--puroro_out` directory. `Message` and `StringMut` come from that crate's `puroro` module.
+
+```toml
+[dependencies]
+bookstore = { path = "../bookstore" }
+```
+
+`Shelf::new`, `title`, `get`, and `is_set` are methods on `Shelf`. `encode_to_vec`, `decode`, and `set` are methods of traits in `bookstore::puroro`. `title()` returns [`Optional<&str, …>`](https://github.com/wada314/puroro/blob/master/src/optional.rs). That type follows `std::option::Option`: `is_set()` reports whether the field was set, and `get()` returns that value. When `title` is absent, `get()` returns the editions default `"foo"`. `Optional` does not convert to `Option`, because that conversion drops the default. `None` would only record that the field is absent, and `"foo"` would be gone. If the `.proto` file has a field `encode`, call the codec method as `Message::encode(&shelf)`. Another generated crate re-exports the same `puroro` when Cargo resolves one `puroro` version. Import `Message` from one of those crates.
+
+```rust
+use bookstore::demo::Shelf;
+use bookstore::puroro::{Message, StringMut};
+
+let mut shelf = Shelf::new();
+assert!(!shelf.title().is_set());
+assert_eq!(shelf.title().get(), "foo");
+shelf.title_mut().set("Shore");
+assert!(shelf.title().is_set());
+assert_eq!(shelf.title().get(), "Shore");
+
+let bytes = shelf.encode_to_vec();
+let decoded = Shelf::decode(&bytes[..]).unwrap();
+assert_eq!(decoded.title().get(), "Shore");
+```
+
+`Shelf::new()` and `Shelf::decode` use the `Global` allocator. `StringMut` has to be in scope for `set`. Generated messages do not emit `has_title()`. The full accessor table is [DESIGN.md §4](https://github.com/wada314/puroro/blob/master/DESIGN.md#4-generated-code-specification).
+
+## gRPC stubs (tonic)
 
 When a `.proto` file has `service` / `rpc`, the plugin emits cfg-gated tonic
 client and server modules next to the message types. Message bytes go through
@@ -102,7 +135,7 @@ client and server modules next to the message types. Message bytes go through
 which uses the `Global` allocator). The same overview is on
 [`puroro::tonic`](https://docs.rs/puroro/latest/puroro/tonic/index.html) rustdoc.
 
-#### Generate
+### Generate
 
 ```protobuf
 syntax = "proto3";
@@ -126,7 +159,7 @@ Stub emission is on by default when services exist. Pass
 `tonic_server=false` to emit only one side). Option table:
 [`protoc-gen-puroro` README](protoc-gen-puroro/README.md#options-puroro_opt).
 
-#### Depend on the generated crate
+### Depend on the generated crate
 
 Enable the generated crate's optional `tonic` feature (it also turns on
 `puroro/tonic`). Application code typically also depends on `tonic` with
@@ -142,7 +175,7 @@ tokio = { version = "1", features = ["macros", "rt-multi-thread", "net"] }
 Without `features = ["tonic"]`, message types still compile; the
 `{service}_client` / `{service}_server` modules are `cfg`-gated out.
 
-#### Implement and call
+### Implement and call
 
 Paths follow the protobuf package. For `package helloworld` and `service Greeter`:
 
@@ -200,39 +233,6 @@ APIs yet.
 Avoid naming a message so its companion module collides with a stub module
 (for example `message GreeterClient` next to `service Greeter` both want
 `mod greeter_client`).
-
-## proto2
-
-A proto2 `string` is `&[u8]` unless you pass `--puroro_opt=proto2_utf8=verify`. Combine it with the crate name as `crate_name=bookstore,proto2_utf8=verify`.
-
-## Use the generated crate from another crate
-
-The application crate depends on the generated crate. The path is the `--puroro_out` directory. `Message` and `StringMut` come from that crate's `puroro` module.
-
-```toml
-[dependencies]
-bookstore = { path = "../bookstore" }
-```
-
-`Shelf::new`, `title`, `get`, and `is_set` are methods on `Shelf`. `encode_to_vec`, `decode`, and `set` are methods of traits in `bookstore::puroro`. `title()` returns [`Optional<&str, …>`](https://github.com/wada314/puroro/blob/master/src/optional.rs). That type follows `std::option::Option`: `is_set()` reports whether the field was set, and `get()` returns that value. When `title` is absent, `get()` returns the editions default `"foo"`. `Optional` does not convert to `Option`, because that conversion drops the default. `None` would only record that the field is absent, and `"foo"` would be gone. If the `.proto` file has a field `encode`, call the codec method as `Message::encode(&shelf)`. Another generated crate re-exports the same `puroro` when Cargo resolves one `puroro` version. Import `Message` from one of those crates.
-
-```rust
-use bookstore::demo::Shelf;
-use bookstore::puroro::{Message, StringMut};
-
-let mut shelf = Shelf::new();
-assert!(!shelf.title().is_set());
-assert_eq!(shelf.title().get(), "foo");
-shelf.title_mut().set("Shore");
-assert!(shelf.title().is_set());
-assert_eq!(shelf.title().get(), "Shore");
-
-let bytes = shelf.encode_to_vec();
-let decoded = Shelf::decode(&bytes[..]).unwrap();
-assert_eq!(decoded.title().get(), "Shore");
-```
-
-`Shelf::new()` and `Shelf::decode` use the `Global` allocator. `StringMut` has to be in scope for `set`. Generated messages do not emit `has_title()`. The full accessor table is [DESIGN.md §4](https://github.com/wada314/puroro/blob/master/DESIGN.md#4-generated-code-specification).
 
 ## Build the plugin from a checkout
 
