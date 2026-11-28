@@ -7,10 +7,9 @@
 //! # Using gRPC with generated stubs
 //!
 //! `protoc-gen-puroro` emits tonic client/server modules when the `.proto` has
-//! `service` / `rpc`. Those stubs wire this codec via [`Default`] (eager
-//! messages, [`allocator_api2::alloc::Global`]). Enable the generated crate's
-//! `tonic` feature, implement the service trait, then serve or connect with
-//! `tonic`.
+//! `service` / `rpc`. Those stubs wire this codec via [`Default`]
+//! ([`allocator_api2::alloc::Global`]). Enable the generated crate's `tonic`
+//! feature, implement the service trait, then serve or connect with `tonic`.
 //!
 //! Full walkthrough (generate, depend, implement, call):
 //! [puroro README — gRPC stubs (tonic)](https://github.com/wada314/puroro/blob/master/README.md#grpc-stubs-tonic).

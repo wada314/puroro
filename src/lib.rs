@@ -30,7 +30,7 @@
 //!
 //! Generated messages expose proto fields as **inherent methods** on the concrete
 //! type (`title()`, `title_mut()`, `clear_title()`, …). Explicit-presence getters
-//! return [`Optional`]; eager messages do not generate `has_*`. Codec helpers
+//! return [`Optional`]; generated messages do not emit `has_*`. Codec helpers
 //! stay on [`Message`] so proto names do not collide; call them via UFCS when
 //! needed (`Message::validate(&msg)`).
 //!

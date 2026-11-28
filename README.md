@@ -91,7 +91,7 @@ The `[dependencies]` in that `Cargo.toml` are the crates `lib.rs` calls. The plu
 
 ### Experimental lazy aliases
 
-By default the plugin emits only the eager message (`Shelf`). Pass `--puroro_opt=lazy=true` (alone or comma-combined with `crate_name=…`) to also emit experimental `ShelfLazy` and to enable `puroro-rt`'s `lazy` feature in the generated `Cargo.toml`. Lazy design is not settled; API and behaviour may change. `(puroro.child_parse) = LAZY` also requires that opt-in. Details: [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing).
+By default the plugin emits `Shelf`. Pass `--puroro_opt=lazy=true` (alone or comma-combined with `crate_name=…`) to also emit experimental `ShelfLazy` and to enable `puroro-rt`'s `lazy` feature in the generated `Cargo.toml`. Lazy design is not settled; API and behaviour may change. `(puroro.child_parse) = LAZY` also requires that opt-in. Details: [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing).
 
 ### gRPC stubs (tonic)
 
@@ -193,9 +193,9 @@ let reply = client.say_hello(Request::new(req)).await?.into_inner();
 assert_eq!(reply.message(), "Hello world");
 ```
 
-Stubs stay on eager messages with `Global`. Custom decode allocators are available
-on `PuroroCodec` / `PuroroDecoder` for hand-rolled tonic wiring; they are not
-threaded through the generated stub APIs yet.
+Stubs decode into the generated message types with `Global`. Custom decode
+allocators are available on `PuroroCodec` / `PuroroDecoder` for hand-rolled
+tonic wiring; they are not threaded through the generated stub APIs yet.
 
 Avoid naming a message so its companion module collides with a stub module
 (for example `message GreeterClient` next to `service Greeter` both want
@@ -232,7 +232,7 @@ let decoded = Shelf::decode(&bytes[..]).unwrap();
 assert_eq!(decoded.title().get(), "Shore");
 ```
 
-`Shelf::new()` and `Shelf::decode` use the `Global` allocator. `StringMut` has to be in scope for `set`. Eager messages do not generate `has_title()`. The full accessor table is [DESIGN.md §4](https://github.com/wada314/puroro/blob/master/DESIGN.md#4-generated-code-specification).
+`Shelf::new()` and `Shelf::decode` use the `Global` allocator. `StringMut` has to be in scope for `set`. Generated messages do not emit `has_title()`. The full accessor table is [DESIGN.md §4](https://github.com/wada314/puroro/blob/master/DESIGN.md#4-generated-code-specification).
 
 ## Build the plugin from a checkout
 
