@@ -124,7 +124,115 @@ let decoded = Shelf::decode(&bytes[..]).unwrap();
 assert_eq!(decoded.title().get(), "Shore");
 ```
 
-`Shelf::new()` and `Shelf::decode` use the `Global` allocator. `StringMut` has to be in scope for `set`. Eager messages do not generate `has_title()`. The full accessor table is [DESIGN.md §4](https://github.com/wada314/puroro/blob/master/DESIGN.md#4-generated-code-specification).
+`Shelf::new()` and `Shelf::decode` use the `Global` allocator. `StringMut` has to be in scope for `set`. Generated messages do not emit `has_title()`. The full accessor table is [DESIGN.md §4](https://github.com/wada314/puroro/blob/master/DESIGN.md#4-generated-code-specification).
+
+## gRPC stubs (tonic)
+
+When a `.proto` file has `service` / `rpc`, the plugin emits cfg-gated tonic
+client and server modules next to the message types. Message bytes go through
+[`puroro::tonic::PuroroCodec`](https://docs.rs/puroro/latest/puroro/tonic/struct.PuroroCodec.html)
+(Cargo feature `tonic` on this crate; generated stubs construct it via `Default`,
+which uses the `Global` allocator). The same overview is on
+[`puroro::tonic`](https://docs.rs/puroro/latest/puroro/tonic/index.html) rustdoc.
+
+### Generate
+
+```protobuf
+syntax = "proto3";
+package helloworld;
+
+message HelloRequest { string name = 1; }
+message HelloReply { string message = 1; }
+
+service Greeter {
+  rpc SayHello(HelloRequest) returns (HelloReply);
+}
+```
+
+```shell
+mkdir -p greeter
+protoc --puroro_out=greeter --puroro_opt=crate_name=greeter -I . greeter.proto
+```
+
+Stub emission is on by default when services exist. Pass
+`--puroro_opt=tonic=false` to suppress it (or `tonic_client=false` /
+`tonic_server=false` to emit only one side). Option table:
+[`protoc-gen-puroro` README](protoc-gen-puroro/README.md#options-puroro_opt).
+
+### Depend on the generated crate
+
+Enable the generated crate's optional `tonic` feature (it also turns on
+`puroro/tonic`). Application code typically also depends on `tonic` with
+transport:
+
+```toml
+[dependencies]
+greeter = { path = "../greeter", features = ["tonic"] }
+tonic = "0.14"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net"] }
+```
+
+Without `features = ["tonic"]`, message types still compile; the
+`{service}_client` / `{service}_server` modules are `cfg`-gated out.
+
+### Implement and call
+
+Paths follow the protobuf package. For `package helloworld` and `service Greeter`:
+
+```text
+greeter::helloworld::HelloRequest
+greeter::helloworld::greeter_server::{Greeter, GreeterServer}
+greeter::helloworld::greeter_client::GreeterClient
+```
+
+```rust,ignore
+use greeter::helloworld::greeter_server::{Greeter, GreeterServer};
+use greeter::helloworld::{HelloReply, HelloRequest};
+use greeter::puroro::StringMut;
+use tonic::{Request, Response, Status};
+
+struct MyGreeter;
+
+#[tonic::async_trait]
+impl Greeter for MyGreeter {
+    async fn say_hello(
+        &self,
+        request: Request<HelloRequest>,
+    ) -> Result<Response<HelloReply>, Status> {
+        let name = request.into_inner().name().to_owned();
+        let mut reply = HelloReply::new();
+        reply.message_mut().push_str(&format!("Hello {name}"));
+        Ok(Response::new(reply))
+    }
+}
+
+// Server:
+tonic::transport::Server::builder()
+    .add_service(GreeterServer::new(MyGreeter))
+    .serve("127.0.0.1:50051".parse()?)
+    .await?;
+```
+
+```rust,ignore
+use greeter::helloworld::greeter_client::GreeterClient;
+use greeter::helloworld::HelloRequest;
+use greeter::puroro::StringMut;
+use tonic::Request;
+
+let mut client = GreeterClient::connect("http://127.0.0.1:50051").await?;
+let mut req = HelloRequest::new();
+req.name_mut().push_str("world");
+let reply = client.say_hello(Request::new(req)).await?.into_inner();
+assert_eq!(reply.message(), "Hello world");
+```
+
+Custom decode allocators are available on `PuroroCodec` / `PuroroDecoder` for
+hand-rolled tonic wiring; they are not threaded through the generated stub
+APIs yet.
+
+Avoid naming a message so its companion module collides with a stub module
+(for example `message GreeterClient` next to `service Greeter` both want
+`mod greeter_client`).
 
 ## Build the plugin from a checkout
 
@@ -140,7 +248,7 @@ protoc --plugin=protoc-gen-puroro=$PWD/target/debug/protoc-gen-puroro --puroro_o
 
 Open items (not permanent refusals). The full list is [DESIGN.md §8](https://github.com/wada314/puroro/blob/master/DESIGN.md#8-future-work).
 
-- Service / RPC stub codegen: shipped (v1). Plugin emits cfg-gated tonic client/server stubs (`--puroro_opt` / generated-crate feature `tonic`) on `puroro::tonic::PuroroCodec`. Stubs stay on `Global`; per-request custom allocators in stubs are deferred.
+- gRPC stub custom allocator. Stub codegen is shipped (v1); see [gRPC stubs (tonic)](#grpc-stubs-tonic). Per-request / stub-side custom allocators remain deferred.
 - Richer packing for `Any` on well-known types. `Timestamp` ↔ `SystemTime` and `Duration` ↔ `std::time::Duration` helpers already live in [`puroro-types`](puroro-types/).
 - Full runtime reflection / `DynamicMessage` and parsed descriptor object graphs. Light identity (`Message::FULL_NAME`) is always on; encoded `FileDescriptorSet` bytes are an opt-in `descriptors` feature on generated crates (see `DESIGN.md` §3.1). A reflect layer would sit above `puroro-types`, not in this crate.
 - Extensions (`extend` / proto2 extension fields). Deferred; see [DESIGN.md §6.5](https://github.com/wada314/puroro/blob/master/DESIGN.md#65-extensions-not-yet-implemented).

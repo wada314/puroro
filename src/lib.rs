@@ -18,7 +18,9 @@
 //! - [`OneofView`] / [`OneofViewMut`] — oneof group views
 //! - [`DecodeError`], [`UnknownField`], [`WireType`]
 //! - Cargo feature `tonic` — optional `puroro::tonic` module (`tonic::codec::Codec`
-//!   adapter for gRPC runtimes; service stub codegen lives in `protoc-gen-puroro`)
+//!   adapter). Service stub codegen and the user walkthrough live in the
+//!   [gRPC stubs (tonic)](https://github.com/wada314/puroro/blob/master/README.md#grpc-stubs-tonic)
+//!   section of the repository README
 //!
 //! Generated crates may opt into a `descriptors` feature that embeds a
 //! `FileDescriptorSet` byte slice (`DESIGN.md` §3.1); that surface lives on
@@ -28,7 +30,7 @@
 //!
 //! Generated messages expose proto fields as **inherent methods** on the concrete
 //! type (`title()`, `title_mut()`, `clear_title()`, …). Explicit-presence getters
-//! return [`Optional`]; eager messages do not generate `has_*`. Codec helpers
+//! return [`Optional`]; generated messages do not emit `has_*`. Codec helpers
 //! stay on [`Message`] so proto names do not collide; call them via UFCS when
 //! needed (`Message::validate(&msg)`).
 //!

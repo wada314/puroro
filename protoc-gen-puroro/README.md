@@ -27,6 +27,10 @@ Comma-separated `key=value` pairs (a bare `lazy` also works):
 | `tonic_client` | on | Emit `{service}_client` when `tonic` is on |
 | `tonic_server` | on | Emit `{service}_server` when `tonic` is on |
 
+The generate → depend → implement → call walkthrough for those stubs lives in the
+[puroro README — gRPC stubs (tonic)](https://github.com/wada314/puroro/blob/master/README.md#grpc-stubs-tonic)
+(and on docs.rs under [`puroro::tonic`](https://docs.rs/puroro/latest/puroro/tonic/index.html)).
+
 ## Build the plugin from a checkout
 
 This is for people changing puroro. Other users stop at `cargo install`.
