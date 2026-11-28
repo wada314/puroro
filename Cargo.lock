@@ -810,6 +810,7 @@ dependencies = [
  "protoc-gen-puroro",
  "puroro",
  "puroro-rt",
+ "tokio",
  "tonic",
 ]
 

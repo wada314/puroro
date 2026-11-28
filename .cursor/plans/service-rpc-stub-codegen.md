@@ -4,7 +4,8 @@ Plan for generating gRPC client/server stubs from `service` / `rpc` definitions,
 wired to the existing `puroro::tonic::PuroroCodec` bridge.
 
 Status: shipped (v1). Deferred follow-ups: stub-side custom allocator, stub/message
-module-name clash guard, in-process tonic round-trip fixture (see Future work).
+module-name clash guard (see Future work). In-process unary round-trip lives in
+`puroro-codegen-tests` `grpc_helloworld` under `--features tonic`.
 
 ## Goal
 
@@ -43,12 +44,11 @@ tonic wiring; `Default` keeps the `Global` path that tonic-build's
   resolve/emit guard (codegen error naming both entities), or document a naming
   restriction. Leaving clashes to `rustc` alone is weak UX for a plugin.
 
-- **In-process tonic server+client round-trip fixture.** `grpc_helloworld` under
-  `--features tonic` only forces stub modules to compile (`type_name` on
-  `GreeterClient` / `GreeterServer`). That catches missing emit, not handler
-  signature or `PuroroCodec` wiring regressions. A small in-process unary
-  round-trip (implement `Greeter`, serve, call `SayHello`) would be much stronger;
-  optional for v1 once CI runs the compile-only cfg (it does).
+- ~~**In-process tonic server+client round-trip fixture.**~~ Done —
+  `grpc_helloworld` under `--features tonic` binds `TcpIncoming` on loopback,
+  serves `GreeterServer`, and calls `GreeterClient::say_hello` (unary only;
+  streaming RPC returns `unimplemented`). Needs optional `tokio` on the
+  codegen-tests `tonic` feature.
 
 ## Current state
 
@@ -57,7 +57,7 @@ tonic wiring; `Default` keeps the `Global` path that tonic-build's
 | `puroro` feature `tonic` / `PuroroCodec` | Shipped — `with_alloc`; `Default` → `Global` |
 | `FileDescriptorProto.service` + views | Shipped |
 | Resolve / emit tonic stubs | Shipped (v1); clash guard deferred |
-| `grpc_helloworld` fixture | Compile-only under `--features tonic`; round-trip deferred |
+| `grpc_helloworld` fixture | Compile check + unary loopback round-trip under `--features tonic` |
 | DESIGN / README / IMPLEMENTATION | Stub codegen marked shipped (v1) |
 
 Message types already default `A = Global`, so stub signatures can name
