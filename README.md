@@ -93,6 +93,10 @@ The `[dependencies]` in that `Cargo.toml` are the crates `lib.rs` calls. The plu
 
 By default the plugin emits only the eager message (`Shelf`). Pass `--puroro_opt=lazy=true` (alone or comma-combined with `crate_name=…`) to also emit experimental `ShelfLazy` and to enable `puroro-rt`'s `lazy` feature in the generated `Cargo.toml`. Lazy design is not settled; API and behaviour may change. `(puroro.child_parse) = LAZY` also requires that opt-in. Details: [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing).
 
+### gRPC stubs (tonic)
+
+When a `.proto` file has `service` / `rpc`, the plugin emits cfg-gated tonic client and server modules. Enable the generated crate's `tonic` feature, implement the service trait, and serve or connect with `tonic`. Step-by-step: [`protoc-gen-puroro` README — gRPC stubs](protoc-gen-puroro/README.md#grpc-stubs-tonic). The byte codec is [`puroro::tonic::PuroroCodec`](https://docs.rs/puroro/latest/puroro/tonic/struct.PuroroCodec.html) (Cargo feature `tonic` on this crate).
+
 ## proto2
 
 A proto2 `string` is `&[u8]` unless you pass `--puroro_opt=proto2_utf8=verify`. Combine it with the crate name as `crate_name=bookstore,proto2_utf8=verify`.
@@ -140,7 +144,7 @@ protoc --plugin=protoc-gen-puroro=$PWD/target/debug/protoc-gen-puroro --puroro_o
 
 Open items (not permanent refusals). The full list is [DESIGN.md §8](https://github.com/wada314/puroro/blob/master/DESIGN.md#8-future-work).
 
-- Service / RPC stub codegen: shipped (v1). Plugin emits cfg-gated tonic client/server stubs (`--puroro_opt` / generated-crate feature `tonic`) on `puroro::tonic::PuroroCodec`. Stubs stay on `Global`; per-request custom allocators in stubs are deferred.
+- gRPC stub custom allocator. Stub codegen is shipped (v1); see [gRPC stubs (tonic)](#grpc-stubs-tonic). Per-request / stub-side custom allocators remain deferred.
 - Richer packing for `Any` on well-known types. `Timestamp` ↔ `SystemTime` and `Duration` ↔ `std::time::Duration` helpers already live in [`puroro-types`](puroro-types/).
 - Full runtime reflection / `DynamicMessage` and parsed descriptor object graphs. Light identity (`Message::FULL_NAME`) is always on; encoded `FileDescriptorSet` bytes are an opt-in `descriptors` feature on generated crates (see `DESIGN.md` §3.1). A reflect layer would sit above `puroro-types`, not in this crate.
 - Extensions (`extend` / proto2 extension fields). Deferred; see [DESIGN.md §6.5](https://github.com/wada314/puroro/blob/master/DESIGN.md#65-extensions-not-yet-implemented).

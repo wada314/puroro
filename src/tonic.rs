@@ -1,13 +1,30 @@
-//! Optional [`::tonic::codec::Codec`] adapter for [`Message`] types.
+//! Optional [`tonic::codec::Codec`] adapter for [`Message`] types.
 //!
 //! Enabled with the `tonic` Cargo feature. This module does not implement
-//! HTTP/2, gRPC framing, or service/stub codegen — only the byte codec.
+//! HTTP/2, gRPC framing, or service/stub codegen — only the byte codec used by
+//! those layers.
+//!
+//! # Using gRPC with generated stubs
+//!
+//! `protoc-gen-puroro` emits tonic client/server modules when the `.proto` has
+//! `service` / `rpc`. Those stubs wire this codec via [`Default`] (eager
+//! messages, [`allocator_api2::alloc::Global`]). Enable the generated crate's
+//! `tonic` feature, implement the service trait, then serve or connect with
+//! `tonic`.
+//!
+//! Full walkthrough (generate, depend, implement, call):
+//! [protoc-gen-puroro README — gRPC stubs (tonic)](https://github.com/wada314/puroro/blob/master/protoc-gen-puroro/README.md#grpc-stubs-tonic).
+//!
+//! # Custom allocators
 //!
 //! Decode uses [`Message::new_in`] with a caller-supplied allocator (or
-//! [`Default`] for the usual `Global` path). Generated tonic stubs construct
-//! the codec via [`Default`]; pass [`PuroroCodec::with_alloc`] /
+//! [`Default`] for the usual `Global` path). Generated stubs construct the
+//! codec via [`Default`]. Pass [`PuroroCodec::with_alloc`] /
 //! [`PuroroDecoder::with_alloc`] when wiring tonic by hand with a custom
-//! allocator.
+//! allocator; stub APIs do not take a per-request allocator yet.
+//!
+//! [`tonic::codec::Codec`]: https://docs.rs/tonic/latest/tonic/codec/trait.Codec.html
+//! [`allocator_api2::alloc::Global`]: https://docs.rs/allocator-api2/latest/allocator_api2/alloc/struct.Global.html
 
 use ::core::clone::Clone;
 use ::core::default::Default;
@@ -18,14 +35,21 @@ use ::tonic::codec::{BufferSettings, Codec, DecodeBuf, Decoder, EncodeBuf, Encod
 use crate::error::DecodeError;
 use crate::message::Message;
 
-/// A [`Codec`] that implements `application/grpc+proto` via this crate.
+/// A [`tonic::codec::Codec`] that implements `application/grpc+proto` via this crate.
 ///
 /// `T` is the outbound message type; `U` is the inbound message type. For a
 /// unary RPC those are usually the response and request types respectively on
 /// the server side (tonic wires encode/decode that way around the handler).
 ///
+/// Generated `protoc-gen-puroro` stubs use this type through [`Default`]. For
+/// the generate → feature → trait → `Server` / `Client` path, see the
+/// [gRPC stubs walkthrough](https://github.com/wada314/puroro/blob/master/protoc-gen-puroro/README.md#grpc-stubs-tonic).
+///
 /// The decode allocator is cloned for each inbound message. [`Default`]
-/// requires `U::Alloc: Default` (typically [`::allocator_api2::alloc::Global`]).
+/// requires `U::Alloc: Default` (typically [`allocator_api2::alloc::Global`]).
+///
+/// [`tonic::codec::Codec`]: https://docs.rs/tonic/latest/tonic/codec/trait.Codec.html
+/// [`allocator_api2::alloc::Global`]: https://docs.rs/allocator-api2/latest/allocator_api2/alloc/struct.Global.html
 #[derive(Debug, Clone)]
 pub struct PuroroCodec<T, U: Message> {
     decode_alloc: U::Alloc,
@@ -114,7 +138,9 @@ where
     }
 }
 
-/// A [`Encoder`] that knows how to encode `T`.
+/// An [`tonic::codec::Encoder`] that knows how to encode `T`.
+///
+/// [`tonic::codec::Encoder`]: https://docs.rs/tonic/latest/tonic/codec/trait.Encoder.html
 #[derive(Debug, Clone)]
 pub struct PuroroEncoder<T> {
     _pd: PhantomData<T>,
@@ -152,7 +178,9 @@ impl<T: Message> Encoder for PuroroEncoder<T> {
     }
 }
 
-/// A [`Decoder`] that knows how to decode `U`.
+/// A [`tonic::codec::Decoder`] that knows how to decode `U`.
+///
+/// [`tonic::codec::Decoder`]: https://docs.rs/tonic/latest/tonic/codec/trait.Decoder.html
 #[derive(Debug, Clone)]
 pub struct PuroroDecoder<U: Message> {
     alloc: U::Alloc,
