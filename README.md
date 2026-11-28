@@ -95,7 +95,111 @@ By default the plugin emits only the eager message (`Shelf`). Pass `--puroro_opt
 
 ### gRPC stubs (tonic)
 
-When a `.proto` file has `service` / `rpc`, the plugin emits cfg-gated tonic client and server modules. Enable the generated crate's `tonic` feature, implement the service trait, and serve or connect with `tonic`. Step-by-step: [`protoc-gen-puroro` README — gRPC stubs](protoc-gen-puroro/README.md#grpc-stubs-tonic). The byte codec is [`puroro::tonic::PuroroCodec`](https://docs.rs/puroro/latest/puroro/tonic/struct.PuroroCodec.html) (Cargo feature `tonic` on this crate).
+When a `.proto` file has `service` / `rpc`, the plugin emits cfg-gated tonic
+client and server modules next to the message types. Message bytes go through
+[`puroro::tonic::PuroroCodec`](https://docs.rs/puroro/latest/puroro/tonic/struct.PuroroCodec.html)
+(Cargo feature `tonic` on this crate; generated stubs construct it via `Default`,
+which uses the `Global` allocator). The same overview is on
+[`puroro::tonic`](https://docs.rs/puroro/latest/puroro/tonic/index.html) rustdoc.
+
+#### Generate
+
+```protobuf
+syntax = "proto3";
+package helloworld;
+
+message HelloRequest { string name = 1; }
+message HelloReply { string message = 1; }
+
+service Greeter {
+  rpc SayHello(HelloRequest) returns (HelloReply);
+}
+```
+
+```shell
+mkdir -p greeter
+protoc --puroro_out=greeter --puroro_opt=crate_name=greeter -I . greeter.proto
+```
+
+Stub emission is on by default when services exist. Pass
+`--puroro_opt=tonic=false` to suppress it (or `tonic_client=false` /
+`tonic_server=false` to emit only one side). Option table:
+[`protoc-gen-puroro` README](protoc-gen-puroro/README.md#options-puroro_opt).
+
+#### Depend on the generated crate
+
+Enable the generated crate's optional `tonic` feature (it also turns on
+`puroro/tonic`). Application code typically also depends on `tonic` with
+transport:
+
+```toml
+[dependencies]
+greeter = { path = "../greeter", features = ["tonic"] }
+tonic = "0.14"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net"] }
+```
+
+Without `features = ["tonic"]`, message types still compile; the
+`{service}_client` / `{service}_server` modules are `cfg`-gated out.
+
+#### Implement and call
+
+Paths follow the protobuf package. For `package helloworld` and `service Greeter`:
+
+```text
+greeter::helloworld::HelloRequest
+greeter::helloworld::greeter_server::{Greeter, GreeterServer}
+greeter::helloworld::greeter_client::GreeterClient
+```
+
+```rust,ignore
+use greeter::helloworld::greeter_server::{Greeter, GreeterServer};
+use greeter::helloworld::{HelloReply, HelloRequest};
+use greeter::puroro::StringMut;
+use tonic::{Request, Response, Status};
+
+struct MyGreeter;
+
+#[tonic::async_trait]
+impl Greeter for MyGreeter {
+    async fn say_hello(
+        &self,
+        request: Request<HelloRequest>,
+    ) -> Result<Response<HelloReply>, Status> {
+        let name = request.into_inner().name().to_owned();
+        let mut reply = HelloReply::new();
+        reply.message_mut().push_str(&format!("Hello {name}"));
+        Ok(Response::new(reply))
+    }
+}
+
+// Server:
+tonic::transport::Server::builder()
+    .add_service(GreeterServer::new(MyGreeter))
+    .serve("127.0.0.1:50051".parse()?)
+    .await?;
+```
+
+```rust,ignore
+use greeter::helloworld::greeter_client::GreeterClient;
+use greeter::helloworld::HelloRequest;
+use greeter::puroro::StringMut;
+use tonic::Request;
+
+let mut client = GreeterClient::connect("http://127.0.0.1:50051").await?;
+let mut req = HelloRequest::new();
+req.name_mut().push_str("world");
+let reply = client.say_hello(Request::new(req)).await?.into_inner();
+assert_eq!(reply.message(), "Hello world");
+```
+
+Stubs stay on eager messages with `Global`. Custom decode allocators are available
+on `PuroroCodec` / `PuroroDecoder` for hand-rolled tonic wiring; they are not
+threaded through the generated stub APIs yet.
+
+Avoid naming a message so its companion module collides with a stub module
+(for example `message GreeterClient` next to `service Greeter` both want
+`mod greeter_client`).
 
 ## proto2
 

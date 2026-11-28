@@ -13,7 +13,7 @@
 //! `tonic`.
 //!
 //! Full walkthrough (generate, depend, implement, call):
-//! [protoc-gen-puroro README — gRPC stubs (tonic)](https://github.com/wada314/puroro/blob/master/protoc-gen-puroro/README.md#grpc-stubs-tonic).
+//! [puroro README — gRPC stubs (tonic)](https://github.com/wada314/puroro/blob/master/README.md#grpc-stubs-tonic).
 //!
 //! # Custom allocators
 //!
@@ -43,7 +43,7 @@ use crate::message::Message;
 ///
 /// Generated `protoc-gen-puroro` stubs use this type through [`Default`]. For
 /// the generate → feature → trait → `Server` / `Client` path, see the
-/// [gRPC stubs walkthrough](https://github.com/wada314/puroro/blob/master/protoc-gen-puroro/README.md#grpc-stubs-tonic).
+/// [gRPC stubs walkthrough](https://github.com/wada314/puroro/blob/master/README.md#grpc-stubs-tonic).
 ///
 /// The decode allocator is cloned for each inbound message. [`Default`]
 /// requires `U::Alloc: Default` (typically [`allocator_api2::alloc::Global`]).

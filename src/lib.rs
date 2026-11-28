@@ -19,7 +19,8 @@
 //! - [`DecodeError`], [`UnknownField`], [`WireType`]
 //! - Cargo feature `tonic` — optional `puroro::tonic` module (`tonic::codec::Codec`
 //!   adapter). Service stub codegen and the user walkthrough live in the
-//!   [protoc-gen-puroro gRPC stubs section](https://github.com/wada314/puroro/blob/master/protoc-gen-puroro/README.md#grpc-stubs-tonic)
+//!   [gRPC stubs (tonic)](https://github.com/wada314/puroro/blob/master/README.md#grpc-stubs-tonic)
+//!   section of the repository README
 //!
 //! Generated crates may opt into a `descriptors` feature that embeds a
 //! `FileDescriptorSet` byte slice (`DESIGN.md` §3.1); that surface lives on
