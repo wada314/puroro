@@ -46,9 +46,9 @@ tonic wiring; `Default` keeps the `Global` path that tonic-build's
 
 - ~~**In-process tonic server+client round-trip fixture.**~~ Done —
   `grpc_helloworld` under `--features tonic` binds `TcpIncoming` on loopback,
-  serves `GreeterServer`, and calls `GreeterClient::say_hello` (unary only;
-  streaming RPC returns `unimplemented`). Needs optional `tokio` on the
-  codegen-tests `tonic` feature.
+  serves `GreeterServer`, and calls unary `say_hello` plus server-streaming
+  `say_hello_stream`. Needs optional `tokio` on the codegen-tests `tonic`
+  feature.
 
 ## Current state
 
@@ -57,7 +57,7 @@ tonic wiring; `Default` keeps the `Global` path that tonic-build's
 | `puroro` feature `tonic` / `PuroroCodec` | Shipped — `with_alloc`; `Default` → `Global` |
 | `FileDescriptorProto.service` + views | Shipped |
 | Resolve / emit tonic stubs | Shipped (v1); clash guard deferred |
-| `grpc_helloworld` fixture | Compile check + unary loopback round-trip under `--features tonic` |
+| `grpc_helloworld` fixture | Compile check + unary / server-streaming loopback under `--features tonic` |
 | DESIGN / README / IMPLEMENTATION | Stub codegen marked shipped (v1) |
 
 Message types already default `A = Global`, so stub signatures can name
