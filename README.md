@@ -193,9 +193,9 @@ let reply = client.say_hello(Request::new(req)).await?.into_inner();
 assert_eq!(reply.message(), "Hello world");
 ```
 
-Stubs use `Global`. Custom decode allocators are available on `PuroroCodec` /
-`PuroroDecoder` for hand-rolled tonic wiring; they are not threaded through
-the generated stub APIs yet.
+Custom decode allocators are available on `PuroroCodec` / `PuroroDecoder` for
+hand-rolled tonic wiring; they are not threaded through the generated stub
+APIs yet.
 
 Avoid naming a message so its companion module collides with a stub module
 (for example `message GreeterClient` next to `service Greeter` both want

@@ -7,9 +7,10 @@
 //! # Using gRPC with generated stubs
 //!
 //! `protoc-gen-puroro` emits tonic client/server modules when the `.proto` has
-//! `service` / `rpc`. Those stubs wire this codec via [`Default`]
-//! ([`allocator_api2::alloc::Global`]). Enable the generated crate's `tonic`
-//! feature, implement the service trait, then serve or connect with `tonic`.
+//! `service` / `rpc`. Those stubs wire this codec via [`Default`], which uses
+//! the [`allocator_api2::alloc::Global`] allocator. Enable the generated
+//! crate's `tonic` feature, implement the service trait, then serve or
+//! connect with `tonic`.
 //!
 //! Full walkthrough (generate, depend, implement, call):
 //! [puroro README — gRPC stubs (tonic)](https://github.com/wada314/puroro/blob/master/README.md#grpc-stubs-tonic).
@@ -17,10 +18,11 @@
 //! # Custom allocators
 //!
 //! Decode uses [`Message::new_in`] with a caller-supplied allocator (or
-//! [`Default`] for the usual `Global` path). Generated stubs construct the
-//! codec via [`Default`]. Pass [`PuroroCodec::with_alloc`] /
-//! [`PuroroDecoder::with_alloc`] when wiring tonic by hand with a custom
-//! allocator; stub APIs do not take a per-request allocator yet.
+//! [`Default`] for the usual [`allocator_api2::alloc::Global`] allocator).
+//! Generated stubs construct the codec via [`Default`]. Pass
+//! [`PuroroCodec::with_alloc`] / [`PuroroDecoder::with_alloc`] when wiring
+//! tonic by hand with a custom allocator; stub APIs do not take a
+//! per-request allocator yet.
 //!
 //! [`tonic::codec::Codec`]: https://docs.rs/tonic/latest/tonic/codec/trait.Codec.html
 //! [`allocator_api2::alloc::Global`]: https://docs.rs/allocator-api2/latest/allocator_api2/alloc/struct.Global.html
